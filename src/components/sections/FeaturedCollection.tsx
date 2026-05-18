@@ -36,21 +36,15 @@ export function FeaturedCollection() {
         whileInView="visible"
         viewport={{ once: true, margin: "-10% 0px" }}
         role="list"
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 lg:gap-6"
+        className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6"
       >
         {featuredProducts.map((product) => (
           <motion.div
             key={product.id}
             variants={scaleIn}
             role="listitem"
-            className={`${product.span ?? ""} ${
-              product.id === "f2" ? "lg:-mt-8" : ""
-            }`}
           >
-            <ProductCard
-              product={product}
-              aspectRatio={product.aspectRatio ?? "aspect-[3/4]"}
-            />
+            <ProductCard product={product} />
           </motion.div>
         ))}
       </motion.div>
