@@ -1,6 +1,6 @@
 import { useScroll, useTransform, motion } from "framer-motion";
 import { CascadeCards } from "@/components/ui/CascadeCards";
-import { MentionBadge } from "@/components/ui/MentionBadge";
+
 import { Button } from "@/components/ui/Button";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { AnimatedText } from "@/components/ui/AnimatedText";
@@ -73,19 +73,6 @@ export function Hero() {
 
         {/* Cascade Cards — positioned relative to create space */}
         <div className="relative w-full mt-12 md:mt-14">
-          {/* Mention badges positioned relative to this container */}
-          <div className="absolute -top-6 left-[2%] z-30 hidden sm:block">
-            <MentionBadge handle="@aurora" delay={0} dark={true} style={{}} />
-          </div>
-          <div className="absolute -top-2 right-[5%] z-30 hidden sm:block">
-            <MentionBadge
-              handle="@editorial"
-              delay={0.9}
-              dark={false}
-              style={{}}
-            />
-          </div>
-
           <CascadeCards products={heroProducts} />
         </div>
 
