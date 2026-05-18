@@ -9,7 +9,6 @@ import { heroProducts } from "@/data/products";
 export function Hero() {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 600], [0, -100]);
-  const opacity = useTransform(scrollY, [0, 450], [1, 0]);
 
   return (
     <section
@@ -41,7 +40,7 @@ export function Hero() {
       </div>
 
       <motion.div
-        style={{ y, opacity }}
+        style={{ y }}
         className="relative z-10 flex flex-col items-center text-center w-full max-w-6xl mx-auto px-6"
       >
         {/* Eyebrow */}
@@ -133,22 +132,7 @@ export function Hero() {
         </motion.div>
       </motion.div>
 
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.8, duration: 0.8 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
-      >
-        <span className="text-[#ABABAB] text-[10px] tracking-[0.2em] uppercase font-medium">
-          Scroll
-        </span>
-        <motion.div
-          animate={{ scaleY: [0, 1, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-          className="w-[1px] h-8 bg-[#ABABAB] origin-top"
-        />
-      </motion.div>
+
     </section>
   );
 }
