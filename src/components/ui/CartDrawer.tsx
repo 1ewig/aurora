@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/hooks/useCartStore";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { drawerSlide } from "@/animations/variants";
 
@@ -85,7 +86,7 @@ export function CartDrawer() {
                       className="flex gap-4"
                     >
                       <div className="w-20 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-[#F7F7F5]">
-                        <img
+                        <OptimizedImage
                           src={item.image}
                           alt={item.name}
                           className="w-full h-full object-cover"

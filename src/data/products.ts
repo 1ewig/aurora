@@ -27,7 +27,7 @@ export const heroProducts: Product[] = [
     category: "Outerwear",
     price: 1290,
     badge: "New",
-    image: "/images/hero-product-1.jpg",
+    image: "/images/hero-product-1.webp",
     altText: "Ivory cream wool overcoat on seamless white background",
   },
   {
@@ -35,7 +35,7 @@ export const heroProducts: Product[] = [
     name: "Camel Cashmere Turtleneck",
     category: "Knitwear",
     price: 485,
-    image: "/images/hero-product-2.jpg",
+    image: "/images/hero-product-2.webp",
     altText: "Camel cashmere turtleneck sweater folded on marble surface",
   },
   {
@@ -44,7 +44,7 @@ export const heroProducts: Product[] = [
     category: "Outerwear",
     price: 890,
     badge: "Limited",
-    image: "/images/hero-product-3.jpg",
+    image: "/images/hero-product-3.webp",
     altText: "Ecru linen blazer on ghost mannequin with side lighting",
   },
   {
@@ -52,7 +52,7 @@ export const heroProducts: Product[] = [
     name: "Charcoal Wide-Leg Trousers",
     category: "Trousers",
     price: 395,
-    image: "/images/hero-product-4.jpg",
+    image: "/images/hero-product-4.webp",
     altText: "Charcoal wide-leg tailored trousers styled with white shirt",
   },
   {
@@ -61,7 +61,7 @@ export const heroProducts: Product[] = [
     category: "Dresses",
     price: 720,
     badge: "New",
-    image: "/images/hero-product-5.jpg",
+    image: "/images/hero-product-5.webp",
     altText: "Champagne gold silk slip dress hanging on brass rail",
   },
 ];
@@ -73,7 +73,7 @@ export const featuredProducts: Product[] = [
     category: "Outerwear",
     price: 1290,
     badge: "New",
-    image: "/images/hero-product-1.jpg",
+    image: "/images/hero-product-1.webp",
     altText: "Ivory cream wool overcoat",
     span: "lg:col-span-2",
     aspectRatio: "aspect-[3/4]",
@@ -84,7 +84,7 @@ export const featuredProducts: Product[] = [
     category: "Outerwear",
     price: 890,
     badge: "Limited",
-    image: "/images/hero-product-3.jpg",
+    image: "/images/hero-product-3.webp",
     altText: "Ecru linen blazer",
     span: "lg:col-span-1",
     aspectRatio: "aspect-square",
@@ -95,7 +95,7 @@ export const featuredProducts: Product[] = [
     category: "Dresses",
     price: 720,
     badge: "New",
-    image: "/images/hero-product-5.jpg",
+    image: "/images/hero-product-5.webp",
     altText: "Champagne silk slip dress",
     span: "lg:col-span-2",
     aspectRatio: "aspect-[3/4]",
@@ -108,7 +108,7 @@ export const allProducts: Product[] = [
     name: "Camel Wrap Coat",
     category: "Outerwear",
     price: 1150,
-    image: "/images/camel-wrap-coat.jpg",
+    image: "/images/camel-wrap-coat.webp",
     altText: "Camel wrap coat",
   },
   {
@@ -117,7 +117,7 @@ export const allProducts: Product[] = [
     category: "Outerwear",
     price: 1390,
     badge: "Limited",
-    image: "/images/ebony-wool-overcoat.jpg",
+    image: "/images/ebony-wool-overcoat.webp",
     altText: "Ebony wool overcoat with peak lapels",
   },
   {
@@ -125,7 +125,7 @@ export const allProducts: Product[] = [
     name: "Silk Scarf in Amber",
     category: "Accessories",
     price: 195,
-    image: "/images/silk-scarf-amber.jpg",
+    image: "/images/silk-scarf-amber.webp",
     altText: "Silk scarf in amber gold",
   },
   {
@@ -133,7 +133,7 @@ export const allProducts: Product[] = [
     name: "Charcoal Merino Crewneck",
     category: "Knitwear",
     price: 325,
-    image: "/images/charcoal-merino-crewneck.jpg",
+    image: "/images/charcoal-merino-crewneck.webp",
     altText: "Charcoal merino wool crewneck sweater",
   },
   {
@@ -141,7 +141,7 @@ export const allProducts: Product[] = [
     name: "Black Tailored Trousers",
     category: "Trousers",
     price: 450,
-    image: "/images/black-tailored-trousers.jpg",
+    image: "/images/black-tailored-trousers.webp",
     altText: "Black tailored dress trousers",
   },
   {
@@ -150,7 +150,7 @@ export const allProducts: Product[] = [
     category: "Dresses",
     price: 890,
     badge: "New",
-    image: "/images/emerald-velvet-midi-dress.jpg",
+    image: "/images/emerald-velvet-midi-dress.webp",
     altText: "Emerald green velvet midi dress",
   },
   {
@@ -158,7 +158,7 @@ export const allProducts: Product[] = [
     name: "Leather Belt in Oak",
     category: "Accessories",
     price: 240,
-    image: "/images/leather-belt-oak.jpg",
+    image: "/images/leather-belt-oak.webp",
     altText: "Oak brown leather belt with brass buckle",
   },
   {
@@ -166,7 +166,7 @@ export const allProducts: Product[] = [
     name: "Navy Wool Peacoat",
     category: "Outerwear",
     price: 980,
-    image: "/images/navy-wool-peacoat.jpg",
+    image: "/images/navy-wool-peacoat.webp",
     altText: "Navy blue wool peacoat",
   },
   {
@@ -175,7 +175,7 @@ export const allProducts: Product[] = [
     category: "Knitwear",
     price: 520,
     badge: "New",
-    image: "/images/ivory-cashmere-cardigan.jpg",
+    image: "/images/ivory-cashmere-cardigan.webp",
     altText: "Ivory cashmere cardigan",
   },
 ];

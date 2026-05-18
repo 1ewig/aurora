@@ -1,34 +1,35 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 const slides = [
   {
-    src: "/images/lookbook-1.jpg",
+    src: "/images/lookbook-1.webp",
     alt: "Woman in tailored cream overcoat walking through European cobblestone street at golden hour",
     caption: "Look 01 — The Overcoat",
   },
   {
-    src: "/images/lookbook-2.jpg",
+    src: "/images/lookbook-2.webp",
     alt: "Female model in all-white minimalist look in brutalist concrete architecture",
     caption: "Look 02 — The White Study",
   },
   {
-    src: "/images/lookbook-3.jpg",
+    src: "/images/lookbook-3.webp",
     alt: "Model in earth-tone outfit in a mid-century modern interior",
     caption: "Look 03 — The Interior",
   },
   {
-    src: "/images/lookbook-4.jpg",
+    src: "/images/lookbook-4.webp",
     alt: "Solitary figure in charcoal coat in a misty forest at dawn",
     caption: "Look 04 — The Drift",
   },
   {
-    src: "/images/lookbook-5.jpg",
+    src: "/images/lookbook-5.webp",
     alt: "Model in structured black blazer on rooftop at blue hour",
     caption: "Look 05 — Blue Hour",
   },
   {
-    src: "/images/lookbook-6.jpg",
+    src: "/images/lookbook-6.webp",
     alt: "Model in champagne slip dress in gallery-white studio space",
     caption: "Look 06 — The Studio",
   },
@@ -92,11 +93,10 @@ export function LookbookSlider() {
             aria-label={`Look ${current + 1} of ${slides.length}`}
             className="absolute inset-0"
           >
-            <img
+            <OptimizedImage
               src={slides[current].src}
               alt={slides[current].alt}
               className="w-full h-full object-cover object-center"
-              loading="lazy"
             />
 
             {/* Gradient scrim */}

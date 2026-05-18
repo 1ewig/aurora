@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Button } from "@/components/ui/Button";
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { staggerContainer, fadeInUp } from "@/animations/variants";
 
 export function DesignerStory() {
@@ -21,13 +22,17 @@ export function DesignerStory() {
     >
       {/* Image Column */}
       <div className="relative overflow-hidden aspect-square lg:aspect-auto lg:h-auto">
-        <motion.img
-          src="/images/designer.jpg"
-          alt="Aurora's creative director photographed in her design studio, examining fabric swatches"
-          className="absolute inset-0 w-full h-full object-cover object-top"
+        <motion.div
+          className="absolute inset-0 w-full h-full"
           style={{ y: imageY }}
-          loading="eager"
-        />
+        >
+          <OptimizedImage
+            src="/images/designer.webp"
+            alt="Aurora's creative director photographed in her design studio, examining fabric swatches"
+            className="w-full h-full object-cover object-top"
+            loading="eager"
+          />
+        </motion.div>
         {/* Warm color overlay */}
         <div
           className="absolute inset-0"
