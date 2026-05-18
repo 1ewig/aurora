@@ -70,4 +70,8 @@
   img {
     display: block;
   }
+
+  section[id] {
+    scroll-margin-top: 5rem;
+  }
 }
