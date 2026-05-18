@@ -66,42 +66,36 @@ export function ProductGrid() {
         </motion.div>
       </div>
 
-      <motion.div
-        layout
-        transition={springSmooth}
-        className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5"
-      >
-        <AnimatePresence mode="popLayout">
-          {filtered.map((product, i) => {
-            const exitDelay = (filtered.length - 1 - i) * 0.04;
-            return (
-              <motion.div
-                key={`${product.id}-${activeCategory}`}
-                layout
-                variants={cardEnter(i)}
-                initial="hidden"
-                animate="visible"
-                exit={{
-                  opacity: 0,
-                  scale: 0.85,
-                  y: 30,
-                  transition: {
-                    duration: 0.25,
-                    delay: exitDelay,
-                    ease: [0.55, 0.06, 0.68, 0.19],
-                  },
-                }}
-                className={i % 4 === 1 || i % 4 === 2 ? "md:mt-8" : ""}
-              >
-                <ProductCard
-                  product={product}
-                  aspectRatio={aspectRatios[i % aspectRatios.length]}
-                />
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-      </motion.div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeCategory}
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: { duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94], staggerChildren: 0.07 } as Record<string, unknown>,
+            },
+            exit: { opacity: 0, transition: { duration: 0.12 } },
+          }}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5"
+        >
+          {filtered.map((product, i) => (
+            <motion.div
+              key={product.id}
+              variants={cardEnter(i)}
+              className={i % 4 === 1 || i % 4 === 2 ? "md:mt-8" : ""}
+            >
+              <ProductCard
+                product={product}
+                aspectRatio={aspectRatios[i % aspectRatios.length]}
+              />
+            </motion.div>
+          ))}
+        </motion.div>
+      </AnimatePresence>
     </section>
   );
 }
