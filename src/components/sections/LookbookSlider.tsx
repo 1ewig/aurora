@@ -18,17 +18,17 @@ const slides = [
     caption: "Look 03 — The Interior",
   },
   {
-    src: "/images/lookbook-1.jpg",
+    src: "/images/lookbook-4.jpg",
     alt: "Solitary figure in charcoal coat in a misty forest at dawn",
     caption: "Look 04 — The Drift",
   },
   {
-    src: "/images/lookbook-2.jpg",
+    src: "/images/lookbook-5.jpg",
     alt: "Model in structured black blazer on rooftop at blue hour",
     caption: "Look 05 — Blue Hour",
   },
   {
-    src: "/images/lookbook-3.jpg",
+    src: "/images/lookbook-6.jpg",
     alt: "Model in champagne slip dress in gallery-white studio space",
     caption: "Look 06 — The Studio",
   },

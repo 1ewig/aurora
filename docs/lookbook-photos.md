@@ -13,15 +13,13 @@
 
 ---
 
-## 1. The Overcoat
+## Slide 1 — The Overcoat
 
 **File:** `public/images/lookbook-1.jpg`
 
-**Used by slides:** 1, 4
-- Slide 1: "Woman in tailored cream overcoat walking through European cobblestone street at golden hour"
-- Slide 4: "Solitary figure in charcoal coat in a misty forest at dawn"
+**Caption:** Look 01 — The Overcoat
 
-**Scene:** European cobblestone street, golden hour
+**Subject:** Woman in tailored cream double-faced wool overcoat
 
 **Prompt:**
 ```
@@ -38,15 +36,13 @@ aesthetic.
 
 ---
 
-## 2. The White Study
+## Slide 2 — The White Study
 
 **File:** `public/images/lookbook-2.jpg`
 
-**Used by slides:** 2, 5
-- Slide 2: "Female model in all-white minimalist look in brutalist concrete architecture"
-- Slide 5: "Model in structured black blazer on rooftop at blue hour"
+**Caption:** Look 02 — The White Study
 
-**Scene:** Brutalist concrete architecture, bright overcast light
+**Subject:** Female model in all-white minimalist ensemble
 
 **Prompt:**
 ```
@@ -62,15 +58,13 @@ SS 2025 campaign, soft desaturated color palette with warm skin tones.
 
 ---
 
-## 3. The Interior
+## Slide 3 — The Interior
 
 **File:** `public/images/lookbook-3.jpg`
 
-**Used by slides:** 3, 6
-- Slide 3: "Model in earth-tone outfit in a mid-century modern interior"
-- Slide 6: "Model in champagne slip dress in gallery-white studio space"
+**Caption:** Look 03 — The Interior
 
-**Scene:** Mid-century modern interior, warm ambient light
+**Subject:** Model in earth-tone knitwear
 
 **Prompt:**
 ```
@@ -82,4 +76,69 @@ outfit harmonize with the warm wood interior: ochre, rust, camel. Soft window
 light from the right, gentle fill on the shadow side. Warm color grade with 
 golden undertones. Quiet, sophisticated, lived-in luxury. Aurora SS 2025 
 campaign aesthetic.
+```
+
+---
+
+## Slide 4 — The Drift
+
+**File:** `public/images/lookbook-4.jpg`
+
+**Caption:** Look 04 — The Drift
+
+**Subject:** Solitary figure in charcoal wool coat in misty forest
+
+**Prompt:**
+```
+Editorial fashion photography, horizontal 16:9 composition, 3840x2160px. A solitary 
+figure in a long charcoal wool coat stands in a misty forest at dawn — bare trees, 
+low fog drifting across the forest floor, soft diffused morning light penetrating 
+through the canopy. The figure is turned slightly away, facing into the mist, 
+creating a moody silhouette. The charcoal coat is the focal point against the 
+cool muted greens and greys of the forest. Shallow depth of field, the background 
+fades into soft fog. Cinematic, atmospheric, contemplative. Aurora SS 2025 
+campaign.
+```
+
+---
+
+## Slide 5 — Blue Hour
+
+**File:** `public/images/lookbook-5.jpg`
+
+**Caption:** Look 05 — Blue Hour
+
+**Subject:** Model in structured black blazer on rooftop
+
+**Prompt:**
+```
+Editorial fashion photography, horizontal 16:9 composition, 3840x2160px. A model 
+in a structured black blazer stands on a city rooftop at blue hour — the sky is 
+deep indigo transitioning to warm city lights below. The wind catches her hair 
+and the blazer's lapels slightly. She stands against the railing, the city 
+skyline blurred in the background with bokeh lights. The black blazer holds its 
+structure against the dusk light, rim-lit by the last warm glow on the horizon. 
+Cinematic, editorial, urban luxury. Aurora SS 2025 campaign aesthetic.
+```
+
+---
+
+## Slide 6 — The Studio
+
+**File:** `public/images/lookbook-6.jpg`
+
+**Caption:** Look 06 — The Studio
+
+**Subject:** Model in champagne silk slip dress in gallery-white studio
+
+**Prompt:**
+```
+Editorial fashion photography, horizontal 16:9 composition, 3840x2160px. A model 
+in a champagne gold silk slip dress stands in a bright gallery-white studio space 
+— poured concrete floor, white walls, a single large north-facing window. The 
+light is soft and even, wrapping around the subject. The silk dress catches the 
+light with a subtle champagne shimmer. The model stands in a relaxed contrapposto 
+pose, one hand loosely at her side. Minimalist, clean, the dress is the sole focus. 
+Bright natural light, subtle warm tone grading. Editorial luxury, quiet elegance. 
+Aurora SS 2025 campaign.
 ```
