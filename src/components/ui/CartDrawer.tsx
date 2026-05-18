@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/hooks/useCartStore";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -6,6 +7,11 @@ import { drawerSlide } from "@/animations/variants";
 export function CartDrawer() {
   const { isOpen, closeCart, items, removeItem, updateQuantity, totalItems, totalPrice } =
     useCartStore();
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
 
   const count = totalItems();
   const total = totalPrice();

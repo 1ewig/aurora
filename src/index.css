@@ -74,4 +74,28 @@
   section[id] {
     scroll-margin-top: 5rem;
   }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #F7F7F5;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #C8A882;
+    border-radius: 9999px;
+    border: 2px solid #F7F7F5;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #B8860B;
+  }
+
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #C8A882 #F7F7F5;
+  }
 }

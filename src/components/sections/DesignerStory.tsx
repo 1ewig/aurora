@@ -20,7 +20,7 @@ export function DesignerStory() {
       ref={ref}
     >
       {/* Image Column */}
-      <div className="relative overflow-hidden h-[65vw] lg:h-auto">
+      <div className="relative overflow-hidden aspect-square lg:aspect-auto lg:h-auto">
         <motion.img
           src="/images/designer.jpg"
           alt="Aurora's creative director photographed in her design studio, examining fabric swatches"
