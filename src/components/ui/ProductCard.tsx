@@ -32,6 +32,7 @@ function BagIconSmall() {
 
 export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
+  const removeItem = useCartStore((s) => s.removeItem);
   const items = useCartStore((s) => s.items);
   const inCart = items.some((i) => i.id === product.id);
   const [justAdded, setJustAdded] = useState(false);
@@ -41,16 +42,20 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
     return () => clearTimeout(addedTimer.current);
   }, []);
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleToggleCart = (e: React.MouseEvent) => {
     e.preventDefault();
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      size: "M",
-      image: product.image,
-      category: product.category,
-    });
+    if (inCart) {
+      removeItem(product.id, "M");
+    } else {
+      addItem({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        size: "M",
+        image: product.image,
+        category: product.category,
+      });
+    }
     setJustAdded(true);
     clearTimeout(addedTimer.current);
     addedTimer.current = setTimeout(() => setJustAdded(false), 1200);
@@ -98,8 +103,8 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
               {formatCurrency(product.price)}
             </span>
             <motion.button
-              aria-label={inCart ? `${product.name} in bag` : `Add ${product.name} to bag`}
-              onClick={handleAddToCart}
+              aria-label={inCart ? `Remove ${product.name} from bag` : `Add ${product.name} to bag`}
+              onClick={handleToggleCart}
               whileTap={{ scale: 0.9 }}
               animate={
                 justAdded
