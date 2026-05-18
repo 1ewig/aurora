@@ -32,6 +32,8 @@ function BagIconSmall() {
 
 export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
+  const items = useCartStore((s) => s.items);
+  const inCart = items.some((i) => i.id === product.id);
   const [justAdded, setJustAdded] = useState(false);
   const addedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -96,15 +98,19 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
               {formatCurrency(product.price)}
             </span>
             <motion.button
-              aria-label={`Add ${product.name} to bag`}
+              aria-label={inCart ? `${product.name} in bag` : `Add ${product.name} to bag`}
               onClick={handleAddToCart}
               whileTap={{ scale: 0.9 }}
               animate={
                 justAdded
                   ? { scale: [1, 1.25, 1], transition: { duration: 0.4 } }
-                  : {}
+                  : inCart ? { scale: [1, 1.15, 1], transition: { duration: 0.3 } } : {}
               }
-              className="p-2 rounded-full hover:bg-[#F7F7F5] transition-colors text-[#111111]"
+              className={`p-2 rounded-full transition-all duration-300 ${
+                inCart
+                  ? "border border-[#111111] bg-[#F7F7F5] text-[#111111]"
+                  : "hover:bg-[#F7F7F5] text-[#111111]"
+              }`}
             >
               <BagIconSmall />
             </motion.button>
