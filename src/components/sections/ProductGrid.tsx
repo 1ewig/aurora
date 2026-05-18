@@ -1,22 +1,14 @@
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { ProductCard } from "@/components/ui/ProductCard";
-import { allProducts } from "@/data/products";
+import { useProductFilter } from "@/hooks/useProductFilter";
 import { cardEnter } from "@/animations/variants";
 import { springSmooth } from "@/animations/transitions";
-
-const filters = ["All", "Outerwear", "Knitwear", "Trousers", "Accessories", "Dresses"];
 
 const aspectRatios = ["aspect-[3/4]", "aspect-[4/5]", "aspect-[2/3]", "aspect-[3/4]"];
 
 export function ProductGrid() {
-  const [activeFilter, setActiveFilter] = useState("All");
-
-  const filtered =
-    activeFilter === "All"
-      ? allProducts
-      : allProducts.filter((p) => p.filter === activeFilter);
+  const { activeCategory, setActiveCategory, filtered, categories } = useProductFilter();
 
   return (
     <section
@@ -53,22 +45,22 @@ export function ProductGrid() {
           aria-label="Filter collection"
           className="flex flex-wrap gap-2 md:gap-3"
         >
-          {filters.map((filter) => (
+          {categories.map((category) => (
             <motion.button
-              key={filter}
-              aria-pressed={activeFilter === filter}
-              onClick={() => setActiveFilter(filter)}
+              key={category}
+              aria-pressed={activeCategory === category}
+              onClick={() => setActiveCategory(category)}
               layout
               transition={springSmooth}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.96 }}
               className={`px-5 py-2 rounded-full text-sm font-medium border transition-colors duration-300 ${
-                activeFilter === filter
+                activeCategory === category
                   ? "bg-[#0D0D0D] text-[#F7F7F5] border-[#0D0D0D]"
                   : "bg-transparent text-[#6B6B6B] border-[#D0CFC9] hover:border-[#111111] hover:text-[#111111]"
               }`}
             >
-              {filter}
+              {category}
             </motion.button>
           ))}
         </motion.div>
@@ -84,7 +76,7 @@ export function ProductGrid() {
             const exitDelay = (filtered.length - 1 - i) * 0.04;
             return (
               <motion.div
-                key={`${product.id}-${activeFilter}`}
+                key={`${product.id}-${activeCategory}`}
                 layout
                 variants={cardEnter(i)}
                 initial="hidden"

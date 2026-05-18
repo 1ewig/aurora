@@ -8,8 +8,17 @@ export interface Product {
   altText: string;
   span?: string;
   aspectRatio?: string;
-  filter: string;
 }
+
+export const categories = [
+  "Outerwear",
+  "Knitwear",
+  "Trousers",
+  "Dresses",
+  "Accessories",
+] as const;
+
+export type Category = (typeof categories)[number];
 
 export const heroProducts: Product[] = [
   {
@@ -20,7 +29,6 @@ export const heroProducts: Product[] = [
     badge: "New",
     image: "/images/hero-product-1.jpg",
     altText: "Ivory cream wool overcoat on seamless white background",
-    filter: "Outerwear",
   },
   {
     id: "h2",
@@ -29,7 +37,6 @@ export const heroProducts: Product[] = [
     price: 485,
     image: "/images/hero-product-2.jpg",
     altText: "Camel cashmere turtleneck sweater folded on marble surface",
-    filter: "Knitwear",
   },
   {
     id: "h3",
@@ -39,7 +46,6 @@ export const heroProducts: Product[] = [
     badge: "Limited",
     image: "/images/hero-product-3.jpg",
     altText: "Ecru linen blazer on ghost mannequin with side lighting",
-    filter: "Outerwear",
   },
   {
     id: "h4",
@@ -48,7 +54,6 @@ export const heroProducts: Product[] = [
     price: 395,
     image: "/images/hero-product-4.jpg",
     altText: "Charcoal wide-leg tailored trousers styled with white shirt",
-    filter: "Trousers",
   },
   {
     id: "h5",
@@ -58,7 +63,6 @@ export const heroProducts: Product[] = [
     badge: "New",
     image: "/images/hero-product-5.jpg",
     altText: "Champagne gold silk slip dress hanging on brass rail",
-    filter: "Dresses",
   },
 ];
 
@@ -73,7 +77,6 @@ export const featuredProducts: Product[] = [
     altText: "Ivory cream wool overcoat",
     span: "lg:col-span-2",
     aspectRatio: "aspect-[3/4]",
-    filter: "Outerwear",
   },
   {
     id: "f2",
@@ -85,7 +88,6 @@ export const featuredProducts: Product[] = [
     altText: "Ecru linen blazer",
     span: "lg:col-span-1",
     aspectRatio: "aspect-square",
-    filter: "Outerwear",
   },
   {
     id: "f3",
@@ -97,7 +99,6 @@ export const featuredProducts: Product[] = [
     altText: "Champagne silk slip dress",
     span: "lg:col-span-2",
     aspectRatio: "aspect-[3/4]",
-    filter: "Dresses",
   },
 ];
 
@@ -110,7 +111,6 @@ export const allProducts: Product[] = [
     badge: "New",
     image: "/images/hero-product-1.jpg",
     altText: "Ivory wool overcoat",
-    filter: "Outerwear",
   },
   {
     id: "p2",
@@ -119,7 +119,6 @@ export const allProducts: Product[] = [
     price: 485,
     image: "/images/hero-product-2.jpg",
     altText: "Camel cashmere turtleneck",
-    filter: "Knitwear",
   },
   {
     id: "p3",
@@ -129,7 +128,6 @@ export const allProducts: Product[] = [
     badge: "Limited",
     image: "/images/hero-product-3.jpg",
     altText: "Ecru linen blazer",
-    filter: "Outerwear",
   },
   {
     id: "p4",
@@ -138,7 +136,6 @@ export const allProducts: Product[] = [
     price: 395,
     image: "/images/hero-product-4.jpg",
     altText: "Charcoal wide-leg trousers",
-    filter: "Trousers",
   },
   {
     id: "p5",
@@ -148,7 +145,6 @@ export const allProducts: Product[] = [
     badge: "New",
     image: "/images/hero-product-5.jpg",
     altText: "Champagne silk slip dress",
-    filter: "Dresses",
   },
   {
     id: "p6",
@@ -157,17 +153,15 @@ export const allProducts: Product[] = [
     price: 1150,
     image: "/images/hero-product-1.jpg",
     altText: "Camel wrap coat",
-    filter: "Outerwear",
   },
   {
     id: "p7",
-    name: "Ivory Wool Overcoat II",
+    name: "Ebony Wool Overcoat",
     category: "Outerwear",
     price: 1390,
     badge: "Limited",
     image: "/images/hero-product-3.jpg",
-    altText: "Ivory wool overcoat variant",
-    filter: "Outerwear",
+    altText: "Ebony wool overcoat with peak lapels",
   },
   {
     id: "p8",
@@ -176,6 +170,55 @@ export const allProducts: Product[] = [
     price: 195,
     image: "/images/hero-product-2.jpg",
     altText: "Silk scarf in amber gold",
-    filter: "Accessories",
+  },
+  {
+    id: "p9",
+    name: "Charcoal Merino Crewneck",
+    category: "Knitwear",
+    price: 325,
+    image: "/images/hero-product-2.jpg",
+    altText: "Charcoal merino wool crewneck sweater",
+  },
+  {
+    id: "p10",
+    name: "Black Tailored Trousers",
+    category: "Trousers",
+    price: 450,
+    image: "/images/hero-product-4.jpg",
+    altText: "Black tailored dress trousers",
+  },
+  {
+    id: "p11",
+    name: "Emerald Velvet Midi Dress",
+    category: "Dresses",
+    price: 890,
+    badge: "New",
+    image: "/images/hero-product-5.jpg",
+    altText: "Emerald green velvet midi dress",
+  },
+  {
+    id: "p12",
+    name: "Leather Belt in Oak",
+    category: "Accessories",
+    price: 240,
+    image: "/images/hero-product-2.jpg",
+    altText: "Oak brown leather belt with brass buckle",
+  },
+  {
+    id: "p13",
+    name: "Navy Wool Peacoat",
+    category: "Outerwear",
+    price: 980,
+    image: "/images/hero-product-1.jpg",
+    altText: "Navy blue wool peacoat",
+  },
+  {
+    id: "p14",
+    name: "Ivory Cashmere Cardigan",
+    category: "Knitwear",
+    price: 520,
+    badge: "New",
+    image: "/images/hero-product-2.jpg",
+    altText: "Ivory cashmere cardigan",
   },
 ];
