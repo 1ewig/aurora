@@ -57,7 +57,7 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
   return (
     <article aria-label={`${product.name} — ${formatCurrency(product.price)}`}>
       <div
-        className="group relative overflow-hidden rounded-[20px] bg-white cursor-pointer"
+        className="relative overflow-hidden rounded-[20px] bg-white cursor-pointer"
         style={{
           boxShadow:
             "0 2px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
@@ -76,27 +76,6 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
             transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
             loading="lazy"
           />
-
-          {/* Hover Overlay */}
-          <motion.div
-            className="absolute inset-0 bg-[#0D0D0D]/60 flex items-end p-5"
-            initial={{ opacity: 0 }}
-            whileHover={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.button
-              onClick={handleAddToCart}
-              whileTap={{ scale: 0.96 }}
-              animate={
-                justAdded
-                  ? { scale: [1, 1.04, 1], transition: { duration: 0.35 } }
-                  : {}
-              }
-              className="w-full py-3 rounded-full bg-[#F7F7F5] text-[#111111] text-sm font-medium hover:bg-white transition-colors"
-            >
-              {justAdded ? "Added ✓" : "Quick Add +"}
-            </motion.button>
-          </motion.div>
 
           {/* Badge */}
           {product.badge && (
