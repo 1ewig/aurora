@@ -84,7 +84,7 @@ export function ProductGrid() {
             const exitDelay = (filtered.length - 1 - i) * 0.04;
             return (
               <motion.div
-                key={product.id}
+                key={`${product.id}-${activeFilter}`}
                 layout
                 variants={cardEnter(i)}
                 initial="hidden"
