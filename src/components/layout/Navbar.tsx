@@ -53,8 +53,8 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { scrollY } = useScroll();
   const toggleCart = useCartStore((s) => s.toggleCart);
-  const totalItems = useCartStore((s) => s.totalItems);
-  const count = totalItems();
+  const items = useCartStore((s) => s.items);
+  const count = items.reduce((sum, i) => sum + i.quantity, 0);
 
   const navBg = useTransform(
     scrollY,
