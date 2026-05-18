@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -31,7 +32,12 @@ function BagIconSmall() {
 
 export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCardProps) {
   const addItem = useCartStore((s) => s.addItem);
-  const openCart = useCartStore((s) => s.openCart);
+  const [justAdded, setJustAdded] = useState(false);
+  const addedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => {
+    return () => clearTimeout(addedTimer.current);
+  }, []);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -43,7 +49,9 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
       image: product.image,
       category: product.category,
     });
-    openCart();
+    setJustAdded(true);
+    clearTimeout(addedTimer.current);
+    addedTimer.current = setTimeout(() => setJustAdded(false), 1200);
   };
 
   return (
@@ -76,12 +84,18 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
             whileHover={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            <button
+            <motion.button
               onClick={handleAddToCart}
+              whileTap={{ scale: 0.96 }}
+              animate={
+                justAdded
+                  ? { scale: [1, 1.04, 1], transition: { duration: 0.35 } }
+                  : {}
+              }
               className="w-full py-3 rounded-full bg-[#F7F7F5] text-[#111111] text-sm font-medium hover:bg-white transition-colors"
             >
-              Quick Add +
-            </button>
+              {justAdded ? "Added ✓" : "Quick Add +"}
+            </motion.button>
           </motion.div>
 
           {/* Badge */}
@@ -102,13 +116,19 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
             <span className="font-mono font-medium text-[#111111] text-sm">
               {formatCurrency(product.price)}
             </span>
-            <button
+            <motion.button
               aria-label={`Add ${product.name} to bag`}
               onClick={handleAddToCart}
+              whileTap={{ scale: 0.9 }}
+              animate={
+                justAdded
+                  ? { scale: [1, 1.25, 1], transition: { duration: 0.4 } }
+                  : {}
+              }
               className="p-2 rounded-full hover:bg-[#F7F7F5] transition-colors text-[#111111]"
             >
               <BagIconSmall />
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
