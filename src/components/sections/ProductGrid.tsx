@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { allProducts } from "@/data/products";
-import { scaleIn } from "@/animations/variants";
+import { cardEnter } from "@/animations/variants";
+import { springSmooth } from "@/animations/transitions";
 
 const filters = ["All", "Outerwear", "Knitwear", "Trousers", "Accessories", "Dresses"];
 
@@ -53,41 +54,60 @@ export function ProductGrid() {
           className="flex flex-wrap gap-2 md:gap-3"
         >
           {filters.map((filter) => (
-            <button
+            <motion.button
               key={filter}
               aria-pressed={activeFilter === filter}
               onClick={() => setActiveFilter(filter)}
-              className={`px-5 py-2 rounded-full text-sm font-medium border transition-all duration-300 ${
+              layout
+              transition={springSmooth}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              className={`px-5 py-2 rounded-full text-sm font-medium border transition-colors duration-300 ${
                 activeFilter === filter
                   ? "bg-[#0D0D0D] text-[#F7F7F5] border-[#0D0D0D]"
                   : "bg-transparent text-[#6B6B6B] border-[#D0CFC9] hover:border-[#111111] hover:text-[#111111]"
               }`}
             >
               {filter}
-            </button>
+            </motion.button>
           ))}
         </motion.div>
       </div>
 
-      <motion.div layout className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+      <motion.div
+        layout
+        transition={springSmooth}
+        className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5"
+      >
         <AnimatePresence mode="popLayout">
-          {filtered.map((product, i) => (
-            <motion.div
-              key={product.id}
-              layout
-              variants={scaleIn}
-              initial="hidden"
-              animate="visible"
-              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.3 } }}
-              transition={{ delay: i * 0.05 }}
-              className={i % 4 === 1 || i % 4 === 2 ? "md:mt-8" : ""}
-            >
-              <ProductCard
-                product={product}
-                aspectRatio={aspectRatios[i % aspectRatios.length]}
-              />
-            </motion.div>
-          ))}
+          {filtered.map((product, i) => {
+            const exitDelay = (filtered.length - 1 - i) * 0.04;
+            return (
+              <motion.div
+                key={product.id}
+                layout
+                variants={cardEnter(i)}
+                initial="hidden"
+                animate="visible"
+                exit={{
+                  opacity: 0,
+                  scale: 0.85,
+                  y: 30,
+                  transition: {
+                    duration: 0.25,
+                    delay: exitDelay,
+                    ease: [0.55, 0.06, 0.68, 0.19],
+                  },
+                }}
+                className={i % 4 === 1 || i % 4 === 2 ? "md:mt-8" : ""}
+              >
+                <ProductCard
+                  product={product}
+                  aspectRatio={aspectRatios[i % aspectRatios.length]}
+                />
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
       </motion.div>
     </section>

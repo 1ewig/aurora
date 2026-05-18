@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useCartStore } from "@/hooks/useCartStore";
+import { cardImageReveal } from "@/animations/variants";
 import type { Product } from "@/data/products";
 
 interface ProductCardProps {
@@ -60,6 +61,9 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
             src={product.image}
             alt={product.altText}
             className="w-full h-full object-cover object-top"
+            variants={cardImageReveal}
+            initial="hidden"
+            animate="visible"
             whileHover={{ scale: 1.06 }}
             transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
             loading="lazy"
