@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+@theme {
+  /* === BACKGROUNDS === */
+  --color-bg-primary: #F7F7F5;
+  --color-bg-secondary: #FFFFFF;
+  --color-bg-ink: #0D0D0D;
+
+  /* === TEXT === */
+  --color-text-primary: #111111;
+  --color-text-secondary: #6B6B6B;
+  --color-text-muted: #ABABAB;
+  --color-text-inverted: #F7F7F5;
+
+  /* === ACCENT === */
+  --color-accent-primary: #C8A882;
+  --color-accent-secondary: #E8DDD0;
+  --color-accent-vivid: #B8860B;
+
+  /* === BORDERS === */
+  --color-border-subtle: #E8E8E4;
+  --color-border-medium: #D0CFC9;
+
+  /* === SEMANTIC === */
+  --color-success: #4A7C59;
+  --color-error: #C0392B;
+
+  /* === FONT FAMILIES === */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+  /* === BORDER RADIUS === */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 2rem;
+  --radius-full: 9999px;
+
+  /* === SPACING === */
+  --spacing-section: 8rem;
+  --spacing-gutter: 1.5rem;
+  --spacing-gutter-lg: 4rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #F7F7F5;
+    color: #111111;
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: #C8A882;
+    color: #F7F7F5;
+  }
+
+  *:focus-visible {
+    outline: 2px solid #C8A882;
+    outline-offset: 2px;
+  }
+
+  img {
+    display: block;
+  }
+
+  section[id] {
+    scroll-margin-top: 5rem;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #F7F7F5;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #C8A882;
+    border-radius: 9999px;
+    border: 2px solid #F7F7F5;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #B8860B;
+  }
+
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #C8A882 #F7F7F5;
+  }
+}
