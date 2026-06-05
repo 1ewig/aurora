@@ -1,25 +1,26 @@
 # Aurora — Luxury Landing Page
 
-A single-page landing page for **Aurora**, a quiet-luxury fashion brand (SS 2025 Collection). Built with React 19, TypeScript, Vite, Tailwind CSS 4, and Framer Motion.
+A single-page landing page for **Aurora**, a quiet-luxury fashion brand (SS 2025 Collection). Built with Next.js 15, React 19, TypeScript, Tailwind CSS 4, and Framer Motion.
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Framework | React 19 + TypeScript |
-| Build tool | Vite 7 |
+| Framework | Next.js 15.5.19 (App Router) |
+| Language | React 19 + TypeScript |
 | Styling | Tailwind CSS 4 |
 | Animation | Framer Motion 12 |
 | State management | Zustand (cart, persisted to localStorage) |
-| Bundle | Inline all assets into a single HTML file via `vite-plugin-singlefile` |
+| Fonts | next/font (Inter, Playfair Display) |
+| Images | next/image (unoptimized, serving pre-optimized WebP/JPEG) |
 
 ## Getting Started
 
 ```bash
 npm install
-npm run dev      # start dev server
-npm run build    # production build → dist/index.html
-npm run preview  # preview the production build
+npm run dev      # start dev server at http://localhost:3000
+npm run build    # production build → .next/
+npm run start    # serve the production build
 ```
 
 ## Sections
@@ -38,7 +39,9 @@ npm run preview  # preview the production build
 - Fixed navbar with scroll-aware transparency and mobile full-screen menu
 - Slide-in cart drawer with quantity controls and checkout summary
 - Scroll progress indicator
-- WebP/JPEG `<picture>` element fallback for all images
+- next/image with fill layout and pre-optimized asset serving
+- next/font with CSS variable integration
+- next/link for hash-anchored section navigation
 - Responsive design (mobile-first)
 
 ## Image Optimization
@@ -49,11 +52,18 @@ JPEG source images live in `public/images/`. To regenerate WebP variants:
 node scripts/optimize-images.mjs
 ```
 
-Uses [sharp](https://sharp.pixelplumbing.com/) (resize longest edge to 2000px, quality 82).
+Uses [sharp](https://sharp.pixelplumbing.com/) (resize longest edge to 2000px, quality 82). Images are served unoptimized by `next/image` to preserve the hand-tuned WebP/JPEG pairs.
 
 ## Project Structure
 
 ```
+app/                # Next.js App Router
+├── globals.css         # Tailwind v4 + custom theme tokens
+├── hydration-wrapper.tsx  # SSR hydration guard for Zustand
+├── layout.tsx          # Root layout with fonts, metadata, viewport
+├── not-found.tsx       # 404 page
+└── page.tsx            # Home page (composes all sections)
+
 src/
 ├── animations/    # Framer Motion presets and variants
 ├── components/
