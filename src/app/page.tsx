@@ -11,7 +11,6 @@ import { FeaturedCollection } from "@/components/landing/FeaturedCollection";
 import { LookbookSlider } from "@/components/landing/LookbookSlider";
 import { DesignerStory } from "@/components/landing/DesignerStory";
 import { Testimonials } from "@/components/landing/Testimonials";
-import { ProductGrid } from "@/components/landing/ProductGrid";
 import { Newsletter } from "@/components/landing/Newsletter";
 
 export default function HomePage() {
@@ -27,7 +26,6 @@ export default function HomePage() {
         <LookbookSlider />
         <DesignerStory />
         <Testimonials />
-        <ProductGrid />
         <Newsletter />
       </main>
       <Footer />
