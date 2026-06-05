@@ -28,7 +28,7 @@ async function main() {
     }
 
     await pipeline
-      .webp({ quality: 82, effort: 6 })
+      .webp({ quality: 100, effort: 6 })
       .toFile(outputPath);
 
     const { size: orig } = await import("fs").then((f) =>
