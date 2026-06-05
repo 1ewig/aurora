@@ -1,3 +1,6 @@
+"use client";
+
+import { HydrationWrapper } from "./hydration-wrapper";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/ui/CartDrawer";
@@ -11,9 +14,9 @@ import { Testimonials } from "@/components/sections/Testimonials";
 import { ProductGrid } from "@/components/sections/ProductGrid";
 import { Newsletter } from "@/components/sections/Newsletter";
 
-export default function App() {
+export default function HomePage() {
   return (
-    <>
+    <HydrationWrapper>
       <ScrollProgress />
       <Navbar />
       <CartDrawer />
@@ -28,6 +31,6 @@ export default function App() {
         <Newsletter />
       </main>
       <Footer />
-    </>
+    </HydrationWrapper>
   );
 }
