@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -47,6 +48,7 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
 
   const handleToggleCart = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (inCart) {
       removeItem(product.id, "M");
     } else {
@@ -66,70 +68,73 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
 
   return (
     <article aria-label={`${product.name} — ${formatCurrency(product.price)}`}>
-      <div
-        className="relative overflow-hidden rounded-[20px] bg-white cursor-pointer"
-        style={{
-          boxShadow:
-            "0 2px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
-        }}
-      >
-        {/* Product Image */}
-        <div className={cn("relative overflow-hidden", aspectRatio)}>
-          <motion.div
-            className="relative w-full h-full"
-            variants={cardImageReveal}
-            initial="hidden"
-            animate="visible"
-            whileHover={{ scale: 1.06 }}
-            transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-          >
-            <Image
-              src={product.image}
-              alt={product.altText}
-              fill
-              sizes="(max-width: 768px) 50vw, 25vw"
-              className="object-cover object-top"
-            />
-          </motion.div>
-
-          {/* Badge */}
-          {product.badge && (
-            <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-white text-xs font-medium tracking-wide text-text-primary">
-              {product.badge}
-            </span>
-          )}
-        </div>
-
-        {/* Product Info */}
-        <div className="p-4 md:p-5">
-          <h3 className="font-medium text-text-primary text-base leading-snug">
-            {product.name}
-          </h3>
-          <p className="text-text-secondary text-sm mt-1">{product.category}</p>
-          <div className="flex items-center justify-between mt-3">
-            <span className="font-mono font-medium text-text-primary text-sm">
-              {formatCurrency(product.price)}
-            </span>
-            <motion.button
-              aria-label={inCart ? `Remove ${product.name} from bag` : `Add ${product.name} to bag`}
-              onClick={handleToggleCart}
-              whileTap={{ scale: 0.9 }}
-              animate={
-                justAdded
-                  ? { scale: [1, 1.25, 1], transition: { duration: 0.4 } }
-                  : inCart ? { scale: [1, 1.15, 1], transition: { duration: 0.3 } } : {}
-              }
-              className={`p-2 rounded-full transition-all duration-300 ${
-                inCart
-                  ? "border border-text-primary bg-bg-primary text-text-primary"
-                  : "hover:bg-bg-primary text-text-primary"
-              }`}
+      <Link href={`/products/${product.slug}`} className="block">
+        <div
+          className="relative overflow-hidden rounded-[20px] bg-white cursor-pointer group"
+          style={{
+            boxShadow:
+              "0 2px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
+          }}
+        >
+          {/* Product Image */}
+          <div className={cn("relative overflow-hidden", aspectRatio)}>
+            <motion.div
+              className="relative w-full h-full"
+              variants={cardImageReveal}
+              initial="hidden"
+              animate="visible"
+              whileHover={{ scale: 1.06 }}
+              transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
-              <BagIconSmall />
-            </motion.button>
+              <Image
+                src={product.image}
+                alt={product.altText}
+                fill
+                sizes="(max-width: 768px) 50vw, 25vw"
+                className="object-cover object-top"
+              />
+            </motion.div>
+
+            {/* Badge */}
+            {product.badge && (
+              <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-white text-xs font-medium tracking-wide text-text-primary">
+                {product.badge}
+              </span>
+            )}
+          </div>
+
+          {/* Product Info */}
+          <div className="p-4 md:p-5">
+            <h3 className="font-medium text-text-primary text-base leading-snug group-hover:text-accent-primary transition-colors">
+              {product.name}
+            </h3>
+            <p className="text-text-secondary text-sm mt-1">{product.category}</p>
+            <div className="flex items-center justify-between mt-3">
+              <span className="font-mono font-medium text-text-primary text-sm">
+                {formatCurrency(product.price)}
+              </span>
+              <motion.button
+                type="button"
+                aria-label={inCart ? `Remove ${product.name} from bag` : `Add ${product.name} to bag`}
+                onClick={handleToggleCart}
+                whileTap={{ scale: 0.9 }}
+                animate={
+                  justAdded
+                    ? { scale: [1, 1.25, 1], transition: { duration: 0.4 } }
+                    : inCart ? { scale: [1, 1.15, 1], transition: { duration: 0.3 } } : {}
+                }
+                className={`p-2 rounded-full transition-all duration-300 ${
+                  inCart
+                    ? "border border-text-primary bg-bg-primary text-text-primary"
+                    : "hover:bg-bg-primary text-text-primary"
+                }`}
+              >
+                <BagIconSmall />
+              </motion.button>
+            </div>
           </div>
         </div>
-      </div>
+      </Link>
     </article>
   );
 }
