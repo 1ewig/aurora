@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { footerNav } from "@/data/navigation";
 
 function InstagramIcon() {
@@ -73,12 +74,12 @@ export function Footer() {
               <ul role="list" className="space-y-3">
                 {column.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
+                    <Link
+                      href={`/${link.href}`}
                       className="text-sm text-[#6B6B6B] hover:text-[#111111] transition-colors"
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>

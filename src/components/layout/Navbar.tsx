@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { navLinks } from "@/data/navigation";
 import { useCartStore } from "@/hooks/useCartStore";
@@ -96,14 +97,15 @@ export function Navbar() {
             className="flex items-center justify-between h-16 md:h-20 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto"
           >
             {/* Logo */}
-            <motion.a
-              href="/"
-              aria-label="Aurora — return to homepage"
-              style={{ color: logoColor }}
-              className="font-display font-black text-xl tracking-[0.15em] uppercase"
-            >
-              Aurora
-            </motion.a>
+            <motion.span style={{ color: logoColor }}>
+              <Link
+                href="/"
+                aria-label="Aurora — return to homepage"
+                className="font-display font-black text-xl tracking-[0.15em] uppercase"
+              >
+                Aurora
+              </Link>
+            </motion.span>
 
             {/* Desktop Nav Links */}
             <ul
@@ -112,12 +114,12 @@ export function Navbar() {
             >
               {navLinks.map((link) => (
                 <li key={link.href + link.label}>
-                  <a
-                    href={link.href}
+                  <Link
+                    href={`/${link.href}`}
                     className="text-sm font-medium text-[#111111] hover:text-[#C8A882] transition-colors tracking-wide"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -183,13 +185,13 @@ export function Navbar() {
             >
               {navLinks.map((link) => (
                 <motion.li key={link.label} variants={menuItemVariant}>
-                  <a
-                    href={link.href}
+                  <Link
+                    href={`/${link.href}`}
                     onClick={() => setMenuOpen(false)}
                     className="text-5xl font-black text-[#F7F7F5] hover:text-[#C8A882] transition-colors tracking-tight leading-none block"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </motion.li>
               ))}
             </motion.ul>
