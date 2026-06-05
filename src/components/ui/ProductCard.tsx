@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -72,17 +73,21 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
       >
         {/* Product Image */}
         <div className={cn("relative overflow-hidden", aspectRatio)}>
-          <motion.img
-            src={product.image}
-            alt={product.altText}
-            className="w-full h-full object-cover object-top"
+          <motion.div
+            className="relative w-full h-full"
             variants={cardImageReveal}
             initial="hidden"
             animate="visible"
             whileHover={{ scale: 1.06 }}
             transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-            loading="lazy"
-          />
+          >
+            <Image
+              src={product.image}
+              alt={product.altText}
+              fill
+              className="object-cover object-top"
+            />
+          </motion.div>
 
           {/* Badge */}
           {product.badge && (

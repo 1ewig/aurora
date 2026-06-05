@@ -1,4 +1,4 @@
-import { useState } from "react";
+import Image from "next/image";
 
 interface OptimizedImageProps {
   src: string;
@@ -9,23 +9,15 @@ interface OptimizedImageProps {
 }
 
 export function OptimizedImage({ src, alt, className, loading = "lazy", style }: OptimizedImageProps) {
-  const jpgSrc = src.replace(/\.webp$/, ".jpg");
-  const webpSrc = src.replace(/\.jpg$/, ".webp");
-  const [failed, setFailed] = useState(false);
-
-  const fallbackSrc = failed ? jpgSrc : webpSrc;
-
   return (
-    <picture>
-      {!failed && <source srcSet={webpSrc} type="image/webp" />}
-      <img
-        src={fallbackSrc}
-        alt={alt}
-        className={className}
-        loading={loading}
-        style={style}
-        onError={() => setFailed(true)}
-      />
-    </picture>
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      className={className}
+      loading={loading}
+      style={style}
+      sizes="(max-width: 768px) 100vw, 50vw"
+    />
   );
 }

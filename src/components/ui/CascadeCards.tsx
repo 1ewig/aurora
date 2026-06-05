@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { cardCascade, getCardRotation } from "@/animations/variants";
 import type { Product } from "@/data/products";
@@ -53,11 +54,11 @@ export function CascadeCards({ products }: CascadeCardsProps) {
                 boxShadow: "0 20px 60px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.10)",
               }}
             >
-              <img
+              <Image
                 src={product.image}
                 alt={product.altText}
-                className="w-full h-full object-cover object-top"
-                loading={index === 2 ? "eager" : "lazy"}
+                fill
+                className="object-cover object-top"
               />
               {/* Subtle bottom gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
@@ -97,11 +98,11 @@ export function CascadeCards({ products }: CascadeCardsProps) {
                 boxShadow: "0 16px 40px rgba(0,0,0,0.16)",
               }}
             >
-              <img
+              <Image
                 src={product.image}
                 alt={product.altText}
-                className="w-full h-full object-cover object-top"
-                loading="lazy"
+                fill
+                className="object-cover object-top"
               />
             </motion.div>
           );

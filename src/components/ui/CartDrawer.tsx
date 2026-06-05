@@ -85,7 +85,7 @@ export function CartDrawer() {
                       key={`${item.id}-${item.size}`}
                       className="flex gap-4"
                     >
-                      <div className="w-20 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-[#F7F7F5]">
+                      <div className="w-20 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-[#F7F7F5] relative">
                         <OptimizedImage
                           src={item.image}
                           alt={item.name}
