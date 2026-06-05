@@ -2,6 +2,12 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 
+import { HydrationWrapper } from "./hydration-wrapper";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { CartDrawer } from "@/components/ui/CartDrawer";
+import { ScrollProgress } from "@/components/ui/ScrollProgress";
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -39,7 +45,15 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${playfairDisplay.variable}`}
     >
-      <body>{children}</body>
+      <body className="bg-bg-primary min-h-screen antialiased">
+        <HydrationWrapper>
+          <ScrollProgress />
+          <Navbar />
+          <CartDrawer />
+          {children}
+          <Footer />
+        </HydrationWrapper>
+      </body>
     </html>
   );
 }
