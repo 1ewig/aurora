@@ -6,32 +6,32 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 const slides = [
   {
-    src: "/images/lookbook-1.webp",
+    src: "/images/lookbook/lookbook-1.webp",
     alt: "Woman in tailored cream overcoat walking through European cobblestone street at golden hour",
     caption: "Look 01 — The Overcoat",
   },
   {
-    src: "/images/lookbook-2.webp",
+    src: "/images/lookbook/lookbook-2.webp",
     alt: "Female model in all-white minimalist look in brutalist concrete architecture",
     caption: "Look 02 — The White Study",
   },
   {
-    src: "/images/lookbook-3.webp",
+    src: "/images/lookbook/lookbook-3.webp",
     alt: "Model in earth-tone outfit in a mid-century modern interior",
     caption: "Look 03 — The Interior",
   },
   {
-    src: "/images/lookbook-4.webp",
+    src: "/images/lookbook/lookbook-4.webp",
     alt: "Solitary figure in charcoal coat in a misty forest at dawn",
     caption: "Look 04 — The Drift",
   },
   {
-    src: "/images/lookbook-5.webp",
+    src: "/images/lookbook/lookbook-5.webp",
     alt: "Model in structured black blazer on rooftop at blue hour",
     caption: "Look 05 — Blue Hour",
   },
   {
-    src: "/images/lookbook-6.webp",
+    src: "/images/lookbook/lookbook-6.webp",
     alt: "Model in champagne slip dress in gallery-white studio space",
     caption: "Look 06 — The Studio",
   },

@@ -70,7 +70,7 @@ src/
 
 ## Image Optimization
 
-JPEG source images live in `images-sources/` (outside `public/` to avoid shipping raw assets). Pre-optimized WebP variants are served directly from `public/images/` via `next/image`.
+JPEG source images live in `images-sources/` (outside `public/` to avoid shipping raw assets), organized in `products/`, `lookbook/`, and `editorial/` subdirectories. Pre-optimized WebP variants are served directly from `public/images/` via `next/image` in their respective matching subdirectories.
 
 To regenerate WebP from the JPEG originals:
 ```bash

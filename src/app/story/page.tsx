@@ -45,7 +45,7 @@ export default function StoryPage() {
           className="lg:col-span-6 relative aspect-[4/5] bg-border-subtle rounded-2xl overflow-hidden shadow-sm"
         >
           <OptimizedImage
-            src="/images/designer.webp"
+            src="/images/editorial/designer.webp"
             alt="Creative director sketching designs in studio"
             className="w-full h-full object-cover object-top"
             loading="eager"
@@ -78,7 +78,7 @@ export default function StoryPage() {
       {/* Parallax Image Breakout */}
       <section className="my-20 relative h-[50vh] md:h-[60vh] bg-border-subtle overflow-hidden">
         <OptimizedImage
-          src="/images/lookbook-3.webp"
+          src="/images/lookbook/lookbook-3.webp"
           alt="Extrafine fabric detail view"
           className="w-full h-full object-cover object-center scale-105"
         />
@@ -121,14 +121,14 @@ export default function StoryPage() {
           >
             <div className="relative aspect-[3/4] bg-border-subtle rounded-xl overflow-hidden">
               <OptimizedImage
-                src="/images/lookbook-1.webp"
+                src="/images/lookbook/lookbook-1.webp"
                 alt="Wool loom detail"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="relative aspect-[3/4] bg-border-subtle rounded-xl overflow-hidden mt-8">
               <OptimizedImage
-                src="/images/lookbook-2.webp"
+                src="/images/lookbook/lookbook-2.webp"
                 alt="Cashmere folding"
                 className="w-full h-full object-cover"
               />

@@ -14,7 +14,7 @@ export function ImageGallery({ images, altText }: ImageGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   // If there are no additional images, degrade gracefully to a single image
-  const galleryImages = images && images.length > 0 ? images : ["/images/hero-product-1.webp"];
+  const galleryImages = images && images.length > 0 ? images : ["/images/products/hero-product-1.webp"];
 
   return (
     <div className="flex flex-col gap-4 lg:gap-6 w-full">

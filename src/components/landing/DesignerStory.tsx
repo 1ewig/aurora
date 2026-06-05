@@ -29,7 +29,7 @@ export function DesignerStory() {
           style={{ y: imageY }}
         >
           <OptimizedImage
-            src="/images/designer.webp"
+            src="/images/editorial/designer.webp"
             alt="Aurora's creative director photographed in her design studio, examining fabric swatches"
             className="w-full h-full object-cover object-top"
             loading="eager"
