@@ -2,7 +2,7 @@ import sharp from "sharp";
 import { readdir, mkdir } from "fs/promises";
 import { join, parse } from "path";
 
-const INPUT_DIR = "public/images";
+const INPUT_DIR = "images-sources";
 const OUTPUT_DIR = "public/images";
 
 async function main() {

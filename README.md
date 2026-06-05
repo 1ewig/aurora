@@ -46,15 +46,15 @@ npm run start    # serve the production build
 
 ## Image Optimization
 
-JPEG source images live in `public/images/`. Next.js automatically serves optimized WebP/AVIF variants with responsive `srcSet` via `next/image` during `next build`.
+JPEG source images live in `images-sources/` (outside `public/` to avoid shipping them). Pre-optimized WebP variants are served directly from `public/images/` via `next/image` with `unoptimized: true`.
 
-To pre-generate image derivatives locally (e.g., for external use):
+To regenerate WebP from the JPEG originals:
 
 ```bash
 node scripts/optimize-images.mjs
 ```
 
-Uses [sharp](https://sharp.pixelplumbing.com/) (resize longest edge to 2000px, quality 82).
+Uses [sharp](https://sharp.pixelplumbing.com/) (resize longest edge to 2000px, quality 100).
 
 ## Project Structure
 
