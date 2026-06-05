@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/hooks/useCartStore";

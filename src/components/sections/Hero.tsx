@@ -1,3 +1,5 @@
+"use client";
+
 import { useScroll, useTransform, motion } from "framer-motion";
 import { CascadeCards } from "@/components/ui/CascadeCards";
 
