@@ -72,7 +72,7 @@ export function Footer() {
                 {column.links.map((link) => (
                   <li key={link.label}>
                     <Link
-                      href={`/${link.href}`}
+                      href={link.href}
                       className="text-sm text-text-secondary hover:text-text-primary transition-colors"
                     >
                       {link.label}

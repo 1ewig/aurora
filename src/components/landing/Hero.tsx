@@ -1,6 +1,7 @@
 "use client";
 
 import { useScroll, useTransform, motion } from "framer-motion";
+import Link from "next/link";
 import { CascadeCards } from "@/components/ui/CascadeCards";
 
 import { Button } from "@/components/ui/Button";
@@ -96,17 +97,14 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 1.1, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="flex flex-col sm:flex-row gap-4 mt-8"
         >
-          <Button
-            variant="filled"
-            size="lg"
-            onClick={() => {
-              document
-                .getElementById("collection")
-                ?.scrollIntoView({ behavior: "smooth" });
-            }}
-          >
-            Shop the Collection
-          </Button>
+          <Link href="/products">
+            <Button
+              variant="filled"
+              size="lg"
+            >
+              Shop the Collection
+            </Button>
+          </Link>
           <Button
             variant="ghost"
             size="lg"
