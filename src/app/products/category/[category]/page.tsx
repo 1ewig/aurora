@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { heroProducts, allProducts } from "@/data/products";
-import { CategoryCatalog } from "@/components/product/CategoryCatalog";
+import { ProductCatalogView } from "@/components/product/ProductCatalogView";
 
 const categoryMap: Record<string, string> = {
   outerwear: "Outerwear",
@@ -32,15 +31,5 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  // Combine unique products
-  const combinedProducts = [...heroProducts, ...allProducts];
-  const filtered = combinedProducts.filter((p) => p.category === categoryName);
-
-  return (
-    <CategoryCatalog
-      categorySlug={categorySlug}
-      categoryName={categoryName}
-      filteredProducts={filtered}
-    />
-  );
+  return <ProductCatalogView initialCategory={categoryName} />;
 }
