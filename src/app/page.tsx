@@ -5,14 +5,14 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/ui/CartDrawer";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
-import { Hero } from "@/components/sections/Hero";
-import { MarqueeBar } from "@/components/sections/MarqueeBar";
-import { FeaturedCollection } from "@/components/sections/FeaturedCollection";
-import { LookbookSlider } from "@/components/sections/LookbookSlider";
-import { DesignerStory } from "@/components/sections/DesignerStory";
-import { Testimonials } from "@/components/sections/Testimonials";
-import { ProductGrid } from "@/components/sections/ProductGrid";
-import { Newsletter } from "@/components/sections/Newsletter";
+import { Hero } from "@/components/landing/Hero";
+import { MarqueeBar } from "@/components/landing/MarqueeBar";
+import { FeaturedCollection } from "@/components/landing/FeaturedCollection";
+import { LookbookSlider } from "@/components/landing/LookbookSlider";
+import { DesignerStory } from "@/components/landing/DesignerStory";
+import { Testimonials } from "@/components/landing/Testimonials";
+import { ProductGrid } from "@/components/landing/ProductGrid";
+import { Newsletter } from "@/components/landing/Newsletter";
 
 export default function HomePage() {
   return (
