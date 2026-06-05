@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { Button } from "@/components/ui/Button";
@@ -52,17 +53,14 @@ export function FeaturedCollection() {
       </motion.div>
 
       <div className="flex justify-center mt-16">
-        <Button
-          variant="ghost"
-          size="lg"
-          onClick={() => {
-            document
-              .getElementById("all-products")
-              ?.scrollIntoView({ behavior: "smooth" });
-          }}
-        >
-          View Entire Collection →
-        </Button>
+        <Link href="/products">
+          <Button
+            variant="ghost"
+            size="lg"
+          >
+            View Entire Collection →
+          </Button>
+        </Link>
       </div>
     </section>
   );
