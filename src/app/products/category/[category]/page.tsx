@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, use } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { heroProducts, allProducts, categories } from "@/data/products";
@@ -11,11 +12,46 @@ import { springSmooth } from "@/animations/transitions";
 
 const aspectRatios = ["aspect-[3/4]", "aspect-[4/5]", "aspect-[2/3]", "aspect-[3/4]"];
 
-export default function ProductsPage() {
-  // Combine unique products for complete shop catalog
+const categoryMap: Record<string, string> = {
+  outerwear: "Outerwear",
+  knitwear: "Knitwear",
+  trousers: "Trousers",
+  dresses: "Dresses",
+  accessories: "Accessories",
+};
+
+export async function generateStaticParams() {
+  return [
+    { category: "outerwear" },
+    { category: "knitwear" },
+    { category: "trousers" },
+    { category: "dresses" },
+    { category: "accessories" },
+  ];
+}
+
+interface CategoryPageProps {
+  params: Promise<{ category: string }>;
+}
+
+export default function CategoryPage({ params }: CategoryPageProps) {
+  // Await the promise for params
+  const { category: categorySlug } = use(params);
+  
+  const categoryName = categoryMap[categorySlug];
+
+  if (!categoryName) {
+    notFound();
+  }
+
+  // Combine unique products
   const combinedProducts = useMemo(() => {
     return [...heroProducts, ...allProducts];
   }, []);
+
+  const filtered = useMemo(() => {
+    return combinedProducts.filter((p) => p.category === categoryName);
+  }, [categoryName, combinedProducts]);
 
   const allCategories = [
     { label: "All", href: "/products" },
@@ -41,7 +77,7 @@ export default function ProductsPage() {
               className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 text-text-primary uppercase"
               style={{ fontSize: "clamp(2.5rem, 5vw, 4.5rem)" }}
             >
-              Shop All
+              {categoryName}
               <br />
               Pieces.
             </h1>
@@ -53,11 +89,11 @@ export default function ProductsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
             role="group"
-            aria-label="Filter catalog"
+            aria-label="Category catalog filter navigation"
             className="flex flex-wrap gap-2 md:gap-3"
           >
             {allCategories.map((item) => {
-              const isSelected = item.label === "All";
+              const isSelected = item.label === categoryName;
               return (
                 <Link key={item.label} href={item.href}>
                   <motion.span
@@ -82,7 +118,7 @@ export default function ProductsPage() {
         {/* Product Grid */}
         <AnimatePresence mode="wait">
           <motion.div
-            key="all-products-grid"
+            key={categorySlug}
             variants={{
               hidden: { opacity: 0 },
               visible: {
@@ -96,7 +132,7 @@ export default function ProductsPage() {
             exit="exit"
             className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
           >
-            {combinedProducts.map((product, i) => (
+            {filtered.map((product, i) => (
               <motion.div
                 key={product.id}
                 variants={cardEnter(i)}
