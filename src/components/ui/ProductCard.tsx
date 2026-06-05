@@ -87,6 +87,7 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
               src={product.image}
               alt={product.altText}
               fill
+              sizes="(max-width: 768px) 50vw, 25vw"
               className="object-cover object-top"
             />
           </motion.div>

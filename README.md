@@ -12,7 +12,7 @@ A single-page landing page for **Aurora**, a quiet-luxury fashion brand (SS 2025
 | Animation | Framer Motion 12 |
 | State management | Zustand (cart, persisted to localStorage) |
 | Fonts | next/font (Inter, Playfair Display) |
-| Images | next/image (unoptimized, serving pre-optimized WebP/JPEG) |
+| Images | next/image (auto-optimized WebP/AVIF with responsive srcSet) |
 
 ## Getting Started
 
@@ -39,20 +39,22 @@ npm run start    # serve the production build
 - Fixed navbar with scroll-aware transparency and mobile full-screen menu
 - Slide-in cart drawer with quantity controls and checkout summary
 - Scroll progress indicator
-- next/image with fill layout and pre-optimized asset serving
+- next/image with auto-optimization, responsive srcSet, and lazy loading
 - next/font with CSS variable integration
 - next/link for hash-anchored section navigation
 - Responsive design (mobile-first)
 
 ## Image Optimization
 
-JPEG source images live in `public/images/`. To regenerate WebP variants:
+JPEG source images live in `public/images/`. Next.js automatically serves optimized WebP/AVIF variants with responsive `srcSet` via `next/image` during `next build`.
+
+To pre-generate image derivatives locally (e.g., for external use):
 
 ```bash
 node scripts/optimize-images.mjs
 ```
 
-Uses [sharp](https://sharp.pixelplumbing.com/) (resize longest edge to 2000px, quality 82). Images are served unoptimized by `next/image` to preserve the hand-tuned WebP/JPEG pairs.
+Uses [sharp](https://sharp.pixelplumbing.com/) (resize longest edge to 2000px, quality 82).
 
 ## Project Structure
 

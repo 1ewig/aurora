@@ -60,6 +60,7 @@ export function CascadeCards({ products }: CascadeCardsProps) {
                 src={product.image}
                 alt={product.altText}
                 fill
+                sizes="(min-width: 768px) 18vw, 140px"
                 className="object-cover object-top"
               />
               {/* Subtle bottom gradient */}
@@ -104,6 +105,7 @@ export function CascadeCards({ products }: CascadeCardsProps) {
                 src={product.image}
                 alt={product.altText}
                 fill
+                sizes="(min-width: 768px) 18vw, 140px"
                 className="object-cover object-top"
               />
             </motion.div>
