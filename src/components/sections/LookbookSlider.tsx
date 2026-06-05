@@ -76,7 +76,7 @@ export function LookbookSlider() {
       id="lookbook"
       aria-labelledby="lookbook-heading"
       aria-roledescription="carousel"
-      className="relative w-full overflow-hidden bg-[#0D0D0D]"
+      className="relative w-full overflow-hidden bg-bg-ink"
     >
       <h2 id="lookbook-heading" className="sr-only">
         Lookbook — Aurora SS 2025
@@ -150,7 +150,7 @@ export function LookbookSlider() {
             onClick={() => goTo(i)}
             className={`h-[3px] rounded-full transition-all duration-300 ${
               i === current
-                ? "w-6 bg-[#C8A882]"
+                ? "w-6 bg-accent-primary"
                 : "w-2 bg-white/30"
             }`}
           />

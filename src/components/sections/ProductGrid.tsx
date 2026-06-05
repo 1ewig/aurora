@@ -28,7 +28,7 @@ export function ProductGrid() {
           <EyebrowLabel>All Pieces</EyebrowLabel>
           <h2
             id="products-heading"
-            className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 text-[#111111]"
+            className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 text-text-primary"
             style={{ fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}
           >
             The Full
@@ -58,8 +58,8 @@ export function ProductGrid() {
               whileTap={{ scale: 0.96 }}
               className={`px-5 py-2 rounded-full text-sm font-medium border transition-colors duration-300 ${
                 activeCategory === category
-                  ? "bg-[#0D0D0D] text-[#F7F7F5] border-[#0D0D0D]"
-                  : "bg-transparent text-[#6B6B6B] border-[#D0CFC9] hover:border-[#111111] hover:text-[#111111]"
+                  ? "bg-bg-ink text-text-inverted border-bg-ink"
+                  : "bg-transparent text-text-secondary border-border-medium hover:border-text-primary hover:text-text-primary"
               }`}
             >
               {category}

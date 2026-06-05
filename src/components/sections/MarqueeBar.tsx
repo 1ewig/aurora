@@ -18,7 +18,7 @@ export function MarqueeBar() {
     <div
       aria-hidden="true"
       role="presentation"
-      className="overflow-hidden bg-[#0D0D0D] py-5 cursor-default group"
+      className="overflow-hidden bg-bg-ink py-5 cursor-default group"
     >
       <div className="flex whitespace-nowrap group-hover:[animation-play-state:paused]">
         <motion.div
@@ -33,12 +33,12 @@ export function MarqueeBar() {
           {[...Array(2)].map((_, i) => (
             <span
               key={i}
-              className="flex items-center text-sm font-medium tracking-[0.12em] uppercase text-[#F7F7F5]"
+              className="flex items-center text-sm font-medium tracking-[0.12em] uppercase text-text-inverted"
             >
               {marqueeItems.map((item, j) => (
                 <span key={`${i}-${j}`} className="flex items-center">
                   <span className="px-8 inline-block">{item}</span>
-                  <span className="text-[#C8A882] text-base">✦</span>
+                  <span className="text-accent-primary text-base">✦</span>
                 </span>
               ))}
             </span>

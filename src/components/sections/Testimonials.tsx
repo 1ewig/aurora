@@ -68,7 +68,7 @@ export function Testimonials() {
             className="mt-12"
           >
             <p
-              className="font-display italic leading-tight tracking-tight text-[#111111]"
+              className="font-display italic leading-tight tracking-tight text-text-primary"
               style={{ fontSize: "clamp(1.6rem, 3.5vw, 3.5rem)" }}
             >
               ❝ {t.quote} ❞
@@ -83,10 +83,10 @@ export function Testimonials() {
                 {t.initials}
               </div>
               <div>
-                <cite className="font-medium text-[#111111] not-italic block text-sm">
+                <cite className="font-medium text-text-primary not-italic block text-sm">
                   {t.name}, {t.location}
                 </cite>
-                <span className="text-[#ABABAB] text-xs">
+                <span className="text-text-muted text-xs">
                   Verified Customer
                 </span>
               </div>
@@ -103,7 +103,7 @@ export function Testimonials() {
           <button
             aria-label="Previous testimonial"
             onClick={prev}
-            className="w-9 h-9 rounded-full border border-[#E8E8E4] flex items-center justify-center hover:border-[#111111] transition-colors text-sm"
+            className="w-9 h-9 rounded-full border border-border-subtle flex items-center justify-center hover:border-text-primary transition-colors text-sm"
           >
             ←
           </button>
@@ -116,7 +116,7 @@ export function Testimonials() {
                 aria-label={`Go to testimonial ${i + 1}`}
                 onClick={() => { setAuto(false); setCurrent(i); }}
                 className={`h-[3px] rounded-full transition-all duration-300 ${
-                  i === current ? "w-6 bg-[#111111]" : "w-2 bg-[#D0CFC9]"
+                  i === current ? "w-6 bg-text-primary" : "w-2 bg-border-medium"
                 }`}
               />
             ))}
@@ -125,7 +125,7 @@ export function Testimonials() {
           <button
             aria-label="Next testimonial"
             onClick={next}
-            className="w-9 h-9 rounded-full border border-[#E8E8E4] flex items-center justify-center hover:border-[#111111] transition-colors text-sm"
+            className="w-9 h-9 rounded-full border border-border-subtle flex items-center justify-center hover:border-text-primary transition-colors text-sm"
           >
             →
           </button>

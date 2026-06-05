@@ -23,7 +23,7 @@ export function Newsletter() {
     <section
       id="newsletter"
       aria-labelledby="newsletter-heading"
-      className="py-32 px-6 md:px-20 bg-[#0D0D0D]"
+      className="py-32 px-6 md:px-20 bg-bg-ink"
     >
       <div className="max-w-3xl mx-auto text-center">
         <motion.div
@@ -39,7 +39,7 @@ export function Newsletter() {
           <motion.h2
             id="newsletter-heading"
             variants={fadeInUp}
-            className="font-sans font-black leading-tight tracking-[-0.02em] text-[#F7F7F5] mt-4"
+            className="font-sans font-black leading-tight tracking-[-0.02em] text-text-inverted mt-4"
             style={{ fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}
           >
             First to Know.
@@ -49,7 +49,7 @@ export function Newsletter() {
 
           <motion.p
             variants={fadeInUp}
-            className="text-[#ABABAB] mt-6 leading-relaxed max-w-md mx-auto"
+            className="text-text-muted mt-6 leading-relaxed max-w-md mx-auto"
           >
             Early collection access, private sale invitations, and unfiltered
             notes from the studio.
@@ -64,7 +64,7 @@ export function Newsletter() {
                   animate={{ opacity: 1, scale: 1 }}
                   className="flex flex-col items-center gap-4"
                 >
-                  <div className="w-14 h-14 rounded-full bg-[#C8A882] flex items-center justify-center mx-auto">
+                  <div className="w-14 h-14 rounded-full bg-accent-primary flex items-center justify-center mx-auto">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -80,10 +80,10 @@ export function Newsletter() {
                       />
                     </svg>
                   </div>
-                  <p className="text-[#F7F7F5] font-medium text-lg">
+                  <p className="text-text-inverted font-medium text-lg">
                     Welcome to the inner circle.
                   </p>
-                  <p className="text-[#ABABAB] text-sm">
+                  <p className="text-text-muted text-sm">
                     You'll hear from us soon.
                   </p>
                 </motion.div>
@@ -107,12 +107,12 @@ export function Newsletter() {
                     placeholder="your@email.com"
                     required
                     aria-required="true"
-                    className="flex-1 px-6 py-4 rounded-full bg-white/10 border border-white/20 text-[#F7F7F5] placeholder:text-white/40 focus:outline-none focus:border-[#C8A882] transition-colors text-sm"
+                    className="flex-1 px-6 py-4 rounded-full bg-white/10 border border-white/20 text-text-inverted placeholder:text-white/40 focus:outline-none focus:border-accent-primary transition-colors text-sm"
                   />
                   <button
                     type="submit"
                     disabled={loading}
-                    className="px-8 py-4 rounded-full bg-[#C8A882] text-white font-medium hover:bg-[#B8860B] transition-colors text-sm disabled:opacity-70 whitespace-nowrap"
+                    className="px-8 py-4 rounded-full bg-accent-primary text-white font-medium hover:bg-accent-vivid transition-colors text-sm disabled:opacity-70 whitespace-nowrap"
                   >
                     {loading ? "..." : "Subscribe →"}
                   </button>
@@ -123,7 +123,7 @@ export function Newsletter() {
 
           <motion.p
             variants={fadeInUp}
-            className="text-[#ABABAB] text-xs mt-4"
+            className="text-text-muted text-xs mt-4"
           >
             Fewer than 4 emails per month. Unsubscribe anytime.
           </motion.p>

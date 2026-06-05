@@ -22,7 +22,7 @@ function BagIcon({ count }: { count: number }) {
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" />
       </svg>
       {count > 0 && (
-        <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-[#C8A882] text-white text-[10px] flex items-center justify-center font-medium">
+        <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-accent-primary text-white text-[10px] flex items-center justify-center font-medium">
           {count}
         </span>
       )}
@@ -118,7 +118,7 @@ export function Navbar() {
                 <li key={link.href + link.label}>
                   <Link
                     href={`/${link.href}`}
-                    className="text-sm font-medium text-[#111111] hover:text-[#C8A882] transition-colors tracking-wide"
+                    className="text-sm font-medium text-text-primary hover:text-accent-primary transition-colors tracking-wide"
                   >
                     {link.label}
                   </Link>
@@ -130,14 +130,14 @@ export function Navbar() {
             <div className="flex items-center gap-3">
               <button
                 aria-label="Search"
-                className="p-2 rounded-full hover:bg-[#E8E8E4]/50 transition-colors text-[#111111]"
+                className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary"
               >
                 <SearchIcon />
               </button>
               <button
                 aria-label={`Shopping bag, ${count} item${count !== 1 ? "s" : ""}`}
                 onClick={toggleCart}
-                className="p-2 rounded-full hover:bg-[#E8E8E4]/50 transition-colors text-[#111111]"
+                className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary"
               >
                 <BagIcon count={count} />
               </button>
@@ -145,7 +145,7 @@ export function Navbar() {
                 aria-label={menuOpen ? "Close menu" : "Open menu"}
                 aria-expanded={menuOpen}
                 onClick={() => setMenuOpen(!menuOpen)}
-                className="md:hidden p-2 rounded-full hover:bg-[#E8E8E4]/50 transition-colors text-[#111111]"
+                className="md:hidden p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary"
               >
                 <MenuIcon isOpen={menuOpen} />
               </button>
@@ -167,13 +167,13 @@ export function Navbar() {
               visible: { x: 0, opacity: 1, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
               exit: { x: "100%", opacity: 0, transition: { duration: 0.4, ease: [0.55, 0.06, 0.68, 0.19] } },
             }}
-            className="fixed inset-0 z-[55] bg-[#0D0D0D] flex flex-col items-start justify-center px-10"
+            className="fixed inset-0 z-[55] bg-bg-ink flex flex-col items-start justify-center px-10"
           >
             {/* Close button */}
             <button
               aria-label="Close menu"
               onClick={() => setMenuOpen(false)}
-              className="absolute top-5 right-6 text-[#F7F7F5] p-2 text-2xl hover:text-[#C8A882] transition-colors"
+              className="absolute top-5 right-6 text-text-inverted p-2 text-2xl hover:text-accent-primary transition-colors"
             >
               ✕
             </button>
@@ -190,7 +190,7 @@ export function Navbar() {
                   <Link
                     href={`/${link.href}`}
                     onClick={() => setMenuOpen(false)}
-                    className="text-5xl font-black text-[#F7F7F5] hover:text-[#C8A882] transition-colors tracking-tight leading-none block"
+                    className="text-5xl font-black text-text-inverted hover:text-accent-primary transition-colors tracking-tight leading-none block"
                   >
                     {link.label}
                   </Link>
@@ -199,7 +199,7 @@ export function Navbar() {
             </motion.ul>
 
             <div className="mt-16">
-              <p className="text-[#ABABAB] text-sm tracking-wide">
+              <p className="text-text-muted text-sm tracking-wide">
                 SS 2025 Collection
               </p>
             </div>

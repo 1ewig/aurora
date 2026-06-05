@@ -15,7 +15,7 @@ export function EyebrowLabel({
     <span
       className={cn(
         "text-xs font-medium tracking-[0.12em] uppercase block",
-        color === "gold" ? "text-[#C8A882]" : "text-[#ABABAB]",
+        color === "gold" ? "text-accent-primary" : "text-text-muted",
         className
       )}
     >

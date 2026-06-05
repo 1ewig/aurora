@@ -41,22 +41,22 @@ export function Footer() {
   return (
     <footer
       role="contentinfo"
-      className="bg-[#F7F7F5] border-t border-[#E8E8E4]"
+      className="bg-bg-primary border-t border-border-subtle"
     >
       <div className="max-w-[1400px] mx-auto px-6 md:px-20 py-20">
         {/* Top Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {/* Brand Column */}
           <div className="lg:col-span-1">
-            <p className="font-display font-black text-xl tracking-[0.15em] uppercase text-[#111111]">
+            <p className="font-display font-black text-xl tracking-[0.15em] uppercase text-text-primary">
               Aurora
             </p>
-            <p className="text-[#6B6B6B] text-sm leading-relaxed mt-4 max-w-[220px]">
+            <p className="text-text-secondary text-sm leading-relaxed mt-4 max-w-[220px]">
               Designed in solitude.
               <br />
               Worn with intention.
             </p>
-            <p className="text-[#ABABAB] text-xs mt-6 leading-relaxed max-w-[200px]">
+            <p className="text-text-muted text-xs mt-6 leading-relaxed max-w-[200px]">
               Free returns within 30 days. Complimentary shipping on orders
               over $500.
             </p>
@@ -65,7 +65,7 @@ export function Footer() {
           {/* Nav Columns */}
           {footerNav.map((column) => (
             <nav key={column.title} aria-label={column.title}>
-              <h3 className="text-xs font-medium tracking-[0.1em] uppercase text-[#ABABAB] mb-5">
+              <h3 className="text-xs font-medium tracking-[0.1em] uppercase text-text-muted mb-5">
                 {column.title}
               </h3>
               <ul role="list" className="space-y-3">
@@ -73,7 +73,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={`/${link.href}`}
-                      className="text-sm text-[#6B6B6B] hover:text-[#111111] transition-colors"
+                      className="text-sm text-text-secondary hover:text-text-primary transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -85,25 +85,25 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mt-16 pt-8 border-t border-[#E8E8E4]">
-          <p className="text-xs text-[#ABABAB]">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mt-16 pt-8 border-t border-border-subtle">
+          <p className="text-xs text-text-muted">
             © 2025 Aurora. All rights reserved.
           </p>
 
-          <div className="flex gap-6 text-xs text-[#ABABAB]">
-            <a href="#" className="hover:text-[#111111] transition-colors">
+          <div className="flex gap-6 text-xs text-text-muted">
+            <a href="#" className="hover:text-text-primary transition-colors">
               Privacy
             </a>
-            <a href="#" className="hover:text-[#111111] transition-colors">
+            <a href="#" className="hover:text-text-primary transition-colors">
               Terms
             </a>
-            <a href="#" className="hover:text-[#111111] transition-colors">
+            <a href="#" className="hover:text-text-primary transition-colors">
               Cookies
             </a>
           </div>
 
           <div
-            className="flex gap-5 text-[#6B6B6B]"
+            className="flex gap-5 text-text-secondary"
             aria-label="Social media links"
           >
             <a
@@ -111,7 +111,7 @@ export function Footer() {
               aria-label="Aurora on Instagram"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#111111] transition-colors"
+              className="hover:text-text-primary transition-colors"
             >
               <InstagramIcon />
             </a>
@@ -120,7 +120,7 @@ export function Footer() {
               aria-label="Aurora on Pinterest"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#111111] transition-colors"
+              className="hover:text-text-primary transition-colors"
             >
               <PinterestIcon />
             </a>

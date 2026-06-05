@@ -16,11 +16,11 @@ interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
 
 const buttonStyles: Record<ButtonVariant, string> = {
   filled:
-    "bg-[#0D0D0D] text-[#F7F7F5] hover:bg-[#111111] border border-[#0D0D0D]",
+    "bg-bg-ink text-text-inverted hover:bg-text-primary border border-bg-ink",
   ghost:
-    "bg-transparent text-[#111111] border border-[#111111] hover:bg-[#111111] hover:text-[#F7F7F5]",
-  gold: "bg-[#C8A882] text-white hover:bg-[#B8860B] border border-[#C8A882] hover:border-[#B8860B]",
-  icon: "bg-white border border-[#E8E8E4] hover:border-[#D0CFC9]",
+    "bg-transparent text-text-primary border border-text-primary hover:bg-text-primary hover:text-text-inverted",
+  gold: "bg-accent-primary text-white hover:bg-accent-vivid border border-accent-primary hover:border-accent-vivid",
+  icon: "bg-white border border-border-subtle hover:border-border-medium",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -43,7 +43,7 @@ export function Button({
       whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className={cn(
-        "rounded-full font-medium transition-all duration-300 inline-flex items-center justify-center gap-2 cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-[#C8A882] focus-visible:outline-offset-2",
+        "rounded-full font-medium transition-all duration-300 inline-flex items-center justify-center gap-2 cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2",
         buttonStyles[variant],
         sizeStyles[size],
         fullWidth && "w-full",

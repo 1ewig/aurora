@@ -16,7 +16,7 @@ export function Hero() {
     <section
       id="hero"
       aria-labelledby="hero-headline"
-      className="relative flex flex-col items-center justify-center min-h-screen pt-20 pb-16 overflow-hidden bg-[#F7F7F5]"
+      className="relative flex flex-col items-center justify-center min-h-screen pt-20 pb-16 overflow-hidden bg-bg-primary"
     >
       {/* Ambient background gradient blobs */}
       <div
@@ -57,7 +57,7 @@ export function Hero() {
         {/* H1 Headline */}
         <h1
           id="hero-headline"
-          className="font-sans font-black leading-none tracking-[-0.04em] mt-6 text-[#111111] w-full"
+          className="font-sans font-black leading-none tracking-[-0.04em] mt-6 text-text-primary w-full"
           style={{ fontSize: "clamp(3rem, 9vw, 9rem)" }}
         >
           <AnimatedText delay={0.2}>
@@ -67,7 +67,7 @@ export function Hero() {
             <span className="block">The World</span>
           </AnimatedText>
           <AnimatedText delay={0.5}>
-            <span className="block" style={{ color: "#C8A882" }}>
+            <span className="block text-accent-primary">
               Whispers.
             </span>
           </AnimatedText>
@@ -83,7 +83,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-[#6B6B6B] text-base md:text-lg font-light max-w-sm md:max-w-md mt-10 md:mt-8 leading-relaxed"
+          className="text-text-secondary text-base md:text-lg font-light max-w-sm md:max-w-md mt-10 md:mt-8 leading-relaxed"
         >
           Singular pieces for the considered wardrobe. Designed in solitude.
           Worn with intention.

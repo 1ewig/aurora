@@ -19,7 +19,7 @@ export function DesignerStory() {
     <section
       id="story"
       aria-labelledby="story-heading"
-      className="grid grid-cols-1 lg:grid-cols-2 min-h-[90vh] bg-[#F7F7F5]"
+      className="grid grid-cols-1 lg:grid-cols-2 min-h-[90vh] bg-bg-primary"
       ref={ref}
     >
       {/* Image Column */}
@@ -48,7 +48,7 @@ export function DesignerStory() {
 
       {/* Text Column */}
       <motion.div
-        className="flex flex-col justify-center px-8 md:px-12 xl:px-20 py-20 bg-[#F7F7F5]"
+        className="flex flex-col justify-center px-8 md:px-12 xl:px-20 py-20 bg-bg-primary"
         variants={staggerContainer}
         initial="hidden"
         whileInView="visible"
@@ -61,17 +61,17 @@ export function DesignerStory() {
         <motion.h2
           id="story-heading"
           variants={fadeInUp}
-          className="font-sans font-black leading-tight tracking-[-0.02em] mt-5 text-[#111111]"
+          className="font-sans font-black leading-tight tracking-[-0.02em] mt-5 text-text-primary"
           style={{ fontSize: "clamp(2rem, 4vw, 4.5rem)" }}
         >
           Every Stitch
           <br />
-          <span style={{ color: "#C8A882" }}>Is A Decision.</span>
+          <span className="text-accent-primary">Is A Decision.</span>
         </motion.h2>
 
         <motion.p
           variants={fadeInUp}
-          className="text-[#6B6B6B] leading-relaxed mt-8 max-w-lg text-base"
+          className="text-text-secondary leading-relaxed mt-8 max-w-lg text-base"
         >
           Aurora was born from a single conviction: that clothing should carry
           intention. Not just in its making, but in the quiet way it asks you
@@ -80,7 +80,7 @@ export function DesignerStory() {
 
         <motion.p
           variants={fadeInUp}
-          className="text-[#6B6B6B] leading-relaxed mt-4 max-w-lg text-base"
+          className="text-text-secondary leading-relaxed mt-4 max-w-lg text-base"
         >
           Each collection begins in silence — sketched before dawn, refined
           over months. The result is never rushed. The result is never obvious.
@@ -89,7 +89,7 @@ export function DesignerStory() {
 
         <motion.p
           variants={fadeInUp}
-          className="text-[#6B6B6B] leading-relaxed mt-4 max-w-lg text-base"
+          className="text-text-secondary leading-relaxed mt-4 max-w-lg text-base"
         >
           We work with mills that have operated for generations. We choose
           materials that age with grace. And we produce in quantities small
@@ -98,12 +98,12 @@ export function DesignerStory() {
 
         <motion.div
           variants={fadeInUp}
-          className="mt-10 border-t border-[#E8E8E4] pt-8"
+          className="mt-10 border-t border-border-subtle pt-8"
         >
-          <p className="font-display text-lg text-[#111111] italic">
+          <p className="font-display text-lg text-text-primary italic">
             — Elena Voss
           </p>
-          <p className="text-[#ABABAB] text-sm mt-1">
+          <p className="text-text-muted text-sm mt-1">
             Founder & Creative Director, Aurora
           </p>
         </motion.div>

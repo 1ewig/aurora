@@ -23,12 +23,12 @@ export function FeaturedCollection() {
         <EyebrowLabel>Featured Collection</EyebrowLabel>
         <h2
           id="collection-heading"
-          className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 mb-16 text-[#111111]"
+          className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 mb-16 text-text-primary"
           style={{ fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}
         >
           Curated For
           <br />
-          <span style={{ color: "#C8A882" }}>The Rare Few.</span>
+          <span className="text-accent-primary">The Rare Few.</span>
         </h2>
       </motion.div>
 

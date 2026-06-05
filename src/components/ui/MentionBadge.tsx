@@ -26,8 +26,8 @@ export function MentionBadge({
       }}
       className={`absolute px-4 py-2 rounded-full text-sm font-medium shadow-lg cursor-default select-none z-20 ${
         dark
-          ? "bg-[#0D0D0D] text-[#F7F7F5]"
-          : "bg-[#C8A882] text-white"
+          ? "bg-bg-ink text-text-inverted"
+          : "bg-accent-primary text-white"
       }`}
       style={style}
     >

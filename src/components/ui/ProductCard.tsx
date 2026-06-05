@@ -94,7 +94,7 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
 
           {/* Badge */}
           {product.badge && (
-            <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-white text-xs font-medium tracking-wide text-[#111111]">
+            <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-white text-xs font-medium tracking-wide text-text-primary">
               {product.badge}
             </span>
           )}
@@ -102,12 +102,12 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
 
         {/* Product Info */}
         <div className="p-4 md:p-5">
-          <h3 className="font-medium text-[#111111] text-base leading-snug">
+          <h3 className="font-medium text-text-primary text-base leading-snug">
             {product.name}
           </h3>
-          <p className="text-[#6B6B6B] text-sm mt-1">{product.category}</p>
+          <p className="text-text-secondary text-sm mt-1">{product.category}</p>
           <div className="flex items-center justify-between mt-3">
-            <span className="font-mono font-medium text-[#111111] text-sm">
+            <span className="font-mono font-medium text-text-primary text-sm">
               {formatCurrency(product.price)}
             </span>
             <motion.button
@@ -121,8 +121,8 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
               }
               className={`p-2 rounded-full transition-all duration-300 ${
                 inCart
-                  ? "border border-[#111111] bg-[#F7F7F5] text-[#111111]"
-                  : "hover:bg-[#F7F7F5] text-[#111111]"
+                  ? "border border-text-primary bg-bg-primary text-text-primary"
+                  : "hover:bg-bg-primary text-text-primary"
               }`}
             >
               <BagIconSmall />
