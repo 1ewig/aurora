@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/hooks/useCartStore";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
@@ -173,9 +174,11 @@ export function CartDrawer() {
                     {formatCurrency(total)}
                   </span>
                 </div>
-                <button className="w-full py-4 rounded-full bg-bg-ink text-text-inverted font-medium hover:bg-text-primary transition-colors">
-                  Checkout →
-                </button>
+                <Link href="/checkout" onClick={closeCart} className="block w-full">
+                  <button className="w-full py-4 rounded-full bg-bg-ink text-text-inverted font-medium hover:bg-text-primary transition-colors cursor-pointer">
+                    Checkout →
+                  </button>
+                </Link>
                 <p className="text-center text-xs text-text-muted mt-3">
                   Complimentary shipping on orders over $500
                 </p>

@@ -117,7 +117,7 @@ export function Navbar() {
               {navLinks.map((link) => (
                 <li key={link.href + link.label}>
                   <Link
-                    href={`/${link.href}`}
+                    href={link.href}
                     className="text-sm font-medium text-text-primary hover:text-accent-primary transition-colors tracking-wide"
                   >
                     {link.label}
@@ -188,7 +188,7 @@ export function Navbar() {
               {navLinks.map((link) => (
                 <motion.li key={link.label} variants={menuItemVariant}>
                   <Link
-                    href={`/${link.href}`}
+                    href={link.href}
                     onClick={() => setMenuOpen(false)}
                     className="text-5xl font-black text-text-inverted hover:text-accent-primary transition-colors tracking-tight leading-none block"
                   >

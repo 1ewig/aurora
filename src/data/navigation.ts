@@ -9,27 +9,29 @@ export interface FooterColumn {
 }
 
 export const navLinks: NavLink[] = [
-  { label: "Collections", href: "#collection" },
-  { label: "Lookbook", href: "#lookbook" },
-  { label: "Story", href: "#story" },
-  { label: "Contact", href: "#newsletter" },
+  { label: "Shop All", href: "/products" },
+  { label: "Collections", href: "/#collection" },
+  { label: "Lookbook", href: "/#lookbook" },
+  { label: "Story", href: "/#story" },
+  { label: "Contact", href: "/#newsletter" },
 ];
 
 export const footerNav: FooterColumn[] = [
   {
     title: "Shop",
     links: [
-      { label: "Outerwear", href: "#all-products" },
-      { label: "Knitwear", href: "#all-products" },
-      { label: "Trousers", href: "#all-products" },
-      { label: "Dresses", href: "#all-products" },
-      { label: "Accessories", href: "#all-products" },
+      { label: "All Pieces", href: "/products" },
+      { label: "Outerwear", href: "/products" },
+      { label: "Knitwear", href: "/products" },
+      { label: "Trousers", href: "/products" },
+      { label: "Dresses", href: "/products" },
+      { label: "Accessories", href: "/products" },
     ],
   },
   {
     title: "Aurora",
     links: [
-      { label: "Our Story", href: "#story" },
+      { label: "Our Story", href: "/#story" },
       { label: "Press", href: "#" },
       { label: "Sustainability", href: "#" },
       { label: "Careers", href: "#" },
@@ -41,7 +43,7 @@ export const footerNav: FooterColumn[] = [
       { label: "Shipping & Returns", href: "#" },
       { label: "Size Guide", href: "#" },
       { label: "Care Instructions", href: "#" },
-      { label: "Contact Us", href: "#newsletter" },
+      { label: "Contact Us", href: "/#newsletter" },
     ],
   },
 ];
