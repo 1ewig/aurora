@@ -100,10 +100,7 @@ export function DesignerStory() {
           variants={fadeInUp}
           className="mt-10 border-t border-[#E8E8E4] pt-8"
         >
-          <p
-            className="text-lg text-[#111111] italic"
-            className="font-display"
-          >
+          <p className="font-display text-lg text-[#111111] italic">
             — Elena Voss
           </p>
           <p className="text-[#ABABAB] text-sm mt-1">

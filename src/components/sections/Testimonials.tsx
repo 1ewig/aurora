@@ -68,8 +68,7 @@ export function Testimonials() {
             className="mt-12"
           >
             <p
-              className="italic leading-tight tracking-tight text-[#111111]"
-              className="font-display"
+              className="font-display italic leading-tight tracking-tight text-[#111111]"
               style={{ fontSize: "clamp(1.6rem, 3.5vw, 3.5rem)" }}
             >
               ❝ {t.quote} ❞
