@@ -55,7 +55,7 @@ export function Hero() {
         {/* H1 Headline */}
         <h1
           id="hero-headline"
-          className="font-['Inter'] font-black leading-none tracking-[-0.04em] mt-6 text-[#111111] w-full"
+          className="font-sans font-black leading-none tracking-[-0.04em] mt-6 text-[#111111] w-full"
           style={{ fontSize: "clamp(3rem, 9vw, 9rem)" }}
         >
           <AnimatedText delay={0.2}>

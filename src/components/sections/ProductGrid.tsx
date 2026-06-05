@@ -26,7 +26,7 @@ export function ProductGrid() {
           <EyebrowLabel>All Pieces</EyebrowLabel>
           <h2
             id="products-heading"
-            className="font-['Inter'] font-black leading-tight tracking-[-0.02em] mt-4 text-[#111111]"
+            className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 text-[#111111]"
             style={{ fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}
           >
             The Full

@@ -49,7 +49,7 @@ export function Footer() {
           <div className="lg:col-span-1">
             <p
               className="font-black text-xl tracking-[0.15em] uppercase text-[#111111]"
-              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+              className="font-display"
             >
               Aurora
             </p>

@@ -59,7 +59,7 @@ export function DesignerStory() {
         <motion.h2
           id="story-heading"
           variants={fadeInUp}
-          className="font-['Inter'] font-black leading-tight tracking-[-0.02em] mt-5 text-[#111111]"
+          className="font-sans font-black leading-tight tracking-[-0.02em] mt-5 text-[#111111]"
           style={{ fontSize: "clamp(2rem, 4vw, 4.5rem)" }}
         >
           Every Stitch
@@ -100,7 +100,7 @@ export function DesignerStory() {
         >
           <p
             className="text-lg text-[#111111] italic"
-            style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            className="font-display"
           >
             — Elena Voss
           </p>

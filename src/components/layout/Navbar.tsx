@@ -100,7 +100,7 @@ export function Navbar() {
               href="/"
               aria-label="Aurora — return to homepage"
               style={{ color: logoColor }}
-              className="font-['Playfair_Display'] font-black text-xl tracking-[0.15em] uppercase"
+              className="font-display font-black text-xl tracking-[0.15em] uppercase"
             >
               Aurora
             </motion.a>

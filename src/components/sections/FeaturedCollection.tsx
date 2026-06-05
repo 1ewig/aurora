@@ -21,7 +21,7 @@ export function FeaturedCollection() {
         <EyebrowLabel>Featured Collection</EyebrowLabel>
         <h2
           id="collection-heading"
-          className="font-['Inter'] font-black leading-tight tracking-[-0.02em] mt-4 mb-16 text-[#111111]"
+          className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 mb-16 text-[#111111]"
           style={{ fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}
         >
           Curated For

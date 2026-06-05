@@ -67,10 +67,8 @@ export function Testimonials() {
           >
             <p
               className="italic leading-tight tracking-tight text-[#111111]"
-              style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "clamp(1.6rem, 3.5vw, 3.5rem)",
-              }}
+              className="font-display"
+              style={{ fontSize: "clamp(1.6rem, 3.5vw, 3.5rem)" }}
             >
               ❝ {t.quote} ❞
             </p>

@@ -37,7 +37,7 @@ export function Newsletter() {
           <motion.h2
             id="newsletter-heading"
             variants={fadeInUp}
-            className="font-['Inter'] font-black leading-tight tracking-[-0.02em] text-[#F7F7F5] mt-4"
+            className="font-sans font-black leading-tight tracking-[-0.02em] text-[#F7F7F5] mt-4"
             style={{ fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}
           >
             First to Know.
