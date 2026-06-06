@@ -34,6 +34,14 @@ export function CheckoutForm() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
           </svg>
         </div>
+        <div className="bg-accent-secondary/20 border border-accent-primary/20 rounded-lg px-4 py-3 mb-6">
+          <p className="text-xs font-semibold text-accent-primary uppercase tracking-wider">
+            Demo Site Notice
+          </p>
+          <p className="text-xs text-text-secondary mt-1">
+            This is a dummy e-commerce site built for learning purposes. No real order has been placed.
+          </p>
+        </div>
         <h2 className="font-display font-black text-3xl tracking-tight text-text-primary">
           Order Received
         </h2>
