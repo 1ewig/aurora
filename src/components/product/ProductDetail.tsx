@@ -58,12 +58,12 @@ export function ProductDetail({ product }: ProductDetailProps) {
       {/* Main Layout Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
         {/* Left Side - Image Gallery */}
-        <div className="lg:col-span-7">
+        <div className="lg:col-span-5">
           <ImageGallery images={product.images} altText={product.altText} />
         </div>
 
         {/* Right Side - Info & Purchasing */}
-        <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-24">
+        <div className="lg:col-span-7 space-y-8 lg:sticky lg:top-24">
           <div className="space-y-4">
             {product.badge && (
               <span className="inline-block px-3 py-1 rounded-full bg-accent-secondary/50 text-[10px] font-bold uppercase tracking-wider text-accent-primary">
