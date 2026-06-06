@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { useCarousel } from "@/hooks/useCarousel";
 
 const slides = [
   {
@@ -38,38 +38,11 @@ const slides = [
 ];
 
 export function LookbookSlider() {
-  const [[current, direction], setSlide] = useState([0, 0]);
-  const [auto, setAuto] = useState(true);
-
-  const next = useCallback(() => {
-    setAuto(false);
-    setSlide(([c]) => [(c + 1) % slides.length, 1]);
-  }, []);
-
-  const prev = useCallback(() => {
-    setAuto(false);
-    setSlide(([c]) => [(c - 1 + slides.length) % slides.length, -1]);
-  }, []);
-
-  const goTo = (i: number) => {
-    setAuto(false);
-    setSlide(([c]) => [i, i > c ? 1 : -1]);
-  };
-
-  useEffect(() => {
-    if (!auto) return;
-    const timer = setInterval(() => {
-      setSlide(([c]) => [(c + 1) % slides.length, 1]);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, [auto]);
-
-  useEffect(() => {
-    if (!auto) {
-      const timer = setTimeout(() => setAuto(true), 10000);
-      return () => clearTimeout(timer);
-    }
-  }, [auto]);
+  const { current, direction, next, prev, goTo } = useCarousel({
+    length: slides.length,
+    interval: 6000,
+    autoResumeDelay: 10000,
+  });
 
   return (
     <section

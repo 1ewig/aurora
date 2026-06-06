@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { navLinks } from "@/data/navigation";
 import { useCartStore } from "@/hooks/useCartStore";
+import { useNavbarScroll } from "@/hooks/useNavbarScroll";
 import { navbarReveal, staggerContainer, menuItemVariant } from "@/animations/variants";
 
 function SearchIcon() {
@@ -54,22 +55,11 @@ function MenuIcon({ isOpen }: { isOpen: boolean }) {
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { scrollY } = useScroll();
   const toggleCart = useCartStore((s) => s.toggleCart);
   const items = useCartStore((s) => s.items);
   const count = items.reduce((sum, i) => sum + i.quantity, 0);
 
-  const navBg = useTransform(
-    scrollY,
-    [0, 80],
-    ["rgba(247,247,245,0)", "rgba(247,247,245,0.92)"]
-  );
-  const navBorder = useTransform(
-    scrollY,
-    [0, 80],
-    ["rgba(232,232,228,0)", "rgba(232,232,228,1)"]
-  );
-  const navBlur = useTransform(scrollY, [0, 80], ["blur(0px)", "blur(16px)"]);
+  const { navBg, navBorder, navBlur } = useNavbarScroll();
   return (
     <>
       <motion.header

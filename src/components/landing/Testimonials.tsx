@@ -1,38 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
+import { useCarousel } from "@/hooks/useCarousel";
 import { testimonials } from "@/data/testimonials";
 
 export function Testimonials() {
-  const [current, setCurrent] = useState(0);
-  const [auto, setAuto] = useState(true);
-
-  const next = () => {
-    setAuto(false);
-    setCurrent((c) => (c + 1) % testimonials.length);
-  };
-
-  const prev = () => {
-    setAuto(false);
-    setCurrent((c) => (c - 1 + testimonials.length) % testimonials.length);
-  };
-
-  useEffect(() => {
-    if (!auto) return;
-    const timer = setInterval(() => {
-      setCurrent((c) => (c + 1) % testimonials.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, [auto]);
-
-  useEffect(() => {
-    if (!auto) {
-      const t = setTimeout(() => setAuto(true), 12000);
-      return () => clearTimeout(t);
-    }
-  }, [auto]);
+  const { current, next, prev, goTo } = useCarousel({
+    length: testimonials.length,
+    autoResumeDelay: 12000,
+  });
 
   const t = testimonials[current];
 
@@ -114,7 +91,7 @@ export function Testimonials() {
               <button
                 key={i}
                 aria-label={`Go to testimonial ${i + 1}`}
-                onClick={() => { setAuto(false); setCurrent(i); }}
+                onClick={() => goTo(i)}
                 className={`h-[3px] rounded-full transition-all duration-300 ${
                   i === current ? "w-6 bg-text-primary" : "w-2 bg-border-medium"
                 }`}

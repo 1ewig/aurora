@@ -1,23 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
+import { useNewsletterSubmit } from "@/hooks/useNewsletterSubmit";
 import { staggerContainer, fadeInUp } from "@/animations/variants";
 
 export function Newsletter() {
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    setSubmitted(true);
-  };
+  const { email, setEmail, submitted, loading, handleSubmit } = useNewsletterSubmit();
 
   return (
     <section

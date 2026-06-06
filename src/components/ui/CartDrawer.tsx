@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/hooks/useCartStore";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { drawerSlide } from "@/animations/variants";
@@ -12,10 +12,7 @@ export function CartDrawer() {
   const { isOpen, closeCart, items, removeItem, updateQuantity, totalItems, totalPrice } =
     useCartStore();
 
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [isOpen]);
+  useBodyScrollLock(isOpen);
 
   const count = totalItems();
   const total = totalPrice();

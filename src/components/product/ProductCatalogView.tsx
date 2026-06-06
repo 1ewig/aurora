@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { heroProducts, allProducts, categories } from "@/data/products";
+import { useProductFilter } from "@/hooks/useProductFilter";
 import { cardEnter } from "@/animations/variants";
 
 const aspectRatios = ["aspect-[3/4]", "aspect-[4/5]", "aspect-[2/3]", "aspect-[3/4]"];
@@ -23,34 +22,15 @@ interface ProductCatalogViewProps {
 }
 
 export function ProductCatalogView({ initialCategory }: ProductCatalogViewProps) {
-  const [activeCategory, setActiveCategory] = useState(initialCategory);
-
-  // Sync state if initialCategory changes from back/forward routing actions
-  useEffect(() => {
-    setActiveCategory(initialCategory);
-  }, [initialCategory]);
-
-  const combinedProducts = useMemo(() => {
-    return [...heroProducts, ...allProducts];
-  }, []);
-
-  const filtered = useMemo(() => {
-    if (activeCategory === "All") {
-      return combinedProducts;
-    }
-    return combinedProducts.filter((p) => p.category === activeCategory);
-  }, [activeCategory, combinedProducts]);
-
-  const allCategories = ["All", ...categories];
-
-  const handleCategoryChange = (categoryName: string) => {
-    setActiveCategory(categoryName);
-    
-    // Update browser URL without triggering a full page reload or component unmount
-    const slug = categorySlugMap[categoryName];
-    const newUrl = slug ? `/products/category/${slug}` : "/products";
-    window.history.pushState(null, "", newUrl);
-  };
+  const { activeCategory, filtered, handleCategoryChange, categories } = useProductFilter({
+    initialCategory,
+    includeHero: true,
+    onCategoryChange: (categoryName) => {
+      const slug = categorySlugMap[categoryName];
+      const newUrl = slug ? `/products/category/${slug}` : "/products";
+      window.history.pushState(null, "", newUrl);
+    },
+  });
 
   return (
     <main id="main-content" tabIndex={-1} className="pt-28 pb-32">
@@ -76,7 +56,7 @@ export function ProductCatalogView({ initialCategory }: ProductCatalogViewProps)
             aria-label="Filter catalog"
             className="flex flex-wrap gap-2 md:gap-3"
           >
-            {allCategories.map((category) => {
+            {categories.map((category) => {
               const isSelected = category === activeCategory;
               return (
                 <button
