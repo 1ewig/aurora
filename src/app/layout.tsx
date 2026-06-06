@@ -6,7 +6,6 @@ import { HydrationWrapper } from "./hydration-wrapper";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/ui/CartDrawer";
-import { ScrollProgress } from "@/components/ui/ScrollProgress";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -47,7 +46,6 @@ export default function RootLayout({
     >
       <body className="bg-bg-primary min-h-screen antialiased">
         <HydrationWrapper>
-          <ScrollProgress />
           <Navbar />
           <CartDrawer />
           {children}
