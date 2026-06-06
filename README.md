@@ -63,95 +63,33 @@ npm run start    # serve the production build
 
 ```
 src/
-├── app/                          # Next.js App Router Pages
-│   ├── checkout/
-│   │   └── page.tsx                  # Client — orchestrates form, summary, empty, success states
+├── app/
+│   ├── checkout/page.tsx
 │   ├── products/
-│   │   ├── page.tsx                  # Client — catalog with useProductFilter
-│   │   ├── [slug]/
-│   │   │   └── page.tsx              # Server (SSG) — renders ProductDetailContainer
-│   │   └── category/[category]/
-│   │       └── page.tsx              # Server (SSG) — renders CategoryProductsPage
-│   ├── story/
-│   │   └── page.tsx                  # Client — composes 5 story section components
-│   ├── layout.tsx                     # Global shell (Navbar, Footer, CartDrawer)
-│   ├── page.tsx                       # Brand landing layout
-│   └── globals.css                    # Tailwind v4 directives & custom design tokens
+│   │   ├── page.tsx
+│   │   ├── [slug]/page.tsx              # SSG
+│   │   └── category/[category]/page.tsx # SSG
+│   ├── story/page.tsx
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── globals.css
 │
-├── components/                   # All UI & page layout components
-│   ├── checkout/
-│   │   ├── CartEmptyState.tsx         # Presentational — empty bag with "Shop the Collection" CTA
-│   │   ├── CheckoutForm.tsx           # Presentational — 9 form fields, delegates to hook
-│   │   ├── CheckoutSuccess.tsx        # Presentational — order confirmation + demo notice
-│   │   ├── OrderSummary.tsx           # Presentational — item list + subtotal/shipping/tax/total
-│   │   └── OrderSummaryContainer.tsx  # Bridge — reads cart store, calls useOrderPricing
-│   │
-│   ├── landing/
-│   │   ├── FeaturedCollection.tsx
-│   │   ├── HeroSection.tsx
-│   │   ├── LookbookSlider.tsx         # Uses useCarousel (autoplay, direction, slide state)
-│   │   ├── Newsletter.tsx             # Uses useNewsletterSubmit (email + submission lifecycle)
-│   │   └── Testimonials.tsx           # Uses useCarousel
-│   │
-│   ├── layout/
-│   │   ├── Footer.tsx
-│   │   └── Navbar.tsx                 # Uses useNavbarScroll (scroll-driven background/border/blur)
-│   │
+├── components/
+│   ├── checkout/      CartEmptyState, CheckoutForm, CheckoutSuccess, OrderSummary, OrderSummaryContainer
+│   ├── landing/       FeaturedCollection, HeroSection, LookbookSlider, Newsletter, Testimonials
+│   ├── layout/        Footer, Navbar
 │   ├── product/
-│   │   ├── listing/                   # Category listing page components
-│   │   │   ├── CategoryFilter.tsx         # Presentational — animated filter pill buttons
-│   │   │   ├── CategoryProductsPage.tsx   # Client orchestrator for /category/[category]
-│   │   │   ├── PageHeader.tsx             # Presentational — category title with eyebrow
-│   │   │   └── ProductGrid.tsx            # Presentational — animated grid with stagger
-│   │   └── detail/                    # Product detail page components
-│   │       ├── ImageGallery.tsx           # Presentational — product image display
-│   │       ├── ProductDetail.tsx          # Presentational — full product page layout
-│   │       ├── ProductDetailContainer.tsx # Bridge — reads stores, passes props to ProductDetail
-│   │       ├── RelatedProducts.tsx        # Presentational — related pieces grid
-│   │       ├── SizeGuideModal.tsx         # Presentational — sizing tables with unit toggle
-│   │       └── SizeSelector.tsx           # Presentational — size radio group
-│   │
-│   ├── story/
-│   │   ├── AtelierSection.tsx
-│   │   ├── ParallaxBreakout.tsx
-│   │   ├── PhilosophySection.tsx
-│   │   ├── StoryCta.tsx
-│   │   └── StoryHero.tsx
-│   │
-│   └── ui/                           # Shared atomic/utility components
-│       ├── Button.tsx
-│       ├── CartDrawer.tsx               # Uses useBodyScrollLock
-│       ├── EyebrowLabel.tsx
-│       ├── OptimizedImage.tsx
-│       └── ProductCard.tsx
+│   │   ├── listing/   CategoryFilter, CategoryProductsPage, PageHeader, ProductGrid
+│   │   └── detail/    ImageGallery, ProductDetail, ProductDetailContainer, RelatedProducts, SizeGuideModal, SizeSelector
+│   ├── story/         AtelierSection, ParallaxBreakout, PhilosophySection, StoryCta, StoryHero
+│   └── ui/            Button, CartDrawer, EyebrowLabel, OptimizedImage, ProductCard
 │
-├── stores/                        # Zustand state management
-│   ├── useCartStore.ts                # Cart items, drawer visibility, add/remove/update/clear, totals
-│   └── useProductStore.ts             # Per-product selected sizes, active tabs, size guide modal state
-│
-├── hooks/                          # Business logic & reusable state
-│   ├── useBodyScrollLock.ts           # Toggles document.body overflow
-│   ├── useCarousel.ts                 # Slide index, direction, autoplay with timer lifecycle
-│   ├── useCheckoutForm.ts             # 9 field states, validation, mock order processing, PII masking
-│   ├── useInView.ts                   # Intersection Observer wrapper
-│   ├── useMagneticHover.ts            # Magnetic button/target tracking
-│   ├── useMediaQuery.ts               # Responsive breakpoint matching
-│   ├── useNavbarScroll.ts             # Scroll position → nav background/blur/border
-│   ├── useNewsletterSubmit.ts         # Email field + submit lifecycle
-│   ├── useOrderPricing.ts             # Shipping threshold (free over $500), tax (8%), total calc
-│   └── useRelatedProducts.ts          # Memoized category match + fallback filtering
-│
-├── data/                           # Static datasets
-│   ├── navigation.ts
-│   ├── products.ts                    # Product interface + 14-item catalog
-│   └── testimonials.ts
-│
-├── animations/
-│   └── variants.ts                     # Shared Framer Motion variants (card enter, drawer slide, etc.)
-│
-└── utils/
-    ├── cn.ts                           # Tailwind class merge (clsx + tailwind-merge)
-    └── formatCurrency.ts               # Intl.NumberFormat price display
+├── stores/            useCartStore (persisted), useProductStore
+├── hooks/             useBodyScrollLock, useCarousel, useCheckoutForm, useInView, useMagneticHover,
+│                      useMediaQuery, useNavbarScroll, useNewsletterSubmit, useOrderPricing, useRelatedProducts
+├── data/              navigation, products (14 items), testimonials
+├── animations/        variants.ts
+└── utils/             cn.ts, formatCurrency.ts
 ```
 
 ## Hooks Overview
