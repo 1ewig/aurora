@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/hooks/useCartStore";
+import { useProductStore } from "@/hooks/useProductStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { ImageGallery } from "./ImageGallery";
 import { SizeSelector } from "./SizeSelector";
@@ -18,25 +18,32 @@ interface ProductDetailProps {
 
 export function ProductDetail({ product }: ProductDetailProps) {
   const router = useRouter();
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || "M");
-  const [activeTab, setActiveTab] = useState<"details" | "shipping">("details");
-  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
-  const [isAdded, setIsAdded] = useState(false);
+
+  const selectedSize = useProductStore((s) => s.selectedSizes[product.id]) || product.sizes[0] || "M";
+  const setSelectedSize = useProductStore((s) => s.setSelectedSize);
+
+  const activeTab = useProductStore((s) => s.activeTabs[product.id]) || "details";
+  const setActiveTab = useProductStore((s) => s.setActiveTab);
+
+  const isSizeGuideOpen = useProductStore((s) => s.isSizeGuideOpen);
+  const setIsSizeGuideOpen = useProductStore((s) => s.setSizeGuideOpen);
+
+  const isAdded = useProductStore((s) => s.addedProducts[product.id]) || false;
+  const addToBag = useProductStore((s) => s.addToBag);
+
   const addItem = useCartStore((s) => s.addItem);
 
   const handleAddToBag = () => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      size: selectedSize,
-      image: product.image,
-      category: product.category,
+    addToBag(product.id, () => {
+      addItem({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        size: selectedSize,
+        image: product.image,
+        category: product.category,
+      });
     });
-    setIsAdded(true);
-    setTimeout(() => {
-      setIsAdded(false);
-    }, 2000);
   };
 
   const handleBuyNow = () => {
@@ -113,7 +120,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             <SizeSelector
               sizes={product.sizes}
               selectedSize={selectedSize}
-              onChange={setSelectedSize}
+              onChange={(size) => setSelectedSize(product.id, size)}
               onOpenSizeGuide={() => setIsSizeGuideOpen(true)}
             />
           </div>
@@ -125,7 +132,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
               size="lg"
               fullWidth
               onClick={handleAddToBag}
-              className="py-4 font-semibold uppercase tracking-wider text-xs"
+              disabled={isAdded}
+              className="py-4 font-semibold uppercase tracking-wider text-xs disabled:opacity-75 disabled:cursor-not-allowed"
             >
               {isAdded ? "Added!" : "Add to Bag"}
             </Button>
@@ -147,7 +155,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 type="button"
                 role="tab"
                 aria-selected={activeTab === "details" ? "true" : "false"}
-                onClick={() => setActiveTab("details")}
+                onClick={() => setActiveTab(product.id, "details")}
                 className={`pb-3 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all mr-6 cursor-pointer ${
                   activeTab === "details"
                     ? "border-text-primary text-text-primary"
@@ -160,7 +168,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 type="button"
                 role="tab"
                 aria-selected={activeTab === "shipping" ? "true" : "false"}
-                onClick={() => setActiveTab("shipping")}
+                onClick={() => setActiveTab(product.id, "shipping")}
                 className={`pb-3 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
                   activeTab === "shipping"
                     ? "border-text-primary text-text-primary"
