@@ -70,12 +70,6 @@ export function Navbar() {
     ["rgba(232,232,228,0)", "rgba(232,232,228,1)"]
   );
   const navBlur = useTransform(scrollY, [0, 80], ["blur(0px)", "blur(16px)"]);
-  const logoColor = useTransform(
-    scrollY,
-    [0, 80],
-    ["#111111", "#C8A882"]
-  );
-
   return (
     <>
       <motion.header
@@ -99,15 +93,13 @@ export function Navbar() {
             className="flex items-center justify-between h-16 md:h-20 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto"
           >
             {/* Logo */}
-            <motion.span style={{ color: logoColor }}>
-              <Link
-                href="/"
-                aria-label="Aurora — return to homepage"
-                className="font-display font-black text-xl tracking-[0.15em] uppercase"
-              >
-                Aurora
-              </Link>
-            </motion.span>
+            <Link
+              href="/"
+              aria-label="Aurora — return to homepage"
+              className="font-display font-black text-xl tracking-[0.15em] uppercase text-text-primary hover:text-accent-primary transition-colors"
+            >
+              Aurora
+            </Link>
 
             {/* Desktop Nav Links */}
             <ul
