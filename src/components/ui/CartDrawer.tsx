@@ -85,17 +85,25 @@ export function CartDrawer() {
                       key={`${item.id}-${item.size}`}
                       className="flex gap-4"
                     >
-                      <div className="w-20 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-bg-primary relative">
+                      <Link
+                        href={`/products/${item.slug}`}
+                        onClick={closeCart}
+                        className="w-20 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-bg-primary relative"
+                      >
                         <OptimizedImage
                           src={item.image}
                           alt={item.name}
                           className="w-full h-full object-cover"
                         />
-                      </div>
+                      </Link>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-text-primary text-sm leading-snug">
+                        <Link
+                          href={`/products/${item.slug}`}
+                          onClick={closeCart}
+                          className="font-medium text-text-primary text-sm leading-snug hover:text-accent-primary transition-colors"
+                        >
                           {item.name}
-                        </p>
+                        </Link>
                         <p className="text-text-muted text-xs mt-1">
                           Size: {item.size}
                         </p>

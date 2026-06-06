@@ -54,6 +54,7 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
     } else {
       addItem({
         id: product.id,
+        slug: product.slug,
         name: product.name,
         price: product.price,
         size: "M",

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { formatCurrency } from "@/utils/formatCurrency";
 import type { CartItem } from "@/stores/useCartStore";
 
@@ -29,7 +30,7 @@ export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSum
       <ul role="list" className="divide-y divide-border-subtle max-h-[350px] overflow-y-auto pr-2">
         {items.map((item) => (
           <li key={`${item.id}-${item.size}`} className="py-4 flex gap-4 items-center">
-            <div className="relative w-16 h-20 bg-border-subtle rounded-md overflow-hidden flex-shrink-0">
+            <Link href={`/products/${item.slug}`} className="relative w-16 h-20 bg-border-subtle rounded-md overflow-hidden flex-shrink-0">
               <Image
                 src={item.image}
                 alt={`${item.name} in size ${item.size}`}
@@ -37,9 +38,14 @@ export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSum
                 sizes="64px"
                 className="object-cover object-top"
               />
-            </div>
+            </Link>
             <div className="flex-1 min-w-0">
-              <h3 className="font-medium text-text-primary text-sm truncate">{item.name}</h3>
+              <Link
+                href={`/products/${item.slug}`}
+                className="font-medium text-text-primary text-sm truncate hover:text-accent-primary transition-colors"
+              >
+                {item.name}
+              </Link>
               <p className="text-text-secondary text-xs mt-0.5">Size: {item.size} × Qty: {item.quantity}</p>
             </div>
             <span className="font-mono text-sm font-medium text-text-primary">

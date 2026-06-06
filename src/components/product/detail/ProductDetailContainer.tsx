@@ -31,6 +31,7 @@ export function ProductDetailContainer({ product }: ProductDetailContainerProps)
   const handleAddToBag = () => {
     addItem({
       id: product.id,
+      slug: product.slug,
       name: product.name,
       price: product.price,
       size: selectedSize,
@@ -42,6 +43,7 @@ export function ProductDetailContainer({ product }: ProductDetailContainerProps)
   const handleBuyNow = () => {
     addItem({
       id: product.id,
+      slug: product.slug,
       name: product.name,
       price: product.price,
       size: selectedSize,
