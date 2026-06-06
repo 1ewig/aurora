@@ -1,26 +1,15 @@
 "use client";
 
-import { heroProducts, allProducts, Product } from "@/data/products";
+import { useRelatedProducts } from "@/hooks/useRelatedProducts";
 import { ProductCard } from "@/components/ui/ProductCard";
+import type { Product } from "@/data/products";
 
 interface RelatedProductsProps {
   currentProduct: Product;
 }
 
 export function RelatedProducts({ currentProduct }: RelatedProductsProps) {
-  // Combine all unique products to find matching category items
-  const combined = [...heroProducts, ...allProducts];
-
-  // Filter for matching category, excluding the active product
-  const related = combined
-    .filter((p) => p.category === currentProduct.category && p.id !== currentProduct.id)
-    .slice(0, 4);
-
-  if (related.length === 0) {
-    // If no exact category matches, fallback to showing any other premium pieces
-    const fallback = combined.filter((p) => p.id !== currentProduct.id).slice(0, 4);
-    related.push(...fallback);
-  }
+  const related = useRelatedProducts(currentProduct);
 
   return (
     <section aria-labelledby="related-heading" className="py-20 border-t border-border-subtle mt-20">

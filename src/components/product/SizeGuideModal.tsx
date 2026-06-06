@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
 interface SizeGuideModalProps {
   isOpen: boolean;
@@ -12,16 +13,7 @@ interface SizeGuideModalProps {
 export function SizeGuideModal({ isOpen, onClose, category }: SizeGuideModalProps) {
   const [unit, setUnit] = useState<"in" | "cm">("cm");
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
+  useBodyScrollLock(isOpen);
 
   const isAccessory = category.toLowerCase() === "accessories";
   // Determine if it is likely a belt based on the category/sizing style
