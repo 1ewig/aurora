@@ -6,18 +6,23 @@ interface SizeSelectorProps {
   sizes: string[];
   selectedSize: string;
   onChange: (size: string) => void;
+  onOpenSizeGuide: () => void;
 }
 
-export function SizeSelector({ sizes, selectedSize, onChange }: SizeSelectorProps) {
+export function SizeSelector({ sizes, selectedSize, onChange, onOpenSizeGuide }: SizeSelectorProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
           Select Size
         </span>
-        <span className="text-xs text-accent-primary hover:underline cursor-pointer">
+        <button
+          type="button"
+          onClick={onOpenSizeGuide}
+          className="text-xs text-accent-primary hover:underline cursor-pointer bg-transparent border-none p-0 outline-none"
+        >
           Size Guide
-        </span>
+        </button>
       </div>
       <div className="flex flex-wrap gap-3" role="radiogroup" aria-label="Product size selection">
         {sizes.map((size) => {

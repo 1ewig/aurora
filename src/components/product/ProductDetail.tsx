@@ -9,6 +9,7 @@ import { SizeSelector } from "./SizeSelector";
 import { RelatedProducts } from "./RelatedProducts";
 import { Button } from "@/components/ui/Button";
 import type { Product } from "@/data/products";
+import { SizeGuideModal } from "./SizeGuideModal";
 
 interface ProductDetailProps {
   product: Product;
@@ -17,6 +18,7 @@ interface ProductDetailProps {
 export function ProductDetail({ product }: ProductDetailProps) {
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || "M");
   const [activeTab, setActiveTab] = useState<"details" | "shipping">("details");
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
   const openCart = useCartStore((s) => s.openCart);
 
@@ -95,6 +97,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
               sizes={product.sizes}
               selectedSize={selectedSize}
               onChange={setSelectedSize}
+              onOpenSizeGuide={() => setIsSizeGuideOpen(true)}
             />
           </div>
 
@@ -168,6 +171,13 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
       {/* Related Products Grid */}
       <RelatedProducts currentProduct={product} />
+
+      {/* Size Guide Modal */}
+      <SizeGuideModal
+        isOpen={isSizeGuideOpen}
+        onClose={() => setIsSizeGuideOpen(false)}
+        category={product.category}
+      />
     </div>
   );
 }
