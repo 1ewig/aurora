@@ -28,21 +28,19 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const isSizeGuideOpen = useProductStore((s) => s.isSizeGuideOpen);
   const setIsSizeGuideOpen = useProductStore((s) => s.setSizeGuideOpen);
 
-  const isAdded = useProductStore((s) => s.addedProducts[product.id]) || false;
-  const addToBag = useProductStore((s) => s.addToBag);
-
   const addItem = useCartStore((s) => s.addItem);
+  const isInCart = useCartStore((s) =>
+    s.items.some((item) => item.id === product.id && item.size === selectedSize)
+  );
 
   const handleAddToBag = () => {
-    addToBag(product.id, () => {
-      addItem({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        size: selectedSize,
-        image: product.image,
-        category: product.category,
-      });
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      size: selectedSize,
+      image: product.image,
+      category: product.category,
     });
   };
 
@@ -132,10 +130,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
               size="lg"
               fullWidth
               onClick={handleAddToBag}
-              disabled={isAdded}
+              disabled={isInCart}
               className="py-4 font-semibold uppercase tracking-wider text-xs disabled:opacity-75 disabled:cursor-not-allowed"
             >
-              {isAdded ? "Added!" : "Add to Bag"}
+              {isInCart ? "Added!" : "Add to Bag"}
             </Button>
             <Button
               variant="filled"
