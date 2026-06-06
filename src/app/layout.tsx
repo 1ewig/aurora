@@ -5,6 +5,7 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CartDrawer } from "@/components/ui/CartDrawer";
+import Providers from "@/app/providers";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -44,10 +45,12 @@ export default function RootLayout({
       className={`${inter.variable} ${playfairDisplay.variable}`}
     >
       <body className="bg-bg-primary min-h-screen antialiased">
+        <Providers>
           <Navbar />
           <CartDrawer />
           {children}
           <Footer />
+        </Providers>
       </body>
     </html>
   );

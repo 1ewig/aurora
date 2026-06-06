@@ -5,10 +5,14 @@ import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { Button } from "@/components/ui/Button";
-import { featuredProducts } from "@/data/products";
+import { useProductsQuery } from "@/hooks/queries";
 import { staggerContainer, scaleIn } from "@/animations/variants";
 
 export function FeaturedCollection() {
+  const { data: products = [] } = useProductsQuery();
+  const featured = products.filter((p) =>
+    ["ivory-wool-overcoat", "ecru-linen-blazer", "champagne-silk-slip-dress"].includes(p.slug)
+  );
   return (
     <section
       id="collection"
@@ -41,7 +45,7 @@ export function FeaturedCollection() {
         role="list"
         className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6"
       >
-        {featuredProducts.map((product) => (
+        {featured.map((product) => (
           <motion.div
             key={product.id}
             variants={scaleIn}

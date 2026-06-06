@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
-import { allProducts, heroProducts, categories } from "@/data/products";
+import { useProductsQuery } from "@/hooks/queries";
+import { categories } from "@/data/products";
 
 interface UseProductFilterOptions {
   initialCategory?: string;
@@ -10,7 +11,6 @@ interface UseProductFilterOptions {
 export function useProductFilter(options: UseProductFilterOptions = {}) {
   const {
     initialCategory = "All",
-    includeHero = false,
     onCategoryChange,
   } = options;
 
@@ -20,17 +20,14 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
     setActiveCategory(initialCategory);
   }, [initialCategory]);
 
-  const combined = useMemo(
-    () => (includeHero ? [...heroProducts, ...allProducts] : allProducts),
-    [includeHero]
-  );
+  const { data: dbProducts = [], isLoading } = useProductsQuery();
 
   const filtered = useMemo(
     () =>
       activeCategory === "All"
-        ? combined
-        : combined.filter((p) => p.category === activeCategory),
-    [activeCategory, combined]
+        ? dbProducts
+        : dbProducts.filter((p) => p.category === activeCategory),
+    [activeCategory, dbProducts]
   );
 
   const handleCategoryChange = (category: string) => {
@@ -43,6 +40,7 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
     setActiveCategory,
     handleCategoryChange,
     filtered,
+    isLoading,
     categories: ["All", ...categories] as const,
   };
 }

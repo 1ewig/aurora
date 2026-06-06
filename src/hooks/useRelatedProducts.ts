@@ -1,18 +1,19 @@
 import { useMemo } from "react";
-import { heroProducts, allProducts, Product } from "@/data/products";
+import { useProductsQuery } from "@/hooks/queries";
+import type { Product } from "@/data/products";
 
 export function useRelatedProducts(currentProduct: Product) {
-  return useMemo(() => {
-    const combined = [...heroProducts, ...allProducts];
+  const { data: dbProducts = [] } = useProductsQuery();
 
-    const related = combined.filter(
-      (p) => p.category === currentProduct.category && p.id !== currentProduct.id
+  return useMemo(() => {
+    const related = dbProducts.filter(
+      (p) => p.category === currentProduct.category && p.slug !== currentProduct.slug
     );
 
     if (related.length > 0) {
       return related.slice(0, 4);
     }
 
-    return combined.filter((p) => p.id !== currentProduct.id).slice(0, 4);
-  }, [currentProduct]);
+    return dbProducts.filter((p) => p.slug !== currentProduct.slug).slice(0, 4);
+  }, [currentProduct, dbProducts]);
 }

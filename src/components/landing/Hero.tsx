@@ -7,11 +7,22 @@ import { CascadeCards } from "./ui/CascadeCards";
 import { Button } from "@/components/ui/Button";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { AnimatedText } from "@/components/ui/AnimatedText";
-import { heroProducts } from "@/data/products";
+import { useProductsQuery } from "@/hooks/queries";
 
 export function Hero() {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 600], [0, -100]);
+
+  const { data: products = [] } = useProductsQuery();
+  const heroProductsList = products.filter((p) =>
+    [
+      "ivory-wool-overcoat",
+      "camel-cashmere-turtleneck",
+      "ecru-linen-blazer",
+      "charcoal-wide-leg-trousers",
+      "champagne-silk-slip-dress",
+    ].includes(p.slug)
+  );
 
   return (
     <section
@@ -76,7 +87,7 @@ export function Hero() {
 
         {/* Cascade Cards — positioned relative to create space */}
         <div className="relative w-full mt-12 md:mt-14">
-          <CascadeCards products={heroProducts} />
+          <CascadeCards products={heroProductsList} />
         </div>
 
         {/* Subheadline */}
