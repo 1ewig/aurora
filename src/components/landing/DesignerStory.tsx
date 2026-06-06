@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Button } from "@/components/ui/Button";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
@@ -109,7 +110,9 @@ export function DesignerStory() {
         </motion.div>
 
         <motion.div variants={fadeInUp} className="mt-8">
-          <Button variant="ghost">Read The Full Story →</Button>
+          <Link href="/story">
+            <Button variant="ghost">Read The Full Story →</Button>
+          </Link>
         </motion.div>
       </motion.div>
     </section>
