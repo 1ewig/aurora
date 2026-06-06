@@ -1,61 +1,39 @@
-"use client";
-
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCartStore } from "@/stores/useCartStore";
-import { useProductStore } from "@/stores/useProductStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { ImageGallery } from "./ImageGallery";
 import { SizeSelector } from "./SizeSelector";
 import { RelatedProducts } from "./RelatedProducts";
+import { SizeGuideModal } from "./SizeGuideModal";
 import { Button } from "@/components/ui/Button";
 import type { Product } from "@/data/products";
-import { SizeGuideModal } from "./SizeGuideModal";
 
 interface ProductDetailProps {
   product: Product;
+  selectedSize: string;
+  onSizeChange: (size: string) => void;
+  activeTab: "details" | "shipping";
+  onTabChange: (tab: "details" | "shipping") => void;
+  isSizeGuideOpen: boolean;
+  onOpenSizeGuide: () => void;
+  onCloseSizeGuide: () => void;
+  isInCart: boolean;
+  onAddToBag: () => void;
+  onBuyNow: () => void;
 }
 
-export function ProductDetail({ product }: ProductDetailProps) {
-  const router = useRouter();
-
-  const selectedSize = useProductStore((s) => s.selectedSizes[product.id]) || product.sizes[0] || "M";
-  const setSelectedSize = useProductStore((s) => s.setSelectedSize);
-
-  const activeTab = useProductStore((s) => s.activeTabs[product.id]) || "details";
-  const setActiveTab = useProductStore((s) => s.setActiveTab);
-
-  const isSizeGuideOpen = useProductStore((s) => s.isSizeGuideOpen);
-  const setIsSizeGuideOpen = useProductStore((s) => s.setSizeGuideOpen);
-
-  const addItem = useCartStore((s) => s.addItem);
-  const isInCart = useCartStore((s) =>
-    s.items.some((item) => item.id === product.id && item.size === selectedSize)
-  );
-
-  const handleAddToBag = () => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      size: selectedSize,
-      image: product.image,
-      category: product.category,
-    });
-  };
-
-  const handleBuyNow = () => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      size: selectedSize,
-      image: product.image,
-      category: product.category,
-    });
-    router.push("/checkout");
-  };
-
+export function ProductDetail({
+  product,
+  selectedSize,
+  onSizeChange,
+  activeTab,
+  onTabChange,
+  isSizeGuideOpen,
+  onOpenSizeGuide,
+  onCloseSizeGuide,
+  isInCart,
+  onAddToBag,
+  onBuyNow,
+}: ProductDetailProps) {
   return (
     <div className="pt-24 pb-16 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
       {/* Breadcrumbs */}
@@ -118,8 +96,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
             <SizeSelector
               sizes={product.sizes}
               selectedSize={selectedSize}
-              onChange={(size) => setSelectedSize(product.id, size)}
-              onOpenSizeGuide={() => setIsSizeGuideOpen(true)}
+              onChange={onSizeChange}
+              onOpenSizeGuide={onOpenSizeGuide}
             />
           </div>
 
@@ -129,7 +107,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
               variant="ghost"
               size="lg"
               fullWidth
-              onClick={handleAddToBag}
+              onClick={onAddToBag}
               disabled={isInCart}
               className="py-4 font-semibold uppercase tracking-wider text-xs disabled:opacity-75 disabled:cursor-not-allowed"
             >
@@ -139,7 +117,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
               variant="filled"
               size="lg"
               fullWidth
-              onClick={handleBuyNow}
+              onClick={onBuyNow}
               className="py-4 font-semibold uppercase tracking-wider text-xs"
             >
               Buy Now
@@ -153,7 +131,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 type="button"
                 role="tab"
                 aria-selected={activeTab === "details" ? "true" : "false"}
-                onClick={() => setActiveTab(product.id, "details")}
+                onClick={() => onTabChange("details")}
                 className={`pb-3 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all mr-6 cursor-pointer ${
                   activeTab === "details"
                     ? "border-text-primary text-text-primary"
@@ -166,7 +144,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 type="button"
                 role="tab"
                 aria-selected={activeTab === "shipping" ? "true" : "false"}
-                onClick={() => setActiveTab(product.id, "shipping")}
+                onClick={() => onTabChange("shipping")}
                 className={`pb-3 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
                   activeTab === "shipping"
                     ? "border-text-primary text-text-primary"
@@ -207,7 +185,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
       {/* Size Guide Modal */}
       <SizeGuideModal
         isOpen={isSizeGuideOpen}
-        onClose={() => setIsSizeGuideOpen(false)}
+        onClose={onCloseSizeGuide}
         category={product.category}
       />
     </div>

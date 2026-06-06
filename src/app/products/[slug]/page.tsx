@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { heroProducts, allProducts } from "@/data/products";
-import { ProductDetail } from "@/components/product/ProductDetail";
+import { ProductDetailContainer } from "@/components/product/ProductDetailContainer";
 
 export async function generateStaticParams() {
   const all = [...heroProducts, ...allProducts];
@@ -26,7 +26,7 @@ export default async function ProductPage({ params }: PageProps) {
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <ProductDetail product={product} />
+      <ProductDetailContainer product={product} />
     </main>
   );
 }
