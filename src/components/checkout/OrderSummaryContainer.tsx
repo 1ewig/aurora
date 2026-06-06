@@ -9,6 +9,8 @@ export function OrderSummaryContainer() {
   const subtotal = useCartStore((s) => s.totalPrice());
   const { shipping, tax, total } = useOrderPricing(subtotal);
 
+  if (items.length === 0) return null;
+
   return (
     <OrderSummary
       items={items}

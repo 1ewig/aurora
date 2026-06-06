@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useCheckoutForm } from "@/hooks/useCheckoutForm";
 import { Button } from "@/components/ui/Button";
+import { CartEmptyState } from "@/components/checkout/CartEmptyState";
 
 export function CheckoutForm() {
   const {
@@ -70,7 +71,7 @@ export function CheckoutForm() {
   }
 
   if (items.length === 0) {
-    return null;
+    return <CartEmptyState />;
   }
 
   return (
