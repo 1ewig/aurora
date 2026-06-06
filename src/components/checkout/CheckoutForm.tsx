@@ -3,9 +3,12 @@
 import { motion } from "framer-motion";
 import { useCheckoutForm } from "@/hooks/useCheckoutForm";
 import { Button } from "@/components/ui/Button";
-import { CartEmptyState } from "@/components/checkout/CartEmptyState";
 
-export function CheckoutForm() {
+interface CheckoutFormProps {
+  onOrderPlaced?: () => void;
+}
+
+export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
   const {
     email, setEmail,
     firstName, setFirstName,
@@ -21,7 +24,7 @@ export function CheckoutForm() {
     handlePlaceOrder,
     maskEmail,
     maskCardNumber,
-  } = useCheckoutForm();
+  } = useCheckoutForm(onOrderPlaced);
 
   if (success) {
     return (
@@ -71,7 +74,7 @@ export function CheckoutForm() {
   }
 
   if (items.length === 0) {
-    return <CartEmptyState />;
+    return null;
   }
 
   return (

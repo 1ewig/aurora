@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useCartStore } from "@/stores/useCartStore";
 
-export function useCheckoutForm() {
+export function useCheckoutForm(onOrderPlaced?: () => void) {
   const clearCart = useCartStore((s) => s.clearCart);
   const items = useCartStore((s) => s.items);
 
@@ -35,6 +35,7 @@ export function useCheckoutForm() {
       setOrderNumber(generatedOrder);
       setSuccess(true);
       setLoading(false);
+      onOrderPlaced?.();
       clearCart();
     }, 1500);
   };
