@@ -5,8 +5,13 @@ import { CategoryFilter } from "@/components/product/CategoryFilter";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { useProductFilter } from "@/hooks/useProductFilter";
 
-export default function ProductsPage() {
+interface CategoryProductsPageProps {
+  categoryName: string;
+}
+
+export function CategoryProductsPage({ categoryName }: CategoryProductsPageProps) {
   const { activeCategory, filtered, categories, handleCategoryChange } = useProductFilter({
+    initialCategory: categoryName,
     includeHero: true,
     onCategoryChange: (name) => {
       const slug = name === "All" ? "" : name.toLowerCase();

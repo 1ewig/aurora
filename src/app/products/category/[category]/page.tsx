@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { ProductCatalogView } from "@/components/product/ProductCatalogView";
+import { CategoryProductsPage } from "./CategoryProductsPage";
 
 const categoryMap: Record<string, string> = {
   outerwear: "Outerwear",
@@ -31,5 +31,5 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  return <ProductCatalogView initialCategory={categoryName} />;
+  return <CategoryProductsPage categoryName={categoryName} />;
 }
