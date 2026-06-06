@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCartStore } from "@/hooks/useCartStore";
+import { useCartStore } from "@/stores/useCartStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 
 export function OrderSummary() {

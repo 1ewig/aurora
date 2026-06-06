@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCartStore } from "@/hooks/useCartStore";
+import { useCartStore } from "@/stores/useCartStore";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { formatCurrency } from "@/utils/formatCurrency";

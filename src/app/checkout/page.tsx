@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCartStore } from "@/hooks/useCartStore";
+import { useCartStore } from "@/stores/useCartStore";
 import { CheckoutForm } from "@/components/checkout/CheckoutForm";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
 import { Button } from "@/components/ui/Button";

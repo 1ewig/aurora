@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/utils/cn";
 import { formatCurrency } from "@/utils/formatCurrency";
-import { useCartStore } from "@/hooks/useCartStore";
+import { useCartStore } from "@/stores/useCartStore";
 import { cardImageReveal } from "@/animations/variants";
 import type { Product } from "@/data/products";
 

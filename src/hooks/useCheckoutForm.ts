@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useCartStore } from "./useCartStore";
+import { useCartStore } from "@/stores/useCartStore";
 
 export function useCheckoutForm() {
   const clearCart = useCartStore((s) => s.clearCart);

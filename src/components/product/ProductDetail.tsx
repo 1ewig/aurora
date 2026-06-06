@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCartStore } from "@/hooks/useCartStore";
-import { useProductStore } from "@/hooks/useProductStore";
+import { useCartStore } from "@/stores/useCartStore";
+import { useProductStore } from "@/stores/useProductStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { ImageGallery } from "./ImageGallery";
 import { SizeSelector } from "./SizeSelector";

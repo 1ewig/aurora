@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { navLinks } from "@/data/navigation";
-import { useCartStore } from "@/hooks/useCartStore";
+import { useCartStore } from "@/stores/useCartStore";
 import { useNavbarScroll } from "@/hooks/useNavbarScroll";
 import { navbarReveal, staggerContainer, menuItemVariant } from "@/animations/variants";
 
