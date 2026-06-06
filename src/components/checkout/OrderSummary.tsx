@@ -1,18 +1,16 @@
-"use client";
-
 import Image from "next/image";
-import { useCartStore } from "@/stores/useCartStore";
 import { formatCurrency } from "@/utils/formatCurrency";
+import type { CartItem } from "@/stores/useCartStore";
 
-export function OrderSummary() {
-  const items = useCartStore((s) => s.items);
-  const subtotal = useCartStore((s) => s.totalPrice());
+interface OrderSummaryProps {
+  items: CartItem[];
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
+}
 
-  // Luxury billing: Free shipping over $500, otherwise $25 flat express rate
-  const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
-  const tax = Math.round(subtotal * 0.08 * 100) / 100;
-  const total = subtotal + shipping + tax;
-
+export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSummaryProps) {
   if (items.length === 0) {
     return (
       <div className="bg-bg-secondary p-8 rounded-2xl border border-border-subtle text-center space-y-4">

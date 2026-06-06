@@ -2,7 +2,7 @@
 
 import { useCartStore } from "@/stores/useCartStore";
 import { CheckoutForm } from "@/components/checkout/CheckoutForm";
-import { OrderSummary } from "@/components/checkout/OrderSummary";
+import { OrderSummaryContainer } from "@/components/checkout/OrderSummaryContainer";
 import { CartEmptyState } from "@/components/checkout/CartEmptyState";
 
 export default function CheckoutPage() {
@@ -25,7 +25,7 @@ export default function CheckoutPage() {
               <CheckoutForm />
             </div>
             <div className="lg:col-span-5 lg:sticky lg:top-24">
-              <OrderSummary />
+              <OrderSummaryContainer />
             </div>
           </div>
         )}
