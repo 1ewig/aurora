@@ -1,0 +1,20 @@
+"use client";
+
+import { OptimizedImage } from "@/components/ui/OptimizedImage";
+
+export function ParallaxBreakout() {
+  return (
+    <section className="my-20 relative h-[50vh] md:h-[60vh] bg-border-subtle overflow-hidden">
+      <OptimizedImage
+        src="/images/lookbook/lookbook-3.webp"
+        alt="Extrafine fabric detail view"
+        className="w-full h-full object-cover object-center scale-105"
+      />
+      <div className="absolute inset-0 bg-bg-ink/25 backdrop-blur-[1px] flex items-center justify-center">
+        <h2 className="text-text-inverted font-display font-black text-2xl md:text-5xl uppercase tracking-widest text-center px-4">
+          Honest Craft. Eternal Wear.
+        </h2>
+      </div>
+    </section>
+  );
+}
