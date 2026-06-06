@@ -66,28 +66,4 @@
   section[id] {
     scroll-margin-top: 5rem;
   }
-
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: var(--color-bg-primary);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-accent-primary);
-    border-radius: 9999px;
-    border: 2px solid var(--color-bg-primary);
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-accent-vivid);
-  }
-
-  html {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-accent-primary) var(--color-bg-primary);
-  }
 }
