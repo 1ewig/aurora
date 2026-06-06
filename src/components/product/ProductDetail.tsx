@@ -45,7 +45,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
           <li>/</li>
           <li>
             <Link href="/products" className="hover:text-text-primary transition-colors">
-              Shop
+              Products
             </Link>
           </li>
           <li>/</li>
