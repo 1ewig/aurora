@@ -21,8 +21,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || "M");
   const [activeTab, setActiveTab] = useState<"details" | "shipping">("details");
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
-  const openCart = useCartStore((s) => s.openCart);
 
   const handleAddToBag = () => {
     addItem({
@@ -33,7 +33,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
       image: product.image,
       category: product.category,
     });
-    openCart();
+    setIsAdded(true);
+    setTimeout(() => {
+      setIsAdded(false);
+    }, 2000);
   };
 
   const handleBuyNow = () => {
@@ -124,7 +127,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
               onClick={handleAddToBag}
               className="py-4 font-semibold uppercase tracking-wider text-xs"
             >
-              Add to Bag
+              {isAdded ? "Added!" : "Add to Bag"}
             </Button>
             <Button
               variant="filled"
