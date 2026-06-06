@@ -19,6 +19,7 @@ interface ProductDetailProps {
   isInCart: boolean;
   onAddToBag: () => void;
   onBuyNow: () => void;
+  relatedProducts: Product[];
 }
 
 export function ProductDetail({
@@ -33,6 +34,7 @@ export function ProductDetail({
   isInCart,
   onAddToBag,
   onBuyNow,
+  relatedProducts,
 }: ProductDetailProps) {
   return (
     <div className="pt-24 pb-16 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
@@ -180,7 +182,7 @@ export function ProductDetail({
       </div>
 
       {/* Related Products Grid */}
-      <RelatedProducts currentProduct={product} />
+      <RelatedProducts products={relatedProducts} />
 
       {/* Size Guide Modal */}
       <SizeGuideModal

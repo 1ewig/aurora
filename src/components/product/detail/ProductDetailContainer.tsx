@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/stores/useCartStore";
 import { useProductStore } from "@/stores/useProductStore";
+import { useRelatedProducts } from "@/hooks/useRelatedProducts";
 import { ProductDetail } from "./ProductDetail";
 import type { Product } from "@/data/products";
 
@@ -19,6 +20,8 @@ export function ProductDetailContainer({ product }: ProductDetailContainerProps)
   const setActiveTab = useProductStore((s) => s.setActiveTab);
   const isSizeGuideOpen = useProductStore((s) => s.isSizeGuideOpen);
   const setIsSizeGuideOpen = useProductStore((s) => s.setSizeGuideOpen);
+
+  const relatedProducts = useRelatedProducts(product);
 
   const addItem = useCartStore((s) => s.addItem);
   const isInCart = useCartStore((s) =>
@@ -61,6 +64,7 @@ export function ProductDetailContainer({ product }: ProductDetailContainerProps)
       isInCart={isInCart}
       onAddToBag={handleAddToBag}
       onBuyNow={handleBuyNow}
+      relatedProducts={relatedProducts}
     />
   );
 }

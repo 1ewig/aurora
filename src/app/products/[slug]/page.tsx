@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { heroProducts, allProducts } from "@/data/products";
-import { ProductDetailContainer } from "@/components/product/ProductDetailContainer";
+import { ProductDetailContainer } from "@/components/product/detail/ProductDetailContainer";
 
 export async function generateStaticParams() {
   const all = [...heroProducts, ...allProducts];

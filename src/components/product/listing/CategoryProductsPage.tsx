@@ -1,8 +1,8 @@
 "use client";
 
-import { PageHeader } from "@/components/product/PageHeader";
-import { CategoryFilter } from "@/components/product/CategoryFilter";
-import { ProductGrid } from "@/components/product/ProductGrid";
+import { PageHeader } from "@/components/product/listing/PageHeader";
+import { CategoryFilter } from "@/components/product/listing/CategoryFilter";
+import { ProductGrid } from "@/components/product/listing/ProductGrid";
 import { useProductFilter } from "@/hooks/useProductFilter";
 
 interface CategoryProductsPageProps {

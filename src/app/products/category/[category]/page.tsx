@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { CategoryProductsPage } from "@/components/product/CategoryProductsPage";
+import { CategoryProductsPage } from "@/components/product/listing/CategoryProductsPage";
 
 const categoryMap: Record<string, string> = {
   outerwear: "Outerwear",
