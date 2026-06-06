@@ -2,7 +2,7 @@
 
 import { useScroll, useTransform, motion } from "framer-motion";
 import Link from "next/link";
-import { CascadeCards } from "@/components/ui/CascadeCards";
+import { CascadeCards } from "./ui/CascadeCards";
 
 import { Button } from "@/components/ui/Button";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
