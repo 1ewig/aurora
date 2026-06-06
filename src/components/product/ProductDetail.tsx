@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCartStore } from "@/hooks/useCartStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { ImageGallery } from "./ImageGallery";
@@ -16,6 +17,7 @@ interface ProductDetailProps {
 }
 
 export function ProductDetail({ product }: ProductDetailProps) {
+  const router = useRouter();
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || "M");
   const [activeTab, setActiveTab] = useState<"details" | "shipping">("details");
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
@@ -32,6 +34,18 @@ export function ProductDetail({ product }: ProductDetailProps) {
       category: product.category,
     });
     openCart();
+  };
+
+  const handleBuyNow = () => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      size: selectedSize,
+      image: product.image,
+      category: product.category,
+    });
+    router.push("/checkout");
   };
 
   return (
@@ -101,16 +115,25 @@ export function ProductDetail({ product }: ProductDetailProps) {
             />
           </div>
 
-          {/* Add to Bag CTA */}
-          <div className="pt-4">
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <Button
-              variant="filled"
+              variant="ghost"
               size="lg"
               fullWidth
               onClick={handleAddToBag}
               className="py-4 font-semibold uppercase tracking-wider text-xs"
             >
               Add to Bag
+            </Button>
+            <Button
+              variant="filled"
+              size="lg"
+              fullWidth
+              onClick={handleBuyNow}
+              className="py-4 font-semibold uppercase tracking-wider text-xs"
+            >
+              Buy Now
             </Button>
           </div>
 
