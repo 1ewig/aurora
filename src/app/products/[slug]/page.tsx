@@ -24,6 +24,15 @@ export default async function ProductPage({ params }: PageProps) {
       notFound();
     }
 
+    const productId = row.id;
+
+    // Fetch related details from normalized tables in parallel
+    const [imagesRes, sizesRes, detailsRes] = await Promise.all([
+      pool.query('SELECT image_url FROM product_images WHERE product_id = $1 ORDER BY id', [productId]),
+      pool.query('SELECT size FROM product_sizes WHERE product_id = $1 ORDER BY id', [productId]),
+      pool.query('SELECT detail FROM product_details WHERE product_id = $1 ORDER BY id', [productId]),
+    ]);
+
     const product = {
       id: row.id,
       slug: row.slug,
@@ -32,13 +41,13 @@ export default async function ProductPage({ params }: PageProps) {
       price: Number(row.price),
       badge: row.badge,
       image: row.image,
-      images: row.images,
+      images: imagesRes.rows.map((r) => r.image_url),
       altText: row.alt_text,
       span: row.span,
       aspectRatio: row.aspect_ratio,
       description: row.description,
-      details: row.details,
-      sizes: row.sizes,
+      details: detailsRes.rows.map((r) => r.detail),
+      sizes: sizesRes.rows.map((r) => r.size),
     };
 
     return (

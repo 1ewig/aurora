@@ -41,7 +41,7 @@ export function ProductDetailsTabs({ product }: { product: Product }) {
       <div className="min-h-[120px]">
         {activeTab === "details" ? (
           <ul className="space-y-2 text-xs md:text-sm text-text-secondary list-disc pl-4">
-            {product.details.map((detail, idx) => (
+            {(product.details || []).map((detail, idx) => (
               <li key={idx}>{detail}</li>
             ))}
           </ul>

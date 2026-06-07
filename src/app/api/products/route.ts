@@ -6,7 +6,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
 
-    let query = 'SELECT * FROM products';
+    let query = 'SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio FROM products';
     let params: string[] = [];
 
     if (category && category !== 'All') {
@@ -28,13 +28,9 @@ export async function GET(request: Request) {
       price: Number(row.price),
       badge: row.badge,
       image: row.image,
-      images: row.images,
       altText: row.alt_text,
       span: row.span,
       aspectRatio: row.aspect_ratio,
-      description: row.description,
-      details: row.details,
-      sizes: row.sizes,
     }));
 
     return NextResponse.json(products);

@@ -50,8 +50,13 @@ addProducts(allProducts);
 
 const uniqueProducts = Array.from(productMap.values());
 
-const createTableQuery = `
-CREATE TABLE IF NOT EXISTS products (
+const createTablesQuery = `
+DROP TABLE IF EXISTS product_images CASCADE;
+DROP TABLE IF EXISTS product_sizes CASCADE;
+DROP TABLE IF EXISTS product_details CASCADE;
+DROP TABLE IF EXISTS products CASCADE;
+
+CREATE TABLE products (
   id VARCHAR(50) PRIMARY KEY,
   slug VARCHAR(100) UNIQUE NOT NULL,
   name VARCHAR(255) NOT NULL,
@@ -59,14 +64,31 @@ CREATE TABLE IF NOT EXISTS products (
   price NUMERIC(10, 2) NOT NULL CHECK (price >= 0),
   badge VARCHAR(50),
   image TEXT NOT NULL,
-  images TEXT[] NOT NULL,
   alt_text TEXT NOT NULL,
   span VARCHAR(50),
   aspect_ratio VARCHAR(50),
   description TEXT NOT NULL,
-  details TEXT[] NOT NULL,
-  sizes VARCHAR(50)[] NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE product_images (
+  id SERIAL PRIMARY KEY,
+  product_id VARCHAR(50) REFERENCES products(id) ON DELETE CASCADE,
+  image_url TEXT NOT NULL
+);
+
+CREATE TABLE product_sizes (
+  id SERIAL PRIMARY KEY,
+  product_id VARCHAR(50) REFERENCES products(id) ON DELETE CASCADE,
+  size VARCHAR(50) NOT NULL,
+  stock INT NOT NULL DEFAULT 10,
+  UNIQUE(product_id, size)
+);
+
+CREATE TABLE product_details (
+  id SERIAL PRIMARY KEY,
+  product_id VARCHAR(50) REFERENCES products(id) ON DELETE CASCADE,
+  detail TEXT NOT NULL
 );
 `;
 
@@ -76,39 +98,36 @@ async function seed() {
   await client.connect();
   console.log("Connected successfully.");
 
-  console.log("Creating products table if not exists...");
-  await client.query(createTableQuery);
-
-  console.log("Truncating products table to avoid conflicts...");
-  await client.query("TRUNCATE TABLE products;");
+  console.log("Creating normalized tables...");
+  await client.query(createTablesQuery);
 
   console.log(`Inserting/Updating ${uniqueProducts.length} products...`);
   
-  const insertQuery = `
+  const insertProductQuery = `
     INSERT INTO products (
-      id, slug, name, category, price, badge, image, images, alt_text, span, aspect_ratio, description, details, sizes
+      id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description
     ) VALUES (
-      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
+      $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
     )
-    ON CONFLICT (id) DO UPDATE SET
-      slug = EXCLUDED.slug,
-      name = EXCLUDED.name,
-      category = EXCLUDED.category,
-      price = EXCLUDED.price,
-      badge = EXCLUDED.badge,
-      image = EXCLUDED.image,
-      images = EXCLUDED.images,
-      alt_text = EXCLUDED.alt_text,
-      span = EXCLUDED.span,
-      aspect_ratio = EXCLUDED.aspect_ratio,
-      description = EXCLUDED.description,
-      details = EXCLUDED.details,
-      sizes = EXCLUDED.sizes;
+  `;
+
+  const insertImageQuery = `
+    INSERT INTO product_images (product_id, image_url) VALUES ($1, $2)
+  `;
+
+  const insertSizeQuery = `
+    INSERT INTO product_sizes (product_id, size, stock) VALUES ($1, $2, $3)
+  `;
+
+  const insertDetailQuery = `
+    INSERT INTO product_details (product_id, detail) VALUES ($1, $2)
   `;
 
   for (const product of uniqueProducts) {
     console.log(`Seeding product: ${product.name} (${product.id})`);
-    await client.query(insertQuery, [
+    
+    // 1. Insert product base
+    await client.query(insertProductQuery, [
       product.id,
       product.slug,
       product.name,
@@ -116,17 +135,35 @@ async function seed() {
       product.price,
       product.badge || null,
       product.image,
-      product.images,
       product.altText,
       product.span || null,
       product.aspectRatio || null,
-      product.description,
-      product.details,
-      product.sizes
+      product.description
     ]);
+
+    // 2. Insert product images
+    if (product.images && product.images.length > 0) {
+      for (const imgUrl of product.images) {
+        await client.query(insertImageQuery, [product.id, imgUrl]);
+      }
+    }
+
+    // 3. Insert product sizes (default stock to 10)
+    if (product.sizes && product.sizes.length > 0) {
+      for (const size of product.sizes) {
+        await client.query(insertSizeQuery, [product.id, size, 10]);
+      }
+    }
+
+    // 4. Insert product details (bullet points)
+    if (product.details && product.details.length > 0) {
+      for (const detail of product.details) {
+        await client.query(insertDetailQuery, [product.id, detail]);
+      }
+    }
   }
 
-  console.log("Database seeded successfully!");
+  console.log("Database seeded successfully with normalized relations!");
   await client.end();
 }
 

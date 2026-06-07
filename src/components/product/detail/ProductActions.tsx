@@ -11,7 +11,7 @@ import type { Product } from "@/data/products";
 export function ProductActions({ product }: { product: Product }) {
   const router = useRouter();
 
-  const selectedSize = useProductStore((s) => s.selectedSizes[product.id]) || product.sizes[0] || "M";
+  const selectedSize = useProductStore((s) => s.selectedSizes[product.id]) || product.sizes?.[0] || "M";
   const setSelectedSize = useProductStore((s) => s.setSelectedSize);
   const isSizeGuideOpen = useProductStore((s) => s.isSizeGuideOpen);
   const setIsSizeGuideOpen = useProductStore((s) => s.setSizeGuideOpen);
@@ -49,7 +49,7 @@ export function ProductActions({ product }: { product: Product }) {
   return (
     <div className="space-y-6 border-t border-border-subtle pt-6">
       <SizeSelector
-        sizes={product.sizes}
+        sizes={product.sizes || []}
         selectedSize={selectedSize}
         onChange={(size) => setSelectedSize(product.id, size)}
         onOpenSizeGuide={() => setIsSizeGuideOpen(true)}

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 
 interface ImageGalleryProps {
-  images: string[];
+  images?: string[];
   altText: string;
 }
 

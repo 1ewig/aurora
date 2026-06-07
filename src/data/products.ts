@@ -6,13 +6,13 @@ export interface Product {
   price: number;
   badge?: string;
   image: string;
-  images: string[];
+  images?: string[];
   altText: string;
   span?: string;
   aspectRatio?: string;
-  description: string;
-  details: string[];
-  sizes: string[];
+  description?: string;
+  details?: string[];
+  sizes?: string[];
 }
 
 export const categories = [
