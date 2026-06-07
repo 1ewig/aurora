@@ -7,6 +7,7 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Button } from "@/components/ui/Button";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { staggerContainer, fadeInUp } from "@/animations/variants";
+import { getStorageUrl } from "@/utils/insforge";
 
 export function DesignerStory() {
   const ref = useRef<HTMLDivElement>(null);
@@ -30,7 +31,7 @@ export function DesignerStory() {
           style={{ y: imageY }}
         >
           <OptimizedImage
-            src="/images/editorial/designer.webp"
+            src={getStorageUrl("/images/editorial/designer.webp")}
             alt="Aurora's creative director photographed in her design studio, examining fabric swatches"
             className="w-full h-full object-cover object-top"
             loading="eager"

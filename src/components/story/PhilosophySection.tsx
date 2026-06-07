@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { fadeInUp, staggerContainer } from "@/animations/variants";
+import { getStorageUrl } from "@/utils/insforge";
 
 export function PhilosophySection() {
   return (
@@ -15,7 +16,7 @@ export function PhilosophySection() {
         className="lg:col-span-6 relative aspect-[4/5] bg-border-subtle rounded-2xl overflow-hidden shadow-sm"
       >
         <OptimizedImage
-          src="/images/editorial/designer.webp"
+          src={getStorageUrl("/images/editorial/designer.webp")}
           alt="Creative director sketching designs in studio"
           className="w-full h-full object-cover object-top"
           loading="eager"

@@ -1,12 +1,13 @@
 "use client";
 
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { getStorageUrl } from "@/utils/insforge";
 
 export function ParallaxBreakout() {
   return (
     <section className="my-20 relative h-[50vh] md:h-[60vh] bg-border-subtle overflow-hidden">
       <OptimizedImage
-        src="/images/lookbook/lookbook-3.webp"
+        src={getStorageUrl("/images/lookbook/lookbook-3.webp")}
         alt="Extrafine fabric detail view"
         className="w-full h-full object-cover object-center scale-105"
       />

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { fadeInUp, staggerContainer } from "@/animations/variants";
+import { getStorageUrl } from "@/utils/insforge";
 
 export function AtelierSection() {
   return (
@@ -38,14 +39,14 @@ export function AtelierSection() {
         >
           <div className="relative aspect-[3/4] bg-border-subtle rounded-xl overflow-hidden">
             <OptimizedImage
-              src="/images/lookbook/lookbook-1.webp"
+              src={getStorageUrl("/images/lookbook/lookbook-1.webp")}
               alt="Wool loom detail"
               className="w-full h-full object-cover"
             />
           </div>
           <div className="relative aspect-[3/4] bg-border-subtle rounded-xl overflow-hidden mt-8">
             <OptimizedImage
-              src="/images/lookbook/lookbook-2.webp"
+              src={getStorageUrl("/images/lookbook/lookbook-2.webp")}
               alt="Cashmere folding"
               className="w-full h-full object-cover"
             />

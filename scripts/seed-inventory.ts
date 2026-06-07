@@ -92,6 +92,16 @@ CREATE TABLE product_details (
 );
 `;
 
+function getStorageUrl(localPath: string): string {
+  if (!localPath || !localPath.startsWith('/images/')) {
+    return localPath;
+  }
+  const bucketKey = localPath.replace(/^\/?images\//, '');
+  const encodedKey = bucketKey.split('/').map(encodeURIComponent).join('%2F');
+  const insforgeUrl = process.env.NEXT_PUBLIC_INSFORGE_URL || 'https://4eu5wk8i.us-east.insforge.app';
+  return `${insforgeUrl}/api/storage/buckets/product-media/objects/${encodedKey}`;
+}
+
 async function seed() {
   const client = new Client({ connectionString });
   console.log("Connecting to database...");
@@ -134,7 +144,7 @@ async function seed() {
       product.category,
       product.price,
       product.badge || null,
-      product.image,
+      getStorageUrl(product.image),
       product.altText,
       product.span || null,
       product.aspectRatio || null,
@@ -144,7 +154,7 @@ async function seed() {
     // 2. Insert product images
     if (product.images && product.images.length > 0) {
       for (const imgUrl of product.images) {
-        await client.query(insertImageQuery, [product.id, imgUrl]);
+        await client.query(insertImageQuery, [product.id, getStorageUrl(imgUrl)]);
       }
     }
 

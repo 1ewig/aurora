@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import { getStorageUrl } from "@/utils/insforge";
 
 interface ImageGalleryProps {
   images?: string[];
@@ -12,7 +13,7 @@ export function ImageGallery({ images, altText }: ImageGalleryProps) {
   const activeIndex = 0;
 
   // If there are no additional images, degrade gracefully to a single image
-  const galleryImages = images && images.length > 0 ? images : ["/images/products/hero-product-1.webp"];
+  const galleryImages = images && images.length > 0 ? images : [getStorageUrl("/images/products/hero-product-1.webp")];
 
   return (
     <div className="flex flex-col gap-4 lg:gap-6 w-full">
