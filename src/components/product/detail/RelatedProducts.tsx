@@ -1,13 +1,16 @@
 "use client";
 
 import { ProductCard } from "@/components/ui/ProductCard";
+import { useRelatedProducts } from "@/hooks/useRelatedProducts";
 import type { Product } from "@/data/products";
 
 interface RelatedProductsProps {
-  products: Product[];
+  product: Product;
 }
 
-export function RelatedProducts({ products }: RelatedProductsProps) {
+export function RelatedProducts({ product }: RelatedProductsProps) {
+  const products = useRelatedProducts(product);
+
   return (
     <section aria-labelledby="related-heading" className="py-20 border-t border-border-subtle mt-20">
       <div className="max-w-[1400px] mx-auto">
@@ -15,8 +18,8 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
           Related Pieces
         </h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-          {products.slice(0, 4).map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {products.slice(0, 4).map((relatedProduct) => (
+            <ProductCard key={relatedProduct.id} product={relatedProduct} />
           ))}
         </div>
       </div>
