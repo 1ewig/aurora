@@ -8,7 +8,7 @@ if (!connectionString) {
 
 export const pool = new Pool({
   connectionString,
-  ssl: connectionString?.includes('sslmode=require') 
+  ssl: (connectionString?.includes('sslmode=require') || connectionString?.includes('sslmode=verify-full'))
     ? { rejectUnauthorized: false } 
     : undefined,
   idleTimeoutMillis: 1000, // Close idle connections after 1 second to allow Next.js build process to exit
