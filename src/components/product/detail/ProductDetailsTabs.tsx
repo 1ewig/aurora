@@ -40,11 +40,20 @@ export function ProductDetailsTabs({ product }: { product: Product }) {
 
       <div className="min-h-[120px]">
         {activeTab === "details" ? (
-          <ul className="space-y-2 text-xs md:text-sm text-text-secondary list-disc pl-4">
-            {(product.details || []).map((detail, idx) => (
-              <li key={idx}>{detail}</li>
-            ))}
-          </ul>
+          (!product.details || product.details.length === 0) ? (
+            <div className="space-y-2.5 animate-pulse" aria-hidden="true">
+              <div className="h-3.5 bg-bg-secondary rounded w-2/3" />
+              <div className="h-3.5 bg-bg-secondary rounded w-1/2" />
+              <div className="h-3.5 bg-bg-secondary rounded w-3/4" />
+              <div className="h-3.5 bg-bg-secondary rounded w-2/5" />
+            </div>
+          ) : (
+            <ul className="space-y-2 text-xs md:text-sm text-text-secondary list-disc pl-4">
+              {product.details.map((detail, idx) => (
+                <li key={idx}>{detail}</li>
+              ))}
+            </ul>
+          )
         ) : (
           <div className="text-xs md:text-sm text-text-secondary space-y-2 leading-relaxed">
             <p>

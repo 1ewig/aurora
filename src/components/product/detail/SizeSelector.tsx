@@ -24,28 +24,37 @@ export function SizeSelector({ sizes, selectedSize, onChange, onOpenSizeGuide }:
           Size Guide
         </button>
       </div>
-      <div className="flex flex-wrap gap-3" role="radiogroup" aria-label="Product size selection">
-        {sizes.map((size) => {
-          const isSelected = selectedSize === size;
-          return (
-            <button
-              key={size}
-              type="button"
-              role="radio"
-              aria-checked={isSelected ? "true" : "false"}
-              onClick={() => onChange(size)}
-              className={cn(
-                "min-w-[50px] h-[50px] px-3 border rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-300 flex items-center justify-center cursor-pointer select-none",
-                isSelected
-                  ? "bg-bg-ink border-bg-ink text-text-inverted"
-                  : "bg-bg-secondary border-border-subtle text-text-primary hover:border-text-primary"
-              )}
-            >
-              {size}
-            </button>
-          );
-        })}
-      </div>
+      {sizes.length === 0 ? (
+        <div className="flex flex-wrap gap-3 animate-pulse" aria-hidden="true">
+          <div className="w-[50px] h-[50px] bg-bg-secondary rounded-full" />
+          <div className="w-[50px] h-[50px] bg-bg-secondary rounded-full" />
+          <div className="w-[50px] h-[50px] bg-bg-secondary rounded-full" />
+          <div className="w-[50px] h-[50px] bg-bg-secondary rounded-full" />
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-3" role="radiogroup" aria-label="Product size selection">
+          {sizes.map((size) => {
+            const isSelected = selectedSize === size;
+            return (
+              <button
+                key={size}
+                type="button"
+                role="radio"
+                aria-checked={isSelected ? "true" : "false"}
+                onClick={() => onChange(size)}
+                className={cn(
+                  "min-w-[50px] h-[50px] px-3 border rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-300 flex items-center justify-center cursor-pointer select-none",
+                  isSelected
+                    ? "bg-bg-ink border-bg-ink text-text-inverted"
+                    : "bg-bg-secondary border-border-subtle text-text-primary hover:border-text-primary"
+                )}
+              >
+                {size}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

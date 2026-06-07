@@ -24,9 +24,17 @@ export function ProductInfo({ product }: { product: Product }) {
       </div>
 
       <div className="border-t border-border-subtle pt-6">
-        <p className="text-text-secondary leading-relaxed text-sm md:text-base">
-          {product.description}
-        </p>
+        {!product.description ? (
+          <div className="space-y-2.5 animate-pulse" aria-hidden="true">
+            <div className="h-4 bg-bg-secondary rounded w-full" />
+            <div className="h-4 bg-bg-secondary rounded w-11/12" />
+            <div className="h-4 bg-bg-secondary rounded w-3/4" />
+          </div>
+        ) : (
+          <p className="text-text-secondary leading-relaxed text-sm md:text-base">
+            {product.description}
+          </p>
+        )}
       </div>
     </div>
   );

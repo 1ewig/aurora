@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Product } from '@/data/products';
 
 async function fetchProducts(category?: string): Promise<Product[]> {
@@ -29,10 +29,31 @@ async function fetchProductDetails(slug: string): Promise<Product> {
 }
 
 export function useProductDetailsQuery(slug: string) {
+  const queryClient = useQueryClient();
+
   return useQuery({
     queryKey: ['product', slug],
     queryFn: () => fetchProductDetails(slug),
     enabled: !!slug,
+    staleTime: 0, // Force background refetch to fetch complete details on mount
+    initialData: () => {
+      const cachedQueries = queryClient.getQueriesData<Product[]>({ queryKey: ['products'] });
+      for (const [, products] of cachedQueries) {
+        if (products) {
+          const product = products.find((p) => p.slug === slug);
+          if (product) {
+            return {
+              ...product,
+              images: product.images || [product.image],
+              description: product.description || '',
+              details: product.details || [],
+              sizes: product.sizes || [],
+            };
+          }
+        }
+      }
+      return undefined;
+    },
   });
 }
 
