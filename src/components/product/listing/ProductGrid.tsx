@@ -9,9 +9,27 @@ const aspectRatios = ["aspect-[3/4]", "aspect-[4/5]", "aspect-[2/3]", "aspect-[3
 
 interface ProductGridProps {
   products: Product[];
+  isLoading?: boolean;
 }
 
-export function ProductGrid({ products }: ProductGridProps) {
+export function ProductGrid({ products, isLoading }: ProductGridProps) {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 animate-pulse" aria-hidden="true">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className={`flex flex-col space-y-4 ${i % 4 === 1 || i % 4 === 2 ? "md:mt-8" : ""}`}>
+            <div className={`w-full bg-bg-secondary rounded-[20px] ${aspectRatios[i % aspectRatios.length]}`} />
+            <div className="space-y-2 px-2">
+              <div className="h-4 w-2/3 bg-bg-secondary rounded" />
+              <div className="h-3 w-1/3 bg-bg-secondary rounded" />
+              <div className="h-4 w-1/4 bg-bg-secondary rounded mt-2" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <AnimatePresence mode="wait">
       <motion.div

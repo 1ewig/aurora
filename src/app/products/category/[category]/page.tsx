@@ -27,7 +27,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  const { activeCategory, filtered, categories, handleCategoryChange } = useProductFilter({
+  const { activeCategory, filtered, categories, handleCategoryChange, isLoading } = useProductFilter({
     initialCategory: categoryName,
     onCategoryChange: (name) => {
       const slug = name === "All" ? "" : name.toLowerCase();
@@ -47,7 +47,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
             onChange={handleCategoryChange}
           />
         </div>
-        <ProductGrid products={filtered} />
+        <ProductGrid products={filtered} isLoading={isLoading} />
       </div>
     </main>
   );

@@ -19,3 +19,20 @@ export function useProductsQuery(category?: string) {
     queryFn: () => fetchProducts(category),
   });
 }
+
+async function fetchProductDetails(slug: string): Promise<Product> {
+  const response = await fetch(`/api/products/${encodeURIComponent(slug)}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch product details');
+  }
+  return response.json();
+}
+
+export function useProductDetailsQuery(slug: string) {
+  return useQuery({
+    queryKey: ['product', slug],
+    queryFn: () => fetchProductDetails(slug),
+    enabled: !!slug,
+  });
+}
+

@@ -6,7 +6,7 @@ import { ProductGrid } from "@/components/product/listing/ProductGrid";
 import { useProductFilter } from "@/hooks/useProductFilter";
 
 export default function ProductsPage() {
-  const { activeCategory, filtered, categories, handleCategoryChange } = useProductFilter({
+  const { activeCategory, filtered, categories, handleCategoryChange, isLoading } = useProductFilter({
     includeHero: true,
     onCategoryChange: (name) => {
       const slug = name === "All" ? "" : name.toLowerCase();
@@ -26,7 +26,7 @@ export default function ProductsPage() {
             onChange={handleCategoryChange}
           />
         </div>
-        <ProductGrid products={filtered} />
+        <ProductGrid products={filtered} isLoading={isLoading} />
       </div>
     </main>
   );
