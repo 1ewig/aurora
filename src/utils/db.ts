@@ -11,4 +11,5 @@ export const pool = new Pool({
   ssl: connectionString?.includes('sslmode=require') 
     ? { rejectUnauthorized: false } 
     : undefined,
+  idleTimeoutMillis: 1000, // Close idle connections after 1 second to allow Next.js build process to exit
 });

@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { CategoryProductsPage } from "@/components/product/listing/CategoryProductsPage";
 
+export const revalidate = 60; // Revalidate page at most once every 60 seconds
+
 const categoryMap: Record<string, string> = {
   outerwear: "Outerwear",
   knitwear: "Knitwear",
