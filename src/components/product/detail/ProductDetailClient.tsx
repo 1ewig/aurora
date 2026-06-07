@@ -2,12 +2,14 @@
 
 import { notFound } from "next/navigation";
 import { useProductDetailsQuery } from "@/hooks/queries";
+import { useProductStore } from "@/stores/useProductStore";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { ImageGallery } from "./ImageGallery";
 import { ProductInfo } from "./ProductInfo";
 import { ProductActions } from "./ProductActions";
 import { ProductDetailsTabs } from "./ProductDetailsTabs";
 import { RelatedProducts } from "./RelatedProducts";
+import { SizeGuideModal } from "./SizeGuideModal";
 
 interface ProductDetailClientProps {
   slug: string;
@@ -15,6 +17,8 @@ interface ProductDetailClientProps {
 
 export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const { data: product, isLoading, error } = useProductDetailsQuery(slug);
+  const isSizeGuideOpen = useProductStore((s) => s.isSizeGuideOpen);
+  const setSizeGuideOpen = useProductStore((s) => s.setSizeGuideOpen);
 
   if (isLoading) {
     return (
@@ -71,6 +75,12 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
 
       {/* Related Products Grid */}
       <RelatedProducts product={product} />
+
+      <SizeGuideModal
+        isOpen={isSizeGuideOpen}
+        onClose={() => setSizeGuideOpen(false)}
+        category={product.category}
+      />
     </main>
   );
 }

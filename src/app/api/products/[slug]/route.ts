@@ -8,8 +8,39 @@ export async function GET(
   try {
     const { slug } = await params;
 
-    // Fetch the base product record first
-    const result = await pool.query('SELECT * FROM products WHERE slug = $1', [slug]);
+    // Fetch base product and all nested relationships in a single query
+    const result = await pool.query(`
+      SELECT 
+        p.id, 
+        p.slug, 
+        p.name, 
+        p.category, 
+        p.price, 
+        p.badge, 
+        p.image, 
+        p.alt_text as "altText", 
+        p.span, 
+        p.aspect_ratio as "aspectRatio", 
+        p.description,
+        (
+          SELECT COALESCE(json_agg(image_url ORDER BY id), '[]'::json)
+          FROM product_images
+          WHERE product_id = p.id
+        ) as images,
+        (
+          SELECT COALESCE(json_agg(size ORDER BY id), '[]'::json)
+          FROM product_sizes
+          WHERE product_id = p.id
+        ) as sizes,
+        (
+          SELECT COALESCE(json_agg(detail ORDER BY id), '[]'::json)
+          FROM product_details
+          WHERE product_id = p.id
+        ) as details
+      FROM products p
+      WHERE p.slug = $1
+    `, [slug]);
+
     const row = result.rows[0];
 
     if (!row) {
@@ -19,15 +50,6 @@ export async function GET(
       );
     }
 
-    const productId = row.id;
-
-    // Fetch related details from normalized tables in parallel
-    const [imagesRes, sizesRes, detailsRes] = await Promise.all([
-      pool.query('SELECT image_url FROM product_images WHERE product_id = $1 ORDER BY id', [productId]),
-      pool.query('SELECT size, stock FROM product_sizes WHERE product_id = $1 ORDER BY id', [productId]),
-      pool.query('SELECT detail FROM product_details WHERE product_id = $1 ORDER BY id', [productId]),
-    ]);
-
     const product = {
       id: row.id,
       slug: row.slug,
@@ -36,13 +58,13 @@ export async function GET(
       price: Number(row.price),
       badge: row.badge,
       image: row.image,
-      images: imagesRes.rows.map((r) => r.image_url),
-      altText: row.alt_text,
+      images: row.images,
+      altText: row.altText,
       span: row.span,
-      aspectRatio: row.aspect_ratio,
+      aspectRatio: row.aspectRatio,
       description: row.description,
-      details: detailsRes.rows.map((r) => r.detail),
-      sizes: sizesRes.rows.map((r) => r.size),
+      details: row.details,
+      sizes: row.sizes,
     };
 
     return NextResponse.json(product);

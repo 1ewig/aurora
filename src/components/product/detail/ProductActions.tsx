@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useCartStore } from "@/stores/useCartStore";
 import { useProductStore } from "@/stores/useProductStore";
 import { SizeSelector } from "./SizeSelector";
-import { SizeGuideModal } from "./SizeGuideModal";
 import { Button } from "@/components/ui/Button";
 import type { Product } from "@/data/products";
 
@@ -13,7 +12,6 @@ export function ProductActions({ product }: { product: Product }) {
 
   const selectedSize = useProductStore((s) => s.selectedSizes[product.id]) || product.sizes?.[0] || "M";
   const setSelectedSize = useProductStore((s) => s.setSelectedSize);
-  const isSizeGuideOpen = useProductStore((s) => s.isSizeGuideOpen);
   const setIsSizeGuideOpen = useProductStore((s) => s.setSizeGuideOpen);
 
   const addItem = useCartStore((s) => s.addItem);
@@ -76,12 +74,6 @@ export function ProductActions({ product }: { product: Product }) {
           Buy Now
         </Button>
       </div>
-
-      <SizeGuideModal
-        isOpen={isSizeGuideOpen}
-        onClose={() => setIsSizeGuideOpen(false)}
-        category={product.category}
-      />
     </div>
   );
 }
