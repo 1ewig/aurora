@@ -17,6 +17,7 @@ export function OptimizedImage({ src, alt, className, loading = "lazy", style }:
       className={className}
       loading={loading}
       style={style}
+      quality={100}
       sizes="(max-width: 768px) 100vw, 50vw"
     />
   );
