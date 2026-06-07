@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { pool } from "@/utils/db";
-import { ProductDetailContainer } from "@/components/product/detail/ProductDetailContainer";
+import { ProductDetail } from "@/components/product/detail/ProductDetail";
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +38,7 @@ export default async function ProductPage({ params }: PageProps) {
 
     return (
       <main id="main-content" tabIndex={-1}>
-        <ProductDetailContainer product={product} />
+        <ProductDetail product={product} />
       </main>
     );
   } catch (error) {
