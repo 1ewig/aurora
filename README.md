@@ -1,8 +1,10 @@
 # Aurora — Premium E-Commerce Application
 
-Aurora is a quiet-luxury fashion brand e-commerce web application (SS 2025 Collection). Built with Next.js 15, React 19, TypeScript, Tailwind CSS 4, and Framer Motion.
+Aurora is a quiet-luxury fashion brand e-commerce web application (SS 2025 Collection). Built with Next.js 15, React 19, TypeScript, Tailwind CSS 4, Framer Motion, PostgreSQL, TanStack Query, and InsForge.
 
-This repository evolved from a single landing page into a multi-page digital boutique with dynamic SSG routing, client-side category filtering, and a simulated checkout flow. Throughout development, business logic and complex state management were systematically extracted from UI components into dedicated hooks and Zustand stores, following a **pages → containers → hooks/stores → presentational components** architecture.
+The application uses **InsForge** as its Backend-as-a-Service (BaaS) for database and media storage. It implements **TanStack Query** for client-side caching, utilizing a progressive **Initial Data Seeding** technique to load detail pages instantly from the listing cache, and uses **Row Level Security (RLS)** in PostgreSQL to secure the catalog.
+
+---
 
 ## Tech Stack
 
@@ -10,68 +12,113 @@ This repository evolved from a single landing page into a multi-page digital bou
 |---|---|
 | Framework | Next.js 15.5.19 (App Router) |
 | Language | React 19 + TypeScript 5.9 |
+| Database | PostgreSQL (hosted on InsForge Cloud DB) |
+| Client SDK | `@insforge/sdk` (Storage Bucket client) |
+| Data Caching | `@tanstack/react-query` v5 |
 | Styling | Tailwind CSS 4 |
 | Animation | Framer Motion 12 |
-| State Management | Zustand (cart persisted to localStorage) |
-| Fonts | next/font (Inter, Playfair Display) |
-| Images | next/image (auto-optimized WebP/AVIF) |
+| State Management | Zustand (cart persisted to `localStorage`) |
+| Fonts | `next/font` (Inter, Playfair Display) |
+
+---
 
 ## Architecture Pattern
 
-The codebase follows a consistent 4-layer separation of concerns:
+The codebase follows a 4-layer separation of concerns:
 
-1. **Pages** — Server or client entry points. Server pages use `generateStaticParams` for SSG. Client pages call hooks and render presentational components.
-2. **Containers/Bridges** — Thin `"use client"` wrappers that read Zustand stores, call business logic hooks, and pass resolved data + callbacks as props to presentational components.
-3. **Hooks & Stores** — `src/hooks/` contains reusable business logic (form state, carousel, scroll effects, pricing calculations). `src/stores/` holds Zustand stores for global state with persistence.
-4. **Presentational Components** — Pure JSX that receives all data and event handlers via props. Zero store imports, zero business logic.
+```
+Pages (src/app/)
+  │  Import components, call hooks, pass data as props
+  │
+  ▼
+Containers / Bridges (src/components/*/)
+  │  Read stores, call hooks, assemble props
+  │
+  ├──► Hooks & Queries (src/hooks/)
+  │     Business logic, react-query hooks, form state
+  │
+  ├──► Stores (src/stores/)
+  │     Zustand global state management
+  │
+  ▼
+Presentational Components (src/components/*/)
+  Pure JSX — receive everything via props, zero store/hook imports
+```
 
-This ensures SSG compatibility where it matters (product detail and category pages are pre-rendered), while keeping interactive state management cleanly isolated.
+---
 
 ## Getting Started
 
+### Prerequisites
+1. InsForge CLI authenticated and linked:
+   ```bash
+   npx @insforge/cli login --user-api-key <your-user-api-key>
+   npx @insforge/cli link --project-id 98edf59a-99c7-4da4-8476-06561d0d4edb
+   ```
+2. Environment variables set in `.env.local`:
+   * `DATABASE_URL` (Postgres connection string with `sslmode=verify-full`)
+   * `NEXT_PUBLIC_INSFORGE_URL`
+   * `NEXT_PUBLIC_INSFORGE_ANON_KEY`
+   * `INSFORGE_API_KEY`
+
+### Setup & Launch
 ```bash
+# 1. Install dependencies
 npm install
-npm run dev      # start dev server at http://localhost:3000
-npm run build    # production build and static SSG generation → .next/
-npm run start    # serve the production build
+
+# 2. Seed the remote InsForge PostgreSQL database
+npx tsx scripts/seed-inventory.ts
+
+# 3. Start development server
+npm run dev
+
+# 4. Build for production (compiles and checks types)
+npm run build
 ```
+
+---
 
 ## Route Structure
 
 | Route | Type | Description |
 |---|---|---|
-| `/` | Static | Brand landing page — hero, featured collection, lookbook carousel, testimonials, newsletter |
-| `/products` | Static | Shop catalog — 14 pieces with fluid category filter pills |
-| `/products/category/[category]` | SSG | Pre-rendered subpages for Outerwear, Knitwear, Trousers, Dresses, Accessories |
-| `/products/[slug]` | SSG | Product detail — image gallery, size selector, details tabs, related pieces, size guide modal |
-| `/checkout` | Static | Simulated checkout — 9-field form, order summary with pricing breakdown, order confirmation with demo notice |
-| `/story` | Static | Brand narrative — hero, philosophy, parallax breakout, atelier section, CTA |
+| `/` | Static | Brand landing page — hero slider, featured collections, lookbook carousel |
+| `/products` | Static | Shop catalog with client-side category filter query pills |
+| `/products/category/[category]` | Dynamic (SSR) | Category-specific product lists |
+| `/products/[slug]` | Dynamic (SSR) | Product detail view with progressive loading, size selection, specs |
+| `/checkout` | Static | Checkout form, summary pricing, masked PII confirmation |
+| `/story` | Static | Brand narrative, philosophy, parallax breakout, atelier section |
+| `/api/products` | API | Database SELECT endpoint for catalog products |
+| `/api/products/[slug]` | API | Consolidated SELECT query for detail specifications, images, and sizes |
+
+---
 
 ## Core Features
 
-- **SSG Product Pages** — All product detail and category pages are pre-rendered at build time via `generateStaticParams`. Interactive elements are encapsulated in client wrappers (`ProductDetailContainer`, `CategoryProductsPage`) that leave SSG intact.
-- **Category Filtering** — Pill buttons on `/products` update the URL via `pushState` for instant client-side filtering while maintaining shareable URLs. The `useProductFilter` hook powers both the main catalog and category subpages.
-- **Cart Persistence** — Zustand store with `persist` middleware keeps bag contents, quantities, and sizes synced to `localStorage` across sessions.
-- **PII Masking** — Checkout completion masks credit card digits and email addresses before rendering confirmation.
-- **Demo Notice** — Order confirmation displays a prominent notice that this is a dummy e-commerce site built for learning purposes.
-- **Animation Suite** — Framer Motion drives layout animations (spring-based tab indicators, staggered grid entries, drawer slides), magnetic hover effects, and image reveals.
-- **Scroll-Aware Navbar** — The navigation bar dynamically applies background, border, and blur based on scroll position via `useNavbarScroll`.
-- **Body Scroll Lock** — Cart drawer and size guide modal lock body scroll via `useBodyScrollLock` to prevent background scrolling.
-- **Related Products** — Automatically filtered by category with fallback to any product when insufficient category matches.
+- **Database-Driven Content**: Products, sizes, images, and specifications are fetched dynamically from a PostgreSQL database hosted on InsForge.
+- **Unified Querying**: `/api/products/[slug]` performs a single SQL query using PostgreSQL subqueries with `json_agg()` to retrieve base columns, sizes, details, and lookup images in a single connection.
+- **Initial Data Seeding (0ms Load Times)**: When opening a details page, TanStack Query pre-populates the details view using cached list data from the catalog. The user immediately sees the correct product image, title, and price, while descriptions and sizes load progressively in the background.
+- **InsForge Storage Integration**: All product, editorial, and lookbook WebP assets are served directly from the public InsForge `product-media` storage bucket.
+- **Row Level Security (RLS)**: Enforced database-level security policies (`Allow public read access`) permitting public `SELECT` lookups while restricting all `INSERT`/`UPDATE`/`DELETE` writes to administrators.
+- **Indexed Relationships**: Foreign keys on `product_images` and `product_details` are indexed to speed up database joins and handle cascading deletes efficiently.
+
+---
 
 ## Project Structure
 
 ```
+scripts/
+├── seed-inventory.ts               # Database table creation and seeding script
 src/
 ├── app/
 │   ├── checkout/page.tsx
 │   ├── products/
 │   │   ├── page.tsx
-│   │   ├── [slug]/page.tsx              # SSG
-│   │   └── category/[category]/page.tsx # SSG
+│   │   ├── [slug]/page.tsx
+│   │   └── category/[category]/page.tsx
 │   ├── story/page.tsx
 │   ├── layout.tsx
-│   ├── page.tsx
+│   ├── providers.tsx               # TanStack QueryClient Provider wrapper
 │   └── globals.css
 │
 ├── components/
@@ -79,50 +126,13 @@ src/
 │   ├── landing/       FeaturedCollection, HeroSection, LookbookSlider, Newsletter, Testimonials
 │   ├── layout/        Footer, Navbar
 │   ├── product/
-│   │   ├── listing/   CategoryFilter, CategoryProductsPage, PageHeader, ProductGrid
-│   │   └── detail/    ImageGallery, ProductDetail, ProductDetailContainer, RelatedProducts, SizeGuideModal, SizeSelector
-│   ├── story/         AtelierSection, ParallaxBreakout, PhilosophySection, StoryCta, StoryHero
-│   └── ui/            Button, CartDrawer, EyebrowLabel, OptimizedImage, ProductCard
+│   │   ├── listing/   CategoryFilter, PageHeader, ProductGrid
+│   │   └── detail/    Breadcrumbs, ImageGallery, ProductActions, ProductDetailClient, ProductDetailsTabs, ProductInfo, RelatedProducts, SizeGuideModal, SizeSelector
+│   └── story/         AtelierSection, ParallaxBreakout, PhilosophySection, StoryCta, StoryHero
 │
-├── stores/            useCartStore (persisted), useProductStore
-├── hooks/             useBodyScrollLock, useCarousel, useCheckoutForm, useInView, useMagneticHover,
-│                      useMediaQuery, useNavbarScroll, useNewsletterSubmit, useOrderPricing, useRelatedProducts
-├── data/              navigation, products (14 items), testimonials
-├── animations/        variants.ts
-└── utils/             cn.ts, formatCurrency.ts
+├── stores/            useCartStore (persisted to localStorage), useProductStore
+├── hooks/             queries (useProductsQuery, useProductDetailsQuery), useBodyScrollLock, useCarousel,
+│                      useCheckoutForm, useNavbarScroll, useRelatedProducts, useOrderPricing
+├── data/              navigation, products, testimonials
+└── utils/             cn.ts, db.ts (pg pool configuration), insforge.ts (BaaS client config)
 ```
-
-## Hooks Overview
-
-| Hook | Purpose | Used By |
-|---|---|---|
-| `useCarousel` | Slide index, direction, autoplay with proper timer cleanup | LookbookSlider, Testimonials |
-| `useCheckoutForm` | 9 form fields, validation, order processing, PII masking | CheckoutForm |
-| `useNewsletterSubmit` | Email field state + submission lifecycle | Newsletter |
-| `useNavbarScroll` | Scroll threshold → background, border, blur classes | Navbar |
-| `useBodyScrollLock` | Toggle `overflow: hidden` on body | CartDrawer, SizeGuideModal |
-| `useProductFilter` | Category state, filtered product list, URL sync | ProductsPage, CategoryProductsPage |
-| `useRelatedProducts` | Memoized category-matched + fallback products | ProductDetailContainer → ProductDetail |
-| `useOrderPricing` | Shipping threshold, 8% tax, total calculation | OrderSummaryContainer |
-| `useInView` | Intersection Observer for entrance animations | Various |
-| `useMediaQuery` | Window matchMedia listener | Various |
-| `useMagneticHover` | Pointer tracking for magnetic button effect | UI components |
-
-## State Management
-
-Two Zustand stores handle global state:
-
-- **`useCartStore`** — Cart items (id, slug, name, price, size, quantity, image, category), drawer open/close, add/remove/update operations, computed totals. Persisted to `localStorage` under key `aurora-cart`.
-- **`useProductStore`** — Per-product selected sizes, active info tabs, and size guide modal visibility. Not persisted (resets on page refresh).
-
-## Image Optimization
-
-JPEG source images live in `images-sources/` (outside `public/` to avoid shipping raw assets), organized in `products/`, `lookbook/`, and `editorial/` subdirectories. Pre-optimized WebP variants are served directly from `public/images/` via `next/image`.
-
-To regenerate WebP from JPEG originals:
-
-```bash
-node scripts/optimize-images.mjs
-```
-
-Uses [sharp](https://sharp.pixelplumbing.com/) (resizes longest edge to 2000px, quality 100).
