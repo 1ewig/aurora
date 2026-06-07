@@ -1,11 +1,5 @@
-"use client";
-
-import { use } from "react";
-import { notFound } from "next/navigation";
-import { PageHeader } from "@/components/product/listing/PageHeader";
-import { CategoryFilter } from "@/components/product/listing/CategoryFilter";
-import { ProductGrid } from "@/components/product/listing/ProductGrid";
-import { useProductFilter } from "@/hooks/useProductFilter";
+import type { Metadata } from "next";
+import CategoryPageClient from "@/components/product/listing/CategoryPageClient";
 
 const categoryMap: Record<string, string> = {
   outerwear: "Outerwear",
@@ -19,36 +13,16 @@ interface CategoryPageProps {
   params: Promise<{ category: string }>;
 }
 
-export default function CategoryPage({ params }: CategoryPageProps) {
-  const { category: categorySlug } = use(params);
-  const categoryName = categoryMap[categorySlug];
-
-  if (!categoryName) {
-    notFound();
-  }
-
-  const { activeCategory, filtered, categories, handleCategoryChange, isLoading } = useProductFilter({
-    initialCategory: categoryName,
-    onCategoryChange: (name) => {
-      const slug = name === "All" ? "" : name.toLowerCase();
-      const url = slug ? `/products/category/${slug}` : "/products";
-      window.history.pushState(null, "", url);
-    },
-  });
-
-  return (
-    <main id="main-content" tabIndex={-1} className="pt-28 pb-32">
-      <div className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
-          <PageHeader category={activeCategory} />
-          <CategoryFilter
-            categories={categories}
-            activeCategory={activeCategory}
-            onChange={handleCategoryChange}
-          />
-        </div>
-        <ProductGrid products={filtered} isLoading={isLoading} />
-      </div>
-    </main>
-  );
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  const { category } = await params;
+  const categoryName = categoryMap[category.toLowerCase()] || "Collection";
+  return {
+    title: `${categoryName} | Aurora`,
+    description: `Discover our collection of premium ${categoryName.toLowerCase()} designed for the considered wardrobe.`,
+  };
 }
+
+export default async function CategoryPage({ params }: CategoryPageProps) {
+  return <CategoryPageClient params={params} />;
+}
+

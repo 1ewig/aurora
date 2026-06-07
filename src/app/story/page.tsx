@@ -1,19 +1,12 @@
-"use client";
+import type { Metadata } from "next";
+import StoryPageClient from "@/components/story/StoryPageClient";
 
-import { StoryHero } from "@/components/story/StoryHero";
-import { PhilosophySection } from "@/components/story/PhilosophySection";
-import { ParallaxBreakout } from "@/components/story/ParallaxBreakout";
-import { AtelierSection } from "@/components/story/AtelierSection";
-import { StoryCta } from "@/components/story/StoryCta";
+export const metadata: Metadata = {
+  title: "Our Story | Aurora",
+  description: "Learn about the philosophy, atelier, and conscious craftsmanship behind Aurora's clothing.",
+};
 
 export default function StoryPage() {
-  return (
-    <main id="main-content" tabIndex={-1} className="pt-28 pb-32">
-      <StoryHero />
-      <PhilosophySection />
-      <ParallaxBreakout />
-      <AtelierSection />
-      <StoryCta />
-    </main>
-  );
+  return <StoryPageClient />;
 }
+
