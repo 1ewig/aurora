@@ -49,31 +49,13 @@ Presentational Components (src/components/*/)
 
 ## Getting Started
 
-### Prerequisites
-1. InsForge CLI authenticated and linked:
-   ```bash
-   npx @insforge/cli login --user-api-key <your-user-api-key>
-   npx @insforge/cli link --project-id 98edf59a-99c7-4da4-8476-06561d0d4edb
-   ```
-2. Environment variables set in `.env.local`:
-   * `DATABASE_URL` (Postgres connection string with `sslmode=verify-full`)
-   * `NEXT_PUBLIC_INSFORGE_URL`
-   * `NEXT_PUBLIC_INSFORGE_ANON_KEY`
-   * `INSFORGE_API_KEY`
+Follow the step-by-step guide in [`BACKEND_DEPLOYMENT.md`](BACKEND_DEPLOYMENT.md) to set up a new InsForge project, create the database tables, upload product images, and seed the catalog.
 
-### Setup & Launch
+Quick start after the backend is deployed:
+
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Seed the remote InsForge PostgreSQL database
-npx tsx scripts/seed-inventory.ts
-
-# 3. Start development server
 npm run dev
-
-# 4. Build for production (compiles and checks types)
-npm run build
 ```
 
 ---
@@ -108,7 +90,8 @@ npm run build
 
 ```
 scripts/
-├── seed-inventory.ts               # Database table creation and seeding script
+├── upload-and-seed.mts              # Uploads images + seeds DB (--fresh for first-time, additive by default)
+├── create-tables.sql                # Standalone SQL DDL for manual use
 src/
 ├── app/
 │   ├── checkout/page.tsx

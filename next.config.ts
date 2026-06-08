@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '4eu5wk8i.us-east.insforge.app',
+        hostname: '**.insforge.app',
         pathname: '/api/storage/buckets/**',
       },
     ],
