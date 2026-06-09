@@ -57,7 +57,7 @@ export function LookbookSlider() {
       </h2>
 
       {/* Slide Container */}
-      <div className="relative aspect-[4/5] md:aspect-[16/9] lg:aspect-[21/9]">
+      <div className="relative aspect-[4/5] md:aspect-[16/9]">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.figure
             key={current}
