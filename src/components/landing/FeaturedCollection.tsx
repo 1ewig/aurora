@@ -5,14 +5,11 @@ import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { Button } from "@/components/ui/Button";
-import { useProductsQuery } from "@/hooks/queries";
+import { useFeaturedProducts } from "@/hooks/useFeaturedProducts";
 import { staggerContainer, scaleIn } from "@/animations/variants";
 
 export function FeaturedCollection() {
-  const { data: products = [] } = useProductsQuery();
-  const featured = products.filter((p) =>
-    ["ivory-wool-overcoat", "ecru-linen-blazer", "champagne-silk-slip-dress"].includes(p.slug)
-  );
+  const { featured } = useFeaturedProducts(3);
   return (
     <section
       id="collection"
