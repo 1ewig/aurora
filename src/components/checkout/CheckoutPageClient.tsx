@@ -62,6 +62,9 @@ export default function CheckoutPageClient() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          <div className="lg:col-span-5 lg:sticky lg:top-24">
+            <OrderSummaryContainer />
+          </div>
           <div className="lg:col-span-7">
             <CheckoutForm
               onOrderPlaced={(orderNumber, maskedEmail, cardNumber, maskedCardNumber) => {
@@ -69,9 +72,6 @@ export default function CheckoutPageClient() {
                 setHasOrdered(true);
               }}
             />
-          </div>
-          <div className="lg:col-span-5 lg:sticky lg:top-24">
-            <OrderSummaryContainer />
           </div>
         </div>
       </div>
