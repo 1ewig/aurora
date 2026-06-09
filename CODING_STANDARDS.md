@@ -6,7 +6,7 @@ The codebase follows a strict 4-layer separation of concerns:
 
 ```
 Pages (src/app/)
-  │  Import components, call hooks, pass data as props
+  │  Server Components: resolve route params, export SEO metadata, render containers
   │
   ▼
 Containers / Bridges (src/components/*/)
@@ -32,33 +32,35 @@ Data flows **down** from pages through containers into presentational components
 
 ### Pages (`src/app/`)
 
-- Import components, call hooks, pass returned data as props
-- Server components by default — use `"use client"` only when interactivity is required
-- Use `generateStaticParams` for SSG on product detail and category pages
-- Never import Zustand stores directly — delegate to a bridge/container or hook
+- Server components by default to maximize SEO indexing and performance
+- Export static metadata or use `generateMetadata()` for dynamic pages
+- Resolve route/search parameters on the server and pass them directly to containers
+- Never import Zustand stores or call client hooks directly (must delegate to a client container)
 - Never contain JSX markup beyond layout scaffolding (wrapping `<main>`, containers)
 
 ```tsx
-// ✅ Good — server page, SSG, delegates to a client container
+// ✅ Good — Server page exporting dynamic metadata and delegating to a client container
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const product = await getProduct(slug);
+  return { title: `${product.name} | Brand` };
+}
+
 export default async function ProductPage({ params }) {
   const { slug } = await params;
-  const product = findProduct(slug);
-  if (!product) notFound();
-  return <ProductDetailContainer product={product} />;
+  return <ProductDetailClient slug={slug} />;
 }
 ```
 
 ```tsx
-// ✅ Good — client page, calls hook, passes props
+// ✅ Good — Server page exporting static metadata and delegating to a client container
+export const metadata = {
+  title: "All Products | Brand",
+  description: "Explore our premium collection.",
+};
+
 export default function ProductsPage() {
-  const { activeCategory, filtered, categories, handleCategoryChange } = useProductFilter();
-  return (
-    <main>
-      <PageHeader category={activeCategory} />
-      <CategoryFilter ... />
-      <ProductGrid products={filtered} />
-    </main>
-  );
+  return <ProductsPageClient />;
 }
 ```
 
