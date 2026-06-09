@@ -173,7 +173,7 @@ type ImageResult = {
 async function resolveImage(
   admin: ReturnType<typeof createAdminClient>,
   localRelPath: string,
-  shouldUpload: boolean,
+  existingKeys: Set<string>,
 ): Promise<ImageResult> {
   const fullPath = path.resolve(
     process.cwd(),
@@ -187,7 +187,7 @@ async function resolveImage(
 
   const storageKey = localRelPath.replace(/^\/images\//, '');
 
-  if (!shouldUpload) {
+  if (existingKeys.has(storageKey)) {
     return { url: buildStorageUrl(storageKey), status: 'exists' };
   }
 
@@ -320,6 +320,20 @@ async function seed() {
   console.time(`  Images (${allImagePaths.size} files)`);
 
   console.log(`\nResolving ${allImagePaths.size} images (bucket: "${BUCKET}")...\n`);
+  
+  const existingKeys = new Set<string>();
+  if (bucketExists) {
+    try {
+      const { data: listData } = await admin.storage.from(BUCKET).list({ limit: 1000 });
+      const objects = (listData as any)?.data || (listData as any)?.objects || [];
+      for (const obj of objects) {
+        existingKeys.add(obj.key);
+      }
+    } catch (err: any) {
+      console.warn(`Warning pre-populating existing keys: ${err.message || err}`);
+    }
+  }
+
   const urlMap = new Map<string, string>();
 
   let uploaded = 0;
@@ -327,7 +341,7 @@ async function seed() {
   let missing = 0;
 
   await eachBatch(Array.from(allImagePaths), 5, async (localPath) => {
-    const { url, status } = await resolveImage(admin, localPath, isFresh);
+    const { url, status } = await resolveImage(admin, localPath, existingKeys);
     const label = localPath.replace(/^\/images\//, '');
 
     if (url) {
