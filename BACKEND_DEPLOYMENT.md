@@ -80,15 +80,18 @@ You now have three values:
 
 ---
 
-## Step 5 — Create the storage bucket
+## Step 5 — Create the storage bucket (Optional / Automated)
 
-The app stores product images in a bucket called `product-media`:
+The app stores product images in a bucket called `product-media`. 
+
+> [!NOTE]
+> The seeding script in **Step 8** automatically verifies if the bucket exists. If it does not exist, the script automatically creates it and sets it to public. You can skip this step and let the seed script handle it.
+
+If you prefer to create it manually:
 
 ```bash
 npx @insforge/cli storage create-bucket product-media
 ```
-
-> This bucket is **public** by default, which allows images to be viewed without authentication.
 
 Verify the bucket exists:
 
@@ -152,11 +155,13 @@ For a **first-time deploy**, run with the `--fresh` flag:
 npx tsx scripts/upload-and-seed.mts --fresh
 ```
 
-This does:
-1. Creates all 4 database tables (drops any existing data first)
-2. Uploads every referenced image from `public/images/` to the `product-media` bucket
-3. Inserts all 14 products with their real uploaded image URLs
-4. Inserts sizes, details, and additional gallery images
+This performs automated setup and seeding:
+1. **Bucket Verification & Automated Wipe**: 
+   - Checks if the `product-media` bucket exists. If missing, it automatically creates it and configures it public.
+   - If the bucket exists and contains data, it automatically wipes it clean and recreates it (to prevent name collisions or duplicate versions like `image (1).webp`).
+2. **Recursive Image Scan**: Recursively crawls `public/images/` to scan and upload **all** local images (products, lookbooks, and editorial assets) to storage.
+3. **Database Tables**: Drops and creates all 4 database tables.
+4. **Data Seeding**: Seeds all products, gallery image relations, sizes, and detail bullets.
 
 You'll see output like:
 

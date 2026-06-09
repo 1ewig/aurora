@@ -35,6 +35,7 @@ import { createAdminClient } from '@insforge/sdk';
 import { Client } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
+import { execSync } from 'child_process';
 
 // Reads the static product definitions from src/data/products.ts.
 // To add new products, edit that file, then run this script without --fresh.
@@ -226,9 +227,87 @@ async function seed() {
   console.log("Initializing InsForge admin client...");
   const admin = createAdminClient({ baseUrl: ossHost, apiKey });
 
+  // ── 1b. Verify and prepare storage bucket ──
+  console.log(`Verifying storage bucket "${BUCKET}"...`);
+  let bucketExists = false;
+  let hasData = false;
+
+  try {
+    const bucketsList = execSync(`npx @insforge/cli storage buckets`, { encoding: 'utf-8' });
+    bucketExists = bucketsList.includes(BUCKET);
+    
+    if (bucketExists) {
+      const { data: listData } = await admin.storage.from(BUCKET).list({ limit: 1 });
+      const objects = (listData as any)?.data || (listData as any)?.objects;
+      if (objects && objects.length > 0) {
+        hasData = true;
+      }
+    }
+  } catch (err: any) {
+    console.warn(`Warning checking bucket status: ${err.message || err}`);
+    bucketExists = false;
+  }
+
+  if (!bucketExists) {
+    console.log(`Bucket "${BUCKET}" does not exist. Creating it...`);
+    try {
+      const createOut = execSync(`npx @insforge/cli storage create-bucket ${BUCKET}`, { encoding: 'utf-8' });
+      console.log(createOut);
+      console.log(`Successfully created bucket "${BUCKET}".`);
+    } catch (err: any) {
+      console.error(`Failed to create bucket "${BUCKET}" via CLI:`, err.message || err);
+      process.exit(1);
+    }
+  } else if (isFresh && hasData) {
+    console.log(`Bucket "${BUCKET}" has existing data. Wiping and recreating bucket...`);
+    try {
+      const deleteOut = execSync(`npx @insforge/cli storage delete-bucket ${BUCKET}`, { input: 'y\n', encoding: 'utf-8' });
+      console.log(deleteOut);
+      const createOut = execSync(`npx @insforge/cli storage create-bucket ${BUCKET}`, { encoding: 'utf-8' });
+      console.log(createOut);
+      console.log(`Successfully wiped and recreated bucket "${BUCKET}".`);
+    } catch (err: any) {
+      console.error(`Failed to recreate bucket "${BUCKET}" via CLI:`, err.message || err);
+      process.exit(1);
+    }
+  } else {
+    console.log(`Bucket "${BUCKET}" is ready.`);
+  }
+
   // ── 2. Collect all unique image paths ──
 
   const allImagePaths = new Set<string>();
+
+  // Collect all files from public/images recursively
+  const publicDir = path.resolve(process.cwd(), 'public');
+  const imagesDir = path.resolve(publicDir, 'images');
+
+  function getFilesRecursively(dir: string, baseDir: string): string[] {
+    let results: string[] = [];
+    if (!fs.existsSync(dir)) return results;
+    const list = fs.readdirSync(dir);
+    for (const file of list) {
+      const filePath = path.resolve(dir, file);
+      const stat = fs.statSync(filePath);
+      if (stat && stat.isDirectory()) {
+        results = results.concat(getFilesRecursively(filePath, baseDir));
+      } else {
+        const ext = path.extname(filePath).toLowerCase();
+        if (['.webp', '.jpg', '.jpeg', '.png', '.svg', '.gif'].includes(ext)) {
+          const rel = path.relative(baseDir, filePath);
+          const normalized = '/' + rel.replace(/\\/g, '/');
+          results.push(normalized);
+        }
+      }
+    }
+    return results;
+  }
+
+  const scannedImages = getFilesRecursively(imagesDir, publicDir);
+  for (const img of scannedImages) {
+    allImagePaths.add(img);
+  }
+
   for (const product of uniqueProducts) {
     if (product.image) allImagePaths.add(product.image);
     for (const img of product.images || []) {
