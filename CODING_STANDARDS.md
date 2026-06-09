@@ -66,25 +66,55 @@ export default function ProductsPage() {
 
 ### Containers / Bridges
 
-- `"use client"` wrappers that act as the bridge between stores/hooks and presentational components
-- Read Zustand stores with individual selectors (avoid subscribing to the entire store)
-- Call business logic hooks
-- Pass resolved data and event handlers as props
-- One container per page-orchestrated feature
+- `"use client"` wrappers that act as the bridge between stores/hooks and presentational components.
+- Naming conventions:
+  - **Page-level client wrappers**: Named `XxxClient.tsx` (e.g., `ProductDetailClient.tsx`, `CheckoutPageClient.tsx`) placed in their respective component folder.
+  - **Sub-page feature containers**: Named `XxxContainer.tsx` (e.g., `OrderSummaryContainer.tsx`).
+- Read Zustand stores with individual selectors to avoid subscribing to the entire store state.
+- Call custom business logic hooks or query hooks (e.g., `useProductDetailsQuery`, `useProductFilter`).
+- Pass resolved data and event handlers down as props to children.
 
 ```tsx
-// ✅ Good — bridge reads stores, passes props
-export function ProductDetailContainer({ product }) {
-  const selectedSize = useProductStore((s) => s.selectedSizes[product.id]);
-  const addItem = useCartStore((s) => s.addItem);
-  const relatedProducts = useRelatedProducts(product);
+// ✅ Good — Page-level container/client wrapper fetching data and passing it to presentational items
+export function ProductDetailClient({ slug }: ProductDetailClientProps) {
+  const { data: product, isLoading, error } = useProductDetailsQuery(slug);
+  const isSizeGuideOpen = useProductStore((s) => s.isSizeGuideOpen);
+  const setSizeGuideOpen = useProductStore((s) => s.setSizeGuideOpen);
+
+  if (isLoading) return <LoadingSkeleton />;
+  if (error || !product) notFound();
 
   return (
-    <ProductDetail
-      product={product}
-      selectedSize={selectedSize}
-      onAddToBag={handleAddToBag}
-      relatedProducts={relatedProducts}
+    <main id="main-content">
+      <Breadcrumbs category={product.category} />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <ImageGallery images={product.images} altText={product.altText} />
+        <div className="lg:col-span-7">
+          <ProductInfo product={product} />
+          <ProductActions product={product} />
+        </div>
+      </div>
+    </main>
+  );
+}
+```
+
+```tsx
+// ✅ Good — Sub-page feature container bridging cart store and order details
+export function OrderSummaryContainer() {
+  const items = useCartStore((s) => s.items);
+  const subtotal = useCartStore((s) => s.totalPrice());
+  const { shipping, tax, total } = useOrderPricing(subtotal);
+
+  if (items.length === 0) return null;
+
+  return (
+    <OrderSummary
+      items={items}
+      subtotal={subtotal}
+      shipping={shipping}
+      tax={tax}
+      total={total}
     />
   );
 }
@@ -139,27 +169,34 @@ export const useCartStore = create<CartState>()(
 
 ### Presentational Components (`src/components/`)
 
-- Receive everything via props
-- Zero store imports, zero hook imports (except utility hooks like `useBodyScrollLock` that manage pure UI concerns)
-- No business logic — no filtering, no calculations, no data fetching
-- Pure JSX rendering with Tailwind styling
-- Prefer composition over configuration — lean interfaces with specific props
+- Receive everything via props.
+- Zero store imports, zero hook imports (except UI-only utility hooks like `useBodyScrollLock` or animation-specific libraries like Framer Motion).
+- No business logic, no filtering, no calculations, no data fetching.
+- Pure JSX rendering with Tailwind styling.
+- Prefer composition over configuration.
 
 ```tsx
-// ✅ Good — pure presentational, all data comes via props
-interface ProductDetailProps {
-  product: Product;
-  selectedSize: string;
-  onSizeChange: (size: string) => void;
-  onAddToBag: () => void;
-  isInCart: boolean;
+// ✅ Good — pure presentational, receiving all dynamic states as props
+interface OrderSummaryProps {
+  items: CartItem[];
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
 }
 
-export function ProductDetail({ product, selectedSize, onSizeChange, onAddToBag, isInCart }: ProductDetailProps) {
+export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSummaryProps) {
+  if (items.length === 0) return <EmptyCart />;
+
   return (
-    <div>
-      <SizeSelector sizes={product.sizes} selectedSize={selectedSize} onChange={onSizeChange} />
-      <Button onClick={onAddToBag} disabled={isInCart}>Add to Bag</Button>
+    <div className="bg-bg-secondary p-8 rounded-2xl border border-border-subtle">
+      <h2>Order Summary</h2>
+      <ul>
+        {items.map((item) => (
+          <li key={item.id}>{item.name}</li>
+        ))}
+      </ul>
+      <div>Total: {formatCurrency(total)}</div>
     </div>
   );
 }
