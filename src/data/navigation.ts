@@ -21,11 +21,11 @@ export const footerNav: FooterColumn[] = [
     title: "Shop",
     links: [
       { label: "All Pieces", href: "/products" },
-      { label: "Outerwear", href: "/products" },
-      { label: "Knitwear", href: "/products" },
-      { label: "Trousers", href: "/products" },
-      { label: "Dresses", href: "/products" },
-      { label: "Accessories", href: "/products" },
+      { label: "Outerwear", href: "/products/category/outerwear" },
+      { label: "Knitwear", href: "/products/category/knitwear" },
+      { label: "Trousers", href: "/products/category/trousers" },
+      { label: "Dresses", href: "/products/category/dresses" },
+      { label: "Accessories", href: "/products/category/accessories" },
     ],
   },
   {
