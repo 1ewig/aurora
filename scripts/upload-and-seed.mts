@@ -2,14 +2,14 @@
  * upload-and-seed.mts
  * ===================
  *
- * Uploads product images to InsForge Storage and seeds the Aurora database.
+ * Uploads all images recursively to InsForge Storage and seeds the Aurora database.
  *
  * ── Usage ───────────────────────────────────────────────
  *
  *   First-time deploy (fresh project, empty DB, no images):
  *     npx tsx scripts/upload-and-seed.mts --fresh
  *
- *   Adding new products later (existing DB, skip duplicates):
+ *   Adding new products/images later (existing DB, incremental update):
  *     npx tsx scripts/upload-and-seed.mts
  *
  * ── Modes ───────────────────────────────────────────────
@@ -17,17 +17,19 @@
  *   --fresh (flag):
  *     - Drops and recreates all 4 tables (products, product_images,
  *       product_sizes, product_details)
- *     - Uploads every image to the product-media bucket via the SDK
+ *     - Verifies storage bucket. If missing, creates it. If it contains data,
+ *       wipes the bucket clean and recreates it to prevent duplicates.
+ *     - Recursively scans public/images/ and uploads all files to storage.
  *     - Inserts ALL products from src/data/products.ts
  *
  *   Additive (default, no flag):
- *     - Skips table creation (tables must already exist)
- *     - Skips ALL SDK uploads — constructs storage URLs directly
- *       (images were uploaded during the --fresh run)
+ *     - Skips table/bucket recreation (keeps existing database records intact)
+ *     - Auto-creates bucket if completely missing
+ *     - Queries existing keys in the storage bucket and uploads only new/missing
+ *       images recursively (skips existing images for performance)
  *     - Queries existing slugs from the DB upfront
  *     - Inserts only products whose slug is new (skips duplicates)
- *     - Appends related data (images, sizes, details) ONLY for
- *       newly inserted products
+ *     - Appends related data (images, sizes, details) ONLY for newly inserted products
  *     - Safe to run repeatedly — existing data is never touched
  */
 
