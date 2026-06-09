@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Button } from "@/components/ui/Button";
@@ -31,11 +32,11 @@ export function StoryCta() {
             Step inside our complete library of premium outercoats, cashmeres, and accessories designed for longevity.
           </p>
           <div className="pt-4 flex justify-center">
-            <a href="/products">
+            <Link href="/products">
               <Button variant="gold" size="lg" className="px-10">
                 Shop the Collection &rarr;
               </Button>
-            </a>
+            </Link>
           </div>
         </div>
       </motion.div>

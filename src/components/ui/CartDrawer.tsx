@@ -94,6 +94,7 @@ export function CartDrawer() {
                           src={item.image}
                           alt={item.name}
                           className="w-full h-full object-cover"
+                          sizes="80px"
                         />
                       </Link>
                       <div className="flex-1 min-w-0">

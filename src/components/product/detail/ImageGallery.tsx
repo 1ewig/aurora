@@ -33,6 +33,7 @@ export function ImageGallery({ images, altText }: ImageGalleryProps) {
               alt={`${altText} - view ${activeIndex + 1}`}
               className="object-cover w-full h-full"
               loading="eager"
+              sizes="(max-width: 1024px) 100vw, 50vw"
             />
           </motion.div>
         </AnimatePresence>

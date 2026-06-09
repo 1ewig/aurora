@@ -6,9 +6,10 @@ interface OptimizedImageProps {
   className?: string;
   loading?: "lazy" | "eager";
   style?: React.CSSProperties;
+  sizes?: string;
 }
 
-export function OptimizedImage({ src, alt, className, loading = "lazy", style }: OptimizedImageProps) {
+export function OptimizedImage({ src, alt, className, loading = "lazy", style, sizes = "100vw" }: OptimizedImageProps) {
   return (
     <Image
       src={src}
@@ -18,7 +19,7 @@ export function OptimizedImage({ src, alt, className, loading = "lazy", style }:
       loading={loading}
       style={style}
       quality={100}
-      sizes="(max-width: 768px) 100vw, 50vw"
+      sizes={sizes}
     />
   );
 }

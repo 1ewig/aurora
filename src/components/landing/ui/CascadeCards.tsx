@@ -60,6 +60,7 @@ export function CascadeCards({ products }: CascadeCardsProps) {
                 src={product.image}
                 alt={product.altText}
                 fill
+                quality={100}
                 sizes="(min-width: 768px) 18vw, 140px"
                 className="object-cover object-top"
               />
@@ -105,6 +106,7 @@ export function CascadeCards({ products }: CascadeCardsProps) {
                 src={product.image}
                 alt={product.altText}
                 fill
+                quality={100}
                 sizes="(min-width: 768px) 18vw, 140px"
                 className="object-cover object-top"
               />

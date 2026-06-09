@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -129,11 +130,11 @@ export function CheckoutSuccess({
       )}
 
       <div className="pt-6">
-        <a href="/products">
+        <Link href="/products">
           <Button variant="ghost" size="md">
             Return to Catalog
           </Button>
-        </a>
+        </Link>
       </div>
     </motion.div>
   );

@@ -42,6 +42,7 @@ export function AtelierSection() {
               src={getStorageUrl("/images/lookbook/lookbook-1.webp")}
               alt="Wool loom detail"
               className="w-full h-full object-cover"
+              sizes="(max-width: 1024px) 50vw, 30vw"
             />
           </div>
           <div className="relative aspect-[3/4] bg-border-subtle rounded-xl overflow-hidden mt-8">
@@ -49,6 +50,7 @@ export function AtelierSection() {
               src={getStorageUrl("/images/lookbook/lookbook-2.webp")}
               alt="Cashmere folding"
               className="w-full h-full object-cover"
+              sizes="(max-width: 1024px) 50vw, 30vw"
             />
           </div>
         </motion.div>
