@@ -15,6 +15,7 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
   } = options;
 
   const [activeCategory, setActiveCategory] = useState<string>(initialCategory);
+  const [sortBy, setSortBy] = useState<string>("featured");
 
   useEffect(() => {
     setActiveCategory(initialCategory);
@@ -22,13 +23,22 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
 
   const { data: dbProducts = [], isLoading } = useProductsQuery();
 
-  const filtered = useMemo(
-    () =>
-      activeCategory === "All"
-        ? dbProducts
-        : dbProducts.filter((p) => p.category === activeCategory),
-    [activeCategory, dbProducts]
-  );
+  const filtered = useMemo(() => {
+    let result = activeCategory === "All"
+      ? [...dbProducts]
+      : dbProducts.filter((p) => p.category === activeCategory);
+
+    if (sortBy === "price-asc") {
+      result.sort((a, b) => Number(a.price) - Number(b.price));
+    } else if (sortBy === "price-desc") {
+      result.sort((a, b) => Number(b.price) - Number(a.price));
+    } else if (sortBy === "name-asc") {
+      result.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === "name-desc") {
+      result.sort((a, b) => b.name.localeCompare(a.name));
+    }
+    return result;
+  }, [activeCategory, dbProducts, sortBy]);
 
   const handleCategoryChange = (category: string) => {
     setActiveCategory(category);
@@ -39,6 +49,8 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
     activeCategory,
     setActiveCategory,
     handleCategoryChange,
+    sortBy,
+    setSortBy,
     filtered,
     isLoading,
     categories: ["All", ...categories] as const,
