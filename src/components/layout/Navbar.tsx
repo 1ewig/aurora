@@ -8,13 +8,7 @@ import { useCartStore } from "@/stores/useCartStore";
 import { useNavbarScroll } from "@/hooks/useNavbarScroll";
 import { navbarReveal, staggerContainer, menuItemVariant } from "@/animations/variants";
 
-function SearchIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0016.803 15.803z" />
-    </svg>
-  );
-}
+
 
 function BagIcon({ count }: { count: number }) {
   return (
@@ -110,12 +104,6 @@ export function Navbar() {
 
             {/* Utility Icons */}
             <div className="flex items-center gap-3">
-              <button
-                aria-label="Search"
-                className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary"
-              >
-                <SearchIcon />
-              </button>
               <button
                 aria-label={`Shopping bag, ${count} item${count !== 1 ? "s" : ""}`}
                 onClick={toggleCart}
