@@ -49,9 +49,33 @@ Presentational Components (src/components/*/)
 
 ## Getting Started
 
-Follow the step-by-step guide in [`BACKEND_DEPLOYMENT.md`](BACKEND_DEPLOYMENT.md) to set up a new InsForge project, create the database tables, upload product images, and seed the catalog.
+Follow the step-by-step guide in [`BACKEND_DEPLOYMENT.md`](BACKEND_DEPLOYMENT.md) to set up a new InsForge project, configure your environment variables (`.env.local`), and seed the database.
 
-Quick start after the backend is deployed:
+### Seeding and Managing Data
+
+The project includes built-in scripts to manage the e-commerce catalog:
+
+* **First-time setup / Wiping & Seeding**:
+  Drops existing tables, verifies and wipes/recreates the storage bucket, recursively uploads all local assets, and seeds the DB.
+  ```bash
+  npx tsx scripts/upload-and-seed.mts --fresh
+  ```
+
+* **Incremental updates (Additive mode)**:
+  Checks existing items, uploads only new/missing images to storage, and seeds only new products without dropping tables.
+  ```bash
+  npx tsx scripts/upload-and-seed.mts
+  ```
+
+* **Wipe a product (Database & Storage)**:
+  Wipes a product from the database, cascading to related tables, and automatically deletes its associated images from the InsForge storage bucket if they are not used by other products.
+  ```bash
+  npx tsx scripts/delete-product.mts <product_id>
+  ```
+
+### Running Locally
+
+Once the database and storage are seeded:
 
 ```bash
 npm install
