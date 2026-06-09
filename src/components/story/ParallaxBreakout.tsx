@@ -5,7 +5,7 @@ import { getStorageUrl } from "@/utils/insforge";
 
 export function ParallaxBreakout() {
   return (
-    <section className="my-20 relative h-[50vh] md:h-[60vh] bg-border-subtle overflow-hidden">
+    <section className="my-20 relative h-[70vh] md:h-[85vh] bg-border-subtle overflow-hidden">
       <OptimizedImage
         src={getStorageUrl("/images/lookbook/lookbook-3.webp")}
         alt="Extrafine fabric detail view"
