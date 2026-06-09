@@ -15,6 +15,11 @@ export default function CheckoutPageClient() {
     maskedEmail: string;
     cardNumber: string;
     maskedCardNumber: string;
+    items: any[];
+    subtotal: number;
+    shipping: number;
+    tax: number;
+    total: number;
   } | null>(null);
 
   if (!hasOrdered && items.length === 0) {
@@ -38,7 +43,7 @@ export default function CheckoutPageClient() {
         <div className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
           <div className="border-b border-border-subtle pb-8 mb-12">
             <h1 className="font-display font-black text-3xl md:text-4xl tracking-tight text-text-primary uppercase">
-              Secure Checkout
+              Order Confirmation
             </h1>
           </div>
           <CheckoutSuccess
@@ -46,6 +51,11 @@ export default function CheckoutPageClient() {
             maskedEmail={orderData.maskedEmail}
             cardNumber={orderData.cardNumber}
             maskedCardNumber={orderData.maskedCardNumber}
+            items={orderData.items}
+            subtotal={orderData.subtotal}
+            shipping={orderData.shipping}
+            tax={orderData.tax}
+            total={orderData.total}
           />
         </div>
       </main>
@@ -67,8 +77,18 @@ export default function CheckoutPageClient() {
           </div>
           <div className="lg:col-span-7">
             <CheckoutForm
-              onOrderPlaced={(orderNumber, maskedEmail, cardNumber, maskedCardNumber) => {
-                setOrderData({ orderNumber, maskedEmail, cardNumber, maskedCardNumber });
+              onOrderPlaced={(orderNumber, maskedEmail, cardNumber, maskedCardNumber, itemsSnapshot, subtotal, shipping, tax, total) => {
+                setOrderData({
+                  orderNumber,
+                  maskedEmail,
+                  cardNumber,
+                  maskedCardNumber,
+                  items: itemsSnapshot,
+                  subtotal,
+                  shipping,
+                  tax,
+                  total
+                });
                 setHasOrdered(true);
               }}
             />

@@ -4,7 +4,17 @@ import { useCheckoutForm } from "@/hooks/useCheckoutForm";
 import { Button } from "@/components/ui/Button";
 
 interface CheckoutFormProps {
-  onOrderPlaced?: (orderNumber: string, maskedEmail: string, cardNumber: string, maskedCardNumber: string) => void;
+  onOrderPlaced?: (
+    orderNumber: string,
+    maskedEmail: string,
+    cardNumber: string,
+    maskedCardNumber: string,
+    items: any[],
+    subtotal: number,
+    shipping: number,
+    tax: number,
+    total: number
+  ) => void;
 }
 
 export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {

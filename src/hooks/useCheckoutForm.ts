@@ -1,7 +1,17 @@
 import { useState } from "react";
 import { useCartStore } from "@/stores/useCartStore";
 
-export function useCheckoutForm(onOrderPlaced?: (orderNumber: string, maskedEmail: string, cardNumber: string, maskedCardNumber: string) => void) {
+export function useCheckoutForm(onOrderPlaced?: (
+  orderNumber: string,
+  maskedEmail: string,
+  cardNumber: string,
+  maskedCardNumber: string,
+  items: any[],
+  subtotal: number,
+  shipping: number,
+  tax: number,
+  total: number
+) => void) {
   const clearCart = useCartStore((s) => s.clearCart);
   const items = useCartStore((s) => s.items);
 
@@ -28,6 +38,12 @@ export function useCheckoutForm(onOrderPlaced?: (orderNumber: string, maskedEmai
 
     setLoading(true);
 
+    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
+    const tax = Math.round(subtotal * 0.08 * 100) / 100;
+    const total = subtotal + shipping + tax;
+    const itemsSnapshot = items.map((item) => ({ ...item }));
+
     setTimeout(() => {
       const generatedOrder = `AUR-${new Date().getFullYear()}-${Math.floor(
         100000 + Math.random() * 900000
@@ -35,7 +51,17 @@ export function useCheckoutForm(onOrderPlaced?: (orderNumber: string, maskedEmai
       setOrderNumber(generatedOrder);
       setSuccess(true);
       setLoading(false);
-      onOrderPlaced?.(generatedOrder, maskEmail(email), cardNumber, maskCardNumber(cardNumber));
+      onOrderPlaced?.(
+        generatedOrder,
+        maskEmail(email),
+        cardNumber,
+        maskCardNumber(cardNumber),
+        itemsSnapshot,
+        subtotal,
+        shipping,
+        tax,
+        total
+      );
       clearCart();
     }, 1500);
   };
