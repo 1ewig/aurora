@@ -87,7 +87,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mt-16 pt-8 border-t border-border-subtle">
           <p className="text-xs text-text-muted">
-            © 2025 Aurora. All rights reserved.
+            © 2026 Aurora. All rights reserved.
           </p>
 
           <div className="flex gap-6 text-xs text-text-muted">

@@ -53,7 +53,7 @@ export function LookbookSlider() {
       className="relative w-full overflow-hidden bg-bg-ink"
     >
       <h2 id="lookbook-heading" className="sr-only">
-        Lookbook — Aurora SS 2025
+        Lookbook — Aurora SS 2026
       </h2>
 
       {/* Slide Container */}

@@ -63,7 +63,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
-          <EyebrowLabel>SS 2025 Collection</EyebrowLabel>
+          <EyebrowLabel>SS 2026 Collection</EyebrowLabel>
         </motion.div>
 
         {/* H1 Headline */}

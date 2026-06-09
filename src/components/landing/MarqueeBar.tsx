@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 const marqueeItems = [
   "Aurora",
-  "SS 2025",
+  "SS 2026",
   "Designed in Solitude",
   "Limited Editions",
   "Crafted with Intention",

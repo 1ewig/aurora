@@ -170,7 +170,7 @@ export function Navbar() {
 
             <div className="mt-16">
               <p className="text-text-muted text-sm tracking-wide">
-                SS 2025 Collection
+                SS 2026 Collection
               </p>
             </div>
           </motion.div>
