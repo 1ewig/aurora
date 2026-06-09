@@ -28,7 +28,7 @@ The codebase follows a 4-layer separation of concerns:
 
 ```
 Pages (src/app/)
-  │  Import components, call hooks, pass data as props
+  │  Server Components: resolve route params, export SEO metadata, render containers
   │
   ▼
 Containers / Bridges (src/components/*/)
