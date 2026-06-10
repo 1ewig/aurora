@@ -11,7 +11,6 @@ export interface User {
 export interface Profile {
   displayName: string;
   bio: string;
-  avatarUrl: string;
 }
 
 interface AuthState {
@@ -48,7 +47,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const profile: Profile = {
           displayName: profileDataAny?.displayName || profileDataAny?.profile?.displayName || '',
           bio: profileDataAny?.bio || profileDataAny?.profile?.bio || '',
-          avatarUrl: profileDataAny?.avatarUrl || profileDataAny?.profile?.avatarUrl || '',
         };
         set({ user, profile, loading: false });
       } else {
@@ -73,7 +71,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const profile: Profile = {
         displayName: profileDataAny?.displayName || profileDataAny?.profile?.displayName || '',
         bio: profileDataAny?.bio || profileDataAny?.profile?.bio || '',
-        avatarUrl: profileDataAny?.avatarUrl || profileDataAny?.profile?.avatarUrl || '',
       };
       set({ user, profile, loading: false });
     } else {
@@ -95,7 +92,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return { error };
     }
     const user = data?.user || null;
-    set({ user, profile: { displayName: name || '', bio: '', avatarUrl: '' }, loading: false });
+    set({ user, profile: { displayName: name || '', bio: '' }, loading: false });
     return { error: null };
   },
 
@@ -111,7 +108,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const { data, error } = await insforge.auth.setProfile({
       displayName: newProfile.displayName,
       bio: newProfile.bio,
-      avatarUrl: newProfile.avatarUrl,
     });
     if (error) {
       return { error };
@@ -121,7 +117,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       profile: {
         displayName: dataAny?.displayName || dataAny?.profile?.displayName || '',
         bio: dataAny?.bio || dataAny?.profile?.bio || '',
-        avatarUrl: dataAny?.avatarUrl || dataAny?.profile?.avatarUrl || '',
       }
     });
     return { error: null };

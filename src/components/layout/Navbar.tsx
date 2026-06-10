@@ -63,8 +63,6 @@ export function Navbar() {
   const count = items.reduce((sum, i) => sum + i.quantity, 0);
 
   const user = useAuthStore((s) => s.user);
-  const profile = useAuthStore((s) => s.profile);
-  const loading = useAuthStore((s) => s.loading);
 
   const profileHref = user ? "/profile" : "/login";
 
@@ -122,17 +120,9 @@ export function Navbar() {
               <Link
                 href={profileHref}
                 aria-label={user ? "View Profile" : "Sign In / Sign Up"}
-                className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary flex items-center justify-center overflow-hidden w-9 h-9"
+                className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary flex items-center justify-center w-9 h-9"
               >
-                {!loading && user && profile?.avatarUrl ? (
-                  <img
-                    src={profile.avatarUrl}
-                    alt={profile.displayName || "Profile"}
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  <UserIcon />
-                )}
+                <UserIcon />
               </Link>
 
               <button

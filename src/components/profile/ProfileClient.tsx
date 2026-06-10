@@ -11,7 +11,6 @@ export function ProfileClient() {
 
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
   const [statusType, setStatusType] = useState<"success" | "error" | "">("");
   const [updating, setUpdating] = useState(false);
@@ -26,7 +25,6 @@ export function ProfileClient() {
     if (profile) {
       setDisplayName(profile.displayName || "");
       setBio(profile.bio || "");
-      setAvatarUrl(profile.avatarUrl || "");
     }
   }, [profile]);
 
@@ -39,7 +37,6 @@ export function ProfileClient() {
     const { error } = await updateProfile({
       displayName,
       bio,
-      avatarUrl,
     });
 
     setUpdating(false);
@@ -56,6 +53,17 @@ export function ProfileClient() {
   const handleSignOut = async () => {
     await signOut();
     router.push("/login"); // Updated path to point to /login
+  };
+
+  const getInitials = (name: string) => {
+    if (!name) return "AM";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .filter(Boolean)
+      .join("")
+      .substring(0, 2)
+      .toUpperCase();
   };
 
   if (loading || !user) {
@@ -94,28 +102,8 @@ export function ProfileClient() {
             </div>
 
             <div className="flex flex-col items-center text-center relative z-10">
-              <div className="w-24 h-24 rounded-full border-2 border-accent-primary overflow-hidden bg-bg-primary/10 mb-5 flex items-center justify-center">
-                {avatarUrl ? (
-                  <img
-                    src={avatarUrl}
-                    alt={displayName || "Profile avatar"}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <svg
-                    className="w-12 h-12 text-text-muted"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1"
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
-                )}
+              <div className="w-20 h-20 rounded-full border border-accent-primary bg-bg-primary/10 mb-5 flex items-center justify-center font-display font-bold text-xl tracking-wider text-accent-primary select-none">
+                {displayName ? getInitials(displayName) : "AM"}
               </div>
 
               <h2 className="font-display font-bold text-2xl tracking-wide uppercase mb-1">
@@ -160,40 +148,21 @@ export function ProfileClient() {
           </h3>
 
           <form onSubmit={handleUpdate} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label
-                  htmlFor="profile-display-name"
-                  className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2"
-                >
-                  Display Name
-                </label>
-                <input
-                  id="profile-display-name"
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full px-4 py-3 bg-bg-primary border border-border-medium rounded focus:border-accent-primary focus:outline-none transition-colors text-sm"
-                  placeholder="e.g. Jean Doe"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="profile-avatar-url"
-                  className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2"
-                >
-                  Avatar Image URL
-                </label>
-                <input
-                  id="profile-avatar-url"
-                  type="url"
-                  value={avatarUrl}
-                  onChange={(e) => setAvatarUrl(e.target.value)}
-                  className="w-full px-4 py-3 bg-bg-primary border border-border-medium rounded focus:border-accent-primary focus:outline-none transition-colors text-sm"
-                  placeholder="https://images.unsplash.com/..."
-                />
-              </div>
+            <div>
+              <label
+                htmlFor="profile-display-name"
+                className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2"
+              >
+                Display Name
+              </label>
+              <input
+                id="profile-display-name"
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="w-full px-4 py-3 bg-bg-primary border border-border-medium rounded focus:border-accent-primary focus:outline-none transition-colors text-sm"
+                placeholder="e.g. Jean Doe"
+              />
             </div>
 
             <div>
@@ -205,7 +174,7 @@ export function ProfileClient() {
               </label>
               <textarea
                 id="profile-bio"
-                rows={4}
+                rows={5}
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 className="w-full px-4 py-3 bg-bg-primary border border-border-medium rounded focus:border-accent-primary focus:outline-none transition-colors text-sm resize-none"
