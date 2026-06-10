@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/Button";
 
 interface ProfileWorkspaceProps {
   user: { id: string; email: string };
@@ -55,7 +56,7 @@ export function ProfileWorkspace({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
         {/* Left Side: Live Preview Card */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-bg-ink text-text-inverted rounded-lg p-8 relative overflow-hidden shadow-lg border border-white/10">
+          <div className="bg-bg-ink text-text-inverted rounded-[24px] p-8 relative overflow-hidden shadow-lg border border-white/10">
             {/* Elegant Background Grid / Accent */}
             <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-y-6 translate-x-6">
               <span className="font-display font-black text-[12rem] uppercase leading-none select-none">
@@ -95,16 +96,19 @@ export function ProfileWorkspace({
             </div>
           </div>
 
-          <button
+          <Button
             onClick={handleSignOut}
-            className="w-full py-3 border border-border-medium hover:border-error hover:text-error rounded uppercase tracking-wider text-sm font-semibold transition-all duration-300 bg-bg-secondary"
+            variant="ghost"
+            fullWidth
+            size="md"
+            className="hover:border-error hover:text-error hover:bg-transparent rounded-full"
           >
             Sign Out Session
-          </button>
+          </Button>
         </div>
 
         {/* Right Side: Edit Form */}
-        <div className="lg:col-span-8 bg-bg-secondary border border-border-subtle p-8 md:p-10 rounded-lg shadow-sm">
+        <div className="lg:col-span-8 bg-bg-secondary border border-border-subtle p-8 md:p-10 rounded-[24px] shadow-sm">
           <h3 className="font-display font-bold text-2xl uppercase tracking-wide mb-6 pb-4 border-b border-border-subtle">
             Profile Details
           </h3>
@@ -113,7 +117,7 @@ export function ProfileWorkspace({
             <div>
               <label
                 htmlFor="profile-display-name"
-                className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2"
+                className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2 px-1"
               >
                 Display Name
               </label>
@@ -122,7 +126,7 @@ export function ProfileWorkspace({
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full px-4 py-3 bg-bg-primary border border-border-medium rounded focus:border-accent-primary focus:outline-none transition-colors text-sm"
+                className="w-full px-5 py-3.5 bg-bg-primary border border-border-medium rounded-full focus:border-accent-primary focus:outline-none transition-colors text-sm"
                 placeholder="e.g. Jean Doe"
               />
             </div>
@@ -130,7 +134,7 @@ export function ProfileWorkspace({
             <div>
               <label
                 htmlFor="profile-bio"
-                className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2"
+                className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2 px-1"
               >
                 Biography
               </label>
@@ -139,14 +143,14 @@ export function ProfileWorkspace({
                 rows={5}
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                className="w-full px-4 py-3 bg-bg-primary border border-border-medium rounded focus:border-accent-primary focus:outline-none transition-colors text-sm resize-none"
+                className="w-full px-5 py-3.5 bg-bg-primary border border-border-medium rounded-[20px] focus:border-accent-primary focus:outline-none transition-colors text-sm resize-none"
                 placeholder="Share details about your wardrobe preference, sizing, style matches, etc."
               />
             </div>
 
             {statusMsg && (
               <div
-                className={`text-xs font-medium ${
+                className={`text-xs font-medium px-1 ${
                   statusType === "success" ? "text-success" : "text-error"
                 }`}
               >
@@ -154,13 +158,14 @@ export function ProfileWorkspace({
               </div>
             )}
 
-            <button
+            <Button
               type="submit"
+              variant="filled"
+              size="md"
               disabled={updating}
-              className="px-8 py-3 bg-bg-ink hover:bg-accent-primary text-white hover:text-bg-ink font-semibold rounded uppercase tracking-wider text-sm transition-all duration-300 disabled:opacity-50"
             >
               {updating ? "Saving Changes..." : "Save Profile Details"}
-            </button>
+            </Button>
           </form>
         </div>
       </div>
