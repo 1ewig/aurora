@@ -28,7 +28,7 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
     cardNumber, setCardNumber,
     cardExpiry, setCardExpiry,
     cardCVC, setCardCVC,
-    loading, success,
+    loading, success, error,
     items,
     handlePlaceOrder,
   } = useCheckoutForm(onOrderPlaced);
@@ -190,6 +190,10 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
           </div>
         </div>
       </div>
+
+      {error && (
+        <div className="text-error text-xs font-medium px-1">{error}</div>
+      )}
 
       {/* Checkout Submit CTA */}
       <div className="pt-4">

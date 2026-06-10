@@ -28,13 +28,13 @@ export function useCheckoutForm(onOrderPlaced?: (
   const [loading, setLoading] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
-    if (!email || !firstName || !lastName || !address || !city || !zipCode) {
-      return;
-    }
+    if (!email || !firstName || !lastName || !address || !city || !zipCode) return;
 
     setLoading(true);
 
@@ -42,17 +42,42 @@ export function useCheckoutForm(onOrderPlaced?: (
     const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
     const tax = Math.round(subtotal * 0.08 * 100) / 100;
     const total = subtotal + shipping + tax;
+
     const itemsSnapshot = items.map((item) => ({ ...item }));
 
-    setTimeout(() => {
-      const generatedOrder = `AUR-${new Date().getFullYear()}-${Math.floor(
-        100000 + Math.random() * 900000
-      )}`;
-      setOrderNumber(generatedOrder);
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: itemsSnapshot,
+          subtotal,
+          shipping,
+          tax,
+          total,
+          shippingAddress: {
+            email,
+            firstName,
+            lastName,
+            address,
+            city,
+            zipCode,
+          },
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to place order.");
+      }
+
+      setOrderNumber(data.orderNumber);
       setSuccess(true);
       setLoading(false);
+
       onOrderPlaced?.(
-        generatedOrder,
+        data.orderNumber,
         maskEmail(email),
         cardNumber,
         maskCardNumber(cardNumber),
@@ -62,8 +87,12 @@ export function useCheckoutForm(onOrderPlaced?: (
         tax,
         total
       );
+
       clearCart();
-    }, 1500);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong. Please try again.");
+      setLoading(false);
+    }
   };
 
   const maskEmail = (rawEmail: string) => {
@@ -80,19 +109,10 @@ export function useCheckoutForm(onOrderPlaced?: (
   };
 
   return {
-    email, setEmail,
-    firstName, setFirstName,
-    lastName, setLastName,
-    address, setAddress,
-    city, setCity,
-    zipCode, setZipCode,
-    cardNumber, setCardNumber,
-    cardExpiry, setCardExpiry,
-    cardCVC, setCardCVC,
-    loading, orderNumber, success,
-    items,
-    handlePlaceOrder,
-    maskEmail,
-    maskCardNumber,
+    email, setEmail, firstName, setFirstName, lastName, setLastName,
+    address, setAddress, city, setCity, zipCode, setZipCode,
+    cardNumber, setCardNumber, cardExpiry, setCardExpiry, cardCVC, setCardCVC,
+    loading, orderNumber, success, items, handlePlaceOrder,
+    error, setError,
   };
 }
