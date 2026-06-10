@@ -1,6 +1,6 @@
 "use client";
 
-import { useScroll, useTransform, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { CascadeCards } from "./ui/CascadeCards";
 
@@ -10,9 +10,6 @@ import { AnimatedText } from "@/components/ui/AnimatedText";
 import { useProductsQuery } from "@/hooks/queries";
 
 export function Hero() {
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 600], [0, -100]);
-
   const { data: products = [] } = useProductsQuery();
   const heroProductsList = products.filter((p) =>
     [
@@ -54,7 +51,6 @@ export function Hero() {
       </div>
 
       <motion.div
-        style={{ y }}
         className="relative z-10 flex flex-col items-center text-center w-full max-w-6xl mx-auto px-6"
       >
         {/* Eyebrow */}
