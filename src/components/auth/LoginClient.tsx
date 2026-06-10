@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useSignIn } from "@/hooks/useSignIn";
 import { LoginForm } from "./LoginForm";
 
 export function LoginClient() {
@@ -10,7 +11,8 @@ export function LoginClient() {
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState("");
 
-  const { user, signIn, loading, error: storeError, clearError } = useAuthStore();
+  const { user, loading, error: storeError, clearError } = useAuthStore();
+  const signIn = useSignIn();
   const router = useRouter();
 
   useEffect(() => {

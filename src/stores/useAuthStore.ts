@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { insforge } from '@/utils/insforge';
+import { normalizeProfile } from '@/utils/auth';
 
 export interface User {
   id: string;
@@ -18,7 +19,6 @@ interface AuthState {
   profile: Profile | null;
   loading: boolean;
   error: string | null;
-  initialize: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, name?: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -34,66 +34,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   clearError: () => set({ error: null }),
 
-  initialize: async () => {
-    set({ loading: true, error: null });
-    try {
-      const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
-      if (userError) {
-        set({ user: null, profile: null, loading: false });
-        return;
-      }
-      
-      const user = userData?.user || null;
-      if (user) {
-        const { data: profileData } = await insforge.auth.getProfile(user.id);
-        const profileDataAny = profileData as any;
-        const profile: Profile = {
-          displayName: profileDataAny?.displayName || profileDataAny?.profile?.displayName || '',
-          bio: profileDataAny?.bio || profileDataAny?.profile?.bio || '',
-        };
-        set({ user, profile, loading: false });
-      } else {
-        set({ user: null, profile: null, loading: false });
-      }
-    } catch (e: any) {
-      set({ error: e.message || 'Initialization failed', loading: false });
-    }
-  },
-
   signIn: async (email, password) => {
     set({ loading: true, error: null });
     const { data, error } = await insforge.auth.signInWithPassword({ email, password });
     if (error) {
-      let message = error.message || 'Invalid email or password.';
-      try {
-        const checkRes = await fetch('/api/auth/check-user', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
-        });
-        if (checkRes.ok) {
-          const checkData = await checkRes.json();
-          if (checkData && checkData.exists === false) {
-            message = 'This email is not registered. Please create an account first.';
-          } else {
-            message = 'Incorrect password. Please try again.';
-          }
-        }
-      } catch (e) {
-        // Fallback to original error message
-      }
-      const updatedError = { ...error, message };
-      set({ loading: false, error: message });
-      return { error: updatedError };
+      set({ loading: false, error: error.message || 'Invalid email or password.' });
+      return { error };
     }
     const user = data?.user || null;
     if (user) {
       const { data: profileData } = await insforge.auth.getProfile(user.id);
-      const profileDataAny = profileData as any;
-      const profile: Profile = {
-        displayName: profileDataAny?.displayName || profileDataAny?.profile?.displayName || '',
-        bio: profileDataAny?.bio || profileDataAny?.profile?.bio || '',
-      };
+      const profile = normalizeProfile(profileData);
       set({ user, profile, loading: false });
     } else {
       set({ user: null, profile: null, loading: false });
@@ -139,13 +90,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (error) {
       return { error };
     }
-    const dataAny = data as any;
-    set({
-      profile: {
-        displayName: dataAny?.displayName || dataAny?.profile?.displayName || '',
-        bio: dataAny?.bio || dataAny?.profile?.bio || '',
-      }
-    });
+    const profile = normalizeProfile(data);
+    set({ profile });
     return { error: null };
   }
 }));

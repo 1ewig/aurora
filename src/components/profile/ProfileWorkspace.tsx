@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import Link from "next/link";
 
 interface ProfileWorkspaceProps {
@@ -27,6 +29,8 @@ export function ProfileWorkspace({
   handleUpdate,
   handleSignOut,
 }: ProfileWorkspaceProps) {
+  const [showSignOutDialog, setShowSignOutDialog] = useState(false);
+
   const getInitials = (name: string) => {
     if (!name) return "AM";
     return name
@@ -128,7 +132,7 @@ export function ProfileWorkspace({
           {/* Sign Out — desktop only (sidebar) */}
           <div className="hidden lg:block mt-6">
             <Button
-              onClick={handleSignOut}
+              onClick={() => setShowSignOutDialog(true)}
               variant="ghost"
               fullWidth
               size="md"
@@ -206,7 +210,7 @@ export function ProfileWorkspace({
 
               {/* Sign Out — mobile only (thumb-reachable bottom) */}
               <Button
-                onClick={handleSignOut}
+                onClick={() => setShowSignOutDialog(true)}
                 variant="ghost"
                 size="md"
                 fullWidth
@@ -218,6 +222,19 @@ export function ProfileWorkspace({
           </form>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={showSignOutDialog}
+        title="Sign Out"
+        description="Are you sure you want to sign out of your Aurora wardrobe profile? You will need to sign in again to access your account."
+        confirmLabel="Sign Out"
+        cancelLabel="Cancel"
+        onConfirm={() => {
+          setShowSignOutDialog(false);
+          handleSignOut();
+        }}
+        onCancel={() => setShowSignOutDialog(false)}
+      />
     </main>
   );
 }
