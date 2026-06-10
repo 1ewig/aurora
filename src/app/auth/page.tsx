@@ -7,6 +7,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState("");
@@ -26,6 +27,11 @@ export default function AuthPage() {
     setFormError("");
     setSuccessMsg("");
 
+    if (isSignUp && !name) {
+      setFormError("Please enter your name.");
+      return;
+    }
+
     if (!email || !password) {
       setFormError("Please fill in all fields.");
       return;
@@ -37,7 +43,7 @@ export default function AuthPage() {
     }
 
     if (isSignUp) {
-      const { error } = await signUp(email, password);
+      const { error } = await signUp(email, password, name);
       if (error) {
         setFormError(error.message || "Failed to sign up.");
       } else {
@@ -87,6 +93,26 @@ export default function AuthPage() {
             transition={{ duration: 0.3 }}
           >
             <form onSubmit={handleSubmit} className="space-y-5">
+              {isSignUp && (
+                <div>
+                  <label
+                    htmlFor="auth-name"
+                    className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2"
+                  >
+                    Full Name
+                  </label>
+                  <input
+                    id="auth-name"
+                    type="text"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-4 py-3 bg-bg-primary border border-border-medium rounded focus:border-accent-primary focus:outline-none transition-colors text-sm"
+                    placeholder="Jean Doe"
+                  />
+                </div>
+              )}
+
               <div>
                 <label
                   htmlFor="auth-email"
@@ -151,6 +177,7 @@ export default function AuthPage() {
             <button
               onClick={() => {
                 setIsSignUp(!isSignUp);
+                setName("");
                 setFormError("");
                 setSuccessMsg("");
               }}

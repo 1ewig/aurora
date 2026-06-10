@@ -21,7 +21,7 @@ interface AuthState {
   error: string | null;
   initialize: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, name?: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   updateProfile: (profile: Partial<Profile>) => Promise<{ error: any }>;
 }
@@ -82,11 +82,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     return { error: null };
   },
 
-  signUp: async (email, password) => {
+  signUp: async (email, password, name) => {
     set({ loading: true, error: null });
     const { data, error } = await insforge.auth.signUp({
       email,
       password,
+      name,
       redirectTo: `${window.location.origin}/profile`
     });
     if (error) {
@@ -94,7 +95,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return { error };
     }
     const user = data?.user || null;
-    set({ user, profile: { displayName: '', bio: '', avatarUrl: '' }, loading: false });
+    set({ user, profile: { displayName: name || '', bio: '', avatarUrl: '' }, loading: false });
     return { error: null };
   },
 
