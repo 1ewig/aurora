@@ -7,6 +7,15 @@ import { navLinks } from "@/data/navigation";
 import { useCartStore } from "@/stores/useCartStore";
 import { useNavbarScroll } from "@/hooks/useNavbarScroll";
 import { navbarReveal, staggerContainer, menuItemVariant } from "@/animations/variants";
+import { useAuthStore } from "@/stores/useAuthStore";
+
+function UserIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+    </svg>
+  );
+}
 
 
 
@@ -52,6 +61,12 @@ export function Navbar() {
   const toggleCart = useCartStore((s) => s.toggleCart);
   const items = useCartStore((s) => s.items);
   const count = items.reduce((sum, i) => sum + i.quantity, 0);
+
+  const user = useAuthStore((s) => s.user);
+  const profile = useAuthStore((s) => s.profile);
+  const loading = useAuthStore((s) => s.loading);
+
+  const profileHref = user ? "/profile" : "/auth";
 
   const { navBg, navBorder, navBlur } = useNavbarScroll();
   return (
@@ -104,6 +119,22 @@ export function Navbar() {
 
             {/* Utility Icons */}
             <div className="flex items-center gap-3">
+              <Link
+                href={profileHref}
+                aria-label={user ? "View Profile" : "Sign In / Sign Up"}
+                className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary flex items-center justify-center overflow-hidden w-9 h-9"
+              >
+                {!loading && user && profile?.avatarUrl ? (
+                  <img
+                    src={profile.avatarUrl}
+                    alt={profile.displayName || "Profile"}
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  <UserIcon />
+                )}
+              </Link>
+
               <button
                 aria-label={`Shopping bag, ${count} item${count !== 1 ? "s" : ""}`}
                 onClick={toggleCart}
@@ -111,6 +142,7 @@ export function Navbar() {
               >
                 <BagIcon count={count} />
               </button>
+              
               <button
                 aria-label={menuOpen ? "Close menu" : "Open menu"}
                 aria-expanded={menuOpen}
@@ -166,6 +198,16 @@ export function Navbar() {
                   </Link>
                 </motion.li>
               ))}
+              
+              <motion.li variants={menuItemVariant}>
+                <Link
+                  href={profileHref}
+                  onClick={() => setMenuOpen(false)}
+                  className="text-5xl font-black text-text-inverted hover:text-accent-primary transition-colors tracking-tight leading-none block"
+                >
+                  {user ? "PROFILE" : "SIGN IN"}
+                </Link>
+              </motion.li>
             </motion.ul>
 
             <div className="mt-16">
