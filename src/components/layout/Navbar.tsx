@@ -66,7 +66,7 @@ export function Navbar() {
   const profile = useAuthStore((s) => s.profile);
   const loading = useAuthStore((s) => s.loading);
 
-  const profileHref = user ? "/profile" : "/auth";
+  const profileHref = user ? "/profile" : "/login";
 
   const { navBg, navBorder, navBlur } = useNavbarScroll();
   return (

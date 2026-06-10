@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useAuthStore } from "@/stores/useAuthStore";
 
-export default function ProfilePage() {
+export function ProfileClient() {
   const { user, profile, loading, updateProfile, signOut } = useAuthStore();
   const router = useRouter();
 
@@ -18,7 +18,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/auth");
+      router.push("/login"); // Updated path to point to /login
     }
   }, [user, loading, router]);
 
@@ -55,7 +55,7 @@ export default function ProfilePage() {
 
   const handleSignOut = async () => {
     await signOut();
-    router.push("/auth");
+    router.push("/login"); // Updated path to point to /login
   };
 
   if (loading || !user) {
