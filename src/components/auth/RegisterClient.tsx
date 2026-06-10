@@ -12,8 +12,12 @@ export function RegisterClient() {
   const [formError, setFormError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
-  const { user, signUp, loading, error: storeError } = useAuthStore();
+  const { user, signUp, loading, error: storeError, clearError } = useAuthStore();
   const router = useRouter();
+
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   useEffect(() => {
     if (user && !loading) {

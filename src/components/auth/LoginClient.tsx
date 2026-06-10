@@ -10,8 +10,12 @@ export function LoginClient() {
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState("");
 
-  const { user, signIn, loading, error: storeError } = useAuthStore();
+  const { user, signIn, loading, error: storeError, clearError } = useAuthStore();
   const router = useRouter();
+
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   useEffect(() => {
     if (user && !loading) {

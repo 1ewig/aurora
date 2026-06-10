@@ -23,6 +23,7 @@ interface AuthState {
   signUp: (email: string, password: string, name?: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   updateProfile: (profile: Partial<Profile>) => Promise<{ error: any }>;
+  clearError: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -30,6 +31,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   profile: null,
   loading: true,
   error: null,
+
+  clearError: () => set({ error: null }),
 
   initialize: async () => {
     set({ loading: true, error: null });
@@ -61,8 +64,27 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ loading: true, error: null });
     const { data, error } = await insforge.auth.signInWithPassword({ email, password });
     if (error) {
-      set({ loading: false, error: error.message });
-      return { error };
+      let message = error.message || 'Invalid email or password.';
+      try {
+        const checkRes = await fetch('/api/auth/check-user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        if (checkRes.ok) {
+          const checkData = await checkRes.json();
+          if (checkData && checkData.exists === false) {
+            message = 'This email is not registered. Please create an account first.';
+          } else {
+            message = 'Incorrect password. Please try again.';
+          }
+        }
+      } catch (e) {
+        // Fallback to original error message
+      }
+      const updatedError = { ...error, message };
+      set({ loading: false, error: message });
+      return { error: updatedError };
     }
     const user = data?.user || null;
     if (user) {
@@ -88,8 +110,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       redirectTo: `${window.location.origin}/profile`
     });
     if (error) {
-      set({ loading: false, error: error.message });
-      return { error };
+      let message = error.message || 'Failed to sign up.';
+      if (error.error === 'AUTH_EMAIL_EXISTS' || message.toLowerCase().includes('exists')) {
+        message = 'An account with this email already exists. Please sign in instead.';
+      }
+      const updatedError = { ...error, message };
+      set({ loading: false, error: message });
+      return { error: updatedError };
     }
     const user = data?.user || null;
     set({ user, profile: { displayName: name || '', bio: '' }, loading: false });
