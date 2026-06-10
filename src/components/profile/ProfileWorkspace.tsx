@@ -39,7 +39,7 @@ export function ProfileWorkspace({
   };
 
   return (
-    <main className="min-h-screen bg-bg-primary pt-24 pb-16 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
+    <main className="min-h-screen bg-bg-primary pt-16 pb-16 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
       {/* Back to Home Link */}
       <div className="mb-6">
         <Link href="/" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors font-medium">
@@ -161,9 +161,8 @@ export function ProfileWorkspace({
 
             {statusMsg && (
               <div
-                className={`text-xs font-medium px-1 ${
-                  statusType === "success" ? "text-success" : "text-error"
-                }`}
+                className={`text-xs font-medium px-1 ${statusType === "success" ? "text-success" : "text-error"
+                  }`}
               >
                 {statusMsg}
               </div>

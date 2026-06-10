@@ -46,7 +46,7 @@ export function RegisterForm({
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <main className="min-h-[90vh] md:min-h-screen bg-bg-primary pt-24 pb-12 px-6 flex flex-col items-center justify-center">
+    <main className="min-h-[90vh] md:min-h-screen bg-bg-primary pt-12 pb-12 px-6 flex flex-col items-center justify-center">
       {/* Back to Home Link */}
       <div className="w-full max-w-[440px] mb-4">
         <Link href="/" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors font-medium">
