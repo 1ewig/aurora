@@ -17,6 +17,19 @@ interface CheckoutFormProps {
   ) => void;
 }
 
+function fieldClass(hasError: boolean) {
+  return `w-full px-4 py-3 rounded-md bg-white border focus:outline-none transition-colors text-sm text-text-primary ${
+    hasError
+      ? "border-error focus:border-error"
+      : "border-border-subtle focus:border-accent-primary"
+  }`;
+}
+
+function FieldError({ show, message }: { show: boolean; message?: string }) {
+  if (!show || !message) return null;
+  return <p className="text-error text-[11px] mt-1">{message}</p>;
+}
+
 export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
   const {
     email, setEmail,
@@ -31,6 +44,7 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
     loading, success, error,
     items,
     handlePlaceOrder,
+    fieldErrors, handleBlur, touched,
   } = useCheckoutForm(onOrderPlaced);
 
   if (success) {
@@ -58,9 +72,11 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 rounded-md bg-white border border-border-subtle focus:border-accent-primary focus:outline-none transition-colors text-sm text-text-primary"
+            onBlur={() => handleBlur("email")}
+            className={fieldClass(touched.has("email") && !!fieldErrors.email)}
             placeholder="johndoe@example.com"
           />
+          <FieldError show={touched.has("email")} message={fieldErrors.email} />
         </div>
       </div>
 
@@ -80,8 +96,10 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
               required
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="w-full px-4 py-3 rounded-md bg-white border border-border-subtle focus:border-accent-primary focus:outline-none transition-colors text-sm text-text-primary"
+              onBlur={() => handleBlur("firstName")}
+              className={fieldClass(touched.has("firstName") && !!fieldErrors.firstName)}
             />
+            <FieldError show={touched.has("firstName")} message={fieldErrors.firstName} />
           </div>
           <div className="space-y-1">
             <label htmlFor="last-name" className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
@@ -93,8 +111,10 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
               required
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="w-full px-4 py-3 rounded-md bg-white border border-border-subtle focus:border-accent-primary focus:outline-none transition-colors text-sm text-text-primary"
+              onBlur={() => handleBlur("lastName")}
+              className={fieldClass(touched.has("lastName") && !!fieldErrors.lastName)}
             />
+            <FieldError show={touched.has("lastName")} message={fieldErrors.lastName} />
           </div>
         </div>
         <div className="space-y-1">
@@ -107,8 +127,10 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
             required
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            className="w-full px-4 py-3 rounded-md bg-white border border-border-subtle focus:border-accent-primary focus:outline-none transition-colors text-sm text-text-primary"
+            onBlur={() => handleBlur("address")}
+            className={fieldClass(touched.has("address") && !!fieldErrors.address)}
           />
+          <FieldError show={touched.has("address")} message={fieldErrors.address} />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
@@ -121,8 +143,10 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
               required
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              className="w-full px-4 py-3 rounded-md bg-white border border-border-subtle focus:border-accent-primary focus:outline-none transition-colors text-sm text-text-primary"
+              onBlur={() => handleBlur("city")}
+              className={fieldClass(touched.has("city") && !!fieldErrors.city)}
             />
+            <FieldError show={touched.has("city")} message={fieldErrors.city} />
           </div>
           <div className="space-y-1">
             <label htmlFor="zip" className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
@@ -134,8 +158,11 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
               required
               value={zipCode}
               onChange={(e) => setZipCode(e.target.value)}
-              className="w-full px-4 py-3 rounded-md bg-white border border-border-subtle focus:border-accent-primary focus:outline-none transition-colors text-sm text-text-primary"
+              onBlur={() => handleBlur("zipCode")}
+              className={fieldClass(touched.has("zipCode") && !!fieldErrors.zipCode)}
+              placeholder="10001"
             />
+            <FieldError show={touched.has("zipCode")} message={fieldErrors.zipCode} />
           </div>
         </div>
       </div>
@@ -155,9 +182,11 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
             required
             value={cardNumber}
             onChange={(e) => setCardNumber(e.target.value)}
-            className="w-full px-4 py-3 rounded-md bg-white border border-border-subtle focus:border-accent-primary focus:outline-none transition-colors text-sm text-text-primary"
+            onBlur={() => handleBlur("cardNumber")}
+            className={fieldClass(touched.has("cardNumber") && !!fieldErrors.cardNumber)}
             placeholder="4111 2222 3333 4444"
           />
+          <FieldError show={touched.has("cardNumber")} message={fieldErrors.cardNumber} />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
@@ -170,9 +199,11 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
               required
               value={cardExpiry}
               onChange={(e) => setCardExpiry(e.target.value)}
-              className="w-full px-4 py-3 rounded-md bg-white border border-border-subtle focus:border-accent-primary focus:outline-none transition-colors text-sm text-text-primary"
+              onBlur={() => handleBlur("cardExpiry")}
+              className={fieldClass(touched.has("cardExpiry") && !!fieldErrors.cardExpiry)}
               placeholder="12/28"
             />
+            <FieldError show={touched.has("cardExpiry")} message={fieldErrors.cardExpiry} />
           </div>
           <div className="space-y-1">
             <label htmlFor="card-cvc" className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
@@ -184,9 +215,11 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
               required
               value={cardCVC}
               onChange={(e) => setCardCVC(e.target.value)}
-              className="w-full px-4 py-3 rounded-md bg-white border border-border-subtle focus:border-accent-primary focus:outline-none transition-colors text-sm text-text-primary"
+              onBlur={() => handleBlur("cardCVC")}
+              className={fieldClass(touched.has("cardCVC") && !!fieldErrors.cardCVC)}
               placeholder="123"
             />
+            <FieldError show={touched.has("cardCVC")} message={fieldErrors.cardCVC} />
           </div>
         </div>
       </div>

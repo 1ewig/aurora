@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/utils/db";
-import { insforge } from "@/utils/insforge";
 
 function generateOrderNumber(): string {
   const year = new Date().getFullYear();
@@ -8,27 +7,37 @@ function generateOrderNumber(): string {
   return `AUR-${year}-${num}`;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const { data } = await insforge.auth.getCurrentUser();
-    const user = data?.user ?? null;
+    const { searchParams } = new URL(request.url);
+    const email = searchParams.get("email");
 
-    if (!user) {
+    if (!email) {
+      return NextResponse.json([]);
+    }
+
+    const userResult = await pool.query(
+      "SELECT id FROM auth.users WHERE email = $1",
+      [email.toLowerCase().trim()]
+    );
+
+    const userId = userResult.rows[0]?.id ?? null;
+
+    if (!userId) {
       return NextResponse.json([]);
     }
 
     const result = await pool.query(
-      `SELECT id, user_id, guest_email, order_number, items, subtotal, shipping, tax, total, shipping_address, status, created_at
+      `SELECT id, user_id, order_number, items, subtotal, shipping, tax, total, shipping_address, status, created_at
        FROM orders
-       WHERE user_id = $1 OR (guest_email = $2 AND user_id IS NULL)
+       WHERE user_id = $1
        ORDER BY created_at DESC`,
-      [user.id, user.email]
+      [userId]
     );
 
     const orders = result.rows.map((row) => ({
       id: row.id,
       userId: row.user_id,
-      guestEmail: row.guest_email,
       orderNumber: row.order_number,
       items: row.items,
       subtotal: Number(row.subtotal),
@@ -62,27 +71,36 @@ export async function POST(request: Request) {
       );
     }
 
-    let userId: string | null = null;
-    let guestEmail: string | null = null;
+    const email = shippingAddress.email;
+    if (!email) {
+      return NextResponse.json(
+        { error: "Email is required" },
+        { status: 400 }
+      );
+    }
 
-    const { data } = await insforge.auth.getCurrentUser();
-    const sessionUser = data?.user ?? null;
+    const userResult = await pool.query(
+      "SELECT id FROM auth.users WHERE email = $1",
+      [email.toLowerCase().trim()]
+    );
 
-    if (sessionUser) {
-      userId = sessionUser.id;
-    } else {
-      guestEmail = shippingAddress.email || null;
+    const userId = userResult.rows[0]?.id ?? null;
+
+    if (!userId) {
+      return NextResponse.json({
+        orderNumber: null,
+        message: "Guest checkout — order confirmation will be sent via email.",
+      });
     }
 
     const orderNumber = generateOrderNumber();
 
     const result = await pool.query(
-      `INSERT INTO orders (user_id, guest_email, order_number, items, subtotal, shipping, tax, total, shipping_address, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'confirmed')
+      `INSERT INTO orders (user_id, order_number, items, subtotal, shipping, tax, total, shipping_address, status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'confirmed')
        RETURNING id, order_number, created_at`,
       [
         userId,
-        guestEmail,
         orderNumber,
         JSON.stringify(items),
         subtotal,

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useCartStore } from "@/stores/useCartStore";
+import { validateField, validateAll, type FieldErrors } from "@/utils/validation";
 
 export function useCheckoutForm(onOrderPlaced?: (
   orderNumber: string,
@@ -25,16 +26,45 @@ export function useCheckoutForm(onOrderPlaced?: (
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCVC, setCardCVC] = useState("");
 
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [touched, setTouched] = useState<Set<string>>(new Set());
+
   const [loading, setLoading] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
+  const markTouched = useCallback((field: string) => {
+    setTouched((prev) => new Set(prev).add(field));
+  }, []);
+
+  const handleBlur = useCallback((field: string) => {
+    markTouched(field);
+  }, [markTouched]);
+
+  const setAndValidate = useCallback((field: string, value: string, setter: (v: string) => void) => {
+    setter(value);
+    setFieldErrors((prev) => {
+      const error = validateField(field, value);
+      return { ...prev, [field]: error };
+    });
+  }, []);
+
+  const fields: Record<string, string> = {
+    email, firstName, lastName, address, city, zipCode, cardNumber, cardExpiry, cardCVC,
+  };
+
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!email || !firstName || !lastName || !address || !city || !zipCode) return;
+    const allTouched = new Set(Object.keys(fields));
+    setTouched(allTouched);
+
+    const errors = validateAll(fields);
+    setFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) return;
 
     setLoading(true);
 
@@ -72,12 +102,13 @@ export function useCheckoutForm(onOrderPlaced?: (
         throw new Error(data.error || "Failed to place order.");
       }
 
-      setOrderNumber(data.orderNumber);
+      const orderNum = data.orderNumber || "";
+      setOrderNumber(orderNum);
       setSuccess(true);
       setLoading(false);
 
       onOrderPlaced?.(
-        data.orderNumber,
+        orderNum,
         maskEmail(email),
         cardNumber,
         maskCardNumber(cardNumber),
@@ -109,10 +140,26 @@ export function useCheckoutForm(onOrderPlaced?: (
   };
 
   return {
-    email, setEmail, firstName, setFirstName, lastName, setLastName,
-    address, setAddress, city, setCity, zipCode, setZipCode,
-    cardNumber, setCardNumber, cardExpiry, setCardExpiry, cardCVC, setCardCVC,
+    email,
+    setEmail: (v: string) => setAndValidate("email", v, setEmail),
+    firstName,
+    setFirstName: (v: string) => setAndValidate("firstName", v, setFirstName),
+    lastName,
+    setLastName: (v: string) => setAndValidate("lastName", v, setLastName),
+    address,
+    setAddress: (v: string) => setAndValidate("address", v, setAddress),
+    city,
+    setCity: (v: string) => setAndValidate("city", v, setCity),
+    zipCode,
+    setZipCode: (v: string) => setAndValidate("zipCode", v, setZipCode),
+    cardNumber,
+    setCardNumber: (v: string) => setAndValidate("cardNumber", v, setCardNumber),
+    cardExpiry,
+    setCardExpiry: (v: string) => setAndValidate("cardExpiry", v, setCardExpiry),
+    cardCVC,
+    setCardCVC: (v: string) => setAndValidate("cardCVC", v, setCardCVC),
     loading, orderNumber, success, items, handlePlaceOrder,
     error, setError,
+    fieldErrors, handleBlur, touched,
   };
 }
