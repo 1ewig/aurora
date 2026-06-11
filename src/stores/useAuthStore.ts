@@ -11,7 +11,6 @@ export interface User {
 
 export interface Profile {
   displayName: string;
-  bio: string;
 }
 
 interface AuthState {
@@ -70,7 +69,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return { error: updatedError };
     }
     const user = data?.user || null;
-    set({ user, profile: { displayName: name || '', bio: '' }, loading: false });
+    set({ user, profile: { displayName: name || '' }, loading: false });
     return { error: null };
   },
 
@@ -85,7 +84,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const newProfile = { ...currentProfile, ...updatedFields } as Profile;
     const { data, error } = await insforge.auth.setProfile({
       displayName: newProfile.displayName,
-      bio: newProfile.bio,
     });
     if (error) {
       return { error };

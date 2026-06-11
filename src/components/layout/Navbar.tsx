@@ -38,9 +38,9 @@ function BagIcon({ count }: { count: number }) {
 function MenuIcon() {
   return (
     <div className="w-5 h-4 flex flex-col justify-between">
-      <span className="block h-[1.5px] bg-current" />
-      <span className="block h-[1.5px] bg-current" />
-      <span className="block h-[1.5px] bg-current" />
+      <span className="block h-px bg-current" />
+      <span className="block h-px bg-current" />
+      <span className="block h-px bg-current" />
     </div>
   );
 }

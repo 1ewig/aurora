@@ -11,9 +11,9 @@ import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 function MenuIcon() {
   return (
     <div className="w-5 h-4 flex flex-col justify-between">
-      <span className="block h-[1.5px] bg-current" />
-      <span className="block h-[1.5px] bg-current" />
-      <span className="block h-[1.5px] bg-current" />
+      <span className="block h-px bg-current" />
+      <span className="block h-px bg-current" />
+      <span className="block h-px bg-current" />
     </div>
   );
 }
@@ -60,7 +60,7 @@ export function ProfileLayoutClient({ children }: { children: React.ReactNode })
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
           aria-expanded={mobileOpen}
-          className="p-2 -mr-2 rounded-full hover:bg-border-subtle/50 text-text-primary transition-colors cursor-pointer w-9 h-9 flex items-center justify-center"
+          className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary cursor-pointer"
         >
           <MenuIcon />
         </button>

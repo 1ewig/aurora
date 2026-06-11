@@ -45,7 +45,6 @@ CREATE TABLE IF NOT EXISTS product_details (
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   display_name TEXT,
-  bio TEXT,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -66,11 +65,10 @@ CREATE POLICY "Allow individual updates" ON public.profiles FOR UPDATE USING (au
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.profiles (id, display_name, bio)
+  INSERT INTO public.profiles (id, display_name)
   VALUES (
     new.id, 
-    COALESCE(new.profile->>'name', new.profile->>'displayName', ''), 
-    ''
+    COALESCE(new.profile->>'name', new.profile->>'displayName', '')
   );
   RETURN new;
 END;
@@ -88,7 +86,6 @@ BEGIN
   UPDATE public.profiles
   SET 
     display_name = COALESCE(new.profile->>'displayName', new.profile->>'name', new.profile->>'nickname', display_name),
-    bio = COALESCE(new.profile->>'bio', bio),
     updated_at = NOW()
   WHERE id = new.id;
   RETURN new;

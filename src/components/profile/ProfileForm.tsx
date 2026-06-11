@@ -10,8 +10,6 @@ interface ProfileFormProps {
   onSignOut: () => void;
   displayName: string;
   setDisplayName: (val: string) => void;
-  bio: string;
-  setBio: (val: string) => void;
   statusMsg: string;
   statusType: "success" | "error" | "";
   updating: boolean;
@@ -23,8 +21,6 @@ export function ProfileForm({
   onSignOut,
   displayName,
   setDisplayName,
-  bio,
-  setBio,
   statusMsg,
   statusType,
   updating,
@@ -68,23 +64,6 @@ export function ProfileForm({
             onChange={(e) => setDisplayName(e.target.value)}
             className="w-full px-4 sm:px-5 py-3 sm:py-3.5 bg-bg-primary border border-border-medium rounded-full focus:border-accent-primary focus:outline-none transition-colors text-xs sm:text-sm"
             placeholder="e.g. Jean Doe"
-          />
-        </div>
-
-        <div>
-          <label
-            htmlFor="profile-bio"
-            className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2 px-1"
-          >
-            Biography
-          </label>
-          <textarea
-            id="profile-bio"
-            rows={4}
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-            className="w-full px-4 sm:px-5 py-3 sm:py-3.5 bg-bg-primary border border-border-medium rounded-[16px] sm:rounded-[20px] focus:border-accent-primary focus:outline-none transition-colors text-xs sm:text-sm resize-none"
-            placeholder="Share details about your wardrobe preference, sizing, style matches, etc."
           />
         </div>
 

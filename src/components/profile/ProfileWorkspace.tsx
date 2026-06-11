@@ -8,8 +8,6 @@ interface ProfileWorkspaceProps {
   onSignOut: () => void;
   displayName: string;
   setDisplayName: (val: string) => void;
-  bio: string;
-  setBio: (val: string) => void;
   statusMsg: string;
   statusType: "success" | "error" | "";
   updating: boolean;
@@ -21,8 +19,6 @@ export function ProfileWorkspace({
   onSignOut,
   displayName,
   setDisplayName,
-  bio,
-  setBio,
   statusMsg,
   statusType,
   updating,
@@ -49,8 +45,6 @@ export function ProfileWorkspace({
         onSignOut={onSignOut}
         displayName={displayName}
         setDisplayName={setDisplayName}
-        bio={bio}
-        setBio={setBio}
         statusMsg={statusMsg}
         statusType={statusType}
         updating={updating}

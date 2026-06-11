@@ -15,7 +15,6 @@ export function ProfileClient() {
   };
 
   const [displayName, setDisplayName] = useState("");
-  const [bio, setBio] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
   const [statusType, setStatusType] = useState<"success" | "error" | "">("");
   const [updating, setUpdating] = useState(false);
@@ -29,7 +28,6 @@ export function ProfileClient() {
   useEffect(() => {
     if (profile) {
       setDisplayName(profile.displayName || "");
-      setBio(profile.bio || "");
     }
   }, [profile]);
 
@@ -41,7 +39,6 @@ export function ProfileClient() {
 
     const { error } = await updateProfile({
       displayName,
-      bio,
     });
 
     setUpdating(false);
@@ -69,8 +66,6 @@ export function ProfileClient() {
       onSignOut={handleSignOut}
       displayName={displayName}
       setDisplayName={setDisplayName}
-      bio={bio}
-      setBio={setBio}
       statusMsg={statusMsg}
       statusType={statusType}
       updating={updating}
