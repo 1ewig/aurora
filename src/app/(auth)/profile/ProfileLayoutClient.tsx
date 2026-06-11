@@ -8,24 +8,12 @@ import { useRouter } from "next/navigation";
 import { useNavbarScroll } from "@/hooks/useNavbarScroll";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 
-function MenuIcon({ isOpen }: { isOpen: boolean }) {
+function MenuIcon() {
   return (
     <div className="w-5 h-4 flex flex-col justify-between">
-      <motion.span
-        animate={isOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="block h-[1.5px] bg-current origin-left"
-      />
-      <motion.span
-        animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-        transition={{ duration: 0.2 }}
-        className="block h-[1.5px] bg-current"
-      />
-      <motion.span
-        animate={isOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="block h-[1.5px] bg-current origin-left"
-      />
+      <span className="block h-[1.5px] bg-current" />
+      <span className="block h-[1.5px] bg-current" />
+      <span className="block h-[1.5px] bg-current" />
     </div>
   );
 }
@@ -74,7 +62,7 @@ export function ProfileLayoutClient({ children }: { children: React.ReactNode })
           aria-expanded={mobileOpen}
           className="p-2 -mr-2 rounded-full hover:bg-border-subtle/50 text-text-primary transition-colors cursor-pointer w-9 h-9 flex items-center justify-center"
         >
-          <MenuIcon isOpen={mobileOpen} />
+          <MenuIcon />
         </button>
       </motion.header>
 
