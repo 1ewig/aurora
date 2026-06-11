@@ -65,25 +65,12 @@ export function ProfileLayoutClient({ children }: { children: React.ReactNode })
             />
             {/* Slide-out Drawer */}
             <motion.aside
-              initial={{ x: "-100%" }}
+              initial={{ x: "100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
+              exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="lg:hidden fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-bg-secondary border-r border-border-subtle z-50 flex flex-col"
+              className="lg:hidden fixed inset-y-0 right-0 w-72 max-w-[85vw] bg-bg-secondary border-l border-border-subtle z-50 flex flex-col"
             >
-              {/* Drawer Close Button Header */}
-              <div className="flex justify-end p-4 border-b border-border-subtle bg-bg-secondary">
-                <button
-                  onClick={() => setMobileOpen(false)}
-                  aria-label="Close menu"
-                  className="p-2 rounded-full hover:bg-border-subtle/50 text-text-primary transition-colors cursor-pointer"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
               {/* Drawer Content */}
               <div className="flex-1 overflow-y-auto">
                 <ProfileSidebar onClose={() => setMobileOpen(false)} />
