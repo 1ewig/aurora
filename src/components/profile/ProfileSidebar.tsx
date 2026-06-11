@@ -13,28 +13,44 @@ export function ProfileSidebar({ }: ProfileSidebarProps) {
   const isOrdersActive = pathname === "/profile/orders";
 
   return (
-    <div className="h-full flex flex-col justify-between p-6 sm:p-8">
+    <div className="flex flex-col lg:justify-between lg:h-full p-4 sm:p-6 lg:p-8">
       <div>
         {/* Logo and Brand */}
-        <div className="mb-8 px-2">
-          <Link
-            href="/"
-            className="font-display font-black text-xl tracking-[0.15em] uppercase text-text-primary hover:text-accent-primary transition-colors"
-          >
-            Aurora
-          </Link>
-          <p className="text-xs text-text-secondary uppercase tracking-widest font-semibold mt-1">
-            Wardrobe Space
-          </p>
+        <div className="flex items-center justify-between lg:block mb-5 lg:mb-8 px-2">
+          <div>
+            <Link
+              href="/"
+              className="font-display font-black text-xl tracking-[0.15em] uppercase text-text-primary hover:text-accent-primary transition-colors"
+            >
+              Aurora
+            </Link>
+            <p className="text-xs text-text-secondary uppercase tracking-widest font-semibold mt-1">
+              Wardrobe Space
+            </p>
+          </div>
+
+          {/* Mobile Back to Shop */}
+          <div className="lg:hidden">
+            <Link href="/products">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-full flex items-center gap-1.5 px-4 py-2 text-xs"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5 shrink-0">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+                Shop
+              </Button>
+            </Link>
+          </div>
         </div>
 
-
-
         {/* Navigation Links */}
-        <nav className="space-y-1.5 flex flex-col">
+        <nav className="flex flex-row lg:flex-col gap-2 lg:gap-1.5 overflow-x-auto pb-1 lg:pb-0">
           <Link
             href="/profile"
-            className={`flex items-center gap-3 text-xs sm:text-sm transition-all font-semibold uppercase tracking-wider py-3 px-4 rounded-xl ${isProfileActive
+            className={`flex items-center justify-center lg:justify-start gap-2.5 text-xs sm:text-sm transition-all font-semibold uppercase tracking-wider py-3 px-4 rounded-xl flex-1 lg:flex-none ${isProfileActive
                 ? "bg-bg-primary text-text-primary shadow-xs"
                 : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
               }`}
@@ -47,7 +63,7 @@ export function ProfileSidebar({ }: ProfileSidebarProps) {
 
           <Link
             href="/profile/orders"
-            className={`flex items-center gap-3 text-xs sm:text-sm transition-all font-semibold uppercase tracking-wider py-3 px-4 rounded-xl ${isOrdersActive
+            className={`flex items-center justify-center lg:justify-start gap-2.5 text-xs sm:text-sm transition-all font-semibold uppercase tracking-wider py-3 px-4 rounded-xl flex-1 lg:flex-none ${isOrdersActive
                 ? "bg-bg-primary text-text-primary shadow-xs"
                 : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
               }`}
@@ -57,12 +73,11 @@ export function ProfileSidebar({ }: ProfileSidebarProps) {
             </svg>
             Orders
           </Link>
-
         </nav>
       </div>
 
-      {/* Back to Shop section */}
-      <div className="pt-4 border-t border-border-subtle mt-6">
+      {/* Desktop Back to Shop section */}
+      <div className="hidden lg:block pt-4 border-t border-border-subtle mt-6">
         <Link href="/products" className="block w-full">
           <Button
             variant="ghost"
