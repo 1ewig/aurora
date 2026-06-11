@@ -29,7 +29,7 @@ export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSum
       {/* Cart Items List */}
       <ul role="list" className="divide-y divide-border-subtle max-h-[350px] overflow-y-auto pr-2">
         {items.map((item) => (
-          <li key={`${item.id}-${item.size}`} className="py-4 flex gap-4 items-center">
+          <li key={`${item.id}-${item.size}`} className="py-4 flex gap-4">
             <Link href={`/products/${item.slug}`} className="relative w-16 h-20 bg-border-subtle rounded-md overflow-hidden flex-shrink-0">
               <Image
                 src={item.image}
@@ -39,18 +39,18 @@ export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSum
                 className="object-cover object-top"
               />
             </Link>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 space-y-1">
               <Link
                 href={`/products/${item.slug}`}
-                className="font-medium text-text-primary text-sm truncate hover:text-accent-primary transition-colors"
+                className="font-medium text-text-primary text-sm truncate hover:text-accent-primary transition-colors block"
               >
                 {item.name}
               </Link>
-              <p className="text-text-secondary text-xs mt-0.5">Size: {item.size} × Qty: {item.quantity}</p>
+              <p className="text-text-secondary text-xs">Size: {item.size} × Qty: {item.quantity}</p>
+              <span className="font-mono text-sm font-medium text-text-primary block">
+                {formatCurrency(item.price * item.quantity)}
+              </span>
             </div>
-            <span className="font-mono text-sm font-medium text-text-primary">
-              {formatCurrency(item.price * item.quantity)}
-            </span>
           </li>
         ))}
       </ul>

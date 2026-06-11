@@ -40,17 +40,17 @@ export function OrderCard({ order }: OrderCardProps) {
 
       <div className="space-y-3">
         {order.items.map((item) => (
-          <div key={`${item.id}-${item.size}`} className="flex items-center gap-3">
-            <div className="relative w-12 h-14 sm:w-14 sm:h-16 rounded-md bg-border-subtle overflow-hidden shrink-0">
+          <div key={`${item.id}-${item.size}`} className="flex gap-3">
+            <div className="relative w-16 h-20 rounded-md bg-border-subtle overflow-hidden shrink-0">
               <Image
                 src={item.image}
                 alt={item.name}
                 fill
-                sizes="56px"
+                sizes="64px"
                 className="object-cover object-top"
               />
             </div>
-            <div className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1 space-y-1">
               <Link
                 href={`/products/${item.slug}`}
                 className="text-sm font-medium text-text-primary hover:text-accent-primary transition-colors truncate block"
@@ -58,13 +58,12 @@ export function OrderCard({ order }: OrderCardProps) {
                 {item.name}
               </Link>
               <p className="text-xs text-text-secondary">
-                Size: {item.size} &middot; Qty: {item.quantity} &middot;{" "}
-                {formatCurrency(item.price)} each
+                Size: {item.size} × Qty: {item.quantity}
               </p>
+              <span className="font-mono text-sm font-medium text-text-primary block">
+                {formatCurrency(item.price * item.quantity)}
+              </span>
             </div>
-            <span className="font-mono text-sm font-medium text-text-primary shrink-0">
-              {formatCurrency(item.price * item.quantity)}
-            </span>
           </div>
         ))}
       </div>
