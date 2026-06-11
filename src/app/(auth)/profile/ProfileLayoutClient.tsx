@@ -8,6 +8,28 @@ import { useRouter } from "next/navigation";
 import { useNavbarScroll } from "@/hooks/useNavbarScroll";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 
+function MenuIcon({ isOpen }: { isOpen: boolean }) {
+  return (
+    <div className="w-5 h-4 flex flex-col justify-between">
+      <motion.span
+        animate={isOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="block h-[1.5px] bg-current origin-left"
+      />
+      <motion.span
+        animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
+        transition={{ duration: 0.2 }}
+        className="block h-[1.5px] bg-current"
+      />
+      <motion.span
+        animate={isOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="block h-[1.5px] bg-current origin-left"
+      />
+    </div>
+  );
+}
+
 export function ProfileLayoutClient({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore();
   const router = useRouter();
@@ -47,13 +69,12 @@ export function ProfileLayoutClient({ children }: { children: React.ReactNode })
           Aurora
         </Link>
         <button
-          onClick={() => setMobileOpen(true)}
-          aria-label="Open menu"
-          className="p-2 -mr-2 rounded-full hover:bg-border-subtle/50 text-text-primary transition-colors cursor-pointer"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          className="p-2 -mr-2 rounded-full hover:bg-border-subtle/50 text-text-primary transition-colors cursor-pointer w-9 h-9 flex items-center justify-center"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-          </svg>
+          <MenuIcon isOpen={mobileOpen} />
         </button>
       </motion.header>
 
