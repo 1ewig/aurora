@@ -5,12 +5,14 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useRouter } from "next/navigation";
+import { useNavbarScroll } from "@/hooks/useNavbarScroll";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 
 export function ProfileLayoutClient({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { navBg, navBorder, navBlur } = useNavbarScroll();
 
   if (loading) {
     return (
@@ -28,10 +30,19 @@ export function ProfileLayoutClient({ children }: { children: React.ReactNode })
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-bg-primary">
       {/* Mobile Header Navbar */}
-      <header className="lg:hidden flex items-center justify-between h-16 px-6 border-b border-border-subtle bg-bg-secondary sticky top-0 z-40">
+      <motion.header
+        style={{
+          backgroundColor: navBg,
+          backdropFilter: navBlur,
+          borderBottomColor: navBorder,
+          borderBottomWidth: "1px",
+          borderBottomStyle: "solid",
+        }}
+        className="lg:hidden flex items-center justify-between h-16 px-6 sticky top-0 z-40"
+      >
         <Link
           href="/"
-          className="font-display font-black text-lg tracking-[0.15em] uppercase text-text-primary hover:text-accent-primary transition-colors"
+          className="font-display font-black text-xl tracking-[0.15em] uppercase text-text-primary hover:text-accent-primary transition-colors"
         >
           Aurora
         </Link>
@@ -44,7 +55,7 @@ export function ProfileLayoutClient({ children }: { children: React.ReactNode })
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
           </svg>
         </button>
-      </header>
+      </motion.header>
 
       {/* Desktop Sidebar (hidden on mobile) */}
       <aside className="hidden lg:flex w-64 lg:h-screen lg:sticky lg:top-0 border-r border-border-subtle bg-bg-secondary flex-col shrink-0">
