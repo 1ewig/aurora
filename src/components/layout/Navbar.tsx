@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { navLinks } from "@/data/navigation";
@@ -58,13 +58,29 @@ function MenuIcon({ isOpen }: { isOpen: boolean }) {
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
   const toggleCart = useCartStore((s) => s.toggleCart);
   const items = useCartStore((s) => s.items);
   const count = items.reduce((sum, i) => sum + i.quantity, 0);
 
   const user = useAuthStore((s) => s.user);
+  const profile = useAuthStore((s) => s.profile);
 
   const profileHref = user ? "/profile" : "/login";
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const { navBg, navBorder, navBlur } = useNavbarScroll();
   return (
@@ -117,13 +133,56 @@ export function Navbar() {
 
             {/* Utility Icons */}
             <div className="flex items-center gap-3">
-              <Link
-                href={profileHref}
-                aria-label={user ? "View Profile" : "Sign In / Sign Up"}
-                className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary flex items-center justify-center w-9 h-9"
-              >
-                <UserIcon />
-              </Link>
+              {user ? (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    aria-label="Toggle user menu"
+                    aria-expanded={dropdownOpen}
+                    className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary flex items-center justify-center w-9 h-9 cursor-pointer"
+                  >
+                    <UserIcon />
+                  </button>
+                  <AnimatePresence>
+                    {dropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        className="absolute right-0 mt-2 w-56 bg-bg-secondary border border-border-subtle rounded-[16px] shadow-lg py-4 px-5 z-50 flex flex-col gap-1 origin-top-right"
+                      >
+                        <div className="border-b border-border-subtle pb-3 mb-2">
+                          <p className="text-[10px] text-text-secondary uppercase tracking-wider font-semibold mb-0.5">Logged in as</p>
+                          <p className="text-sm font-medium text-text-primary truncate">{profile?.displayName || user.name || user.email}</p>
+                        </div>
+                        <Link
+                          href="/profile"
+                          onClick={() => setDropdownOpen(false)}
+                          className="text-xs font-semibold uppercase tracking-wider text-text-secondary hover:text-accent-primary transition-colors py-2 flex items-center"
+                        >
+                          Profile
+                        </Link>
+                        <Link
+                          href="/profile/orders"
+                          onClick={() => setDropdownOpen(false)}
+                          className="text-xs font-semibold uppercase tracking-wider text-text-secondary hover:text-accent-primary transition-colors py-2 flex items-center"
+                        >
+                          Orders
+                        </Link>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  aria-label="Sign In / Sign Up"
+                  className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary flex items-center justify-center w-9 h-9"
+                >
+                  <UserIcon />
+                </Link>
+              )}
 
               <button
                 aria-label={`Shopping bag, ${count} item${count !== 1 ? "s" : ""}`}
