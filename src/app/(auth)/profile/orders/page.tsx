@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { OrdersClient } from "@/components/profile/OrdersClient";
+import { OrdersClient } from "@/components/profile/orders/OrdersClient";
 
 export const metadata: Metadata = {
   title: "Purchase History — Aurora",

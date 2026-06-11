@@ -8,6 +8,7 @@ import { useCartStore } from "@/stores/useCartStore";
 import { useNavbarScroll } from "@/hooks/useNavbarScroll";
 import { navbarReveal, staggerContainer, menuItemVariant } from "@/animations/variants";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 function UserIcon() {
   return (
@@ -59,6 +60,7 @@ function MenuIcon({ isOpen }: { isOpen: boolean }) {
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const toggleCart = useCartStore((s) => s.toggleCart);
@@ -67,6 +69,7 @@ export function Navbar() {
 
   const user = useAuthStore((s) => s.user);
   const profile = useAuthStore((s) => s.profile);
+  const signOut = useAuthStore((s) => s.signOut);
 
   const profileHref = user ? "/profile" : "/login";
 
@@ -170,6 +173,15 @@ export function Navbar() {
                         >
                           Orders
                         </Link>
+                        <button
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            setShowSignOutDialog(true);
+                          }}
+                          className="text-xs font-semibold uppercase tracking-wider text-error hover:text-red-700 transition-colors py-2 flex items-center w-full text-left cursor-pointer border-t border-border-subtle mt-2 pt-3"
+                        >
+                          Sign Out
+                        </button>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -267,6 +279,22 @@ export function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ConfirmDialog
+        open={showSignOutDialog}
+        title="Sign Out"
+        description="Are you sure you want to sign out of your Aurora wardrobe profile? You will need to sign in again to access your account."
+        confirmLabel="Sign Out"
+        cancelLabel="Cancel"
+        onConfirm={async () => {
+          setShowSignOutDialog(false);
+          await signOut();
+          if (window.location.pathname.startsWith("/profile")) {
+            window.location.href = "/login";
+          }
+        }}
+        onCancel={() => setShowSignOutDialog(false)}
+      />
     </>
   );
 }
