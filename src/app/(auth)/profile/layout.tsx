@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ProfileLayoutClient } from "./ProfileLayoutClient";
 
 export const metadata: Metadata = {
   title: "Your Profile — Aurora",
@@ -10,5 +11,5 @@ export default function ProfileLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <ProfileLayoutClient>{children}</ProfileLayoutClient>;
 }

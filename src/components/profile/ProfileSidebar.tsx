@@ -1,100 +1,91 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface ProfileSidebarProps {
-  user: { id: string; email: string };
-  displayName: string;
-  bio: string;
   onSignOut: () => void;
 }
 
 export function ProfileSidebar({
-  user,
-  displayName,
-  bio,
   onSignOut,
 }: ProfileSidebarProps) {
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
+  const pathname = usePathname();
 
-  const getInitials = (name: string) => {
-    if (!name) return "AM";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .filter(Boolean)
-      .join("")
-      .substring(0, 2)
-      .toUpperCase();
-  };
+  const isProfileActive = pathname === "/profile";
+  const isOrdersActive = pathname === "/profile/orders";
 
   return (
-    <>
-      <div className="bg-bg-ink text-text-inverted rounded-[20px] sm:rounded-[24px] relative overflow-hidden shadow-lg border border-white/10">
-        {/* Decorative "A" — desktop only */}
-        <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none translate-y-6 translate-x-6 hidden lg:block">
-          <span className="font-display font-black text-[12rem] uppercase leading-none select-none">
-            A
-          </span>
+    <div className="h-full flex flex-col justify-between p-6 sm:p-8">
+      <div>
+        {/* Logo and Brand */}
+        <div className="mb-8 px-2">
+          <Link
+            href="/"
+            className="font-display font-black text-xl tracking-[0.15em] uppercase text-text-primary hover:text-accent-primary transition-colors"
+          >
+            Aurora
+          </Link>
+          <p className="text-[10px] text-text-secondary uppercase tracking-widest font-semibold mt-1">
+            Wardrobe Space
+          </p>
         </div>
+        
 
-        <div className="relative z-10 p-4 sm:p-5 lg:p-8">
-          {/* Mobile: horizontal compact row */}
-          <div className="flex lg:flex-col items-center lg:text-center gap-3 sm:gap-4 lg:gap-0">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 lg:w-20 lg:h-20 shrink-0 rounded-full border border-accent-primary bg-bg-primary/10 flex items-center justify-center font-display font-bold text-base sm:text-lg lg:text-xl tracking-wider text-accent-primary select-none">
-              {displayName ? getInitials(displayName) : "AM"}
-            </div>
 
-            <div className="min-w-0 flex-1 lg:flex-none">
-              {/* Mobile: horizontal name + badge */}
-              <div className="lg:text-center">
-                <h2 className="font-display font-bold text-base sm:text-lg lg:text-2xl tracking-wide uppercase truncate lg:mt-5 lg:mb-1">
-                  {displayName || "Unnamed Member"}
-                </h2>
-                <p className="text-[10px] sm:text-xs text-accent-primary uppercase tracking-widest font-semibold">
-                  Aurora Member
-                </p>
-              </div>
+        {/* Navigation Links */}
+        <nav className="space-y-1.5 flex flex-col">
+          <Link
+            href="/profile"
+            className={`flex items-center gap-3 text-xs sm:text-sm transition-all font-semibold uppercase tracking-wider py-3 px-4 rounded-xl ${
+              isProfileActive
+                ? "bg-bg-primary text-text-primary border-l-4 border-accent-primary pl-3 shadow-xs"
+                : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
+            }`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 shrink-0">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+            Profile Details
+          </Link>
 
-              {/* Email — mobile only, under name */}
-              <p className="text-[11px] sm:text-xs text-text-muted mt-0.5 lg:hidden truncate">
-                {user.email}
-              </p>
-            </div>
-          </div>
+          <Link
+            href="/profile/orders"
+            className={`flex items-center gap-3 text-xs sm:text-sm transition-all font-semibold uppercase tracking-wider py-3 px-4 rounded-xl ${
+              isOrdersActive
+                ? "bg-bg-primary text-text-primary border-l-4 border-accent-primary pl-3 shadow-xs"
+                : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
+            }`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 shrink-0">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+            </svg>
+            Purchase History
+          </Link>
 
-          {/* Desktop divider + bio + details */}
-          <div className="hidden lg:block">
-            <div className="w-full border-t border-white/10 my-4"></div>
-
-            <p className="text-sm text-text-muted italic line-clamp-3 mb-6 text-center max-w-xs mx-auto">
-              {bio || "No biography provided yet. Edit your profile to share details."}
-            </p>
-
-            <div className="w-full text-left space-y-2 text-xs text-text-muted">
-              <div>
-                <span className="font-semibold text-white">Email:</span> {user.email}
-              </div>
-              <div>
-                <span className="font-semibold text-white">ID:</span>{" "}
-                <code className="text-[10px] bg-white/5 px-1 py-0.5 rounded">
-                  {user.id.substring(0, 8)}...
-                </code>
-              </div>
-            </div>
-          </div>
-        </div>
+          <Link
+            href="/"
+            className="flex items-center gap-3 text-xs sm:text-sm transition-all font-semibold uppercase tracking-wider py-3 px-4 rounded-xl text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 shrink-0">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
+            Back to Shop
+          </Link>
+        </nav>
       </div>
 
-      {/* Desktop nav links — sidebar */}
-      <div className="hidden lg:block space-y-3 mt-6">
+      {/* Log out section */}
+      <div className="pt-4 border-t border-border-subtle mt-6">
         <Button
           onClick={() => setShowSignOutDialog(true)}
           variant="ghost"
-          fullWidth
           size="md"
+          fullWidth
           className="hover:border-error hover:text-error hover:bg-transparent rounded-full"
         >
           Sign Out Session
@@ -113,6 +104,6 @@ export function ProfileSidebar({
         }}
         onCancel={() => setShowSignOutDialog(false)}
       />
-    </>
+    </div>
   );
 }

@@ -6,7 +6,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { ProfileWorkspace } from "./ProfileWorkspace";
 
 export function ProfileClient() {
-  const { user, profile, loading, updateProfile, signOut } = useAuthStore();
+  const { user, profile, loading, updateProfile } = useAuthStore();
   const router = useRouter();
 
   const [displayName, setDisplayName] = useState("");
@@ -50,11 +50,6 @@ export function ProfileClient() {
     }
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.push("/login");
-  };
-
   if (loading || !user) {
     return (
       <div className="min-h-screen bg-bg-primary flex items-center justify-center">
@@ -65,7 +60,7 @@ export function ProfileClient() {
 
   return (
     <ProfileWorkspace
-      user={user}
+      userEmail={user.email || ""}
       displayName={displayName}
       setDisplayName={setDisplayName}
       bio={bio}
@@ -74,7 +69,6 @@ export function ProfileClient() {
       statusType={statusType}
       updating={updating}
       handleUpdate={handleUpdate}
-      handleSignOut={handleSignOut}
     />
   );
 }

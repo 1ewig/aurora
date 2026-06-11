@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 
 interface ProfileFormProps {
+  userEmail: string;
   displayName: string;
   setDisplayName: (val: string) => void;
   bio: string;
@@ -12,10 +13,10 @@ interface ProfileFormProps {
   statusType: "success" | "error" | "";
   updating: boolean;
   onSubmit: (e: React.FormEvent) => void;
-  onSignOutClick: () => void;
 }
 
 export function ProfileForm({
+  userEmail,
   displayName,
   setDisplayName,
   bio,
@@ -24,15 +25,30 @@ export function ProfileForm({
   statusType,
   updating,
   onSubmit,
-  onSignOutClick,
 }: ProfileFormProps) {
   return (
-    <div className="lg:col-span-8 bg-bg-secondary border border-border-subtle p-5 sm:p-6 md:p-8 lg:p-10 rounded-[20px] sm:rounded-[24px] shadow-sm">
+    <div className="bg-bg-secondary border border-border-subtle p-5 sm:p-6 md:p-8 lg:p-10 rounded-[20px] sm:rounded-[24px] shadow-sm">
       <h3 className="font-display font-bold text-lg sm:text-xl md:text-2xl uppercase tracking-wide mb-4 sm:mb-5 md:mb-6 pb-3 sm:pb-4 border-b border-border-subtle">
         Profile Details
       </h3>
 
       <form onSubmit={onSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
+        <div>
+          <label
+            htmlFor="profile-email"
+            className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5 sm:mb-2 px-1"
+          >
+            Email Address
+          </label>
+          <input
+            id="profile-email"
+            type="email"
+            value={userEmail}
+            readOnly
+            className="w-full px-4 sm:px-5 py-3 sm:py-3.5 bg-bg-primary border border-border-medium rounded-full text-text-secondary opacity-60 cursor-not-allowed text-xs sm:text-sm"
+          />
+        </div>
+
         <div>
           <label
             htmlFor="profile-display-name"
@@ -79,31 +95,16 @@ export function ProfileForm({
           </motion.div>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-3 pt-1 sm:pt-2">
+        <div className="flex gap-3 pt-1 sm:pt-2">
           <Button
             type="submit"
             variant="filled"
             size="md"
             disabled={updating}
             fullWidth
-            className="sm:flex-1"
           >
             {updating ? "Saving Changes..." : "Save Profile Details"}
           </Button>
-
-          {/* Mobile nav links — shown below the main form buttons */}
-          <div className="flex flex-col gap-2 lg:hidden mt-2 sm:mt-0">
-            <Button
-              type="button"
-              onClick={onSignOutClick}
-              variant="ghost"
-              size="md"
-              fullWidth
-              className="hover:border-error hover:text-error hover:bg-transparent rounded-full"
-            >
-              Sign Out Session
-            </Button>
-          </div>
         </div>
       </form>
     </div>
