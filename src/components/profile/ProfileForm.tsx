@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface ProfileFormProps {
   userEmail: string;
+  onSignOut: () => void;
   displayName: string;
   setDisplayName: (val: string) => void;
   bio: string;
@@ -17,6 +20,7 @@ interface ProfileFormProps {
 
 export function ProfileForm({
   userEmail,
+  onSignOut,
   displayName,
   setDisplayName,
   bio,
@@ -26,6 +30,7 @@ export function ProfileForm({
   updating,
   onSubmit,
 }: ProfileFormProps) {
+  const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   return (
     <div className="bg-bg-secondary border border-border-subtle p-5 sm:p-6 md:p-8 lg:p-10 rounded-[20px] sm:rounded-[24px] shadow-sm">
       <h3 className="font-display font-bold text-lg sm:text-xl md:text-2xl uppercase tracking-wide mb-4 sm:mb-5 md:mb-6 pb-3 sm:pb-4 border-b border-border-subtle">
@@ -95,18 +100,42 @@ export function ProfileForm({
           </motion.div>
         )}
 
-        <div className="flex gap-3 pt-1 sm:pt-2">
+        <div className="flex flex-col sm:flex-row gap-3 pt-1 sm:pt-2">
           <Button
             type="submit"
             variant="filled"
             size="md"
             disabled={updating}
             fullWidth
+            className="flex-1"
           >
             {updating ? "Saving Changes..." : "Save Profile Details"}
           </Button>
+          <Button
+            type="button"
+            onClick={() => setShowSignOutDialog(true)}
+            variant="ghost"
+            size="md"
+            fullWidth
+            className="hover:border-error hover:text-error hover:bg-transparent rounded-full flex-1"
+          >
+            Sign Out
+          </Button>
         </div>
       </form>
+
+      <ConfirmDialog
+        open={showSignOutDialog}
+        title="Sign Out"
+        description="Are you sure you want to sign out of your Aurora wardrobe profile? You will need to sign in again to access your account."
+        confirmLabel="Sign Out"
+        cancelLabel="Cancel"
+        onConfirm={() => {
+          setShowSignOutDialog(false);
+          onSignOut();
+        }}
+        onCancel={() => setShowSignOutDialog(false)}
+      />
     </div>
   );
 }

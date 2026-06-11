@@ -5,6 +5,7 @@ import { ProfileForm } from "./ProfileForm";
 
 interface ProfileWorkspaceProps {
   userEmail: string;
+  onSignOut: () => void;
   displayName: string;
   setDisplayName: (val: string) => void;
   bio: string;
@@ -17,6 +18,7 @@ interface ProfileWorkspaceProps {
 
 export function ProfileWorkspace({
   userEmail,
+  onSignOut,
   displayName,
   setDisplayName,
   bio,
@@ -44,6 +46,7 @@ export function ProfileWorkspace({
 
       <ProfileForm
         userEmail={userEmail}
+        onSignOut={onSignOut}
         displayName={displayName}
         setDisplayName={setDisplayName}
         bio={bio}
