@@ -31,7 +31,7 @@ export function OrderCard({ order }: OrderCardProps) {
           <p className="text-xs text-text-secondary mt-0.5">{date}</p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-[10px] uppercase tracking-widest font-semibold px-3 py-1 rounded-full bg-success/10 text-success border border-success/20">
+          <span className="text-xs uppercase tracking-widest font-semibold px-3 py-1 rounded-full bg-success/10 text-success border border-success/20">
             {order.status}
           </span>
           <span className="font-mono font-bold text-lg">{formatCurrency(order.total)}</span>
@@ -57,7 +57,7 @@ export function OrderCard({ order }: OrderCardProps) {
               >
                 {item.name}
               </Link>
-              <p className="text-[11px] text-text-secondary">
+              <p className="text-xs text-text-secondary">
                 Size: {item.size} &middot; Qty: {item.quantity} &middot;{" "}
                 {formatCurrency(item.price)} each
               </p>
@@ -69,7 +69,7 @@ export function OrderCard({ order }: OrderCardProps) {
         ))}
       </div>
 
-      <div className="mt-4 pt-3 border-t border-border-subtle text-[11px] text-text-secondary">
+      <div className="mt-4 pt-3 border-t border-border-subtle text-xs text-text-secondary">
         Shipped to {order.shippingAddress.firstName} {order.shippingAddress.lastName} &middot;{" "}
         {order.shippingAddress.city}, {order.shippingAddress.zipCode}
       </div>

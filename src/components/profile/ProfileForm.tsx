@@ -41,7 +41,7 @@ export function ProfileForm({
         <div>
           <label
             htmlFor="profile-email"
-            className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5 sm:mb-2 px-1"
+            className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2 px-1"
           >
             Email Address
           </label>
@@ -57,7 +57,7 @@ export function ProfileForm({
         <div>
           <label
             htmlFor="profile-display-name"
-            className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5 sm:mb-2 px-1"
+            className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2 px-1"
           >
             Display Name
           </label>
@@ -74,7 +74,7 @@ export function ProfileForm({
         <div>
           <label
             htmlFor="profile-bio"
-            className="block text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5 sm:mb-2 px-1"
+            className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2 px-1"
           >
             Biography
           </label>

@@ -23,7 +23,7 @@ export function ProfileSidebar({}: ProfileSidebarProps) {
           >
             Aurora
           </Link>
-          <p className="text-[10px] text-text-secondary uppercase tracking-widest font-semibold mt-1">
+          <p className="text-xs text-text-secondary uppercase tracking-widest font-semibold mt-1">
             Wardrobe Space
           </p>
         </div>
@@ -36,7 +36,7 @@ export function ProfileSidebar({}: ProfileSidebarProps) {
             href="/profile"
             className={`flex items-center gap-3 text-xs sm:text-sm transition-all font-semibold uppercase tracking-wider py-3 px-4 rounded-xl ${
               isProfileActive
-                ? "bg-bg-primary text-text-primary border-l-4 border-accent-primary pl-3 shadow-xs"
+                ? "bg-bg-primary text-text-primary shadow-xs"
                 : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
             }`}
           >
@@ -50,7 +50,7 @@ export function ProfileSidebar({}: ProfileSidebarProps) {
             href="/profile/orders"
             className={`flex items-center gap-3 text-xs sm:text-sm transition-all font-semibold uppercase tracking-wider py-3 px-4 rounded-xl ${
               isOrdersActive
-                ? "bg-bg-primary text-text-primary border-l-4 border-accent-primary pl-3 shadow-xs"
+                ? "bg-bg-primary text-text-primary shadow-xs"
                 : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
             }`}
           >
