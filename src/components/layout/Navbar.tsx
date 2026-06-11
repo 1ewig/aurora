@@ -35,24 +35,12 @@ function BagIcon({ count }: { count: number }) {
   );
 }
 
-function MenuIcon({ isOpen }: { isOpen: boolean }) {
+function MenuIcon() {
   return (
     <div className="w-5 h-4 flex flex-col justify-between">
-      <motion.span
-        animate={isOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="block h-[1.5px] bg-current origin-left"
-      />
-      <motion.span
-        animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-        transition={{ duration: 0.2 }}
-        className="block h-[1.5px] bg-current"
-      />
-      <motion.span
-        animate={isOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="block h-[1.5px] bg-current origin-left"
-      />
+      <span className="block h-[1.5px] bg-current" />
+      <span className="block h-[1.5px] bg-current" />
+      <span className="block h-[1.5px] bg-current" />
     </div>
   );
 }
@@ -71,7 +59,6 @@ export function Navbar() {
   const profile = useAuthStore((s) => s.profile);
   const signOut = useAuthStore((s) => s.signOut);
 
-  const profileHref = user ? "/profile" : "/login";
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -178,7 +165,7 @@ export function Navbar() {
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="md:hidden p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary"
               >
-                <MenuIcon isOpen={menuOpen} />
+                <MenuIcon />
               </button>
             </div>
           </nav>
@@ -188,8 +175,6 @@ export function Navbar() {
       <MobileMenu
         isOpen={menuOpen}
         onClose={() => setMenuOpen(false)}
-        user={user}
-        profileHref={profileHref}
         navLinks={navLinks}
       />
 

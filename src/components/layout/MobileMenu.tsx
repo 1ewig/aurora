@@ -7,16 +7,12 @@ import { staggerContainer, menuItemVariant } from "@/animations/variants";
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  user: any;
-  profileHref: string;
   navLinks: Array<{ href: string; label: string }>;
 }
 
 export function MobileMenu({
   isOpen,
   onClose,
-  user,
-  profileHref,
   navLinks,
 }: MobileMenuProps) {
   return (
@@ -62,15 +58,7 @@ export function MobileMenu({
               </motion.li>
             ))}
             
-            <motion.li variants={menuItemVariant}>
-              <Link
-                href={profileHref}
-                onClick={onClose}
-                className="text-5xl font-black text-text-inverted hover:text-accent-primary transition-colors tracking-tight leading-none block"
-              >
-                {user ? "PROFILE" : "SIGN IN"}
-              </Link>
-            </motion.li>
+
           </motion.ul>
 
           <div className="mt-16">
