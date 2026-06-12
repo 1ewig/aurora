@@ -75,25 +75,23 @@ export function CheckoutSuccess({
         </h3>
         <ul className="divide-y divide-border-subtle">
           {items.map((item) => (
-            <li key={`${item.id}-${item.size}`} className="py-3 flex justify-between items-center text-sm">
-              <div className="flex items-center gap-3">
-                <div className="relative w-10 h-12 rounded bg-border-subtle overflow-hidden flex-shrink-0">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    sizes="40px"
-                    className="object-cover object-top"
-                  />
-                </div>
-                <div>
-                  <p className="font-medium text-text-primary truncate max-w-[180px]">{item.name}</p>
-                  <p className="text-[10px] text-text-secondary uppercase tracking-wider">Size: {item.size} × Qty: {item.quantity}</p>
-                </div>
+            <li key={`${item.id}-${item.size}`} className="py-3 flex gap-3">
+              <div className="relative w-10 h-14 rounded bg-border-subtle overflow-hidden flex-shrink-0 border border-border-subtle">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  sizes="40px"
+                  className="object-cover object-top"
+                />
               </div>
-              <span className="font-mono text-text-primary font-medium">
-                {formatCurrency(item.price * item.quantity)}
-              </span>
+              <div className="flex-1 min-w-0 space-y-0.5 text-left">
+                <p className="font-medium text-text-primary text-sm truncate max-w-[240px]">{item.name}</p>
+                <p className="text-[10px] text-text-secondary uppercase tracking-wider">Size: {item.size} × Qty: {item.quantity}</p>
+                <span className="font-mono text-xs font-semibold text-text-primary block mt-0.5">
+                  {formatCurrency(item.price * item.quantity)}
+                </span>
+              </div>
             </li>
           ))}
         </ul>
