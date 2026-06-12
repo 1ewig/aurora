@@ -1,5 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useCartStore } from "@/stores/useCartStore";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useQueryClient } from "@tanstack/react-query";
 import { validateField, validateAll, type FieldErrors } from "@/utils/validation";
 
 export function useCheckoutForm(onOrderPlaced?: (
@@ -13,12 +15,28 @@ export function useCheckoutForm(onOrderPlaced?: (
   tax: number,
   total: number
 ) => void) {
+  const queryClient = useQueryClient();
+  const user = useAuthStore((s) => s.user);
+  const profile = useAuthStore((s) => s.profile);
+
   const clearCart = useCartStore((s) => s.clearCart);
   const items = useCartStore((s) => s.items);
 
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+
+  // Prefill email and name if user is logged in
+  useEffect(() => {
+    if (user?.email && !email) {
+      setEmail(user.email);
+    }
+    if (profile?.displayName && !firstName && !lastName) {
+      const parts = profile.displayName.trim().split(/\s+/);
+      if (parts.length > 0) setFirstName(parts[0]);
+      if (parts.length > 1) setLastName(parts.slice(1).join(" "));
+    }
+  }, [user, profile]);
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [zipCode, setZipCode] = useState("");
@@ -80,6 +98,7 @@ export function useCheckoutForm(onOrderPlaced?: (
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          userId: user?.id || null,
           items: itemsSnapshot,
           subtotal,
           shipping,
@@ -120,6 +139,7 @@ export function useCheckoutForm(onOrderPlaced?: (
       );
 
       clearCart();
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
       setLoading(false);

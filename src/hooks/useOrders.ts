@@ -39,17 +39,17 @@ export function useOrders() {
   const user = useAuthStore((s) => s.user);
 
   return useQuery<Order[]>({
-    queryKey: ["orders"],
+    queryKey: ["orders", user?.id],
     queryFn: async () => {
-      if (!user?.email) return [];
+      if (!user?.id) return [];
 
-      const res = await fetch(`/api/orders?email=${encodeURIComponent(user.email)}`);
+      const res = await fetch(`/api/orders?userId=${encodeURIComponent(user.id)}`);
       if (!res.ok) {
         throw new Error("Failed to fetch orders");
       }
       return res.json();
     },
     staleTime: 1000 * 60 * 2,
-    enabled: !!user?.email,
+    enabled: !!user?.id,
   });
 }

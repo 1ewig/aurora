@@ -10,18 +10,18 @@ function generateOrderNumber(): string {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
+    const userIdParam = searchParams.get("userId");
     const email = searchParams.get("email");
 
-    if (!email) {
-      return NextResponse.json([]);
+    let userId = userIdParam;
+
+    if (!userId && email) {
+      const userResult = await pool.query(
+        "SELECT id FROM auth.users WHERE LOWER(email) = LOWER($1)",
+        [email.toLowerCase().trim()]
+      );
+      userId = userResult.rows[0]?.id ?? null;
     }
-
-    const userResult = await pool.query(
-      "SELECT id FROM auth.users WHERE email = $1",
-      [email.toLowerCase().trim()]
-    );
-
-    const userId = userResult.rows[0]?.id ?? null;
 
     if (!userId) {
       return NextResponse.json([]);
@@ -62,7 +62,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { items, subtotal, shipping, tax, total, shippingAddress } = body;
+    const { userId: bodyUserId, items, subtotal, shipping, tax, total, shippingAddress } = body;
 
     if (!items || !shippingAddress || subtotal === undefined || total === undefined) {
       return NextResponse.json(
@@ -79,12 +79,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const userResult = await pool.query(
-      "SELECT id FROM auth.users WHERE email = $1",
-      [email.toLowerCase().trim()]
-    );
+    let userId = bodyUserId ?? null;
 
-    const userId = userResult.rows[0]?.id ?? null;
+    if (!userId) {
+      const userResult = await pool.query(
+        "SELECT id FROM auth.users WHERE LOWER(email) = LOWER($1)",
+        [email.toLowerCase().trim()]
+      );
+      userId = userResult.rows[0]?.id ?? null;
+    }
 
     if (!userId) {
       return NextResponse.json({

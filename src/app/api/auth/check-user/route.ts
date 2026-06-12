@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     }
 
     const result = await pool.query(
-      'SELECT EXISTS(SELECT 1 FROM auth.users WHERE email = $1)',
+      'SELECT EXISTS(SELECT 1 FROM auth.users WHERE LOWER(email) = LOWER($1))',
       [email.toLowerCase().trim()]
     );
 
