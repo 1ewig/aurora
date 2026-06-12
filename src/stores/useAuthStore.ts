@@ -37,8 +37,27 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ loading: true, error: null });
     const { data, error } = await insforge.auth.signInWithPassword({ email, password });
     if (error) {
-      set({ loading: false, error: error.message || 'Invalid email or password.' });
-      return { error };
+      let message = error.message || 'Invalid email or password.';
+      try {
+        const checkRes = await fetch("/api/auth/check-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        if (checkRes.ok) {
+          const checkData = await checkRes.json();
+          if (checkData && checkData.exists === false) {
+            message = "This email is not registered. Please create an account first.";
+          } else {
+            message = "Incorrect password. Please try again.";
+          }
+        }
+      } catch (e) {
+        // Fallback to original message
+      }
+      const updatedError = { ...error, message };
+      set({ loading: false, error: message });
+      return { error: updatedError };
     }
     const user = data?.user || null;
     if (user) {
