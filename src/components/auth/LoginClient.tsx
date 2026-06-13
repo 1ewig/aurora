@@ -11,12 +11,15 @@ export function LoginClient() {
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [showResetOption, setShowResetOption] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
 
   const {
     user,
     loading,
     error: storeError,
     clearError,
+    sendResetPasswordEmail,
   } = useAuthStore();
   const signIn = useSignIn();
   const router = useRouter();
@@ -24,6 +27,10 @@ export function LoginClient() {
   useEffect(() => {
     clearError();
   }, [clearError]);
+
+  useEffect(() => {
+    setShowResetOption(false);
+  }, [email, password]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -52,6 +59,7 @@ export function LoginClient() {
     e.preventDefault();
     setFormError("");
     setSuccessMsg("");
+    setShowResetOption(false);
 
     if (!email || !password) {
       setFormError("Please fill in all fields.");
@@ -63,14 +71,45 @@ export function LoginClient() {
       if (reqVerification) {
         router.push(`/verify?email=${encodeURIComponent(email)}&type=login`);
       } else {
-        setFormError(error.message || "Invalid email or password.");
+        const errorMsg = error.message || "Invalid email or password.";
+        setFormError(errorMsg);
+        
+        // Show reset option if they entered a wrong password on an existing verified account
+        if (errorMsg.includes("Incorrect password")) {
+          setShowResetOption(true);
+        }
       }
     } else {
       router.push("/profile");
     }
   };
 
-  if (loading && !successMsg) {
+  const handleResetClick = async () => {
+    if (!email) {
+      setFormError("Please enter your email address first.");
+      return;
+    }
+    setResetLoading(true);
+    setFormError("");
+    setSuccessMsg("");
+    try {
+      const { error } = await sendResetPasswordEmail(email);
+      if (error) {
+        setFormError(error.message || "Failed to send password reset email.");
+      } else {
+        setSuccessMsg("Password reset email sent! Redirecting...");
+        setTimeout(() => {
+          router.push(`/reset-password?email=${encodeURIComponent(email)}`);
+        }, 1500);
+      }
+    } catch (err) {
+      setFormError("Failed to initiate password reset.");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  if (loading && !successMsg && !resetLoading) {
     return (
       <div className="min-h-screen bg-bg-primary flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
@@ -87,6 +126,9 @@ export function LoginClient() {
       formError={formError || storeError || ""}
       successMsg={successMsg}
       onSubmit={handleSubmit}
+      showResetOption={showResetOption}
+      onResetClick={handleResetClick}
+      resetLoading={resetLoading}
     />
   );
 }

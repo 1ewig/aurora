@@ -24,6 +24,9 @@ interface AuthState {
   updateProfile: (profile: Partial<Profile>) => Promise<{ error: any }>;
   verifyEmail: (email: string, otp: string, name?: string) => Promise<{ error: any }>;
   resendVerification: (email: string) => Promise<{ error: any }>;
+  sendResetPasswordEmail: (email: string) => Promise<{ error: any }>;
+  exchangeResetPasswordToken: (email: string, code: string) => Promise<{ token?: string; error: any }>;
+  resetPassword: (newPassword: string, token: string) => Promise<{ error: any }>;
   clearError: () => void;
 }
 
@@ -155,6 +158,48 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
     if (error) {
       set({ loading: false, error: error.message || 'Failed to resend verification code.' });
+      return { error };
+    }
+    set({ loading: false });
+    return { error: null };
+  },
+
+  sendResetPasswordEmail: async (email) => {
+    set({ loading: true, error: null });
+    const { error } = await insforge.auth.sendResetPasswordEmail({
+      email,
+      redirectTo: `${window.location.origin}/reset-password`
+    });
+    if (error) {
+      set({ loading: false, error: error.message || 'Failed to send reset password email.' });
+      return { error };
+    }
+    set({ loading: false });
+    return { error: null };
+  },
+
+  exchangeResetPasswordToken: async (email, code) => {
+    set({ loading: true, error: null });
+    const { data, error } = await insforge.auth.exchangeResetPasswordToken({
+      email,
+      code
+    });
+    if (error) {
+      set({ loading: false, error: error.message || 'Failed to exchange reset password token.' });
+      return { error };
+    }
+    set({ loading: false });
+    return { token: data?.token, error: null };
+  },
+
+  resetPassword: async (newPassword, token) => {
+    set({ loading: true, error: null });
+    const { error } = await insforge.auth.resetPassword({
+      newPassword,
+      otp: token
+    });
+    if (error) {
+      set({ loading: false, error: error.message || 'Failed to reset password.' });
       return { error };
     }
     set({ loading: false });
