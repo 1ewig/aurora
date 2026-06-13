@@ -171,7 +171,7 @@ function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: st
       storageKey: localRelPath.replace(/^\/images\/editorial\//, ''),
     };
   } else {
-    const key = localRelPath.replace(/^\/images\/(products\/)?/, '');
+    const key = localRelPath.replace(/^\/images\//, '');
     return {
       bucket: BUCKETS.products,
       storageKey: key,
@@ -202,8 +202,8 @@ async function uploadAndOverwriteImage(
   }
 
   if (existingKeys[bucket]?.has(storageKey)) {
-    console.log(`  Removing existing storage key from "${bucket}" to force overwrite: "${storageKey}"`);
-    await admin.storage.from(bucket).remove(storageKey);
+    console.log(`  Asset already exists in "${bucket}": "${storageKey}". Skipping upload.`);
+    return buildStorageUrl(bucket, storageKey);
   }
 
   const buffer = fs.readFileSync(fullPath);
@@ -241,7 +241,12 @@ async function getExistingKeys(admin: ReturnType<typeof createAdminClient>): Pro
   return existingKeys;
 }
 
-async function uploadCatalogImages(admin: ReturnType<typeof createAdminClient>, productsList: Product[]) {
+async function uploadCatalogImages(
+  admin: ReturnType<typeof createAdminClient>,
+  productsList: Product[],
+  lookbookList: typeof lookbookSlides = [],
+  editorialList: typeof editorialItems = []
+) {
   const existingKeys = await getExistingKeys(admin);
   const urlMap = new Map<string, string>();
 
@@ -255,12 +260,20 @@ async function uploadCatalogImages(admin: ReturnType<typeof createAdminClient>, 
       }
     }
   }
-
-  console.log(`Syncing ${imagePaths.size} product media assets...`);
-  for (const imgPath of imagePaths) {
-    const url = await uploadAndOverwriteImage(admin, imgPath, existingKeys);
-    urlMap.set(imgPath, url);
+  for (const s of lookbookList) {
+    if (s.originalImage) imagePaths.add(s.originalImage);
   }
+  for (const e of editorialList) {
+    if (e.originalImage) imagePaths.add(e.originalImage);
+  }
+
+  console.log(`Syncing ${imagePaths.size} media assets in parallel...`);
+  await Promise.all(
+    Array.from(imagePaths).map(async (imgPath) => {
+      const url = await uploadAndOverwriteImage(admin, imgPath, existingKeys);
+      urlMap.set(imgPath, url);
+    })
+  );
   return urlMap;
 }
 
@@ -272,6 +285,7 @@ async function syncProductToDb(client: Client, product: Product, urlMap: Map<str
   const exists = rows.length > 0;
 
   if (exists) {
+    console.log(`  -> Existing product. Running UPDATE for "${product.name}" in database...`);
     await client.query(
       `UPDATE products SET 
         slug = $1, name = $2, category = $3, price = $4, badge = $5, 
@@ -284,6 +298,7 @@ async function syncProductToDb(client: Client, product: Product, urlMap: Map<str
       ]
     );
   } else {
+    console.log(`  -> New product. Running INSERT for "${product.name}" in database...`);
     await client.query(
       `INSERT INTO products (
         id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description
@@ -337,97 +352,65 @@ async function syncProductToDb(client: Client, product: Product, urlMap: Map<str
 // ════════════════════════════════════════════════════════
 
 async function addProductInteractively() {
-  console.log("\n--- ADD NEW PRODUCT ---");
-  const id = await askQuestion("Enter unique Product ID (e.g. p15): ");
-  if (!id) {
-    console.error("ID cannot be empty.");
-    return;
-  }
-  const allMerged = [...allProducts, ...heroProducts, ...featuredProducts];
-  if (allMerged.some(p => p.id === id)) {
-    console.error(`A product with ID "${id}" already exists.`);
-    return;
-  }
-
-  const name = await askQuestion("Enter Product Name: ");
-  if (!name) {
-    console.error("Name cannot be empty.");
-    return;
-  }
-
-  const defaultSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-  const slugInput = await askQuestion(`Enter Slug [Default: ${defaultSlug}]: `);
-  const slug = slugInput || defaultSlug;
-
-  console.log("Categories:\n1. Outerwear\n2. Knitwear\n3. Trousers\n4. Dresses\n5. Accessories");
-  const catChoice = await askQuestion("Select Category (1-5): ");
-  let category = "Outerwear";
-  if (catChoice === "2") category = "Knitwear";
-  else if (catChoice === "3") category = "Trousers";
-  else if (catChoice === "4") category = "Dresses";
-  else if (catChoice === "5") category = "Accessories";
-
-  const priceInput = await askQuestion("Enter Price (number, e.g. 450): ");
-  const price = parseFloat(priceInput) || 0;
-
-  const badge = await askQuestion("Enter Badge (optional, e.g. New / Limited): ");
-
-  const defaultImg = `/images/products/${slug}.webp`;
-  const imgInput = await askQuestion(`Enter Main Image Path [Default: ${defaultImg}]: `);
-  const image = imgInput || defaultImg;
-
-  const altText = await askQuestion("Enter Alt Text: ") || name;
-  const description = await askQuestion("Enter Description: ");
-
-  const detailsInput = await askQuestion("Enter Details (comma-separated): ");
-  const details = detailsInput ? detailsInput.split(',').map(s => s.trim()) : [];
-
-  console.log("Sizes Option:\n1. Apparel (XS, S, M, L, XL)\n2. Accessories (One Size)\n3. Custom (comma-separated)");
-  const sizeChoice = await askQuestion("Select sizes type (1-3): ");
-  let sizes: string[] = [];
-  if (sizeChoice === "2") {
-    sizes = ["One Size"];
-  } else if (sizeChoice === "3") {
-    const customSizes = await askQuestion("Enter custom sizes (comma-separated): ");
-    sizes = customSizes.split(',').map(s => s.trim());
-  } else {
-    sizes = ["XS", "S", "M", "L", "XL"];
-  }
-
-  const addToHero = (await askQuestion("Add to Hero Carousel? (y/N): ")).toLowerCase() === 'y';
-  const addToFeatured = (await askQuestion("Add to Featured Grid? (y/N): ")).toLowerCase() === 'y';
-
-  const newProduct: Product = {
-    id, slug, name, category, price,
-    ...(badge ? { badge } : {}),
-    image,
-    images: [image],
-    altText,
-    ...(description ? { description } : {}),
-    ...(details.length > 0 ? { details } : {}),
-    sizes,
-  };
-
-  // Add to in-memory arrays
-  allProducts.push(newProduct);
-  if (addToHero) heroProducts.push(newProduct);
-  if (addToFeatured) featuredProducts.push(newProduct);
-
-  // 1. Save locally
-  saveProductsLocal(heroProducts, featuredProducts, allProducts);
-  console.log(`\nSuccessfully updated local definition in src/data/products.ts.`);
-
-  // 2. Sync to DB & Storage
-  console.log("\nSyncing changes to Database & Storage...");
-  const admin = createAdminClient({ baseUrl: ossHost, apiKey });
+  console.log("\n--- ADD NEW PRODUCTS FROM LOCAL CONFIG ---");
+  console.log("Connecting to database to check for existing products...");
   const client = new Client({ connectionString: DATABASE_URL });
   await client.connect();
 
-  const urlMap = await uploadCatalogImages(admin, [newProduct]);
-  await syncProductToDb(client, newProduct, urlMap);
+  const { rows } = await client.query('SELECT id FROM products');
+  const dbIds = new Set(rows.map(r => r.id));
+
+  // Gather unique local products
+  const productMap = new Map<string, Product>();
+  function addProducts(products: Product[]) {
+    for (const p of products) {
+      const existing = productMap.get(p.slug);
+      if (existing) {
+        if (existing.id.startsWith('h') && !p.id.startsWith('h')) {
+          productMap.set(p.slug, p);
+        }
+      } else {
+        productMap.set(p.slug, p);
+      }
+    }
+  }
+  addProducts(heroProducts);
+  addProducts(featuredProducts);
+  addProducts(allProducts);
+  const uniqueProducts = Array.from(productMap.values());
+
+  // Compare and find missing ones
+  const newProducts = uniqueProducts.filter(p => !dbIds.has(p.id));
+
+  if (newProducts.length === 0) {
+    console.log("No new products found in local definitions compared to the database.");
+    await client.end();
+    return;
+  }
+
+  console.log(`\nFound ${newProducts.length} new product(s) in local config that are missing from the database:`);
+  newProducts.forEach((p) => {
+    console.log(`  - ID: ${p.id} | Name: ${p.name} | Category: ${p.category} | Price: $${p.price}`);
+  });
+
+  const confirm = await askQuestion("\nDo you want to upload their images and insert them into the database? (y/N): ");
+  if (confirm.toLowerCase() !== 'y') {
+    console.log("Operation cancelled.");
+    await client.end();
+    return;
+  }
+
+  console.log("\nInitializing InsForge client and uploading images...");
+  const admin = createAdminClient({ baseUrl: ossHost, apiKey });
+  const urlMap = await uploadCatalogImages(admin, newProducts);
+
+  console.log("Inserting products into the database...");
+  for (const product of newProducts) {
+    await syncProductToDb(client, product, urlMap);
+  }
 
   await client.end();
-  console.log("\nProduct successfully added to Local Files, InsForge Storage, and Database!");
+  console.log("\nSuccessfully added new product(s) to the database and storage!");
 }
 
 async function modifyProductInteractively() {
@@ -590,7 +573,7 @@ async function runSyncCatalog() {
   addProducts(allProducts);
   const uniqueProducts = Array.from(productMap.values());
 
-  const urlMap = await uploadCatalogImages(admin, uniqueProducts);
+  const urlMap = await uploadCatalogImages(admin, uniqueProducts, lookbookSlides, editorialItems);
 
   console.log("\n=== Phase 2: Connecting to database ===");
   const client = new Client({ connectionString: DATABASE_URL });
@@ -602,19 +585,20 @@ async function runSyncCatalog() {
   }
 
   console.log("\n=== Phase 4: Syncing lookbook slides ===");
-  const existingKeys = await getExistingKeys(admin);
   for (const slide of lookbookSlides) {
-    const imageUrl = await uploadAndOverwriteImage(admin, slide.originalImage, existingKeys);
+    const imageUrl = urlMap.get(slide.originalImage) || slide.originalImage;
     console.log(`Syncing lookbook slide: ${slide.slideNumber}`);
 
     const { rows } = await client.query('SELECT 1 FROM lookbook_slides WHERE slide_number = $1', [slide.slideNumber]);
     if (rows.length > 0) {
+      console.log(`  -> Slide ${slide.slideNumber} exists. Running UPDATE...`);
       await client.query(
         `UPDATE lookbook_slides SET original_image = $1, image_url = $2, alt_text = $3, tag = $4, title = $5, link = $6
          WHERE slide_number = $7`,
         [slide.originalImage, imageUrl, slide.altText, slide.tag || null, slide.title || null, slide.link || null, slide.slideNumber]
       );
     } else {
+      console.log(`  -> Slide ${slide.slideNumber} is new. Running INSERT...`);
       await client.query(
         `INSERT INTO lookbook_slides (slide_number, original_image, image_url, alt_text, tag, title, link)
          VALUES ($1, $2, $3, $4, $5, $6, $7)`,
@@ -625,17 +609,19 @@ async function runSyncCatalog() {
 
   console.log("\n=== Phase 5: Syncing editorial content ===");
   for (const item of editorialItems) {
-    const imageUrl = await uploadAndOverwriteImage(admin, item.originalImage, existingKeys);
+    const imageUrl = urlMap.get(item.originalImage) || item.originalImage;
     console.log(`Syncing editorial item: "${item.id}"`);
 
     const { rows } = await client.query('SELECT 1 FROM editorial_content WHERE id = $1', [item.id]);
     if (rows.length > 0) {
+      console.log(`  -> Editorial item "${item.id}" exists. Running UPDATE...`);
       await client.query(
         `UPDATE editorial_content SET original_image = $1, image_url = $2, alt_text = $3, title = $4, description = $5
          WHERE id = $6`,
         [item.originalImage, imageUrl, item.altText, item.title, item.description || null, item.id]
       );
     } else {
+      console.log(`  -> Editorial item "${item.id}" is new. Running INSERT...`);
       await client.query(
         `INSERT INTO editorial_content (id, original_image, image_url, alt_text, title, description)
          VALUES ($1, $2, $3, $4, $5, $6)`,

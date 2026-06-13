@@ -24,9 +24,9 @@ export const lookbookSlides: LookbookSlide[] = [
     originalImage: "/images/lookbook/lookbook-2.webp",
     imageUrl: "",
     altText: "Female model in all-white minimalist look in brutalist concrete architecture",
-    tag: "Outerwear",
+    tag: "Dresses",
     title: "Look 02 — The White Study",
-    link: "/products/camel-cashmere-turtleneck"
+    link: "/products/ivory-mock-neck-jumpsuit"
   },
   {
     slideNumber: 3,

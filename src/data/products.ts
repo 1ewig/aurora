@@ -392,4 +392,25 @@ export const allProducts: Product[] = [
     ],
     sizes: sizeOptions.apparel,
   },
+  {
+    id: "p15",
+    slug: "ivory-mock-neck-jumpsuit",
+    name: "Ivory Mock-Neck Jumpsuit",
+    category: "Dresses",
+    price: 950,
+    badge: "New",
+    image: "/images/products/ivory-mock-neck-jumpsuit.webp",
+    images: ["/images/products/ivory-mock-neck-jumpsuit.webp"],
+    altText: "Ivory mock-neck sleeveless crepe jumpsuit",
+    description: "A striking sleeveless jumpsuit tailored from heavy double-weave crepe. Featuring a refined mock neck, structured waist panel, and a flowing wide-leg silhouette that moves with effortless grace.",
+    details: [
+      "82% triacetate, 18% polyester double crepe",
+      "Sleeveless mock-neck silhouette",
+      "Concealed zip closure at the back",
+      "Side slip pockets",
+      "Dry clean only",
+      "Crafted in Milan, Italy"
+    ],
+    sizes: sizeOptions.apparel,
+  },
 ];
