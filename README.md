@@ -1,154 +1,162 @@
-# Aurora — Premium E-Commerce Application
+# 🌌 Aurora
+### *Quiet-Luxury Fashion E-Commerce (SS 2025 Collection)*
 
-Aurora is a quiet-luxury fashion brand e-commerce web application (SS 2025 Collection). Built with Next.js 15, React 19, TypeScript, Tailwind CSS 4, Framer Motion, PostgreSQL, TanStack Query, and InsForge.
-
-The application uses **InsForge** as its Backend-as-a-Service (BaaS) for database and media storage. It implements **TanStack Query** for client-side caching, utilizing a progressive **Initial Data Seeding** technique to load detail pages instantly from the listing cache, and uses **Row Level Security (RLS)** in PostgreSQL to secure the catalog.
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 15.5.19 (App Router) |
-| Language | React 19 + TypeScript 5.9 |
-| Database | PostgreSQL (hosted on InsForge Cloud DB) |
-| Client SDK | `@insforge/sdk` (Storage Bucket client) |
-| Data Caching | `@tanstack/react-query` v5 |
-| Styling | Tailwind CSS 4 |
-| Animation | Framer Motion 12 |
-| State Management | Zustand (cart persisted to `localStorage`) |
-| Fonts | `next/font` (Inter, Playfair Display) |
+Aurora is a premium, high-performance e-commerce platform dedicated to a minimalist, quiet-luxury brand. Built on the modern React 19 and Next.js 15 architecture, it integrates **InsForge** as a comprehensive Serverless Backend-as-a-Service (BaaS) alongside high-efficiency caching, relational database querying, and robust authentication.
 
 ---
 
-## Architecture Pattern
+## 🏗️ Architecture & Philosophy
 
-The codebase follows a 4-layer separation of concerns:
+Aurora follows a strict **4-layer Separation of Concerns** model to decouple presentation from side effects, business logic, and global states:
 
 ```
-Pages (src/app/)
-  │  Server Components: resolve route params, export SEO metadata, render containers
-  │
-  ▼
-Containers / Bridges (src/components/*/)
-  │  Read stores, call hooks, assemble props
-  │
-  ├──► Hooks & Queries (src/hooks/)
-  │     Business logic, react-query hooks, form state
-  │
-  ├──► Stores (src/stores/)
-  │     Zustand global state management
-  │
-  ▼
-Presentational Components (src/components/*/)
-  Pure JSX — receive everything via props, zero store/hook imports
+                  ┌────────────────────────┐
+                  │      Pages / Route     │
+                  │      (src/app/*)       │
+                  └───────────┬────────────┘
+                              │ Server Components: Resolve Params, Metadata,
+                              │ and instantiate Root Layout Containers.
+                              ▼
+                  ┌────────────────────────┐
+                  │  Containers & Bridges  │
+                  │   (src/components/*)   │
+                  └──────┬──────────┬──────┘
+                         │          │
+        Reads/Writes     │          │  Invokes Custom Hook queries,
+        Global States    │          │  manages form states, etc.
+                         ▼          ▼
+   ┌───────────────────────┐      ┌────────────────────────┐
+   │    Zustand Stores     │      │    Hooks & Queries     │
+   │    (src/stores/*)     │      │     (src/hooks/*)      │
+   └───────────────────────┘      └─────────┬──────────────┘
+                                            │
+                                            ▼
+                              ┌────────────────────────┐
+                              │ Presentational Element │
+                              │   (src/components/*)   │
+                              └────────────────────────┘
+                                 Pure JSX Components: Receive all configurations
+                                 via props, 100% side-effect-free.
 ```
 
 ---
 
-## Getting Started
+## ⚡ Core Systems & Features
 
-Follow the step-by-step guide in [`BACKEND_DEPLOYMENT.md`](BACKEND_DEPLOYMENT.md) to set up a new InsForge project, configure your environment variables (`.env.local`), and seed the database.
+*   🚀 **0ms Perceived Page Loads (Initial Seeding)**: Aurora leverages TanStack Query client-side state matching. When navigating from the catalog to a product details page, the application pre-populates the UI instantly using existing catalog cache. Extended details and inventory configurations are then fetched progressively in the background.
+*   🗃️ **Unified SQL Subqueries**: To maximize database efficiency, `/api/products/[slug]` retrieves catalog records, attributes, details, and cross-reference image tables inside a single consolidated PostgreSQL query utilizing `json_agg()`.
+*   📦 **Multi-Bucket Asset Management**: Media files are dynamically parsed and uploaded into three separate public InsForge Storage buckets depending on context:
+    *   `product-media`: Product catalog primary images.
+    *   `lookbook-media`: High-resolution landing and collection slide imagery.
+    *   `editorial-media`: Immersive story, narrative, and atelier banner graphics.
+*   🔒 **Row-Level Security (RLS)**: Enforces security policies at the database layer. Public users are restricted to read-only (`SELECT`) actions, while administrative mutations (`INSERT`, `UPDATE`, `DELETE`) require authenticated keys.
+*   ⚙️ **DRY Media Optimization**: Employs a standardized pipeline that rescales local source images and converts them to optimized `.webp` format using `Sharp` via an integrated preprocessing runner.
 
-### Seeding and Managing Data
+---
 
-The project includes built-in scripts to manage the e-commerce catalog, lookbook, and editorial content:
+## 🛠️ Tech Stack Reference
 
-* **First-time setup / Wiping & Seeding**:
-  Drops existing tables, creates/wipes/prepares three public storage buckets (`product-media`, `lookbook-media`, `editorial-media`), recursively uploads all local assets, and seeds the entire database from scratch.
-  ```bash
-  npx tsx scripts/upload-and-seed.mts
-  ```
+| Layer | Technology | Description |
+| :--- | :--- | :--- |
+| **Framework** | Next.js 15.5.19 | App Router, SSR, and dynamic API endpoints |
+| **Language** | React 19 + TypeScript 5.9 | Typed, functional component patterns |
+| **Database** | PostgreSQL | Cloud-managed DB via InsForge |
+| **Client SDK** | `@insforge/sdk` | Serverless SDK for database CRUD and Storage |
+| **Data Fetching** | `@tanstack/react-query` v5 | Declarative client caching and mutations |
+| **Styling** | Tailwind CSS 4 | Utilitarian layout design system |
+| **Animation** | Framer Motion 12 | Fluid transitions and micro-animations |
+| **State** | Zustand | Persistent browser states (e.g. user authentication & cart) |
+| **Typography** | `next/font` | Premium typefaces (Inter & Playfair Display) |
 
-* **Updating catalog / Incremental updates**:
-  Updates existing product details and description, force-overwrites updated images in storage, and inserts any new products without dropping tables (preserving user accounts and orders).
-  ```bash
-  npx tsx scripts/update-catalog.mts
-  ```
+---
 
-* **Wipe a product (Database & Storage)**:
-  Wipes a product from the database, cascading to related tables, and automatically deletes its associated images from the InsForge storage bucket if they are not used by other products.
-  ```bash
-  npx tsx scripts/delete-product.mts <product_id>
-  ```
+## 🚦 Getting Started & Data Management
 
-### Running Locally
+For complete workspace credentials and project connection variables, see the detailed instructions in [BACKEND_DEPLOYMENT.md](file:///c:/Users/moshu%20moshu/Desktop/aurora/BACKEND_DEPLOYMENT.md).
 
-Once the database and storage are seeded:
+### Seeding, Syncing, and Maintenance Commands
 
+Aurora provides highly automated utilities to maintain code-to-database parity:
+
+#### 1. Full Database & Storage Reset
+Wipes all existing database tables, drops/recreates the three media buckets (`product-media`, `lookbook-media`, `editorial-media`), processes local WebP files, uploads media, and runs a clean seed.
 ```bash
-npm install
+npx tsx scripts/upload-and-seed.mts
+```
+
+#### 2. Safe Catalog Synchronizations (Non-destructive)
+Optimizes newly added images, uploads modifications directly to storage, and upserts product parameters into PostgreSQL. **Note:** User profiles, login accounts, and order history are fully preserved.
+```bash
+npx tsx scripts/update-catalog.mts
+```
+
+#### 3. Single-Item Catalog Removal
+Removes a specific product from the database (cascading all joins) and clean-deletes its orphan storage media from the server buckets if not referenced elsewhere.
+```bash
+npx tsx scripts/delete-product.mts <product_id>
+```
+
+#### 4. Project Server Initialization
+Start the local development server once the backend sync succeeds:
+```bash
 npm run dev
 ```
 
 ---
 
-## Route Structure
+## 🗺️ Project Navigation
 
-| Route | Type | Description |
-|---|---|---|
-| `/` | Static | Brand landing page — hero slider, featured collections, lookbook carousel |
-| `/products` | Static | Shop catalog with client-side category filter query pills |
-| `/products/category/[category]` | Dynamic (SSR) | Category-specific product lists |
-| `/products/[slug]` | Dynamic (SSR) | Product detail view with progressive loading, size selection, specs |
-| `/checkout` | Static | Checkout form, summary pricing, masked PII confirmation |
-| `/story` | Static | Brand narrative, philosophy, parallax breakout, atelier section |
-| `/profile` | Static | User profile details and settings (auth-guarded) |
-| `/profile/orders` | Static | User purchase order history list (auth-guarded) |
-| `/login` | Static | User sign-in page |
-| `/register` | Static | User registration page |
-| `/api/products` | API | Database SELECT endpoint for catalog products |
-| `/api/products/[slug]` | API | Consolidated SELECT query for detail specifications, images, and sizes |
-| `/api/lookbook` | API | Database SELECT endpoint for lookbook slides |
-| `/api/editorial` | API | Database SELECT endpoint for editorial/story sections |
-| `/api/orders` | API | Create/retrieve order records linked to user profiles |
+### App Route Definitions
 
----
-
-## Core Features
-
-- **Database-Driven Content**: Products, sizes, images, specifications, lookbook slides, and editorial story cards are fetched dynamically from a PostgreSQL database hosted on InsForge.
-- **Unified Querying**: `/api/products/[slug]` performs a single SQL query using PostgreSQL subqueries with `json_agg()` to retrieve base columns, sizes, details, and lookup images in a single connection.
-- **Initial Data Seeding (0ms Load Times)**: When opening a details page, TanStack Query pre-populates the details view using cached list data from the catalog. The user immediately sees the correct product image, title, and price, while descriptions and sizes load progressively in the background.
-- **Multi-Bucket InsForge Storage**: Assets are routed and stored in three public InsForge buckets (`product-media`, `lookbook-media`, `editorial-media`) depending on their relative paths.
-- **Row Level Security (RLS)**: Enforced database-level security policies (`Allow public read access`) permitting public `SELECT` lookups while restricting all `INSERT`/`UPDATE`/`DELETE` writes to authenticated administrators.
-- **Indexed Relationships**: Foreign keys on `product_images`, `product_details`, and `orders` are indexed to speed up database joins and handle cascading deletes efficiently.
+| Route Path | Content Strategy | Purpose / Operation |
+| :--- | :--- | :--- |
+| `/` | Static | Brand landing experience (lookbook sliders, categories) |
+| `/products` | Static / Client Filtered | Dynamic shop listing with interactive category filters |
+| `/products/category/[category]` | Dynamic (SSR) | Group-targeted product catalogs |
+| `/products/[slug]` | Dynamic (SSR) | Detailed product view with progressive specs and size guides |
+| `/checkout` | Static | Secure shopping cart validation & mock transaction checkouts |
+| `/story` | Static | Brand narrative, parallax breakouts, and atelier showcases |
+| `/profile` | Static (Auth Required) | User account customization and data settings |
+| `/profile/orders` | Static (Auth Required) | Historical user order items log |
+| `/login` | Static | Secure client login panel |
+| `/register` | Static | Secure client account creation panel |
+| `/api/products` | API Endpoint | PostgreSQL SELECT list data |
+| `/api/products/[slug]` | API Endpoint | Deep SQL Join for detail lists and image catalogs |
+| `/api/lookbook` | API Endpoint | Lookbook carousel slider data |
+| `/api/editorial` | API Endpoint | Editorial and atelier component text blocks |
+| `/api/orders` | API Endpoint | Authenticated cart transaction logger |
 
 ---
 
-## Project Structure
+### File Architecture
 
 ```
 scripts/
-├── upload-and-seed.mts              # First-time setup / Wipes buckets & tables and seeds DB from scratch
-├── update-catalog.mts               # Safe catalog update / Optimizes, overwrites storage and upserts DB
-├── optimize-images.mjs              # Standardizes local image scaling and WebP conversion
-├── delete-product.mts               # Wipes a product and deletes its unused media assets
+├── upload-and-seed.mts              # Destructive baseline seed script
+├── update-catalog.mts               # Additive database catalog sync script
+├── optimize-images.mjs              # Local Sharp optimization workflow
+└── delete-product.mts               # Target database & storage purge script
 src/
 ├── app/
-│   ├── (auth)/                      # Login, Register pages
-│   ├── (store)/                     # catalog, checkout, story and details page wrapper group
+│   ├── (auth)/                      # Login and Registration pages
+│   ├── (store)/                     # Catalog, checkout, story, and details page wrapper group
 │   ├── (user)/                      # ProfileLayoutClient, ProfilePage, Orders list pages
-│   ├── api/                         # auth, products, orders, lookbook, and editorial endpoints
-│   ├── layout.tsx
-│   ├── providers.tsx               # TanStack QueryClient Provider wrapper
-│   └── globals.css
+│   ├── api/                         # Backend API endpoints (Auth, Products, Orders, Lookbook, Editorial)
+│   ├── layout.tsx                   # Main global layout container
+│   ├── providers.tsx               # TanStack query clients wrapper
+│   └── globals.css                  # Global Tailwind 4 styles
 │
 ├── components/
-│   ├── auth/          LoginForm, RegisterForm, LoginClient, RegisterClient
-│   ├── checkout/      CartEmptyState, CheckoutForm, CheckoutSuccess, OrderSummary, OrderSummaryContainer
-│   ├── landing/       FeaturedCollection, HeroSection, LookbookSlider, Newsletter, Testimonials
-│   ├── layout/        Footer, Navbar, MobileMenu, NavbarProfileMenu
-│   ├── product/
-│   │   ├── listing/   CategoryFilter, PageHeader, ProductGrid
-│   │   └── detail/    Breadcrumbs, ImageGallery, ProductActions, ProductDetailClient, ProductDetailsTabs, ProductInfo, RelatedProducts, SizeGuideModal, SizeSelector
-│   ├── profile/       ProfileClient, ProfileForm, ProfileSidebar, ProfileWorkspace, OrdersClient, OrderCard, OrderDetailModal
-│   └── story/         AtelierSection, ParallaxBreakout, PhilosophySection, StoryCta, StoryHero
+│   ├── auth/                        # LoginForm, RegisterForm, and client-page bridges
+│   ├── checkout/                    # Checkout forms, orders, summaries, and empty states
+│   ├── landing/                     # Featured collections, Hero, LookbookSlider, and reviews
+│   ├── layout/                      # Navbar, Footer, MobileMenu, and profile controls
+│   ├── product/                     # Category filters, product details, selectors, and size grids
+│   ├── profile/                     # ProfileClient, sidebar dashboards, and order modal panels
+│   └── story/                       # Narrative parallax frames, philosophy sections, and atelier lists
 │
-├── stores/            useCartStore, useAuthStore, useProductStore
-├── hooks/             queries (useProductsQuery, useLookbookQuery, etc.), useBodyScrollLock, useCarousel,
-│                      useCheckoutForm, useNavbarScroll, useRelatedProducts, useInitializeAuth, useOrders
-├── data/              navigation, products, lookbook, editorial, testimonials
-└── utils/             cn.ts, db.ts (pg pool), insforge.ts (BaaS configs), auth.ts, validation.ts
+├── stores/                          # Zustand global hooks (useCartStore, useAuthStore, useProductStore)
+├── hooks/                           # Queries hooks (useProductsQuery, etc.) and layout helpers
+├── data/                            # Local navigation, products, lookbook, and editorial base data
+└── utils/                           # Database pool (pg), BaaS connections, validation, and auth helpers
 ```
