@@ -82,12 +82,23 @@ export function ResetPasswordForm({
             Reset Password
           </h1>
           <p className="text-text-secondary text-sm">
-            Set a new secure password for{" "}
+            Set a new secure password for
+            <br />
             <span className="font-medium text-text-primary break-all">{email}</span>.
           </p>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-5">
+          {/* Visually hidden email field to satisfy browser password managers */}
+          <input
+            type="text"
+            name="username"
+            value={email}
+            readOnly
+            className="sr-only"
+            autoComplete="username"
+          />
+
           {/* Alphanumeric 6-digit Code input - only shown if they are not using a direct reset link */}
           {!hasToken && (
             <div>
@@ -99,6 +110,7 @@ export function ResetPasswordForm({
               </label>
               <input
                 id="reset-code"
+                name="otp"
                 type="text"
                 required
                 maxLength={6}
@@ -109,7 +121,7 @@ export function ResetPasswordForm({
                 }}
                 className="w-full px-5 py-3.5 bg-bg-primary border border-border-medium rounded-full focus:border-accent-primary focus:outline-none transition-colors text-sm font-mono text-center tracking-[0.2em] placeholder:tracking-normal placeholder:font-sans"
                 placeholder="000000"
-                autoComplete="off"
+                autoComplete="one-time-code"
               />
             </div>
           )}
@@ -124,12 +136,14 @@ export function ResetPasswordForm({
             <div className="relative">
               <input
                 id="new-password"
+                name="new-password"
                 type={showNewPassword ? "text" : "password"}
                 required
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="w-full pl-5 pr-12 py-3.5 bg-bg-primary border border-border-medium rounded-full focus:border-accent-primary focus:outline-none transition-colors text-sm"
                 placeholder="••••••••"
+                autoComplete="new-password"
               />
               <button
                 type="button"
@@ -152,12 +166,14 @@ export function ResetPasswordForm({
             <div className="relative">
               <input
                 id="confirm-password"
+                name="confirm-password"
                 type={showConfirmPassword ? "text" : "password"}
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full pl-5 pr-12 py-3.5 bg-bg-primary border border-border-medium rounded-full focus:border-accent-primary focus:outline-none transition-colors text-sm"
                 placeholder="••••••••"
+                autoComplete="new-password"
               />
               <button
                 type="button"
