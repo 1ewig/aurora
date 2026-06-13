@@ -2,11 +2,10 @@
  * update-catalog.mts
  * ==================
  *
- * 1. Optimizes and converts JPG, JPEG, and PNG images from images-sources/ to WebP in public/images/
- * 2. Uploads all images recursively from public/images/ to InsForge Storage (across product-media,
+ * 1. Uploads all images recursively from public/images/ to InsForge Storage (across product-media,
  *    lookbook-media, and editorial-media buckets), deleting existing keys beforehand to force-overwrite.
- * 3. Connects to PostgreSQL and upserts products (updates existing, inserts new) from src/data/products.ts.
- * 4. Upserts/syncs lookbook_slides and editorial_content.
+ * 2. Connects to PostgreSQL and upserts products (updates existing, inserts new) from src/data/products.ts.
+ * 3. Upserts/syncs lookbook_slides and editorial_content.
  *
  * Usage:
  *   npx tsx scripts/update-catalog.mts
@@ -16,7 +15,6 @@ import { createAdminClient } from '@insforge/sdk';
 import { Client } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
-import { execSync } from 'child_process';
 
 // Reads definitions
 import { heroProducts, featuredProducts, allProducts, type Product } from '../src/data/products';
@@ -159,10 +157,7 @@ async function uploadAndOverwriteImage(
 // ════════════════════════════════════════════════════════
 
 async function run() {
-  console.log("\n=== Phase 1: Running image optimization ===");
-  execSync("node scripts/optimize-images.mjs", { stdio: "inherit" });
-
-  console.log("\n=== Phase 2: Connecting to InsForge and fetching existing keys ===");
+  console.log("\n=== Phase 1: Connecting to InsForge and fetching existing keys ===");
   const admin = createAdminClient({ baseUrl: ossHost, apiKey });
   const existingKeys: Record<string, Set<string>> = {};
 
@@ -213,11 +208,11 @@ async function run() {
     urlMap.set(imgPath, url);
   }
 
-  console.log("\n=== Phase 3: Connecting to database ===");
+  console.log("\n=== Phase 2: Connecting to database ===");
   const client = new Client({ connectionString: DATABASE_URL });
   await client.connect();
 
-  console.log("\n=== Phase 4: Syncing products and details ===");
+  console.log("\n=== Phase 3: Syncing products and details ===");
   for (const product of uniqueProducts) {
     const imageUrl = urlMap.get(product.image) || product.image;
     console.log(`Syncing product: "${product.name}" (ID: ${product.id})`);
@@ -286,7 +281,7 @@ async function run() {
     }
   }
 
-  console.log("\n=== Phase 5: Syncing lookbook slides ===");
+  console.log("\n=== Phase 4: Syncing lookbook slides ===");
   for (const slide of lookbookSlides) {
     const imageUrl = urlMap.get(slide.originalImage) || slide.originalImage;
     console.log(`Syncing lookbook slide: ${slide.slideNumber}`);
@@ -309,7 +304,7 @@ async function run() {
     }
   }
 
-  console.log("\n=== Phase 6: Syncing editorial content ===");
+  console.log("\n=== Phase 5: Syncing editorial content ===");
   for (const item of editorialItems) {
     const imageUrl = urlMap.get(item.originalImage) || item.originalImage;
     console.log(`Syncing editorial item: "${item.id}"`);
