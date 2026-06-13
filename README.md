@@ -53,18 +53,18 @@ Follow the step-by-step guide in [`BACKEND_DEPLOYMENT.md`](BACKEND_DEPLOYMENT.md
 
 ### Seeding and Managing Data
 
-The project includes built-in scripts to manage the e-commerce catalog:
+The project includes built-in scripts to manage the e-commerce catalog, lookbook, and editorial content:
 
 * **First-time setup / Wiping & Seeding**:
-  Drops existing tables, verifies and wipes/recreates the storage bucket, recursively uploads all local assets, and seeds the DB.
-  ```bash
-  npx tsx scripts/upload-and-seed.mts --fresh
-  ```
-
-* **Incremental updates (Additive mode)**:
-  Checks existing items, uploads only new/missing images to storage, and seeds only new products without dropping tables.
+  Drops existing tables, creates/wipes/prepares three public storage buckets (`product-media`, `lookbook-media`, `editorial-media`), recursively uploads all local assets, and seeds the entire database from scratch.
   ```bash
   npx tsx scripts/upload-and-seed.mts
+  ```
+
+* **Updating catalog / Incremental updates**:
+  Updates existing product details and description, force-overwrites updated images in storage, and inserts any new products without dropping tables (preserving user accounts and orders).
+  ```bash
+  npx tsx scripts/update-catalog.mts
   ```
 
 * **Wipe a product (Database & Storage)**:
@@ -94,19 +94,26 @@ npm run dev
 | `/products/[slug]` | Dynamic (SSR) | Product detail view with progressive loading, size selection, specs |
 | `/checkout` | Static | Checkout form, summary pricing, masked PII confirmation |
 | `/story` | Static | Brand narrative, philosophy, parallax breakout, atelier section |
+| `/profile` | Static | User profile details and settings (auth-guarded) |
+| `/profile/orders` | Static | User purchase order history list (auth-guarded) |
+| `/login` | Static | User sign-in page |
+| `/register` | Static | User registration page |
 | `/api/products` | API | Database SELECT endpoint for catalog products |
 | `/api/products/[slug]` | API | Consolidated SELECT query for detail specifications, images, and sizes |
+| `/api/lookbook` | API | Database SELECT endpoint for lookbook slides |
+| `/api/editorial` | API | Database SELECT endpoint for editorial/story sections |
+| `/api/orders` | API | Create/retrieve order records linked to user profiles |
 
 ---
 
 ## Core Features
 
-- **Database-Driven Content**: Products, sizes, images, and specifications are fetched dynamically from a PostgreSQL database hosted on InsForge.
+- **Database-Driven Content**: Products, sizes, images, specifications, lookbook slides, and editorial story cards are fetched dynamically from a PostgreSQL database hosted on InsForge.
 - **Unified Querying**: `/api/products/[slug]` performs a single SQL query using PostgreSQL subqueries with `json_agg()` to retrieve base columns, sizes, details, and lookup images in a single connection.
 - **Initial Data Seeding (0ms Load Times)**: When opening a details page, TanStack Query pre-populates the details view using cached list data from the catalog. The user immediately sees the correct product image, title, and price, while descriptions and sizes load progressively in the background.
-- **InsForge Storage Integration**: All product, editorial, and lookbook WebP assets are served directly from the public InsForge `product-media` storage bucket.
-- **Row Level Security (RLS)**: Enforced database-level security policies (`Allow public read access`) permitting public `SELECT` lookups while restricting all `INSERT`/`UPDATE`/`DELETE` writes to administrators.
-- **Indexed Relationships**: Foreign keys on `product_images` and `product_details` are indexed to speed up database joins and handle cascading deletes efficiently.
+- **Multi-Bucket InsForge Storage**: Assets are routed and stored in three public InsForge buckets (`product-media`, `lookbook-media`, `editorial-media`) depending on their relative paths.
+- **Row Level Security (RLS)**: Enforced database-level security policies (`Allow public read access`) permitting public `SELECT` lookups while restricting all `INSERT`/`UPDATE`/`DELETE` writes to authenticated administrators.
+- **Indexed Relationships**: Foreign keys on `product_images`, `product_details`, and `orders` are indexed to speed up database joins and handle cascading deletes efficiently.
 
 ---
 
@@ -114,32 +121,34 @@ npm run dev
 
 ```
 scripts/
-├── upload-and-seed.mts              # Uploads images + seeds DB (--fresh for first-time, additive by default)
-├── create-tables.sql                # Standalone SQL DDL for manual use
+├── upload-and-seed.mts              # First-time setup / Wipes buckets & tables and seeds DB from scratch
+├── update-catalog.mts               # Safe catalog update / Optimizes, overwrites storage and upserts DB
+├── optimize-images.mjs              # Standardizes local image scaling and WebP conversion
+├── delete-product.mts               # Wipes a product and deletes its unused media assets
 src/
 ├── app/
-│   ├── checkout/page.tsx
-│   ├── products/
-│   │   ├── page.tsx
-│   │   ├── [slug]/page.tsx
-│   │   └── category/[category]/page.tsx
-│   ├── story/page.tsx
+│   ├── (auth)/                      # Login, Register pages
+│   ├── (store)/                     # catalog, checkout, story and details page wrapper group
+│   ├── (user)/                      # ProfileLayoutClient, ProfilePage, Orders list pages
+│   ├── api/                         # auth, products, orders, lookbook, and editorial endpoints
 │   ├── layout.tsx
 │   ├── providers.tsx               # TanStack QueryClient Provider wrapper
 │   └── globals.css
 │
 ├── components/
+│   ├── auth/          LoginForm, RegisterForm, LoginClient, RegisterClient
 │   ├── checkout/      CartEmptyState, CheckoutForm, CheckoutSuccess, OrderSummary, OrderSummaryContainer
 │   ├── landing/       FeaturedCollection, HeroSection, LookbookSlider, Newsletter, Testimonials
-│   ├── layout/        Footer, Navbar
+│   ├── layout/        Footer, Navbar, MobileMenu, NavbarProfileMenu
 │   ├── product/
 │   │   ├── listing/   CategoryFilter, PageHeader, ProductGrid
 │   │   └── detail/    Breadcrumbs, ImageGallery, ProductActions, ProductDetailClient, ProductDetailsTabs, ProductInfo, RelatedProducts, SizeGuideModal, SizeSelector
+│   ├── profile/       ProfileClient, ProfileForm, ProfileSidebar, ProfileWorkspace, OrdersClient, OrderCard, OrderDetailModal
 │   └── story/         AtelierSection, ParallaxBreakout, PhilosophySection, StoryCta, StoryHero
 │
-├── stores/            useCartStore (persisted to localStorage), useProductStore
-├── hooks/             queries (useProductsQuery, useProductDetailsQuery), useBodyScrollLock, useCarousel,
-│                      useCheckoutForm, useNavbarScroll, useRelatedProducts, useOrderPricing
-├── data/              navigation, products, testimonials
-└── utils/             cn.ts, db.ts (pg pool configuration), insforge.ts (BaaS client config)
+├── stores/            useCartStore, useAuthStore, useProductStore
+├── hooks/             queries (useProductsQuery, useLookbookQuery, etc.), useBodyScrollLock, useCarousel,
+│                      useCheckoutForm, useNavbarScroll, useRelatedProducts, useInitializeAuth, useOrders
+├── data/              navigation, products, lookbook, editorial, testimonials
+└── utils/             cn.ts, db.ts (pg pool), insforge.ts (BaaS configs), auth.ts, validation.ts
 ```
