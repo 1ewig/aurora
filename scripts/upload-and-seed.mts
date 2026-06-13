@@ -2,35 +2,14 @@
  * upload-and-seed.mts
  * ===================
  *
- * Uploads all images recursively to InsForge Storage and seeds the Aurora database.
+ * First-time setup / Wiping & Seeding script:
+ * - Verifies and wipes/recreates the three storage buckets (product-media, lookbook-media, editorial-media)
+ * - Drops and rebuilds all database tables (products, product_images, product_sizes, product_details, profiles, orders, lookbook_slides, editorial_content)
+ * - Recursively scans and uploads all local assets to storage
+ * - Seeds all catalog, lookbook slides, and editorial content into the database
  *
- * ── Usage ───────────────────────────────────────────────
- *
- *   First-time deploy (fresh project, empty DB, no images):
- *     npx tsx scripts/upload-and-seed.mts --fresh
- *
- *   Adding new products/images later (existing DB, incremental update):
- *     npx tsx scripts/upload-and-seed.mts
- *
- * ── Modes ───────────────────────────────────────────────
- *
- *   --fresh (flag):
- *     - Drops and recreates all 4 tables (products, product_images,
- *       product_sizes, product_details)
- *     - Verifies storage bucket. If missing, creates it. If it contains data,
- *       wipes the bucket clean and recreates it to prevent duplicates.
- *     - Recursively scans public/images/ and uploads all files to storage.
- *     - Inserts ALL products from src/data/products.ts
- *
- *   Additive (default, no flag):
- *     - Skips table/bucket recreation (keeps existing database records intact)
- *     - Auto-creates bucket if completely missing
- *     - Queries existing keys in the storage bucket and uploads only new/missing
- *       images recursively (skips existing images for performance)
- *     - Queries existing slugs from the DB upfront
- *     - Inserts only products whose slug is new (skips duplicates)
- *     - Appends related data (images, sizes, details) ONLY for newly inserted products
- *     - Safe to run repeatedly — existing data is never touched
+ * Usage:
+ *   npx tsx scripts/upload-and-seed.mts
  */
 
 import { createAdminClient } from '@insforge/sdk';
@@ -39,11 +18,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { execSync } from 'child_process';
 
-// Reads the static product definitions from src/data/products.ts.
-// To add new products, edit that file, then run this script without --fresh.
+// Reads the static definitions.
 import { heroProducts, featuredProducts, allProducts, type Product } from '../src/data/products';
-
-const isFresh = process.argv.includes('--fresh');
+import { lookbookSlides } from '../src/data/lookbook';
+import { editorialItems } from '../src/data/editorial';
 
 // ════════════════════════════════════════════════════════
 //  Credential loading
@@ -55,7 +33,7 @@ const dotenvPath = path.resolve(process.cwd(), '.env.local');
 if (!fs.existsSync(projectJsonPath)) {
   console.error(
     "Error: .insforge/project.json not found.\n" +
-    "Run `npx @insforge/cli create` (new project) or `npx @insforge/cli link` (existing project) first."
+    "Run `npx @insforge/cli create` or `npx @insforge/cli link` first."
   );
   process.exit(1);
 }
@@ -86,15 +64,8 @@ if (!DATABASE_URL) {
   process.exit(1);
 }
 
-// ════════════════════════════════════════════════════════
-//  Product deduplication
-//  heroProducts, featuredProducts, and allProducts share
-//  some slugs. This merges them, preferring non-hero IDs
-//  (hero entries have less metadata like span/aspectRatio).
-// ════════════════════════════════════════════════════════
-
+// Deduplicate products
 const productMap = new Map<string, Product>();
-
 function addProducts(products: Product[]) {
   for (const p of products) {
     const existing = productMap.get(p.slug);
@@ -111,14 +82,37 @@ function addProducts(products: Product[]) {
 addProducts(heroProducts);
 addProducts(featuredProducts);
 addProducts(allProducts);
-
 const uniqueProducts = Array.from(productMap.values());
 
 // ════════════════════════════════════════════════════════
-//  Helpers
+//  Buckets Configuration
 // ════════════════════════════════════════════════════════
 
-const BUCKET = 'product-media';
+const BUCKETS = {
+  products: 'product-media',
+  lookbook: 'lookbook-media',
+  editorial: 'editorial-media',
+};
+
+function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: string } {
+  if (localRelPath.startsWith('/images/lookbook/')) {
+    return {
+      bucket: BUCKETS.lookbook,
+      storageKey: localRelPath.replace(/^\/images\/lookbook\//, ''),
+    };
+  } else if (localRelPath.startsWith('/images/editorial/')) {
+    return {
+      bucket: BUCKETS.editorial,
+      storageKey: localRelPath.replace(/^\/images\/editorial\//, ''),
+    };
+  } else {
+    const key = localRelPath.replace(/^\/images\//, '');
+    return {
+      bucket: BUCKETS.products,
+      storageKey: key,
+    };
+  }
+}
 
 function getMimeType(filePath: string): string {
   const ext = path.extname(filePath).toLowerCase();
@@ -133,17 +127,11 @@ function getMimeType(filePath: string): string {
   return mime[ext] || 'application/octet-stream';
 }
 
-/** Build a deterministic storage URL from a bucket key. */
-function buildStorageUrl(bucketKey: string): string {
+function buildStorageUrl(bucketName: string, bucketKey: string): string {
   const encodedKey = bucketKey.split('/').map(encodeURIComponent).join('%2F');
-  return `${ossHost}/api/storage/buckets/product-media/objects/${encodedKey}`;
+  return `${ossHost}/api/storage/buckets/${bucketName}/objects/${encodedKey}`;
 }
 
-/**
- * Process items in fixed-size batches with Promise.allSettled.
- * Each batch runs up to `concurrency` items in parallel.
- * Useful for HTTP calls where too much concurrency overwhelms the server.
- */
 async function eachBatch<T>(
   items: T[],
   concurrency: number,
@@ -156,15 +144,6 @@ async function eachBatch<T>(
 
 // ════════════════════════════════════════════════════════
 //  Image resolution
-//  Returns the URL and a status string for logging.
-//
-//  In fresh mode (shouldUpload = true):
-//    Tries the SDK upload. If the file already exists or
-//    any error occurs, falls back to the constructed URL.
-//
-//  In additive mode (shouldUpload = false):
-//    Skips the SDK entirely — just constructs the URL.
-//    Images were already uploaded during the --fresh run.
 // ════════════════════════════════════════════════════════
 
 type ImageResult = {
@@ -175,7 +154,7 @@ type ImageResult = {
 async function resolveImage(
   admin: ReturnType<typeof createAdminClient>,
   localRelPath: string,
-  existingKeys: Set<string>,
+  existingKeys: Record<string, Set<string>>,
 ): Promise<ImageResult> {
   const fullPath = path.resolve(
     process.cwd(),
@@ -187,10 +166,10 @@ async function resolveImage(
     return { url: null, status: 'missing' };
   }
 
-  const storageKey = localRelPath.replace(/^\/images\//, '');
+  const { bucket, storageKey } = getBucketAndKey(localRelPath);
 
-  if (existingKeys.has(storageKey)) {
-    return { url: buildStorageUrl(storageKey), status: 'exists' };
+  if (existingKeys[bucket]?.has(storageKey)) {
+    return { url: buildStorageUrl(bucket, storageKey), status: 'exists' };
   }
 
   const buffer = fs.readFileSync(fullPath);
@@ -199,88 +178,112 @@ async function resolveImage(
   try {
     const blob = new Blob([buffer], { type: mimeType });
     const { data, error } = await admin.storage
-      .from(BUCKET)
+      .from(bucket)
       .upload(storageKey, blob);
 
     if (error) {
-      return { url: buildStorageUrl(storageKey), status: 'fallback',  };
+      return { url: buildStorageUrl(bucket, storageKey), status: 'fallback' };
     }
 
     const url = data?.url;
     if (!url) {
-      return { url: buildStorageUrl(storageKey), status: 'fallback' };
+      return { url: buildStorageUrl(bucket, storageKey), status: 'fallback' };
     }
 
     return { url, status: 'uploaded' };
   } catch {
-    return { url: buildStorageUrl(storageKey), status: 'fallback' };
+    return { url: buildStorageUrl(bucket, storageKey), status: 'fallback' };
   }
 }
 
 // ════════════════════════════════════════════════════════
-//  Main
+//  Main Seeding Logic
 // ════════════════════════════════════════════════════════
 
 async function seed() {
-  console.log(`\n=== Mode: ${isFresh ? '--fresh (wipe & re-seed)' : 'additive (new products only)'} ===\n`);
-
-  // ── 1. Admin client ──
+  console.log("\n=== Mode: Setup / Fresh seed (wipe & re-create) ===\n");
 
   console.log("Initializing InsForge admin client...");
   const admin = createAdminClient({ baseUrl: ossHost, apiKey });
 
-  // ── 1b. Verify and prepare storage bucket ──
-  console.log(`Verifying storage bucket "${BUCKET}"...`);
-  let bucketExists = false;
-  let hasData = false;
+  // Verify and prepare all three storage buckets
+  const bucketsList = execSync(`npx @insforge/cli storage buckets`, { encoding: 'utf-8' });
+  const existingKeys: Record<string, Set<string>> = {};
 
-  try {
-    const bucketsList = execSync(`npx @insforge/cli storage buckets`, { encoding: 'utf-8' });
-    bucketExists = bucketsList.includes(BUCKET);
-    
+  for (const [key, bucketName] of Object.entries(BUCKETS)) {
+    console.log(`Verifying storage bucket "${bucketName}"...`);
+    let bucketExists = bucketsList.includes(bucketName);
+    let hasData = false;
+
     if (bucketExists) {
-      const { data: listData } = await admin.storage.from(BUCKET).list({ limit: 1 });
-      const objects = (listData as any)?.data || (listData as any)?.objects;
-      if (objects && objects.length > 0) {
-        hasData = true;
+      try {
+        const { data: listData } = await admin.storage.from(bucketName).list({ limit: 1 });
+        const objects = (listData as any)?.data || (listData as any)?.objects;
+        if (objects && objects.length > 0) {
+          hasData = true;
+        }
+      } catch (err: any) {
+        console.warn(`Warning checking bucket "${bucketName}" status: ${err.message || err}`);
       }
     }
-  } catch (err: any) {
-    console.warn(`Warning checking bucket status: ${err.message || err}`);
-    bucketExists = false;
+
+    if (!bucketExists) {
+      console.log(`Bucket "${bucketName}" does not exist. Creating it...`);
+      try {
+        const createOut = execSync(`npx @insforge/cli storage create-bucket ${bucketName}`, { encoding: 'utf-8' });
+        console.log(createOut);
+      } catch (err: any) {
+        console.error(`Failed to create bucket "${bucketName}" via CLI:`, err.message || err);
+        process.exit(1);
+      }
+    } else if (hasData) {
+      console.log(`Bucket "${bucketName}" has existing data. Wiping and recreating bucket...`);
+      try {
+        const deleteOut = execSync(`npx @insforge/cli storage delete-bucket ${bucketName}`, { input: 'y\n', encoding: 'utf-8' });
+        console.log(deleteOut);
+        const createOut = execSync(`npx @insforge/cli storage create-bucket ${bucketName}`, { encoding: 'utf-8' });
+        console.log(createOut);
+      } catch (err: any) {
+        console.error(`Failed to recreate bucket "${bucketName}" via CLI:`, err.message || err);
+        process.exit(1);
+      }
+    }
+
+    // Populate existing keys
+    existingKeys[bucketName] = new Set<string>();
+    try {
+      const { data: listData } = await admin.storage.from(bucketName).list({ limit: 1000 });
+      const objects = (listData as any)?.data || (listData as any)?.objects || [];
+      for (const obj of objects) {
+        existingKeys[bucketName].add(obj.key);
+      }
+    } catch (err: any) {
+      console.warn(`Warning pre-populating keys for bucket "${bucketName}": ${err.message || err}`);
+    }
   }
 
-  if (!bucketExists) {
-    console.log(`Bucket "${BUCKET}" does not exist. Creating it...`);
-    try {
-      const createOut = execSync(`npx @insforge/cli storage create-bucket ${BUCKET}`, { encoding: 'utf-8' });
-      console.log(createOut);
-      console.log(`Successfully created bucket "${BUCKET}".`);
-    } catch (err: any) {
-      console.error(`Failed to create bucket "${BUCKET}" via CLI:`, err.message || err);
-      process.exit(1);
-    }
-  } else if (isFresh && hasData) {
-    console.log(`Bucket "${BUCKET}" has existing data. Wiping and recreating bucket...`);
-    try {
-      const deleteOut = execSync(`npx @insforge/cli storage delete-bucket ${BUCKET}`, { input: 'y\n', encoding: 'utf-8' });
-      console.log(deleteOut);
-      const createOut = execSync(`npx @insforge/cli storage create-bucket ${BUCKET}`, { encoding: 'utf-8' });
-      console.log(createOut);
-      console.log(`Successfully wiped and recreated bucket "${BUCKET}".`);
-    } catch (err: any) {
-      console.error(`Failed to recreate bucket "${BUCKET}" via CLI:`, err.message || err);
-      process.exit(1);
-    }
-  } else {
-    console.log(`Bucket "${BUCKET}" is ready.`);
-  }
-
-  // ── 2. Collect all unique image paths ──
-
+  // Collect all unique image paths from data structures
   const allImagePaths = new Set<string>();
 
-  // Collect all files from public/images recursively
+  // Add product images
+  for (const product of uniqueProducts) {
+    if (product.image) allImagePaths.add(product.image);
+    for (const img of product.images || []) {
+      allImagePaths.add(img);
+    }
+  }
+
+  // Add lookbook images
+  for (const slide of lookbookSlides) {
+    allImagePaths.add(slide.originalImage);
+  }
+
+  // Add editorial images
+  for (const item of editorialItems) {
+    allImagePaths.add(item.originalImage);
+  }
+
+  // Scan directories for other public images
   const publicDir = path.resolve(process.cwd(), 'public');
   const imagesDir = path.resolve(publicDir, 'images');
 
@@ -310,32 +313,8 @@ async function seed() {
     allImagePaths.add(img);
   }
 
-  for (const product of uniqueProducts) {
-    if (product.image) allImagePaths.add(product.image);
-    for (const img of product.images || []) {
-      allImagePaths.add(img);
-    }
-  }
-
-  // ── 3. Resolve image URLs ──
-
-  console.time(`  Images (${allImagePaths.size} files)`);
-
-  console.log(`\nResolving ${allImagePaths.size} images (bucket: "${BUCKET}")...\n`);
+  console.log(`\nResolving ${allImagePaths.size} images across buckets...\n`);
   
-  const existingKeys = new Set<string>();
-  if (bucketExists) {
-    try {
-      const { data: listData } = await admin.storage.from(BUCKET).list({ limit: 1000 });
-      const objects = (listData as any)?.data || (listData as any)?.objects || [];
-      for (const obj of objects) {
-        existingKeys.add(obj.key);
-      }
-    } catch (err: any) {
-      console.warn(`Warning pre-populating existing keys: ${err.message || err}`);
-    }
-  }
-
   const urlMap = new Map<string, string>();
 
   let uploaded = 0;
@@ -353,147 +332,46 @@ async function seed() {
     switch (status) {
       case 'uploaded':
         uploaded++;
-        console.log(`  ✓ ${label}`);
+        console.log(`  ✓ ${label} (uploaded)`);
         break;
       case 'exists':
         exists++;
-        console.log(`  ○ ${label}`);
+        console.log(`  ○ ${label} (exists)`);
         break;
       case 'fallback':
         exists++;
-        console.log(`  ○ ${label}`);
+        console.log(`  ○ ${label} (fallback)`);
         break;
       case 'missing':
         missing++;
-        console.warn(`  ✗ ${label}`);
+        console.warn(`  ✗ ${label} (missing)`);
         break;
     }
   });
 
-  console.timeEnd(`  Images (${allImagePaths.size} files)`);
-
-  if (isFresh) {
-    console.log(`  → ${uploaded} uploaded, ${missing} missing\n`);
-  } else {
-    console.log(`  → ${exists} resolved from bucket, ${missing} missing\n`);
-  }
-
-  // ── 4. Connect to the database ──
-
-  console.time('  Database connect');
-  console.log("Connecting to database...");
+  console.log(`\nConnecting to database...`);
   const client = new Client({ connectionString: DATABASE_URL });
   await client.connect();
-  console.timeEnd('  Database connect');
 
-  // ── 5. Create or verify tables ──
+  console.log("Dropping tables & executing create-tables.sql schema...");
+  await client.query(`
+    DROP TABLE IF EXISTS product_images CASCADE;
+    DROP TABLE IF EXISTS product_sizes CASCADE;
+    DROP TABLE IF EXISTS product_details CASCADE;
+    DROP TABLE IF EXISTS products CASCADE;
+    DROP TABLE IF EXISTS public.profiles CASCADE;
+    DROP TABLE IF EXISTS public.orders CASCADE;
+    DROP TABLE IF EXISTS public.lookbook_slides CASCADE;
+    DROP TABLE IF EXISTS public.editorial_content CASCADE;
+  `);
 
-  console.time('  Table setup');
+  const schemaSql = fs.readFileSync(path.resolve(process.cwd(), 'scripts', 'create-tables.sql'), 'utf-8');
+  await client.query(schemaSql);
 
-  if (isFresh) {
-    console.log("Creating tables (fresh)...");
-    await client.query(`
-      DROP TABLE IF EXISTS product_images CASCADE;
-      DROP TABLE IF EXISTS product_sizes CASCADE;
-      DROP TABLE IF EXISTS product_details CASCADE;
-      DROP TABLE IF EXISTS products CASCADE;
-
-      CREATE TABLE products (
-        id VARCHAR(50) PRIMARY KEY,
-        slug VARCHAR(100) UNIQUE NOT NULL,
-        name VARCHAR(255) NOT NULL,
-        category VARCHAR(50) NOT NULL,
-        price NUMERIC(10, 2) NOT NULL CHECK (price >= 0),
-        badge VARCHAR(50),
-        image TEXT NOT NULL,
-        alt_text TEXT NOT NULL,
-        span VARCHAR(50),
-        aspect_ratio VARCHAR(50),
-        description TEXT NOT NULL,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-      );
-
-      CREATE TABLE product_images (
-        id SERIAL PRIMARY KEY,
-        product_id VARCHAR(50) REFERENCES products(id) ON DELETE CASCADE,
-        image_url TEXT NOT NULL
-      );
-
-      CREATE TABLE product_sizes (
-        id SERIAL PRIMARY KEY,
-        product_id VARCHAR(50) REFERENCES products(id) ON DELETE CASCADE,
-        size VARCHAR(50) NOT NULL,
-        stock INT NOT NULL DEFAULT 10,
-        UNIQUE(product_id, size)
-      );
-
-      CREATE TABLE product_details (
-        id SERIAL PRIMARY KEY,
-        product_id VARCHAR(50) REFERENCES products(id) ON DELETE CASCADE,
-        detail TEXT NOT NULL
-      );
-    `);
-  } else {
-    const { rows } = await client.query(
-      "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"
-    );
-    const tableNames = rows.map((r: any) => r.table_name);
-    const needed = ['products', 'product_images', 'product_sizes', 'product_details'];
-    const missingTables = needed.filter((t) => !tableNames.includes(t));
-    if (missingTables.length > 0) {
-      console.error(
-        `Error: tables [${missingTables.join(', ')}] don't exist.\n` +
-        `Run with --fresh to create them, or run scripts/create-tables.sql manually.`
-      );
-      await client.end();
-      process.exit(1);
-    }
-  }
-
-  console.timeEnd('  Table setup');
-
-  // ── 6. Determine which products to insert ──
-
-  console.time('  Data insertion');
-
-  let existingSlugs = new Set<string>();
-
-  if (!isFresh) {
-    const { rows } = await client.query('SELECT slug FROM products');
-    existingSlugs = new Set(rows.map((r: any) => r.slug));
-  }
-
-  const toInsert = isFresh
-    ? uniqueProducts
-    : uniqueProducts.filter((p) => !existingSlugs.has(p.slug));
-
-  const skipped = uniqueProducts.length - toInsert.length;
-
-  if (toInsert.length === 0) {
-    console.log("\nNo new products to insert. Everything is up to date.");
-    console.timeEnd('  Data insertion');
-    await client.end();
-    return;
-  }
-
-  console.log(
-    isFresh
-      ? `\nInserting all ${toInsert.length} products...\n`
-      : `\nInserting ${toInsert.length} new product(s) (${skipped} already exist)...\n`
-  );
-
-  // ── 7. Insert products + related data ──
-
-  let totalImages = 0;
-  let totalSizes = 0;
-  let totalDetails = 0;
-
-  for (const product of toInsert) {
+  // ── Seeding Products ──
+  console.log(`Inserting ${uniqueProducts.length} products...`);
+  for (const product of uniqueProducts) {
     const imageUrl = urlMap.get(product.image) || product.image;
-
-    console.log(`  ${product.name}`);
-    console.log(`    ID: ${product.id}  |  Category: ${product.category}`);
-
     await client.query(
       `INSERT INTO products (
         id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description
@@ -509,7 +387,6 @@ async function seed() {
     const sizes = product.sizes ?? [];
     const details = product.details ?? [];
 
-    // Multi-row INSERT for gallery images
     if (images.length > 0) {
       const imgParams = images.map((_, i) => `($1, $${i + 2})`).join(', ');
       await client.query(
@@ -518,7 +395,6 @@ async function seed() {
       );
     }
 
-    // Multi-row INSERT for sizes (product_id reused as $1, each size+stock pair gets its own slot)
     if (sizes.length > 0) {
       const szParams: any[] = [product.id];
       const szPlaceholders = sizes.map((s) => {
@@ -531,7 +407,6 @@ async function seed() {
       );
     }
 
-    // Multi-row INSERT for details
     if (details.length > 0) {
       const detParams = details.map((_, i) => `($1, $${i + 2})`).join(', ');
       await client.query(
@@ -539,33 +414,32 @@ async function seed() {
         [product.id, ...details],
       );
     }
-
-    totalImages += images.length;
-    totalSizes += sizes.length;
-    totalDetails += details.length;
-
-    console.log(`    → ${images.length} gallery images, ${sizes.length} sizes, ${details.length} details\n`);
   }
 
-  console.timeEnd('  Data insertion');
-
-  // ── 8. Summary ──
-
-  const productWord = toInsert.length === 1 ? 'product' : 'products';
-
-  if (isFresh) {
-    console.log(`\n=== Done! ${toInsert.length} ${productWord} seeded into fresh tables. ===`);
-  } else {
-    console.log(
-      `\n=== Done! ${toInsert.length} new ${productWord} added. ` +
-      `${skipped} already existed and were left untouched. ===`
+  // ── Seeding Lookbook Slides ──
+  console.log("Seeding lookbook slides...");
+  for (const slide of lookbookSlides) {
+    const imageUrl = urlMap.get(slide.originalImage) || slide.originalImage;
+    await client.query(
+      `INSERT INTO lookbook_slides (slide_number, original_image, image_url, alt_text, tag, title, link)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [slide.slideNumber, slide.originalImage, imageUrl, slide.altText, slide.tag || null, slide.title || null, slide.link || null]
     );
   }
-  console.log(
-    `    Total: ${totalImages} gallery images, ${totalSizes} sizes, ${totalDetails} details\n`
-  );
+
+  // ── Seeding Editorial Content ──
+  console.log("Seeding editorial content...");
+  for (const item of editorialItems) {
+    const imageUrl = urlMap.get(item.originalImage) || item.originalImage;
+    await client.query(
+      `INSERT INTO editorial_content (id, original_image, image_url, alt_text, title, description)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [item.id, item.originalImage, imageUrl, item.altText, item.title, item.description || null]
+    );
+  }
 
   await client.end();
+  console.log("\n=== Seeding completed successfully. ===");
 }
 
 seed().catch((err) => {

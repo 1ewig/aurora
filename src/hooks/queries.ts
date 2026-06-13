@@ -57,3 +57,34 @@ export function useProductDetailsQuery(slug: string) {
   });
 }
 
+async function fetchLookbookSlides(): Promise<any[]> {
+  const response = await fetch('/api/lookbook');
+  if (!response.ok) {
+    throw new Error('Failed to fetch lookbook slides');
+  }
+  return response.json();
+}
+
+export function useLookbookQuery() {
+  return useQuery({
+    queryKey: ['lookbook'],
+    queryFn: fetchLookbookSlides,
+  });
+}
+
+async function fetchEditorialContent(): Promise<any[]> {
+  const response = await fetch('/api/editorial');
+  if (!response.ok) {
+    throw new Error('Failed to fetch editorial content');
+  }
+  return response.json();
+}
+
+export function useEditorialQuery() {
+  return useQuery({
+    queryKey: ['editorial'],
+    queryFn: fetchEditorialContent,
+  });
+}
+
+

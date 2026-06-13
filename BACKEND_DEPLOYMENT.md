@@ -80,49 +80,20 @@ You now have three values:
 
 ---
 
-## Step 5 — Create the storage bucket (Optional / Automated)
+## Step 5 — Create the storage buckets (Automated)
 
-The app stores product images in a bucket called `product-media`. 
+The application stores assets in three public buckets: `product-media`, `lookbook-media`, and `editorial-media`.
 
 > [!NOTE]
-> The seeding script in **Step 8** automatically verifies if the bucket exists. If it does not exist, the script automatically creates it and sets it to public. You can skip this step and let the seed script handle it.
-
-If you prefer to create it manually:
-
-```bash
-npx @insforge/cli storage create-bucket product-media
-```
-
-Verify the bucket exists:
-
-```bash
-npx @insforge/cli storage buckets
-```
+> This step is fully automated. The seeding script in **Step 7** automatically checks if these buckets exist. If they do not, it creates them and sets them to public. If they do, it wipes them clean to prevent duplicate files. You can skip this entirely.
 
 ---
 
-## Step 6 — Create database tables
+## Step 6 — Create database tables (Automated)
 
-There are two ways to do this — pick one.
+> [!NOTE]
+> This step is fully automated. The setup script in **Step 7** automatically loads [`scripts/create-tables.sql`](file:///c:/Users/moshu%20moshu/Desktop/aurora/scripts/create-tables.sql), drops any existing tables, and builds the database schema from scratch. You do not need to run this manually.
 
-### Option A — Via the InsForge Dashboard (recommended for first-time users)
-
-1. Open the InsForge Dashboard
-2. Go to your project → **SQL Editor** (or **Database** → **Query**)
-3. Copy the entire contents of `scripts/create-tables.sql`
-4. Paste and run
-
-### Option B — Via the CLI
-
-```bash
-npx @insforge/cli db query "$(cat scripts/create-tables.sql)"
-```
-
-This creates 4 tables:
-- `products` — base product info (name, price, slug, etc.)
-- `product_images` — multiple images per product
-- `product_sizes` — available sizes with stock counts
-- `product_details` — bullet-point detail lists
 
 ---
 
@@ -149,65 +120,32 @@ NEXT_PUBLIC_INSFORGE_ANON_KEY="your-anon-key"
 
 ## Step 8 — Upload images and seed the database
 
-For a **first-time deploy**, run with the `--fresh` flag:
-
-```bash
-npx tsx scripts/upload-and-seed.mts --fresh
-```
-
-This performs automated setup and seeding:
-1. **Bucket Verification & Automated Wipe**: 
-   - Checks if the `product-media` bucket exists. If missing, it automatically creates it and configures it public.
-   - If the bucket exists and contains data, it automatically wipes it clean and recreates it (to prevent name collisions or duplicate versions like `image (1).webp`).
-2. **Recursive Image Scan**: Recursively crawls `public/images/` to scan and upload **all** local images (products, lookbooks, and editorial assets) to storage.
-3. **Database Tables**: Drops and creates all 4 database tables.
-4. **Data Seeding**: Seeds all products, gallery image relations, sizes, and detail bullets.
-
-You'll see output like:
-
-```
-Mode: --fresh (wipe & re-seed)
-
-Initializing admin client...
-
-Uploading 21 unique images to bucket "product-media"...
-
-  ✓ products/hero-product-1.webp
-  ✓ products/hero-product-2.webp
-  ✓ lookbook/lookbook-1.webp
-  ...
-
-Images: 21 uploaded/skipped, 0 failed
-
-Connecting to database...
-Connected.
-
-Creating tables (fresh)...
-
-Seeding product: Ivory Wool Overcoat (f1)
-Seeding product: Camel Cashmere Turtleneck (h2)
-...
-
-Done! 14 products seeded into fresh tables.
-```
-
----
-
-## Adding more products later
-
-When you add new products to `src/data/products.ts`, run the script **without** `--fresh`:
+For a **first-time setup or clean reset**, run the seeding script:
 
 ```bash
 npx tsx scripts/upload-and-seed.mts
 ```
 
-In this mode (additive, the default):
-- **Tables are never dropped** — existing products stay untouched
-- **Images are only uploaded if new** — existing files in the bucket are skipped
-- **Only new slugs are inserted** — products whose `slug` already exists in the DB are skipped
-- **Related data** (images, sizes, details) is only added for newly inserted products
+This performs a completely automated setup and seeding:
+1. **Multi-Bucket Verification & Wipe**: Checks and prepares three buckets: `product-media`, `lookbook-media`, and `editorial-media`. If missing, it creates them. If they exist with data, it wipes them to prevent name collisions.
+2. **Recursive Image Scan & Route**: Uploads all local assets recursively to their corresponding storage buckets (`/images/lookbook/*` -> `lookbook-media`, `/images/editorial/*` -> `editorial-media`, and products -> `product-media`).
+3. **Database Schema Creation**: Automatically drops existing tables and executes [`scripts/create-tables.sql`](file:///c:/Users/moshu%20moshu/Desktop/aurora/scripts/create-tables.sql) to build the database from scratch.
+4. **Data Seeding**: Seeds all products, gallery image relations, sizes, detail bullets, lookbook slides, and editorial content.
 
-Safe to run repeatedly — if nothing is new, it reports "No new products to insert" and exits.
+---
+
+## Adding more products or updating content later
+
+To add new products, update existing descriptions, or replace lookbook/editorial images without wiping your database (preserving orders and user accounts), run the update catalog script:
+
+```bash
+npx tsx scripts/update-catalog.mts
+```
+
+In this mode:
+- **Tables are never dropped** — existing user profiles and orders are preserved.
+- **Data is updated/inserted (upserted)** — updates existing records and inserts new ones.
+- **Images are force-overwritten** — deletes existing keys in storage before uploading new versions, ensuring lookbook/editorial image updates are instantly replaced.
 
 ---
 
@@ -246,8 +184,9 @@ If you're deploying to Vercel or another platform, set the same three environmen
 |---|---|
 | Auto-generated by `npx @insforge/cli create` | `.insforge/project.json` |
 | You create manually | `.env.local` (from `.env.example`) |
-| Run via dashboard or CLI | `scripts/create-tables.sql` |
-| Run via `npx tsx` | `scripts/upload-and-seed.mts` (`--fresh` for first-time, no flag for later additions) |
+| Handled automatically | `scripts/create-tables.sql` (schema definitions) |
+| Setup and clean seed script | `scripts/upload-and-seed.mts` |
+| Catalog update script | `scripts/update-catalog.mts` |
 
 Everything else is committed to the repository and ready to use.
 
@@ -259,7 +198,7 @@ Everything else is committed to the repository and ready to use.
 |---|---|---|
 | `insforge: command not found` | CLI not installed | Use `npx @insforge/cli ...` (no global install needed) |
 | `DATABASE_URL not found` | `.env.local` missing or misconfigured | Copy `.env.example` → `.env.local` and fill in the values |
-| `relation "products" does not exist` | Tables not created | Run `scripts/create-tables.sql` (Step 6) |
-| `bucket product-media does not exist` | Bucket not created | Run `npx @insforge/cli storage create-bucket product-media` (Step 5) |
-| Images show as broken | Bucket is private | Buckets are public by default, but verify: if private, re-create with `npx @insforge/cli storage delete-bucket product-media` then `npx @insforge/cli storage create-bucket product-media` |
+| `relation "products" does not exist` | Tables not created | Run `npx tsx scripts/upload-and-seed.mts` to automatically build schema |
+| `bucket product-media does not exist` | Bucket not created | Run `npx tsx scripts/upload-and-seed.mts` to automatically create buckets |
+| Images show as broken | Bucket is private | Buckets are public by default, but verify: if private, run setup script to recreate them |
 | Build fails with type errors | Check for missing types | Run `npm install` again |

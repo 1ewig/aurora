@@ -5,8 +5,21 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { fadeInUp, staggerContainer } from "@/animations/variants";
 import { getStorageUrl } from "@/utils/insforge";
+import { useEditorialQuery } from "@/hooks/queries";
 
 export function AtelierSection() {
+  const { data: editorialItems = [] } = useEditorialQuery();
+  const loomItem = editorialItems.find(item => item.id === 'loom');
+  const foldingItem = editorialItems.find(item => item.id === 'folding');
+
+  const loomImg = loomItem?.imageUrl || getStorageUrl("/images/editorial/loom.webp");
+  const loomAlt = loomItem?.altText || "Wool loom detail";
+  const loomTitle = loomItem?.title || "The Historic Mills";
+  const loomDesc = loomItem?.description || "A garment is only as good as the fibers it's made from. We work exclusively with generational family-owned mills in Biella, Italy for our virgin wool blends, and heritage spinning ateliers in Scotland for Mongolian cashmere.";
+
+  const foldingImg = foldingItem?.imageUrl || getStorageUrl("/images/editorial/folding.webp");
+  const foldingAlt = foldingItem?.altText || "Cashmere folding";
+
   return (
     <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto py-12">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
@@ -21,10 +34,10 @@ export function AtelierSection() {
             <EyebrowLabel>Origin Matters</EyebrowLabel>
           </motion.div>
           <motion.h2 variants={fadeInUp} className="font-sans font-black text-3xl md:text-4xl tracking-tight text-text-primary uppercase">
-            The Historic Mills.
+            {loomTitle}.
           </motion.h2>
           <motion.p variants={fadeInUp} className="text-text-secondary leading-relaxed text-sm md:text-base">
-            A garment is only as good as the fibers it&apos;s made from. We work exclusively with generational family-owned mills in Biella, Italy for our virgin wool blends, and heritage spinning ateliers in Scotland for Mongolian cashmere.
+            {loomDesc}
           </motion.p>
           <motion.p variants={fadeInUp} className="text-text-secondary leading-relaxed text-sm md:text-base">
             These partnerships are built on transparency, fair practice, and a mutual obsession with quality. By selecting fibers that are spun to retain their natural resiliency, our clothing grows softer with age and resists wear.
@@ -39,16 +52,16 @@ export function AtelierSection() {
         >
           <div className="relative aspect-[3/4] bg-border-subtle rounded-xl overflow-hidden">
             <OptimizedImage
-              src={getStorageUrl("/images/lookbook/lookbook-1.webp")}
-              alt="Wool loom detail"
+              src={loomImg}
+              alt={loomAlt}
               className="w-full h-full object-cover"
               sizes="(max-width: 1024px) 50vw, 30vw"
             />
           </div>
           <div className="relative aspect-[3/4] bg-border-subtle rounded-xl overflow-hidden mt-8">
             <OptimizedImage
-              src={getStorageUrl("/images/lookbook/lookbook-2.webp")}
-              alt="Cashmere folding"
+              src={foldingImg}
+              alt={foldingAlt}
               className="w-full h-full object-cover"
               sizes="(max-width: 1024px) 50vw, 30vw"
             />

@@ -4,46 +4,53 @@ import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { useCarousel } from "@/hooks/useCarousel";
 import { getStorageUrl } from "@/utils/insforge";
-
-const slides = [
-  {
-    src: getStorageUrl("/images/lookbook/lookbook-1.webp"),
-    alt: "Woman in tailored cream overcoat walking through European cobblestone street at golden hour",
-    caption: "Look 01 — The Overcoat",
-  },
-  {
-    src: getStorageUrl("/images/lookbook/lookbook-2.webp"),
-    alt: "Female model in all-white minimalist look in brutalist concrete architecture",
-    caption: "Look 02 — The White Study",
-  },
-  {
-    src: getStorageUrl("/images/lookbook/lookbook-3.webp"),
-    alt: "Model in earth-tone outfit in a mid-century modern interior",
-    caption: "Look 03 — The Interior",
-  },
-  {
-    src: getStorageUrl("/images/lookbook/lookbook-4.webp"),
-    alt: "Solitary figure in charcoal coat in a misty forest at dawn",
-    caption: "Look 04 — The Drift",
-  },
-  {
-    src: getStorageUrl("/images/lookbook/lookbook-5.webp"),
-    alt: "Model in structured black blazer on rooftop at blue hour",
-    caption: "Look 05 — Blue Hour",
-  },
-  {
-    src: getStorageUrl("/images/lookbook/lookbook-6.webp"),
-    alt: "Model in champagne slip dress in gallery-white studio space",
-    caption: "Look 06 — The Studio",
-  },
-];
+import { useLookbookQuery } from "@/hooks/queries";
+import Link from "next/link";
 
 export function LookbookSlider() {
+  const { data: dbSlides = [] } = useLookbookQuery();
+
+  const fallbackSlides = [
+    {
+      imageUrl: getStorageUrl("/images/lookbook/lookbook-1.webp"),
+      altText: "Woman in tailored cream overcoat walking through European cobblestone street at golden hour",
+      title: "Look 01 — The Overcoat",
+    },
+    {
+      imageUrl: getStorageUrl("/images/lookbook/lookbook-2.webp"),
+      altText: "Female model in all-white minimalist look in brutalist concrete architecture",
+      title: "Look 02 — The White Study",
+    },
+    {
+      imageUrl: getStorageUrl("/images/lookbook/lookbook-3.webp"),
+      altText: "Model in earth-tone outfit in a mid-century modern interior",
+      title: "Look 03 — The Interior",
+    },
+    {
+      imageUrl: getStorageUrl("/images/lookbook/lookbook-4.webp"),
+      altText: "Solitary figure in charcoal coat in a misty forest at dawn",
+      title: "Look 04 — The Drift",
+    },
+    {
+      imageUrl: getStorageUrl("/images/lookbook/lookbook-5.webp"),
+      altText: "Model in structured black blazer on rooftop at blue hour",
+      title: "Look 05 — Blue Hour",
+    },
+    {
+      imageUrl: getStorageUrl("/images/lookbook/lookbook-6.webp"),
+      altText: "Model in champagne slip dress in gallery-white studio space",
+      title: "Look 06 — The Studio",
+    },
+  ];
+
+  const slides = dbSlides.length > 0 ? dbSlides : fallbackSlides;
+
   const { current, direction, next, prev, goTo } = useCarousel({
     length: slides.length,
     interval: 6000,
     autoResumeDelay: 10000,
   });
+
 
   return (
     <section
@@ -70,8 +77,8 @@ export function LookbookSlider() {
             className="absolute inset-0"
           >
             <OptimizedImage
-              src={slides[current].src}
-              alt={slides[current].alt}
+              src={slides[current].imageUrl}
+              alt={slides[current].altText}
               className="w-full h-full object-cover object-center"
             />
 
@@ -80,14 +87,22 @@ export function LookbookSlider() {
 
             {/* Caption */}
             <figcaption className="absolute bottom-8 right-8 text-white/70 text-xs tracking-[0.15em] uppercase font-mono">
-              {slides[current].caption} / {current + 1} of {slides.length}
+              {slides[current].title} / {current + 1} of {slides.length}
             </figcaption>
 
             {/* Watch button overlay */}
             <div className="absolute bottom-8 left-8">
-              <button className="px-5 py-2 rounded-full border border-white/50 text-white text-sm font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors">
-                Watch
-              </button>
+              {slides[current].link ? (
+                <Link href={slides[current].link} className="inline-block">
+                  <button className="px-5 py-2 rounded-full border border-white/50 text-white text-sm font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors cursor-pointer">
+                    Shop Look
+                  </button>
+                </Link>
+              ) : (
+                <button className="px-5 py-2 rounded-full border border-white/50 text-white text-sm font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors">
+                  Watch
+                </button>
+              )}
             </div>
           </motion.figure>
         </AnimatePresence>

@@ -39,7 +39,7 @@ export const heroProducts: Product[] = [
     price: 1290,
     badge: "New",
     image: "/images/products/hero-product-1.webp",
-    images: ["/images/products/hero-product-1.webp", "/images/lookbook/lookbook-1.webp", "/images/lookbook/lookbook-3.webp"],
+    images: ["/images/products/hero-product-1.webp"],
     altText: "Ivory cream wool overcoat on seamless white background",
     description: "An elegant, double-breasted overcoat tailored from premium Italian virgin wool. Designed with a structured drape, classic notch lapels, and a belted waist for a sophisticated silhouette that elevates any winter ensemble.",
     details: [
@@ -59,7 +59,7 @@ export const heroProducts: Product[] = [
     category: "Knitwear",
     price: 485,
     image: "/images/products/hero-product-2.webp",
-    images: ["/images/products/hero-product-2.webp", "/images/lookbook/lookbook-2.webp", "/images/lookbook/lookbook-5.webp"],
+    images: ["/images/products/hero-product-2.webp"],
     altText: "Camel cashmere turtleneck sweater folded on marble surface",
     description: "Indulgently soft and exceptionally warm, this turtleneck is knitted from 100% grade-A Mongolian cashmere. Its classic rib-knit details and relaxed fit offer effortless luxury for cold-weather layering.",
     details: [
@@ -80,7 +80,7 @@ export const heroProducts: Product[] = [
     price: 890,
     badge: "Limited",
     image: "/images/products/hero-product-3.webp",
-    images: ["/images/products/hero-product-3.webp", "/images/lookbook/lookbook-3.webp", "/images/lookbook/lookbook-6.webp"],
+    images: ["/images/products/hero-product-3.webp"],
     altText: "Ecru linen blazer on ghost mannequin with side lighting",
     description: "Lightweight and unstructured, this ecru blazer is woven from premium French flax linen. Ideal for warm climates, it combines casual elegance with structured lapels and clean pocket detailing.",
     details: [
@@ -100,7 +100,7 @@ export const heroProducts: Product[] = [
     category: "Trousers",
     price: 395,
     image: "/images/products/hero-product-4.webp",
-    images: ["/images/products/hero-product-4.webp", "/images/lookbook/lookbook-4.webp", "/images/lookbook/lookbook-2.webp"],
+    images: ["/images/products/hero-product-4.webp"],
     altText: "Charcoal wide-leg tailored trousers styled with white shirt",
     description: "Tailored to sit high on the waist, these trousers feature structured pleats and a flowing wide-leg cut. Made from mid-weight wool crepe, they offer comfort, fluidity, and timeless styling versatility.",
     details: [
@@ -121,7 +121,7 @@ export const heroProducts: Product[] = [
     price: 720,
     badge: "New",
     image: "/images/products/hero-product-5.webp",
-    images: ["/images/products/hero-product-5.webp", "/images/lookbook/lookbook-5.webp", "/images/lookbook/lookbook-1.webp"],
+    images: ["/images/products/hero-product-5.webp"],
     altText: "Champagne gold silk slip dress hanging on brass rail",
     description: "A liquid-like drape crafted from heavyweight 19mm mulberry silk. Cut on the bias to hug contours gracefully, this slip dress features a refined V-neckline and adjustable spaghetti straps for a perfect fit.",
     details: [
@@ -145,7 +145,7 @@ export const featuredProducts: Product[] = [
     price: 1290,
     badge: "New",
     image: "/images/products/hero-product-1.webp",
-    images: ["/images/products/hero-product-1.webp", "/images/lookbook/lookbook-1.webp", "/images/lookbook/lookbook-3.webp"],
+    images: ["/images/products/hero-product-1.webp"],
     altText: "Ivory cream wool overcoat",
     span: "lg:col-span-2",
     aspectRatio: "aspect-[3/4]",
@@ -168,7 +168,7 @@ export const featuredProducts: Product[] = [
     price: 890,
     badge: "Limited",
     image: "/images/products/hero-product-3.webp",
-    images: ["/images/products/hero-product-3.webp", "/images/lookbook/lookbook-3.webp", "/images/lookbook/lookbook-6.webp"],
+    images: ["/images/products/hero-product-3.webp"],
     altText: "Ecru linen blazer",
     span: "lg:col-span-1",
     aspectRatio: "aspect-square",
@@ -191,7 +191,7 @@ export const featuredProducts: Product[] = [
     price: 720,
     badge: "New",
     image: "/images/products/hero-product-5.webp",
-    images: ["/images/products/hero-product-5.webp", "/images/lookbook/lookbook-5.webp", "/images/lookbook/lookbook-1.webp"],
+    images: ["/images/products/hero-product-5.webp"],
     altText: "Champagne silk slip dress",
     span: "lg:col-span-2",
     aspectRatio: "aspect-[3/4]",
@@ -216,7 +216,7 @@ export const allProducts: Product[] = [
     category: "Outerwear",
     price: 1150,
     image: "/images/products/camel-wrap-coat.webp",
-    images: ["/images/products/camel-wrap-coat.webp", "/images/lookbook/lookbook-2.webp"],
+    images: ["/images/products/camel-wrap-coat.webp"],
     altText: "Camel wrap coat",
     description: "A signature wrap coat crafted from pure camel hair. Unlined and finished with hand-stitched details, this piece features a self-tie belt, generous lapels, and deep patch pockets for unmatched style and warmth.",
     details: [
@@ -237,7 +237,7 @@ export const allProducts: Product[] = [
     price: 1390,
     badge: "Limited",
     image: "/images/products/ebony-wool-overcoat.webp",
-    images: ["/images/products/ebony-wool-overcoat.webp", "/images/lookbook/lookbook-4.webp"],
+    images: ["/images/products/ebony-wool-overcoat.webp"],
     altText: "Ebony wool overcoat with peak lapels",
     description: "A sharp, tailored overcoat crafted from heavy felted wool. It features dramatic peak lapels, a double-breasted closure, and deep ebony tones, offering a strong structure and superior protection against elements.",
     details: [
@@ -257,7 +257,7 @@ export const allProducts: Product[] = [
     category: "Accessories",
     price: 195,
     image: "/images/products/silk-scarf-amber.webp",
-    images: ["/images/products/silk-scarf-amber.webp", "/images/lookbook/lookbook-6.webp"],
+    images: ["/images/products/silk-scarf-amber.webp"],
     altText: "Silk scarf in amber gold",
     description: "A luxurious square scarf rendered in deep amber hues. Made from lightweight silk twill, it is hand-rolled and finished with an artistic abstract print, making it the perfect refined accent for any neck, hair, or handbag.",
     details: [
@@ -277,7 +277,7 @@ export const allProducts: Product[] = [
     category: "Knitwear",
     price: 325,
     image: "/images/products/charcoal-merino-crewneck.webp",
-    images: ["/images/products/charcoal-merino-crewneck.webp", "/images/lookbook/lookbook-2.webp"],
+    images: ["/images/products/charcoal-merino-crewneck.webp"],
     altText: "Charcoal merino wool crewneck sweater",
     description: "Knitted from fine Australian merino wool, this crewneck is soft, lightweight, and insulating. Featuring a tailored fit and classic neck line, it's a versatile building block for modular modern wardrobes.",
     details: [
@@ -297,7 +297,7 @@ export const allProducts: Product[] = [
     category: "Trousers",
     price: 450,
     image: "/images/products/black-tailored-trousers.webp",
-    images: ["/images/products/black-tailored-trousers.webp", "/images/lookbook/lookbook-1.webp"],
+    images: ["/images/products/black-tailored-trousers.webp"],
     altText: "Black tailored dress trousers",
     description: "Crafted from a fine wool and silk blend, these trousers offer a sharp crease, slim-straight leg, and clean waistband details. A foundational piece designed for longevity and timeless appeal.",
     details: [
@@ -318,7 +318,7 @@ export const allProducts: Product[] = [
     price: 890,
     badge: "New",
     image: "/images/products/emerald-velvet-midi-dress.webp",
-    images: ["/images/products/emerald-velvet-midi-dress.webp", "/images/lookbook/lookbook-5.webp"],
+    images: ["/images/products/emerald-velvet-midi-dress.webp"],
     altText: "Emerald green velvet midi dress",
     description: "Capturing a deep, luminous green, this midi dress is crafted from rich silk velvet. It is shaped with long sleeves, a mock neck, and a delicate tie back, creating an elegant and striking evening statement.",
     details: [
@@ -338,7 +338,7 @@ export const allProducts: Product[] = [
     category: "Accessories",
     price: 240,
     image: "/images/products/leather-belt-oak.webp",
-    images: ["/images/products/leather-belt-oak.webp", "/images/lookbook/lookbook-4.webp"],
+    images: ["/images/products/leather-belt-oak.webp"],
     altText: "Oak brown leather belt with brass buckle",
     description: "A solid, vegetable-tanned full-grain leather belt in deep oak brown. Finished with a hand-burnished edge and a solid brass buckle, it is designed to age beautifully and develop a rich, personal patina over time.",
     details: [
@@ -358,7 +358,7 @@ export const allProducts: Product[] = [
     category: "Outerwear",
     price: 980,
     image: "/images/products/navy-wool-peacoat.webp",
-    images: ["/images/products/navy-wool-peacoat.webp", "/images/lookbook/lookbook-3.webp"],
+    images: ["/images/products/navy-wool-peacoat.webp"],
     altText: "Navy blue wool peacoat",
     description: "A nautical classic reinterpreted. Made from robust Melton wool, this double-breasted peacoat features wide lapels, anchor-engraved buttons, and warm moleskin-lined pockets for ultimate comfort.",
     details: [
@@ -379,7 +379,7 @@ export const allProducts: Product[] = [
     price: 520,
     badge: "New",
     image: "/images/products/ivory-cashmere-cardigan.webp",
-    images: ["/images/products/ivory-cashmere-cardigan.webp", "/images/lookbook/lookbook-1.webp"],
+    images: ["/images/products/ivory-cashmere-cardigan.webp"],
     altText: "Ivory cashmere cardigan",
     description: "A soft, cocooning cardigan knitted from organic Mongolian cashmere. Designed with an oversized fit, low V-neckline, and horn buttons, it provides a warm layer of relaxed sophistication.",
     details: [

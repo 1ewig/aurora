@@ -19,7 +19,7 @@ async function optimizeDir(subDir = "") {
     const entryPath = join(subDir, entry.name);
     if (entry.isDirectory()) {
       await optimizeDir(entryPath);
-    } else if (entry.isFile() && /\.jpe?g$/i.test(entry.name)) {
+    } else if (entry.isFile() && /\.(jpe?g|png)$/i.test(entry.name)) {
       const { name } = parse(entry.name);
       const inputPath = join(INPUT_DIR, entryPath);
       const outputPath = join(OUTPUT_DIR, join(subDir, `${name}.webp`));

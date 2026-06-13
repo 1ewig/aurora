@@ -2,13 +2,19 @@
 
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { getStorageUrl } from "@/utils/insforge";
+import { useLookbookQuery } from "@/hooks/queries";
 
 export function ParallaxBreakout() {
+  const { data: dbSlides = [] } = useLookbookQuery();
+  const slide3 = dbSlides.find(s => s.slideNumber === 3);
+  const src = slide3?.imageUrl || getStorageUrl("/images/lookbook/lookbook-3.webp");
+  const alt = slide3?.altText || "Extrafine fabric detail view";
+
   return (
     <section className="my-20 relative h-[70vh] md:h-[85vh] bg-border-subtle overflow-hidden">
       <OptimizedImage
-        src={getStorageUrl("/images/lookbook/lookbook-3.webp")}
-        alt="Extrafine fabric detail view"
+        src={src}
+        alt={alt}
         className="w-full h-full object-cover object-center scale-105"
       />
       <div className="absolute inset-0 bg-bg-ink/25 backdrop-blur-[1px] flex items-center justify-center">

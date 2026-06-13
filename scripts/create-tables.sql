@@ -99,3 +99,45 @@ CREATE TRIGGER on_auth_user_updated
   WHEN (old.profile IS DISTINCT FROM new.profile)
   EXECUTE FUNCTION public.handle_user_update();
 
+-- Add orders table for purchase history
+CREATE TABLE IF NOT EXISTS orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  order_number VARCHAR(50) UNIQUE NOT NULL,
+  items JSONB NOT NULL,
+  subtotal NUMERIC(10,2) NOT NULL,
+  shipping NUMERIC(10,2) NOT NULL DEFAULT 0,
+  tax NUMERIC(10,2) NOT NULL DEFAULT 0,
+  total NUMERIC(10,2) NOT NULL,
+  shipping_address JSONB NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'confirmed',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_order_number ON orders(order_number);
+
+-- Lookbook slides table
+CREATE TABLE IF NOT EXISTS public.lookbook_slides (
+  id SERIAL PRIMARY KEY,
+  slide_number INT UNIQUE NOT NULL,
+  original_image TEXT NOT NULL,
+  image_url TEXT NOT NULL,
+  alt_text TEXT NOT NULL,
+  tag VARCHAR(50),
+  title VARCHAR(255),
+  link VARCHAR(255)
+);
+
+-- Editorial content table
+CREATE TABLE IF NOT EXISTS public.editorial_content (
+  id VARCHAR(50) PRIMARY KEY,
+  original_image TEXT NOT NULL,
+  image_url TEXT NOT NULL,
+  alt_text TEXT NOT NULL,
+  title VARCHAR(255),
+  description TEXT
+);
+
+
+
