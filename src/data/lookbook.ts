@@ -33,9 +33,9 @@ export const lookbookSlides: LookbookSlide[] = [
     originalImage: "/images/lookbook/lookbook-3.webp",
     imageUrl: "",
     altText: "Model in earth-tone outfit in a mid-century modern interior",
-    tag: "Outerwear",
+    tag: "Knitwear",
     title: "Look 03 — The Interior",
-    link: "/products/camel-wrap-coat"
+    link: "/products/camel-knit-cardigan"
   },
   {
     slideNumber: 4,
@@ -44,7 +44,7 @@ export const lookbookSlides: LookbookSlide[] = [
     altText: "Solitary figure in charcoal coat in a misty forest at dawn",
     tag: "Outerwear",
     title: "Look 04 — The Drift",
-    link: "/products/ebony-wool-overcoat"
+    link: "/products/charcoal-belted-overcoat"
   },
   {
     slideNumber: 5,
@@ -53,7 +53,7 @@ export const lookbookSlides: LookbookSlide[] = [
     altText: "Model in structured black blazer on rooftop at blue hour",
     tag: "Outerwear",
     title: "Look 05 — Blue Hour",
-    link: "/products/black-tailored-trousers"
+    link: "/products/structured-black-blazer"
   },
   {
     slideNumber: 6,
