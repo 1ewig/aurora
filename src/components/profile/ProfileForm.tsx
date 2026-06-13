@@ -62,6 +62,7 @@ export function ProfileForm({
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
+            maxLength={50}
             className="w-full px-4 sm:px-5 py-3 sm:py-3.5 bg-bg-primary border border-border-medium rounded-full focus:border-accent-primary focus:outline-none transition-colors text-xs sm:text-sm"
             placeholder="e.g. Jean Doe"
           />

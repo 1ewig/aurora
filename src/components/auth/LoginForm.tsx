@@ -9,6 +9,7 @@ interface LoginFormProps {
   password: string;
   setPassword: (val: string) => void;
   formError: string;
+  successMsg?: string;
   onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -35,6 +36,7 @@ export function LoginForm({
   password,
   setPassword,
   formError,
+  successMsg,
   onSubmit,
 }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
@@ -116,6 +118,12 @@ export function LoginForm({
           {formError && (
             <div className="text-xs text-error font-medium px-1">
               {formError}
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="text-xs text-success font-medium px-1">
+              {successMsg}
             </div>
           )}
 
