@@ -1,5 +1,4 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { updateSession } from "@insforge/sdk/ssr";
 
 const protectedPaths = ["/profile"];
 
@@ -9,6 +8,21 @@ function isProtectedPath(pathname: string): boolean {
   );
 }
 
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const payload = token.split(".")[1];
+    return JSON.parse(atob(payload));
+  } catch {
+    return null;
+  }
+}
+
+function isJwtExpired(token: string, leewaySeconds = 60): boolean {
+  const decoded = decodeJwtPayload(token);
+  if (!decoded?.exp || typeof decoded.exp !== "number") return true;
+  return decoded.exp * 1000 <= Date.now() + leewaySeconds * 1000;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -16,24 +30,65 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const response = NextResponse.next({ request });
+  const accessToken = request.cookies.get("insforge_access_token")?.value;
+  const refreshToken = request.cookies.get("insforge_refresh_token")?.value;
 
-  await updateSession({
-    requestCookies: request.cookies as any,
-    responseCookies: response.cookies as any,
-  });
-
-  const existingToken = request.cookies.get("insforge_access_token")?.value;
-  const refreshedToken = response.cookies.get("insforge_access_token")?.value;
-  const accessToken = refreshedToken || existingToken;
-
-  if (!accessToken) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+  if (accessToken && !isJwtExpired(accessToken)) {
+    return NextResponse.next();
   }
 
-  return response;
+  if (refreshToken) {
+    const baseUrl = process.env.NEXT_PUBLIC_INSFORGE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY;
+
+    if (baseUrl && anonKey) {
+      try {
+        const res = await fetch(
+          `${baseUrl}/api/auth/refresh?client_type=mobile`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${anonKey}`,
+            },
+            body: JSON.stringify({ refresh_token: refreshToken }),
+          }
+        );
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.accessToken) {
+            const response = NextResponse.next();
+            response.cookies.set("insforge_access_token", data.accessToken, {
+              httpOnly: true,
+              secure: true,
+              sameSite: "lax",
+              path: "/",
+              maxAge: 60 * 60 * 24 * 7,
+            });
+            response.cookies.set(
+              "insforge_refresh_token",
+              data.refreshToken || refreshToken,
+              {
+                httpOnly: true,
+                secure: true,
+                sameSite: "lax",
+                path: "/",
+                maxAge: 60 * 60 * 24 * 30,
+              }
+            );
+            return response;
+          }
+        }
+      } catch {
+        // Refresh failed — fall through to redirect
+      }
+    }
+  }
+
+  const loginUrl = new URL("/login", request.url);
+  loginUrl.searchParams.set("redirect", pathname);
+  return NextResponse.redirect(loginUrl);
 }
 
 export const config = {
