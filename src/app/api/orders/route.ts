@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { createServerClient } from "@insforge/sdk/ssr";
 import { pool } from "@/utils/db";
 
 function generateOrderNumber(): string {
@@ -7,24 +9,25 @@ function generateOrderNumber(): string {
   return `AUR-${year}-${num}`;
 }
 
-export async function GET(request: Request) {
+async function getAuthenticatedUser() {
+  const cookieStore = await cookies();
+  const insforge = createServerClient({ cookies: cookieStore });
+  const { data, error } = await insforge.auth.getCurrentUser();
+  if (error || !data?.user) {
+    return { insforge: null, user: null, error };
+  }
+  return { insforge, user: data.user, error: null };
+}
+
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const userIdParam = searchParams.get("userId");
-    const email = searchParams.get("email");
+    const { user, error } = await getAuthenticatedUser();
 
-    let userId = userIdParam;
-
-    if (!userId && email) {
-      const userResult = await pool.query(
-        "SELECT id FROM auth.users WHERE LOWER(email) = LOWER($1)",
-        [email.toLowerCase().trim()]
+    if (error || !user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
       );
-      userId = userResult.rows[0]?.id ?? null;
-    }
-
-    if (!userId) {
-      return NextResponse.json([]);
     }
 
     const result = await pool.query(
@@ -32,7 +35,7 @@ export async function GET(request: Request) {
        FROM orders
        WHERE user_id = $1
        ORDER BY created_at DESC`,
-      [userId]
+      [user.id]
     );
 
     const orders = result.rows.map((row) => ({
@@ -62,7 +65,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { userId: bodyUserId, items, subtotal, shipping, tax, total, shippingAddress } = body;
+    const { items, subtotal, shipping, tax, total, shippingAddress } = body;
 
     if (!items || !shippingAddress || subtotal === undefined || total === undefined) {
       return NextResponse.json(
@@ -79,15 +82,8 @@ export async function POST(request: Request) {
       );
     }
 
-    let userId = bodyUserId ?? null;
-
-    if (!userId) {
-      const userResult = await pool.query(
-        "SELECT id FROM auth.users WHERE LOWER(email) = LOWER($1)",
-        [email.toLowerCase().trim()]
-      );
-      userId = userResult.rows[0]?.id ?? null;
-    }
+    const { user } = await getAuthenticatedUser();
+    const userId = user?.id ?? null;
 
     if (!userId) {
       return NextResponse.json({
