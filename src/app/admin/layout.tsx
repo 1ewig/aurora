@@ -104,7 +104,7 @@ export default function AdminLayout({
       </aside>
 
       {/* Main Panel Content */}
-      <main className="flex-1 md:pl-72 p-6 md:p-12 lg:p-16 max-w-[1400px]">
+      <main className="flex-1 md:ml-64 p-6 md:p-12 lg:p-16 max-w-[1400px]">
         {children}
       </main>
     </div>
