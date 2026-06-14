@@ -24,7 +24,7 @@ export async function GET() {
       pool.query(`
         SELECT COUNT(id) as "pendingCount" 
         FROM orders 
-        WHERE status = 'confirmed'
+        WHERE status = 'pending'
       `),
       pool.query(`
         SELECT COUNT(id) as "shippedCount" 

@@ -23,7 +23,8 @@ export function OrderDetailModal({
 
   function getStatusStyles(status: string) {
     const styles: Record<string, string> = {
-      confirmed: "bg-amber-50 text-amber-700 border-amber-200",
+      pending: "bg-amber-50 text-amber-700 border-amber-200",
+      confirmed: "bg-indigo-50 text-indigo-700 border-indigo-200",
       shipped: "bg-blue-50 text-blue-700 border-blue-200",
       delivered: "bg-emerald-50 text-emerald-700 border-emerald-200",
       cancelled: "bg-gray-100 text-gray-500 border-gray-300",
@@ -175,7 +176,18 @@ export function OrderDetailModal({
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 pt-2">
-                      {order.status !== "shipped" && order.status !== "delivered" && order.status !== "cancelled" && (
+                      {order.status === "pending" && (
+                        <Button
+                          disabled={updatingStatusId === order.id}
+                          onClick={() => onStatusUpdate(order.id, "confirmed")}
+                          variant="gold"
+                          size="sm"
+                          className="text-[10px] py-2 px-3"
+                        >
+                          Confirm Order
+                        </Button>
+                      )}
+                      {order.status === "confirmed" && (
                         <Button
                           disabled={updatingStatusId === order.id}
                           onClick={() => onStatusUpdate(order.id, "shipped")}
@@ -192,7 +204,7 @@ export function OrderDetailModal({
                           onClick={() => onStatusUpdate(order.id, "delivered")}
                           variant="gold"
                           size="sm"
-                          className="text-[10px] py-2 px-3 col-span-2"
+                          className="text-[10px] py-2 px-3"
                         >
                           Mark Delivered
                         </Button>

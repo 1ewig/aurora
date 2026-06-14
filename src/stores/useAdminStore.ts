@@ -53,7 +53,7 @@ export interface OrderData {
   tax: number;
   total: number;
   shippingAddress: ShippingAddress;
-  status: "confirmed" | "shipped" | "delivered" | "cancelled";
+  status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
   createdAt: string;
 }
 

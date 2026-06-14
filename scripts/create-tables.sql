@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS orders (
   tax NUMERIC(10,2) NOT NULL DEFAULT 0,
   total NUMERIC(10,2) NOT NULL,
   shipping_address JSONB NOT NULL,
-  status VARCHAR(20) NOT NULL DEFAULT 'confirmed',
+  status VARCHAR(20) NOT NULL DEFAULT 'pending',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

@@ -97,7 +97,7 @@ export async function POST(request: Request) {
 
     const result = await pool.query(
       `INSERT INTO orders (user_id, order_number, items, subtotal, shipping, tax, total, shipping_address, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'confirmed')
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
        RETURNING id, order_number, created_at`,
       [
         userId,

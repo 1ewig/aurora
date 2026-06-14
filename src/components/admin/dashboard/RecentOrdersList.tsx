@@ -35,7 +35,8 @@ export function RecentOrdersList({ recentOrders }: RecentOrdersListProps) {
                 <div>
                   <div className="font-bold text-text-primary">${order.total.toFixed(2)}</div>
                   <span className={`inline-block px-1.5 py-0.2 rounded text-[8px] font-bold uppercase mt-1 border ${
-                    order.status === "confirmed" ? "bg-amber-50 text-amber-600 border-amber-100" :
+                    order.status === "pending" ? "bg-amber-50 text-amber-600 border-amber-100" :
+                    order.status === "confirmed" ? "bg-indigo-50 text-indigo-600 border-indigo-100" :
                     order.status === "shipped" ? "bg-blue-50 text-blue-600 border-blue-100" :
                     order.status === "delivered" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
                     "bg-gray-100 text-gray-500 border-gray-200"

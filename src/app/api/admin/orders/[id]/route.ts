@@ -3,7 +3,7 @@ import { pool } from '@/utils/db';
 import { createServerInsforge } from '@/utils/insforge/server';
 import { isAdmin } from '@/utils/auth';
 
-const VALID_STATUSES = ['confirmed', 'shipped', 'delivered', 'cancelled'];
+const VALID_STATUSES = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
 
 export async function PATCH(
   request: Request,
