@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "@insforge/sdk/ssr";
 
-const protectedPaths = ["/profile", "/checkout"];
+const protectedPaths = ["/profile"];
 
 function isProtectedPath(pathname: string): boolean {
   return protectedPaths.some(
@@ -37,5 +37,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/profile/:path*", "/checkout"],
+  matcher: ["/profile/:path*"],
 };

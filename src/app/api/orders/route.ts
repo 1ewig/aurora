@@ -85,13 +85,6 @@ export async function POST(request: Request) {
     const { data } = await insforge.auth.getCurrentUser();
     const userId = data?.user?.id ?? null;
 
-    if (!userId) {
-      return NextResponse.json({
-        orderNumber: null,
-        message: "Guest checkout — order confirmation will be sent via email.",
-      });
-    }
-
     const subtotal = items.reduce(
       (sum: number, item: any) => sum + item.price * item.quantity,
       0
