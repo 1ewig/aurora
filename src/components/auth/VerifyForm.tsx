@@ -103,7 +103,7 @@ export function VerifyForm({
             Verify Email
           </h1>
           <p className="text-text-secondary text-sm">
-            We sent a 6-digit verification code to{" "}
+            We sent a 6-digit verification code to<br />
             <span className="font-medium text-text-primary break-all">{maskEmail(email)}</span>.
           </p>
         </div>

@@ -23,8 +23,7 @@ export function useInitializeAuth() {
 
         const user = userData?.user || null;
         if (user) {
-          const { data: profileData } = await insforge.auth.getProfile(user.id);
-          const profile = normalizeProfile(profileData);
+          const profile = normalizeProfile((user as any).profile || {});
           useAuthStore.setState({ user, profile, loading: false });
         } else {
           useAuthStore.setState({ user: null, profile: null, loading: false });

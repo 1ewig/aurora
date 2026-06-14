@@ -86,8 +86,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       const user = data?.user || null;
       if (user) {
-        const { data: profileData } = await insforge.auth.getProfile(user.id);
-        const profile = normalizeProfile(profileData);
+        const profile = normalizeProfile((user as any).profile || {});
         set({ user, profile, loading: false });
       } else {
         set({ user: null, profile: null, loading: false });
@@ -184,8 +183,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       const user = data?.user || null;
       if (user) {
-        const { data: profileData } = await insforge.auth.getProfile(user.id);
-        const profile = normalizeProfile(profileData || { displayName: name || '' });
+        const profile = normalizeProfile((user as any).profile || { displayName: name || '' });
         set({ user, profile, loading: false });
       } else {
         set({ user: null, profile: null, loading: false });
