@@ -23,7 +23,9 @@ export async function middleware(request: NextRequest) {
     responseCookies: response.cookies as any,
   });
 
-  const accessToken = response.cookies.get("insforge_access_token")?.value;
+  const existingToken = request.cookies.get("insforge_access_token")?.value;
+  const refreshedToken = response.cookies.get("insforge_access_token")?.value;
+  const accessToken = refreshedToken || existingToken;
 
   if (!accessToken) {
     const loginUrl = new URL("/login", request.url);
