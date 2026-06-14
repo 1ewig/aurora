@@ -149,6 +149,31 @@ export function useProductForm(onSuccess: () => void) {
     }
   }
 
+  // Add detail bullet
+  function handleAddDetail() {
+    if (formDetailInput.trim()) {
+      setFormDetails((prev) => [...prev, formDetailInput.trim()]);
+      setFormDetailInput("");
+    }
+  }
+
+  // Add size / stock
+  function handleAddSize() {
+    if (newSizeName.trim()) {
+      const stock = parseInt(newSizeStock, 10);
+      if (isNaN(stock) || stock < 0) {
+        alert("Invalid stock level");
+        return;
+      }
+      setFormSizes((prev) => {
+        // Prevent duplicate sizes in list
+        const filtered = prev.filter((s) => s.size.toUpperCase() !== newSizeName.trim().toUpperCase());
+        return [...filtered, { size: newSizeName.trim().toUpperCase(), stock }];
+      });
+      setNewSizeName("");
+    }
+  }
+
   return {
     formId, setFormId,
     formName, setFormName,
@@ -172,5 +197,7 @@ export function useProductForm(onSuccess: () => void) {
     resetForm,
     handleUpload,
     handleSave,
+    handleAddDetail,
+    handleAddSize,
   };
 }
