@@ -15,6 +15,7 @@ function VerifyContent() {
   const [formError, setFormError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [initialSent, setInitialSent] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const {
     verifyEmail,
@@ -35,6 +36,15 @@ function VerifyContent() {
     }
   }, [email, router]);
 
+  function parseCooldownSeconds(err: unknown): number {
+    if (err && typeof err === "object" && "message" in err) {
+      const msg = (err as { message: string }).message;
+      const match = msg.match(/(\d+)\s*seconds?/i);
+      if (match) return parseInt(match[1], 10);
+    }
+    return 60;
+  }
+
   // If redirected from login, send a verification code automatically on mount
   useEffect(() => {
     if (email && type === "login" && !initialSent) {
@@ -45,17 +55,21 @@ function VerifyContent() {
           if (error) {
             setFormError(error.message || "Failed to send verification code.");
             setSuccessMsg("");
+            setResendCooldown(parseCooldownSeconds(error));
           } else {
             setSuccessMsg("Verification code has been sent to your email.");
+            setResendCooldown(60);
           }
         })
         .catch(() => {
           setFormError("Failed to send verification code.");
           setSuccessMsg("");
+          setResendCooldown(60);
         });
     } else if (email && type === "signup" && !initialSent) {
       setInitialSent(true);
       setSuccessMsg("Verification code sent to your email. Please enter it below.");
+      setResendCooldown(60);
     }
   }, [email, type, initialSent, resendVerification]);
 
@@ -86,9 +100,11 @@ function VerifyContent() {
     const { error } = await resendVerification(email);
     if (error) {
       setFormError(error.message || "Failed to resend verification code.");
+      setResendCooldown(parseCooldownSeconds(error));
       throw error;
     } else {
       setSuccessMsg("Verification code resent to your email.");
+      setResendCooldown(60);
     }
   };
 
@@ -115,6 +131,7 @@ function VerifyContent() {
       onSubmit={handleSubmit}
       onResend={handleResend}
       onBack={handleBack}
+      initialCooldown={resendCooldown}
     />
   );
 }

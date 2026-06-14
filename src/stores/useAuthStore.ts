@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { insforge } from '@/utils/insforge';
+import { insforge } from '@/utils/insforge/client';
 import { normalizeProfile } from '@/utils/auth';
 
 export interface User {
@@ -40,79 +40,114 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   signIn: async (email, password) => {
     set({ loading: true, error: null });
-    const { data, error } = await insforge.auth.signInWithPassword({ email, password });
-    if (error) {
-      let message = error.message || 'Invalid email or password.';
-      let needsVerification = false;
-      try {
-        const checkRes = await fetch("/api/auth/check-user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        });
-        if (checkRes.ok) {
-          const checkData = await checkRes.json();
-          if (checkData && checkData.exists === false) {
-            message = "This email is not registered. Please create an account first.";
-          } else if (checkData && checkData.exists === true && checkData.verified === false) {
-            message = "Your email address is not verified yet. Please verify it or click resend code.";
-            needsVerification = true;
-          } else {
-            message = "Incorrect password. Please try again.";
+    try {
+      const res = await fetch('/api/auth/sign-in', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        let message = data.message || 'Invalid email or password.';
+        let needsVerification = false;
+
+        if (data.error === 'AUTH_EMAIL_NOT_CONFIRMED') {
+          message = 'Please verify your email address before signing in.';
+          needsVerification = true;
+        } else {
+          try {
+            const checkRes = await fetch('/api/auth/check-user', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email }),
+            });
+            if (checkRes.ok) {
+              const checkData = await checkRes.json();
+              if (checkData && checkData.exists === false) {
+                message = 'This email is not registered. Please create an account first.';
+              } else if (checkData && checkData.exists === true && checkData.verified === false) {
+                message = 'Your email address is not verified yet. Please verify it or click resend code.';
+                needsVerification = true;
+              } else {
+                message = 'Incorrect password. Please try again.';
+              }
+            }
+          } catch (e) {
+            // Fallback to original message
           }
         }
-      } catch (e) {
-        // Fallback to original message
+
+        const updatedError = { ...data, message };
+        set({ loading: false, error: message });
+        return { error: updatedError, needsVerification };
       }
-      const updatedError = { ...error, message };
+
+      const user = data?.user || null;
+      if (user) {
+        const { data: profileData } = await insforge.auth.getProfile(user.id);
+        const profile = normalizeProfile(profileData);
+        set({ user, profile, loading: false });
+      } else {
+        set({ user: null, profile: null, loading: false });
+      }
+      return { error: null, needsVerification: false };
+    } catch (err: any) {
+      const message = err.message || 'Failed to sign in.';
       set({ loading: false, error: message });
-      return { error: updatedError, needsVerification };
+      return { error: { message }, needsVerification: false };
     }
-    const user = data?.user || null;
-    if (user) {
-      const { data: profileData } = await insforge.auth.getProfile(user.id);
-      const profile = normalizeProfile(profileData);
-      set({ user, profile, loading: false });
-    } else {
-      set({ user: null, profile: null, loading: false });
-    }
-    return { error: null, needsVerification: false };
   },
 
   signUp: async (email, password, name) => {
     set({ loading: true, error: null });
-    const { data, error } = await insforge.auth.signUp({
-      email,
-      password,
-      name,
-      redirectTo: `${window.location.origin}/login`
-    });
-    if (error) {
-      let message = error.message || 'Failed to sign up.';
-      if (error.error === 'AUTH_EMAIL_EXISTS' || message.toLowerCase().includes('exists')) {
-        message = 'An account with this email already exists. Please sign in instead.';
-      }
-      const updatedError = { ...error, message };
-      set({ loading: false, error: message });
-      return { error: updatedError };
-    }
-    const user = data?.user || null;
-    const accessToken = data?.accessToken || null;
+    try {
+      const res = await fetch('/api/auth/sign-up', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name }),
+      });
 
-    if (accessToken && user) {
-      // Auto-login (email verification disabled)
-      set({ user, profile: { displayName: name || '' }, loading: false });
-      return { error: null, needsVerification: false };
-    } else {
-      // Email verification is required
+      const data = await res.json();
+
+      if (!res.ok) {
+        let message = data.message || 'Failed to sign up.';
+        if (data.error === 'AUTH_EMAIL_EXISTS' || message.toLowerCase().includes('exists')) {
+          message = 'An account with this email already exists. Please sign in instead.';
+        }
+        const updatedError = { ...data, message };
+        set({ loading: false, error: message });
+        return { error: updatedError };
+      }
+
+      const user = data?.user || null;
+      if (data?.requireEmailVerification) {
+        set({ loading: false });
+        return { error: null, needsVerification: true };
+      }
+
+      if (user) {
+        set({ user, profile: { displayName: name || '' }, loading: false });
+        return { error: null, needsVerification: false };
+      }
+
       set({ loading: false });
       return { error: null, needsVerification: true };
+    } catch (err: any) {
+      const message = err.message || 'Failed to sign up.';
+      set({ loading: false, error: message });
+      return { error: { message } };
     }
   },
 
   signOut: async () => {
     set({ loading: true });
-    await insforge.auth.signOut();
+    try {
+      await fetch('/api/auth/sign-out', { method: 'POST' });
+    } catch (e) {
+      // Proceed with local cleanup even if server call fails
+    }
     set({ user: null, profile: null, loading: false, error: null });
   },
 
@@ -133,28 +168,40 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   verifyEmail: async (email, otp, name) => {
     set({ loading: true, error: null });
-    const { data, error } = await insforge.auth.verifyEmail({ email, otp });
-    if (error) {
-      set({ loading: false, error: error.message || 'Invalid verification code.' });
-      return { error };
+    try {
+      const res = await fetch('/api/auth/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        set({ loading: false, error: data.message || 'Invalid verification code.' });
+        return { error: data };
+      }
+
+      const user = data?.user || null;
+      if (user) {
+        const { data: profileData } = await insforge.auth.getProfile(user.id);
+        const profile = normalizeProfile(profileData || { displayName: name || '' });
+        set({ user, profile, loading: false });
+      } else {
+        set({ user: null, profile: null, loading: false });
+      }
+      return { error: null };
+    } catch (err: any) {
+      set({ loading: false, error: err.message || 'Verification failed.' });
+      return { error: { message: err.message } };
     }
-    const user = data?.user || null;
-    if (user) {
-      // Create user profile if it doesn't exist or is not fetched
-      const { data: profileData } = await insforge.auth.getProfile(user.id);
-      const profile = normalizeProfile(profileData || { displayName: name || '' });
-      set({ user, profile, loading: false });
-    } else {
-      set({ user: null, profile: null, loading: false });
-    }
-    return { error: null };
   },
 
   resendVerification: async (email) => {
     set({ loading: true, error: null });
     const { error } = await insforge.auth.resendVerificationEmail({
       email,
-      redirectTo: `${window.location.origin}/login`
+      redirectTo: `${window.location.origin}/login`,
     });
     if (error) {
       set({ loading: false, error: error.message || 'Failed to resend verification code.' });
@@ -168,7 +215,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ loading: true, error: null });
     const { error } = await insforge.auth.sendResetPasswordEmail({
       email,
-      redirectTo: `${window.location.origin}/reset-password`
+      redirectTo: `${window.location.origin}/reset-password`,
     });
     if (error) {
       set({ loading: false, error: error.message || 'Failed to send reset password email.' });
@@ -182,7 +229,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ loading: true, error: null });
     const { data, error } = await insforge.auth.exchangeResetPasswordToken({
       email,
-      code
+      code,
     });
     if (error) {
       set({ loading: false, error: error.message || 'Failed to exchange reset password token.' });
@@ -196,7 +243,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ loading: true, error: null });
     const { error } = await insforge.auth.resetPassword({
       newPassword,
-      otp: token
+      otp: token,
     });
     if (error) {
       set({ loading: false, error: error.message || 'Failed to reset password.' });
@@ -204,5 +251,5 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
     set({ loading: false });
     return { error: null };
-  }
+  },
 }));

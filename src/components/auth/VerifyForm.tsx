@@ -14,6 +14,7 @@ interface VerifyFormProps {
   onSubmit: (e: React.FormEvent) => void;
   onResend: () => Promise<void>;
   onBack: () => void;
+  initialCooldown?: number;
 }
 
 function maskEmail(rawEmail: string) {
@@ -35,9 +36,16 @@ export function VerifyForm({
   onSubmit,
   onResend,
   onBack,
+  initialCooldown = 0,
 }: VerifyFormProps) {
-  const [countdown, setCountdown] = useState(0);
+  const [countdown, setCountdown] = useState(initialCooldown);
   const [resending, setResending] = useState(false);
+
+  useEffect(() => {
+    if (initialCooldown > 0) {
+      setCountdown(initialCooldown);
+    }
+  }, [initialCooldown]);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -46,14 +54,23 @@ export function VerifyForm({
     }
   }, [countdown]);
 
+  function parseCooldownSeconds(err: unknown): number {
+    if (err && typeof err === "object" && "message" in err) {
+      const msg = (err as { message: string }).message;
+      const match = msg.match(/(\d+)\s*seconds?/i);
+      if (match) return parseInt(match[1], 10);
+    }
+    return 60;
+  }
+
   const handleResendClick = async () => {
     if (countdown > 0 || resending) return;
     setResending(true);
     try {
       await onResend();
-      setCountdown(30); // 30-second throttle
+      setCountdown(60);
     } catch (err) {
-      // Error handled by parent store/form state
+      setCountdown(parseCooldownSeconds(err));
     } finally {
       setResending(false);
     }

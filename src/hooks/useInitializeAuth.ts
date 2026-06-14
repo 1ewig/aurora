@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { insforge } from "@/utils/insforge";
+import { insforge } from "@/utils/insforge/client";
 import { normalizeProfile } from "@/utils/auth";
 
 export function useInitializeAuth() {

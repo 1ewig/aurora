@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { createServerClient } from "@insforge/sdk/ssr";
 import { pool } from "@/utils/db";
+import { createServerInsforge } from "@/utils/insforge/server";
 
 function generateOrderNumber(): string {
   const year = new Date().getFullYear();
@@ -9,21 +8,12 @@ function generateOrderNumber(): string {
   return `AUR-${year}-${num}`;
 }
 
-async function getAuthenticatedUser() {
-  const cookieStore = await cookies();
-  const insforge = createServerClient({ cookies: cookieStore });
-  const { data, error } = await insforge.auth.getCurrentUser();
-  if (error || !data?.user) {
-    return { insforge: null, user: null, error };
-  }
-  return { insforge, user: data.user, error: null };
-}
-
 export async function GET() {
   try {
-    const { user, error } = await getAuthenticatedUser();
+    const insforge = await createServerInsforge();
+    const { data, error } = await insforge.auth.getCurrentUser();
 
-    if (error || !user) {
+    if (error || !data?.user) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -35,7 +25,7 @@ export async function GET() {
        FROM orders
        WHERE user_id = $1
        ORDER BY created_at DESC`,
-      [user.id]
+      [data.user.id]
     );
 
     const orders = result.rows.map((row) => ({
@@ -65,13 +55,22 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { items, subtotal, shipping, tax, total, shippingAddress } = body;
+    const { items, shippingAddress } = body;
 
-    if (!items || !shippingAddress || subtotal === undefined || total === undefined) {
+    if (!items || !Array.isArray(items) || items.length === 0 || !shippingAddress) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
+    }
+
+    for (const item of items) {
+      if (typeof item.price !== "number" || item.price < 0 || !Number.isInteger(item.quantity) || item.quantity < 1) {
+        return NextResponse.json(
+          { error: "Invalid item data" },
+          { status: 400 }
+        );
+      }
     }
 
     const email = shippingAddress.email;
@@ -82,8 +81,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const { user } = await getAuthenticatedUser();
-    const userId = user?.id ?? null;
+    const insforge = await createServerInsforge();
+    const { data } = await insforge.auth.getCurrentUser();
+    const userId = data?.user?.id ?? null;
 
     if (!userId) {
       return NextResponse.json({
@@ -91,6 +91,14 @@ export async function POST(request: Request) {
         message: "Guest checkout — order confirmation will be sent via email.",
       });
     }
+
+    const subtotal = items.reduce(
+      (sum: number, item: any) => sum + item.price * item.quantity,
+      0
+    );
+    const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
+    const tax = Math.round(subtotal * 0.08 * 100) / 100;
+    const total = subtotal + shipping + tax;
 
     const orderNumber = generateOrderNumber();
 

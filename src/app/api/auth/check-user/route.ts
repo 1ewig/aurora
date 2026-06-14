@@ -66,7 +66,7 @@ export async function POST(request: Request) {
 
     const exists = result.rows[0]?.exists || false;
     const verified = result.rows[0]?.verified || false;
-    
+
     return NextResponse.json({ exists, verified });
   } catch (error) {
     console.error('Check user existence failed:', error);

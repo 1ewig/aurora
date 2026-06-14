@@ -98,12 +98,7 @@ export function useCheckoutForm(onOrderPlaced?: (
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: user?.id || null,
           items: itemsSnapshot,
-          subtotal,
-          shipping,
-          tax,
-          total,
           shippingAddress: {
             email,
             firstName,
