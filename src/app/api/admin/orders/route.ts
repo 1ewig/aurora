@@ -1,29 +1,28 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
-import { createServerInsforge } from '@/utils/insforge/server';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 import { isAdmin } from '@/utils/auth';
 
 export async function GET() {
   try {
-    const insforge = await createServerInsforge();
-    const { data, error } = await insforge.auth.getCurrentUser();
-
-    if (error || !data?.user || !isAdmin(data.user.email)) {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user || !isAdmin(session.user.email)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const result = await pool.query(`
-      SELECT 
-        id, 
-        user_id as "userId", 
-        order_number as "orderNumber", 
-        items, 
-        subtotal, 
-        shipping, 
-        tax, 
-        total, 
-        shipping_address as "shippingAddress", 
-        status, 
+      SELECT
+        id,
+        user_id as "userId",
+        order_number as "orderNumber",
+        items,
+        subtotal,
+        shipping,
+        tax,
+        total,
+        shipping_address as "shippingAddress",
+        status,
         created_at as "createdAt"
       FROM orders
       ORDER BY created_at DESC

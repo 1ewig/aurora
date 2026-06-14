@@ -1,12 +1,13 @@
 import { create } from 'zustand';
-import { insforge } from '@/utils/insforge/client';
+import { authClient } from '@/lib/auth-client';
 import { normalizeProfile } from '@/utils/auth';
 
 export interface User {
   id: string;
   email: string;
-  name?: string;
-  emailVerified?: boolean;
+  name?: string | null;
+  emailVerified?: boolean | null;
+  image?: string | null;
 }
 
 export interface Profile {
@@ -41,52 +42,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   signIn: async (email, password) => {
     set({ loading: true, error: null });
     try {
-      const res = await fetch('/api/auth/sign-in', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        let message = data.message || 'Invalid email or password.';
-        let needsVerification = false;
-
-        if (data.error === 'AUTH_EMAIL_NOT_CONFIRMED') {
-          message = 'Please verify your email address before signing in.';
-          needsVerification = true;
-        } else {
-          try {
-            const checkRes = await fetch('/api/auth/check-user', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email }),
-            });
-            if (checkRes.ok) {
-              const checkData = await checkRes.json();
-              if (checkData && checkData.exists === false) {
-                message = 'This email is not registered. Please create an account first.';
-              } else if (checkData && checkData.exists === true && checkData.verified === false) {
-                message = 'Your email address is not verified yet. Please verify it or click resend code.';
-                needsVerification = true;
-              } else {
-                message = 'Incorrect password. Please try again.';
-              }
-            }
-          } catch (e) {
-            // Fallback to original message
-          }
-        }
-
-        const updatedError = { ...data, message };
+      const { data, error } = await authClient.signIn.email({ email, password });
+      if (error) {
+        const message = error.message || 'Invalid email or password.';
         set({ loading: false, error: message });
-        return { error: updatedError, needsVerification };
+        return { error, needsVerification: message.toLowerCase().includes('verify') };
       }
 
-      const user = data?.user || null;
+      const user = data?.user
+        ? { id: data.user.id, email: data.user.email, name: data.user.name, emailVerified: data.user.emailVerified, image: data.user.image }
+        : null;
+
       if (user) {
-        const profile = normalizeProfile((user as any).profile || {});
+        const profile = normalizeProfile({ displayName: user.name || '' });
         set({ user, profile, loading: false });
       } else {
         set({ user: null, profile: null, loading: false });
@@ -102,37 +70,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   signUp: async (email, password, name) => {
     set({ loading: true, error: null });
     try {
-      const res = await fetch('/api/auth/sign-up', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        let message = data.message || 'Failed to sign up.';
-        if (data.error === 'AUTH_EMAIL_EXISTS' || message.toLowerCase().includes('exists')) {
-          message = 'An account with this email already exists. Please sign in instead.';
-        }
-        const updatedError = { ...data, message };
+      const { data, error } = await authClient.signUp.email({ email, password, name: name || '' });
+      if (error) {
+        let message = error.message || 'Failed to sign up.';
         set({ loading: false, error: message });
-        return { error: updatedError };
+        return { error };
       }
 
-      const user = data?.user || null;
-      if (data?.requireEmailVerification) {
+      const needsVerification = !data?.user?.emailVerified;
+
+      if (data?.user) {
+        set({
+          user: { id: data.user.id, email: data.user.email, name: data.user.name, emailVerified: data.user.emailVerified, image: data.user.image },
+          profile: { displayName: name || '' },
+          loading: false,
+        });
+      } else {
         set({ loading: false });
-        return { error: null, needsVerification: true };
       }
 
-      if (user) {
-        set({ user, profile: { displayName: name || '' }, loading: false });
-        return { error: null, needsVerification: false };
-      }
-
-      set({ loading: false });
-      return { error: null, needsVerification: true };
+      return { error: null, needsVerification };
     } catch (err: any) {
       const message = err.message || 'Failed to sign up.';
       set({ loading: false, error: message });
@@ -143,51 +100,41 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   signOut: async () => {
     set({ loading: true });
     try {
-      await fetch('/api/auth/sign-out', { method: 'POST' });
-    } catch (e) {
-      // Proceed with local cleanup even if server call fails
+      await authClient.signOut();
+    } catch {
+      // proceed with local cleanup
     }
     set({ user: null, profile: null, loading: false, error: null });
   },
 
   updateProfile: async (updatedFields) => {
-    const currentProfile = get().profile;
-    const newProfile = { ...currentProfile, ...updatedFields } as Profile;
-    const { data, error } = await insforge.auth.setProfile({
-      name: newProfile.displayName,
-      displayName: newProfile.displayName,
-    });
-    if (error) {
-      return { error };
+    set({ loading: true });
+    try {
+      const currentProfile = get().profile;
+      const displayName = updatedFields.displayName || currentProfile?.displayName || '';
+      const res = await authClient.updateUser({ name: displayName });
+      if (res.error) {
+        set({ loading: false });
+        return { error: res.error };
+      }
+      set({ profile: { displayName }, loading: false });
+      return { error: null };
+    } catch (err: any) {
+      set({ loading: false, error: err.message });
+      return { error: err };
     }
-    const profile = normalizeProfile(data);
-    set({ profile });
-    return { error: null };
   },
 
-  verifyEmail: async (email, otp, name) => {
+  verifyEmail: async (email, _otp, _name) => {
     set({ loading: true, error: null });
     try {
-      const res = await fetch('/api/auth/verify-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        set({ loading: false, error: data.message || 'Invalid verification code.' });
-        return { error: data };
+      const callbackURL = `${window.location.origin}/profile`;
+      const { error } = await authClient.sendVerificationEmail({ email, callbackURL });
+      if (error) {
+        set({ loading: false, error: error.message || 'Failed to send verification email.' });
+        return { error };
       }
-
-      const user = data?.user || null;
-      if (user) {
-        const profile = normalizeProfile((user as any).profile || { displayName: name || '' });
-        set({ user, profile, loading: false });
-      } else {
-        set({ user: null, profile: null, loading: false });
-      }
+      set({ loading: false });
       return { error: null };
     } catch (err: any) {
       set({ loading: false, error: err.message || 'Verification failed.' });
@@ -197,57 +144,67 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   resendVerification: async (email) => {
     set({ loading: true, error: null });
-    const { error } = await insforge.auth.resendVerificationEmail({
-      email,
-      redirectTo: `${window.location.origin}/login`,
-    });
-    if (error) {
-      set({ loading: false, error: error.message || 'Failed to resend verification code.' });
-      return { error };
+    try {
+      const callbackURL = `${window.location.origin}/profile`;
+      const { error } = await authClient.sendVerificationEmail({ email, callbackURL });
+      if (error) {
+        set({ loading: false, error: error.message || 'Failed to resend verification email.' });
+        return { error };
+      }
+      set({ loading: false });
+      return { error: null };
+    } catch (err: any) {
+      set({ loading: false, error: err.message });
+      return { error: err };
     }
-    set({ loading: false });
-    return { error: null };
   },
 
   sendResetPasswordEmail: async (email) => {
     set({ loading: true, error: null });
-    const { error } = await insforge.auth.sendResetPasswordEmail({
-      email,
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    if (error) {
-      set({ loading: false, error: error.message || 'Failed to send reset password email.' });
-      return { error };
+    try {
+      const redirectTo = `${window.location.origin}/reset-password`;
+      const { error } = await authClient.requestPasswordReset({ email, redirectTo });
+      if (error) {
+        set({ loading: false, error: error.message || 'Failed to send reset password email.' });
+        return { error };
+      }
+      set({ loading: false });
+      return { error: null };
+    } catch (err: any) {
+      set({ loading: false, error: err.message });
+      return { error: err };
     }
-    set({ loading: false });
-    return { error: null };
   },
 
-  exchangeResetPasswordToken: async (email, code) => {
+  exchangeResetPasswordToken: async (_email, code) => {
     set({ loading: true, error: null });
-    const { data, error } = await insforge.auth.exchangeResetPasswordToken({
-      email,
-      code,
-    });
-    if (error) {
-      set({ loading: false, error: error.message || 'Failed to exchange reset password token.' });
-      return { error };
+    try {
+      const { error } = await authClient.resetPassword({ newPassword: code });
+      if (error) {
+        set({ loading: false, error: error.message || 'Failed to exchange reset password token.' });
+        return { error };
+      }
+      set({ loading: false });
+      return { token: code, error: null };
+    } catch (err: any) {
+      set({ loading: false, error: err.message });
+      return { error: err };
     }
-    set({ loading: false });
-    return { token: data?.token, error: null };
   },
 
   resetPassword: async (newPassword, token) => {
     set({ loading: true, error: null });
-    const { error } = await insforge.auth.resetPassword({
-      newPassword,
-      otp: token,
-    });
-    if (error) {
-      set({ loading: false, error: error.message || 'Failed to reset password.' });
-      return { error };
+    try {
+      const { error } = await authClient.resetPassword({ newPassword, ...(token ? { token } : {}) });
+      if (error) {
+        set({ loading: false, error: error.message || 'Failed to reset password.' });
+        return { error };
+      }
+      set({ loading: false });
+      return { error: null };
+    } catch (err: any) {
+      set({ loading: false, error: err.message });
+      return { error: err };
     }
-    set({ loading: false });
-    return { error: null };
   },
 }));

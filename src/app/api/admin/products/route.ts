@@ -1,29 +1,28 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
-import { createServerInsforge } from '@/utils/insforge/server';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 import { isAdmin } from '@/utils/auth';
 
 export async function GET() {
   try {
-    const insforge = await createServerInsforge();
-    const { data, error } = await insforge.auth.getCurrentUser();
-
-    if (error || !data?.user || !isAdmin(data.user.email)) {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user || !isAdmin(session.user.email)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const result = await pool.query(`
-      SELECT 
-        p.id, 
-        p.slug, 
-        p.name, 
-        p.category, 
-        p.price, 
-        p.badge, 
-        p.image, 
-        p.alt_text as "altText", 
-        p.span, 
-        p.aspect_ratio as "aspectRatio", 
+      SELECT
+        p.id,
+        p.slug,
+        p.name,
+        p.category,
+        p.price,
+        p.badge,
+        p.image,
+        p.alt_text as "altText",
+        p.span,
+        p.aspect_ratio as "aspectRatio",
         p.description,
         (
           SELECT COALESCE(json_agg(image_url ORDER BY id), '[]'::json)
@@ -58,10 +57,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const insforge = await createServerInsforge();
-    const { data, error } = await insforge.auth.getCurrentUser();
-
-    if (error || !data?.user || !isAdmin(data.user.email)) {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user || !isAdmin(session.user.email)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -83,7 +80,6 @@ export async function POST(request: Request) {
       details = [],
     } = body;
 
-    // Simple validation
     if (!id || !slug || !name || !category || typeof price !== 'number' || !image || !altText || !description) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
@@ -92,7 +88,6 @@ export async function POST(request: Request) {
     try {
       await client.query('BEGIN');
 
-      // Check for ID/slug uniqueness
       const existingProduct = await client.query(
         'SELECT 1 FROM products WHERE id = $1 OR slug = $2',
         [id, slug]
@@ -101,7 +96,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Product with this ID or slug already exists' }, { status: 400 });
       }
 
-      // Insert product
       await client.query(
         `INSERT INTO products (
           id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description
@@ -109,7 +103,6 @@ export async function POST(request: Request) {
         [id, slug, name, category, price, badge || null, image, altText, span || null, aspectRatio || null, description]
       );
 
-      // Insert images
       for (const imgUrl of images) {
         await client.query(
           'INSERT INTO product_images (product_id, image_url) VALUES ($1, $2)',
@@ -117,7 +110,6 @@ export async function POST(request: Request) {
         );
       }
 
-      // Insert sizes
       for (const sizeObj of sizes) {
         const stock = typeof sizeObj.stock === 'number' ? sizeObj.stock : 0;
         await client.query(
@@ -126,7 +118,6 @@ export async function POST(request: Request) {
         );
       }
 
-      // Insert details
       for (const detailText of details) {
         await client.query(
           'INSERT INTO product_details (product_id, detail) VALUES ($1, $2)',

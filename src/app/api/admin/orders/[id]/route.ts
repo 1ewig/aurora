@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
-import { createServerInsforge } from '@/utils/insforge/server';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 import { isAdmin } from '@/utils/auth';
 
 const VALID_STATUSES = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
@@ -11,10 +12,8 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const insforge = await createServerInsforge();
-    const { data, error } = await insforge.auth.getCurrentUser();
-
-    if (error || !data?.user || !isAdmin(data.user.email)) {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user || !isAdmin(session.user.email)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

@@ -58,9 +58,9 @@ export async function POST(request: Request) {
     }
 
     const result = await pool.query(
-      `SELECT 
-        EXISTS(SELECT 1 FROM auth.users WHERE LOWER(email) = LOWER($1)) AS exists,
-        COALESCE((SELECT email_verified FROM auth.users WHERE LOWER(email) = LOWER($1) LIMIT 1), false) AS verified`,
+      `SELECT
+        EXISTS(SELECT 1 FROM better_auth.user WHERE LOWER(email) = LOWER($1)) AS exists,
+        COALESCE((SELECT email_verified FROM better_auth.user WHERE LOWER(email) = LOWER($1) LIMIT 1), false) AS verified`,
       [email.toLowerCase().trim()]
     );
 

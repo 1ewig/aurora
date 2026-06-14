@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { insforge } from "@/utils/insforge/client";
+import { authClient } from "@/lib/auth-client";
 import { normalizeProfile } from "@/utils/auth";
 
 export function useInitializeAuth() {
@@ -15,24 +15,27 @@ export function useInitializeAuth() {
     async function init() {
       useAuthStore.setState({ loading: true, error: null });
       try {
-        const { data: userData, error: userError } = await insforge.auth.getCurrentUser();
-        if (userError) {
-          useAuthStore.setState({ user: null, profile: null, loading: false });
-          return;
-        }
+        const { data: sessionData } = await authClient.getSession();
+        const user = sessionData?.user || null;
 
-        const user = userData?.user || null;
         if (user) {
-          const profile = normalizeProfile((user as any).profile || {});
-          useAuthStore.setState({ user, profile, loading: false });
+          const profile = normalizeProfile({ displayName: user.name || "" });
+          useAuthStore.setState({
+            user: {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              emailVerified: user.emailVerified,
+              image: user.image,
+            },
+            profile,
+            loading: false,
+          });
         } else {
           useAuthStore.setState({ user: null, profile: null, loading: false });
         }
-      } catch (e: any) {
-        useAuthStore.setState({
-          error: e.message || "Initialization failed",
-          loading: false,
-        });
+      } catch {
+        useAuthStore.setState({ user: null, profile: null, loading: false });
       }
     }
 

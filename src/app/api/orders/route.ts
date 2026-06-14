@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/utils/db";
-import { createServerInsforge } from "@/utils/insforge/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 function generateOrderNumber(): string {
   const year = new Date().getFullYear();
@@ -10,10 +11,8 @@ function generateOrderNumber(): string {
 
 export async function GET() {
   try {
-    const insforge = await createServerInsforge();
-    const { data, error } = await insforge.auth.getCurrentUser();
-
-    if (error || !data?.user) {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -25,7 +24,7 @@ export async function GET() {
        FROM orders
        WHERE user_id = $1
        ORDER BY created_at DESC`,
-      [data.user.id]
+      [session.user.id]
     );
 
     const orders = result.rows.map((row) => ({
@@ -81,9 +80,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const insforge = await createServerInsforge();
-    const { data } = await insforge.auth.getCurrentUser();
-    const userId = data?.user?.id ?? null;
+    const session = await auth.api.getSession({ headers: await headers() });
+    const userId = session?.user?.id ?? null;
 
     const subtotal = items.reduce(
       (sum: number, item: any) => sum + item.price * item.quantity,

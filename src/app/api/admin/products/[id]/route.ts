@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
-import { createServerInsforge } from '@/utils/insforge/server';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 import { isAdmin } from '@/utils/auth';
 import { createAdminClient } from '@insforge/sdk';
 import { getStorageKeyFromUrl } from '@/utils/insforge';
@@ -11,7 +12,6 @@ const admin = createAdminClient({
 });
 
 async function deleteUnusedImage(client: any, url: string, productId: string) {
-  // Check if image is used by other products
   const { rows } = await client.query(
     `SELECT COUNT(*) as count FROM (
       SELECT 1 FROM products WHERE image = $1 AND id <> $2
@@ -20,7 +20,7 @@ async function deleteUnusedImage(client: any, url: string, productId: string) {
     ) as usages`,
     [url, productId]
   );
-  
+
   const count = parseInt(rows[0].count, 10);
   if (count === 0) {
     const storageKey = getStorageKeyFromUrl(url);
@@ -40,10 +40,8 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const insforge = await createServerInsforge();
-    const { data, error } = await insforge.auth.getCurrentUser();
-
-    if (error || !data?.user || !isAdmin(data.user.email)) {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user || !isAdmin(session.user.email)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -72,7 +70,6 @@ export async function PUT(
     try {
       await client.query('BEGIN');
 
-      // 1. Check if product exists
       const { rows: productRows } = await client.query(
         'SELECT image FROM products WHERE id = $1',
         [id]
@@ -84,7 +81,6 @@ export async function PUT(
 
       const oldMainImage = productRows[0].image;
 
-      // Check slug uniqueness (excluding current product)
       const existingSlug = await client.query(
         'SELECT 1 FROM products WHERE slug = $1 AND id <> $2',
         [slug, id]
@@ -94,26 +90,21 @@ export async function PUT(
         return NextResponse.json({ error: 'Slug is already used by another product' }, { status: 400 });
       }
 
-      // 2. Fetch old gallery images
       const { rows: galleryRows } = await client.query(
         'SELECT image_url FROM product_images WHERE product_id = $1',
         [id]
       );
       const oldGalleryImages = galleryRows.map(r => r.image_url);
 
-      // 3. Delete unused images from storage
-      // If main image changed
       if (image !== oldMainImage) {
         await deleteUnusedImage(client, oldMainImage, id);
       }
-      // If gallery images were removed
       for (const oldImg of oldGalleryImages) {
         if (!images.includes(oldImg)) {
           await deleteUnusedImage(client, oldImg, id);
         }
       }
 
-      // 4. Update products table
       await client.query(
         `UPDATE products
          SET slug = $1, name = $2, category = $3, price = $4, badge = $5, image = $6, alt_text = $7, span = $8, aspect_ratio = $9, description = $10
@@ -121,7 +112,6 @@ export async function PUT(
         [slug, name, category, price, badge || null, image, altText, span || null, aspectRatio || null, description, id]
       );
 
-      // 5. Re-insert product images
       await client.query('DELETE FROM product_images WHERE product_id = $1', [id]);
       for (const imgUrl of images) {
         await client.query(
@@ -130,7 +120,6 @@ export async function PUT(
         );
       }
 
-      // 6. Re-insert product sizes
       await client.query('DELETE FROM product_sizes WHERE product_id = $1', [id]);
       for (const sizeObj of sizes) {
         const stock = typeof sizeObj.stock === 'number' ? sizeObj.stock : 0;
@@ -140,7 +129,6 @@ export async function PUT(
         );
       }
 
-      // 7. Re-insert product details
       await client.query('DELETE FROM product_details WHERE product_id = $1', [id]);
       for (const detailText of details) {
         await client.query(
@@ -169,10 +157,8 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const insforge = await createServerInsforge();
-    const { data, error } = await insforge.auth.getCurrentUser();
-
-    if (error || !data?.user || !isAdmin(data.user.email)) {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user || !isAdmin(session.user.email)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -180,7 +166,6 @@ export async function DELETE(
     try {
       await client.query('BEGIN');
 
-      // 1. Get images to check and delete
       const { rows: productRows } = await client.query(
         'SELECT image FROM products WHERE id = $1',
         [id]
@@ -197,13 +182,11 @@ export async function DELETE(
       );
       const galleryImages = galleryRows.map(r => r.image_url);
 
-      // 2. Delete unused storage files
       await deleteUnusedImage(client, mainImage, id);
       for (const img of galleryImages) {
         await deleteUnusedImage(client, img, id);
       }
 
-      // 3. Delete product (cascade deletes images, sizes, and details in database)
       await client.query('DELETE FROM products WHERE id = $1', [id]);
 
       await client.query('COMMIT');

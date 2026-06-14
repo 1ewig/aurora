@@ -7,7 +7,7 @@ import { isAdmin } from "@/utils/auth";
 interface NavbarProfileMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  user: { name?: string; email: string } | null;
+  user: { name?: string | null; email: string } | null;
   profile: { displayName: string } | null;
   onSignOutClick: () => void;
 }
