@@ -25,7 +25,7 @@ Built with **Next.js 15** and **PostgreSQL** to demonstrate production-ready ful
 
 ### Security Architecture
 
-- **Middleware-gated protected routes** — `/profile` and subpaths are guarded by `updateSession` from `@insforge/sdk/ssr`. Unauthenticated requests are redirected to `/login?redirect=<path>`. Tokens are refreshed transparently by the middleware on every matching request.
+- **Middleware-gated protected routes** — `/profile` and subpaths are guarded by an inline middleware that reads the `insforge_access_token` cookie, decodes the JWT to check expiry, and transparently refreshes expired tokens by calling the InsForge refresh API directly. Unauthenticated requests are redirected to `/login?redirect=<path>`. No external SDK is imported in the Edge Runtime — everything runs on native Edge APIs.
 - **SSR cookie-based authentication** — Server routes (`/api/auth/sign-in`, `/api/auth/sign-up`, `/api/auth/verify-email`, `/api/auth/sign-out`) use `setAuthCookies` for httpOnly access and refresh tokens. Client-side code calls these server routes rather than the SDK directly, keeping token handling server-side.
 - **Rate-limited user enumeration** — `POST /api/auth/check-user` implements an in-memory sliding-window rate limiter (10 requests per minute per IP) with `429 Too Many Requests` responses.
 - **Server-side pricing enforcement** — `POST /api/orders` recalculates subtotal, shipping (free above $500), tax (8%), and total from the items array only. Client-supplied pricing is ignored entirely.
@@ -158,24 +158,64 @@ display_name = COALESCE(
 ### Middleware protected route guard
 
 ```typescript
-const protectedPaths = ["/profile"];
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    return JSON.parse(atob(token.split(".")[1]));
+  } catch {
+    return null;
+  }
+}
+
+function isJwtExpired(token: string, leewaySeconds = 60): boolean {
+  const decoded = decodeJwtPayload(token);
+  if (!decoded?.exp || typeof decoded.exp !== "number") return true;
+  return decoded.exp * 1000 <= Date.now() + leewaySeconds * 1000;
+}
 
 export async function middleware(request: NextRequest) {
   if (!isProtectedPath(request.nextUrl.pathname)) return NextResponse.next();
 
-  const response = NextResponse.next({ request });
-  await updateSession({ requestCookies: request.cookies, responseCookies: response.cookies });
+  const accessToken = request.cookies.get("insforge_access_token")?.value;
+  const refreshToken = request.cookies.get("insforge_refresh_token")?.value;
 
-  const accessToken =
-    response.cookies.get("insforge_access_token")?.value ||
-    request.cookies.get("insforge_access_token")?.value;
+  if (accessToken && !isJwtExpired(accessToken)) return NextResponse.next();
 
-  if (!accessToken) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", request.nextUrl.pathname);
-    return NextResponse.redirect(loginUrl);
+  if (refreshToken) {
+    const { NEXT_PUBLIC_INSFORGE_URL, NEXT_PUBLIC_INSFORGE_ANON_KEY } = process.env;
+    if (NEXT_PUBLIC_INSFORGE_URL && NEXT_PUBLIC_INSFORGE_ANON_KEY) {
+      try {
+        const res = await fetch(
+          `${NEXT_PUBLIC_INSFORGE_URL}/api/auth/refresh?client_type=mobile`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${NEXT_PUBLIC_INSFORGE_ANON_KEY}`,
+            },
+            body: JSON.stringify({ refresh_token: refreshToken }),
+          }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.accessToken) {
+            const response = NextResponse.next();
+            response.cookies.set("insforge_access_token", data.accessToken, {
+              httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 604800,
+            });
+            response.cookies.set("insforge_refresh_token",
+              data.refreshToken || refreshToken, {
+              httpOnly: true, secure: true, sameSite: "lax", path: "/", maxAge: 2592000,
+            });
+            return response;
+          }
+        }
+      } catch {}
+    }
   }
-  return response;
+
+  const loginUrl = new URL("/login", request.url);
+  loginUrl.searchParams.set("redirect", request.nextUrl.pathname);
+  return NextResponse.redirect(loginUrl);
 }
 ```
 
