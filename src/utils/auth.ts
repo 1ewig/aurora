@@ -5,3 +5,11 @@ export function normalizeProfile(data: any): Profile {
     displayName: data?.displayName || data?.profile?.displayName || data?.nickname || data?.name || "",
   };
 }
+
+export function isAdmin(email?: string): boolean {
+  if (!email) return false;
+  const adminEmailsStr = process.env.NEXT_PUBLIC_ADMIN_EMAILS || "";
+  const adminEmails = adminEmailsStr.split(",").map((e) => e.trim().toLowerCase());
+  return adminEmails.includes(email.toLowerCase());
+}
+

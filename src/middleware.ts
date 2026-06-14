@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { isAdmin } from "@/utils/auth";
 
-const protectedPaths = ["/profile"];
+const protectedPaths = ["/profile", "/admin"];
 
 function isProtectedPath(pathname: string): boolean {
   return protectedPaths.some(
@@ -30,14 +31,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const accessToken = request.cookies.get("insforge_access_token")?.value;
+  let accessToken = request.cookies.get("insforge_access_token")?.value;
   const refreshToken = request.cookies.get("insforge_refresh_token")?.value;
 
-  if (accessToken && !isJwtExpired(accessToken)) {
-    return NextResponse.next();
-  }
+  let isTokenValid = accessToken && !isJwtExpired(accessToken);
+  let hasRefreshed = false;
 
-  if (refreshToken) {
+  if (!isTokenValid && refreshToken) {
     const baseUrl = process.env.NEXT_PUBLIC_INSFORGE_URL;
     const anonKey = process.env.NEXT_PUBLIC_INSFORGE_ANON_KEY;
 
@@ -58,26 +58,9 @@ export async function middleware(request: NextRequest) {
         if (res.ok) {
           const data = await res.json();
           if (data?.accessToken) {
-            const response = NextResponse.next();
-            response.cookies.set("insforge_access_token", data.accessToken, {
-              httpOnly: true,
-              secure: true,
-              sameSite: "lax",
-              path: "/",
-              maxAge: 60 * 60 * 24 * 7,
-            });
-            response.cookies.set(
-              "insforge_refresh_token",
-              data.refreshToken || refreshToken,
-              {
-                httpOnly: true,
-                secure: true,
-                sameSite: "lax",
-                path: "/",
-                maxAge: 60 * 60 * 24 * 30,
-              }
-            );
-            return response;
+            accessToken = data.accessToken;
+            isTokenValid = true;
+            hasRefreshed = true;
           }
         }
       } catch {
@@ -86,11 +69,51 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  if (isTokenValid && accessToken) {
+    // Check admin status for /admin paths
+    const isAdminPath = pathname === "/admin" || pathname.startsWith("/admin/");
+    if (isAdminPath) {
+      const decoded = decodeJwtPayload(accessToken);
+      const email = decoded?.email as string | undefined;
+
+      if (!email || !isAdmin(email)) {
+        // Redirect to homepage if user is not authorized as admin
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+    }
+
+    if (hasRefreshed && accessToken) {
+      const response = NextResponse.next();
+      response.cookies.set("insforge_access_token", accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      });
+      response.cookies.set(
+        "insforge_refresh_token",
+        refreshToken || "",
+        {
+          httpOnly: true,
+          secure: true,
+          sameSite: "lax",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 30,
+        }
+      );
+      return response;
+    }
+
+    return NextResponse.next();
+  }
+
   const loginUrl = new URL("/login", request.url);
   loginUrl.searchParams.set("redirect", pathname);
   return NextResponse.redirect(loginUrl);
 }
 
 export const config = {
-  matcher: ["/profile/:path*"],
+  matcher: ["/profile/:path*", "/admin", "/admin/:path*"],
 };
+

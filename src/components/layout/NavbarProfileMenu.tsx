@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { isAdmin } from "@/utils/auth";
 
 interface NavbarProfileMenuProps {
   isOpen: boolean;
@@ -34,6 +35,15 @@ export function NavbarProfileMenu({
             <p className="text-[10px] text-text-secondary uppercase tracking-wider font-semibold mb-0.5">Logged in as</p>
             <p className="text-sm font-medium text-text-primary truncate">{profile?.displayName || user.name || user.email}</p>
           </div>
+          {isAdmin(user.email) && (
+            <Link
+              href="/admin"
+              onClick={onClose}
+              className="text-xs font-semibold uppercase tracking-wider text-accent-vivid hover:text-accent-primary transition-colors py-2 flex items-center"
+            >
+              Admin Panel
+            </Link>
+          )}
           <Link
             href="/profile"
             onClick={onClose}
@@ -48,6 +58,7 @@ export function NavbarProfileMenu({
           >
             Orders
           </Link>
+
           <button
             onClick={() => {
               onClose();
