@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+
 
 interface ProfileSidebarProps {
   onClose?: () => void;
@@ -36,8 +36,8 @@ export function ProfileSidebar({ onClose }: ProfileSidebarProps) {
           <Link
             href="/profile"
             onClick={onClose}
-            className={`flex items-center gap-3 text-xs sm:text-sm transition-all font-semibold uppercase tracking-wider py-3 px-4 rounded-xl ${isProfileActive
-                ? "bg-bg-primary text-text-primary shadow-xs"
+            className={`flex items-center gap-3 text-xs sm:text-sm transition-all duration-300 font-semibold uppercase tracking-wider px-4 py-3 rounded-full ${isProfileActive
+                ? "bg-bg-ink text-text-inverted"
                 : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
               }`}
           >
@@ -50,8 +50,8 @@ export function ProfileSidebar({ onClose }: ProfileSidebarProps) {
           <Link
             href="/profile/orders"
             onClick={onClose}
-            className={`flex items-center gap-3 text-xs sm:text-sm transition-all font-semibold uppercase tracking-wider py-3 px-4 rounded-xl ${isOrdersActive
-                ? "bg-bg-primary text-text-primary shadow-xs"
+            className={`flex items-center gap-3 text-xs sm:text-sm transition-all duration-300 font-semibold uppercase tracking-wider px-4 py-3 rounded-full ${isOrdersActive
+                ? "bg-bg-ink text-text-inverted"
                 : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
               }`}
           >
@@ -65,18 +65,15 @@ export function ProfileSidebar({ onClose }: ProfileSidebarProps) {
 
       {/* Back to Shop section */}
       <div className="pt-4 border-t border-border-subtle mt-6">
-        <Link href="/products" className="block w-full" onClick={onClose}>
-          <Button
-            variant="ghost"
-            size="md"
-            fullWidth
-            className="rounded-full flex items-center justify-center gap-2"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 shrink-0">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-            </svg>
-            Back to Shop
-          </Button>
+        <Link
+          href="/products"
+          onClick={onClose}
+          className="w-full py-4 bg-bg-ink text-text-inverted rounded-full text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 hover:bg-text-primary"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 shrink-0">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
+          Back to Shop
         </Link>
       </div>
     </div>
