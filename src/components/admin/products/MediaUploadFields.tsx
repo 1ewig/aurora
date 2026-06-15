@@ -1,0 +1,97 @@
+interface MediaUploadFieldsProps {
+  formDescription: string;
+  onFormDescriptionChange: (val: string) => void;
+  uploading: boolean;
+  isReady: boolean;
+  mainImageUrl: string;
+  onUpload: (files: FileList | null, isGallery: boolean) => void;
+  galleryUrls: string[];
+  onRemoveGalleryImage: (index: number) => void;
+}
+
+export function MediaUploadFields({
+  formDescription,
+  onFormDescriptionChange,
+  uploading,
+  isReady,
+  mainImageUrl,
+  onUpload,
+  galleryUrls,
+  onRemoveGalleryImage,
+}: MediaUploadFieldsProps) {
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5">
+          Description
+        </label>
+        <textarea
+          required
+          value={formDescription}
+          onChange={(e) => onFormDescriptionChange(e.target.value)}
+          rows={3}
+          className="w-full px-4 py-3 bg-bg-primary border border-border-medium rounded-2xl text-sm focus:border-accent-primary focus:outline-none"
+          placeholder="Product detailed description..."
+        />
+      </div>
+
+      <div className="border border-border-subtle p-4 rounded-2xl bg-bg-primary/20 space-y-4">
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1">
+            Main Image ({uploading ? "Uploading..." : "Click to select"})
+          </label>
+          <div className="flex items-center gap-3">
+            <input
+              type="file"
+              accept="image/*"
+              disabled={!isReady}
+              onChange={(e) => onUpload(e.target.files, false)}
+              className="text-xs text-text-secondary file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border file:border-border-medium file:text-xs file:font-semibold file:bg-white hover:file:bg-bg-primary file:cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            />
+            {mainImageUrl && (
+              <img
+                src={mainImageUrl}
+                alt="Upload preview"
+                className="w-10 h-14 object-cover rounded border border-border-subtle"
+              />
+            )}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1">
+            Gallery Images
+          </label>
+          <div className="space-y-2">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              disabled={!isReady}
+              onChange={(e) => onUpload(e.target.files, true)}
+              className="text-xs text-text-secondary file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border file:border-border-medium file:text-xs file:font-semibold file:bg-white hover:file:bg-bg-primary file:cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            />
+            <div className="flex gap-2 overflow-x-auto py-1">
+              {galleryUrls.map((url, index) => (
+                <div key={index} className="relative group flex-shrink-0">
+                  <img
+                    src={url}
+                    alt="Gallery item"
+                    className="w-10 h-14 object-cover rounded border border-border-subtle"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => onRemoveGalleryImage(index)}
+                    className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-600 rounded-full text-white text-[10px] flex items-center justify-center hover:bg-red-700 cursor-pointer"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

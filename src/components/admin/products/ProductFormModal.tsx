@@ -3,8 +3,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { type ProductData } from "@/stores/useAdminStore";
-import { useProductForm } from "@/hooks/useProductForm";
-import { categories } from "@/data/products";
+import { type useProductForm } from "@/hooks/useProductForm";
+import { BasicDetailsFields } from "./BasicDetailsFields";
+import { MediaUploadFields } from "./MediaUploadFields";
+import { SizeStockFields } from "./SizeStockFields";
+import { BulletDetailsFields } from "./BulletDetailsFields";
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -19,16 +22,6 @@ export function ProductFormModal({
   editingProduct,
   form,
 }: ProductFormModalProps) {
-  // Add detail bullet
-  function handleAddDetailClick() {
-    form.handleAddDetail();
-  }
-
-  // Add size / stock
-  function handleAddSizeClick() {
-    form.handleAddSize();
-  }
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -66,324 +59,69 @@ export function ProductFormModal({
               {/* Scrollable Body */}
               <div className="flex-1 overflow-y-auto px-6 sm:px-8 py-4 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Basic details */}
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5">
-                        Product ID (e.g. p15)
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        disabled={!!editingProduct}
-                        value={form.formId}
-                        onChange={(e) => form.setFormId(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-bg-primary border border-border-medium rounded-full text-sm disabled:opacity-50 focus:border-accent-primary focus:outline-none"
-                        placeholder="p15"
-                      />
-                    </div>
+                  <BasicDetailsFields
+                    editingProduct={!!editingProduct}
+                    formId={form.formId}
+                    onFormIdChange={form.setFormId}
+                    formName={form.formName}
+                    onFormNameChange={form.setFormName}
+                    formSlug={form.formSlug}
+                    onFormSlugChange={form.setFormSlug}
+                    formCategory={form.formCategory}
+                    onFormCategoryChange={form.setFormCategory}
+                    formPrice={form.formPrice}
+                    onFormPriceChange={form.setFormPrice}
+                    formBadge={form.formBadge}
+                    onFormBadgeChange={form.setFormBadge}
+                    formSpan={form.formSpan}
+                    onFormSpanChange={form.setFormSpan}
+                    formAspectRatio={form.formAspectRatio}
+                    onFormAspectRatioChange={form.setFormAspectRatio}
+                    formAltText={form.formAltText}
+                    onFormAltTextChange={form.setFormAltText}
+                  />
 
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5">
-                        Product Name
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={form.formName}
-                        onChange={(e) => form.setFormName(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
-                        placeholder="Classic Wool Coat"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5">
-                        Slug (unique identifier)
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={form.formSlug}
-                        onChange={(e) => form.setFormSlug(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
-                        placeholder="classic-wool-coat"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5">
-                          Category
-                        </label>
-                        <select
-                          value={form.formCategory}
-                          onChange={(e) => form.setFormCategory(e.target.value)}
-                          className="w-full px-4 py-2.5 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
-                        >
-                          {categories.map((cat) => (
-                            <option key={cat} value={cat}>{cat}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5">
-                          Price ($)
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          required
-                          value={form.formPrice}
-                          onChange={(e) => form.setFormPrice(e.target.value)}
-                          className="w-full px-4 py-2.5 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
-                          placeholder="350.00"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5">
-                          Badge (optional)
-                        </label>
-                        <input
-                          type="text"
-                          value={form.formBadge}
-                          onChange={(e) => form.setFormBadge(e.target.value)}
-                          className="w-full px-4 py-2.5 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
-                          placeholder="New / Limited"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5">
-                          Span grid size (optional)
-                        </label>
-                        <input
-                          type="text"
-                          value={form.formSpan}
-                          onChange={(e) => form.setFormSpan(e.target.value)}
-                          className="w-full px-4 py-2.5 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
-                          placeholder="col-span-2 / tall"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5">
-                          Aspect Ratio (optional)
-                        </label>
-                        <input
-                          type="text"
-                          value={form.formAspectRatio}
-                          onChange={(e) => form.setFormAspectRatio(e.target.value)}
-                          className="w-full px-4 py-2.5 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
-                          placeholder="3/4 or portrait"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5">
-                          Alt Text
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={form.formAltText}
-                          onChange={(e) => form.setFormAltText(e.target.value)}
-                          className="w-full px-4 py-2.5 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
-                          placeholder="Wool coat on model"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Media uploads and descriptions */}
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5">
-                        Description
-                      </label>
-                      <textarea
-                        required
-                        value={form.formDescription}
-                        onChange={(e) => form.setFormDescription(e.target.value)}
-                        rows={3}
-                        className="w-full px-4 py-3 bg-bg-primary border border-border-medium rounded-2xl text-sm focus:border-accent-primary focus:outline-none"
-                        placeholder="Product detailed description..."
-                      />
-                    </div>
-
-                    {/* Image uploads */}
-                    <div className="border border-border-subtle p-4 rounded-2xl bg-bg-primary/20 space-y-4">
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1">
-                          Main Image ({form.uploading ? "Uploading..." : "Click to select"})
-                        </label>
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            disabled={!form.isReady}
-                            onChange={(e) => form.handleUpload(e.target.files, false)}
-                            className="text-xs text-text-secondary file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border file:border-border-medium file:text-xs file:font-semibold file:bg-white hover:file:bg-bg-primary file:cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                          />
-                          {form.mainImageUrl && (
-                            <img
-                              src={form.mainImageUrl}
-                              alt="Upload preview"
-                              className="w-10 h-14 object-cover rounded border border-border-subtle"
-                            />
-                          )}
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1">
-                          Gallery Images
-                        </label>
-                        <div className="space-y-2">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            disabled={!form.isReady}
-                            onChange={(e) => form.handleUpload(e.target.files, true)}
-                            className="text-xs text-text-secondary file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border file:border-border-medium file:text-xs file:font-semibold file:bg-white hover:file:bg-bg-primary file:cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                          />
-                          <div className="flex gap-2 overflow-x-auto py-1">
-                            {form.galleryUrls.map((url, index) => (
-                              <div key={index} className="relative group flex-shrink-0">
-                                <img
-                                  src={url}
-                                  alt="Gallery item"
-                                  className="w-10 h-14 object-cover rounded border border-border-subtle"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => form.setGalleryUrls((prev) => prev.filter((_, i) => i !== index))}
-                                  className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-600 rounded-full text-white text-[10px] flex items-center justify-center hover:bg-red-700 cursor-pointer"
-                                >
-                                  ×
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <MediaUploadFields
+                    formDescription={form.formDescription}
+                    onFormDescriptionChange={form.setFormDescription}
+                    uploading={form.uploading}
+                    isReady={form.isReady}
+                    mainImageUrl={form.mainImageUrl}
+                    onUpload={form.handleUpload}
+                    galleryUrls={form.galleryUrls}
+                    onRemoveGalleryImage={(index) =>
+                      form.setGalleryUrls((prev) => prev.filter((_, i) => i !== index))
+                    }
+                  />
                 </div>
 
-                {/* Sizes and stock list */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-border-subtle">
-                  <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-text-primary mb-3">
-                      Sizes & Stock levels
-                    </h3>
-                    <div className="flex gap-2 mb-4">
-                      <input
-                        type="text"
-                        placeholder="Size (e.g. XL, 38)"
-                        value={form.newSizeName}
-                        onChange={(e) => form.setNewSizeName(e.target.value)}
-                        className="w-1/2 px-4 py-2 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
-                      />
-                      <input
-                        type="number"
-                        placeholder="Stock"
-                        value={form.newSizeStock}
-                        onChange={(e) => form.setNewSizeStock(e.target.value)}
-                        className="w-1/4 px-4 py-2 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleAddSizeClick}
-                        className="px-4 py-2 bg-bg-ink text-text-inverted rounded-full text-xs hover:bg-text-primary transition-colors cursor-pointer"
-                      >
-                        Add Size
-                      </button>
-                    </div>
+                  <SizeStockFields
+                    newSizeName={form.newSizeName}
+                    onNewSizeNameChange={form.setNewSizeName}
+                    newSizeStock={form.newSizeStock}
+                    onNewSizeStockChange={form.setNewSizeStock}
+                    onAddSize={form.handleAddSize}
+                    formSizes={form.formSizes}
+                    onStockChange={(size, stock) =>
+                      form.setFormSizes((prev) =>
+                        prev.map((item) => (item.size === size ? { ...item, stock } : item))
+                      )
+                    }
+                    onRemoveSize={(size) =>
+                      form.setFormSizes((prev) => prev.filter((item) => item.size !== size))
+                    }
+                  />
 
-                    <div className="space-y-2">
-                      {form.formSizes.length === 0 ? (
-                        <div className="text-xs text-text-muted italic">No sizes specified.</div>
-                      ) : (
-                        form.formSizes.map((s) => (
-                          <div key={s.size} className="flex items-center justify-between bg-bg-primary/40 p-2 px-3 border border-border-subtle rounded-lg">
-                            <span className="font-mono text-sm font-semibold">{s.size}</span>
-                            <div className="flex items-center gap-3">
-                              <span className="text-xs text-text-secondary">Stock:</span>
-                              <input
-                                type="number"
-                                value={s.stock}
-                                onChange={(e) => {
-                                  const val = parseInt(e.target.value, 10);
-                                  if (isNaN(val)) return;
-                                  form.setFormSizes((prev) =>
-                                    prev.map((item) => (item.size === s.size ? { ...item, stock: Math.max(0, val) } : item))
-                                  );
-                                }}
-                                className="w-16 px-2 py-1 bg-white border border-border-medium rounded text-xs text-center focus:outline-none focus:border-accent-primary"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => form.setFormSizes((prev) => prev.filter((item) => item.size !== s.size))}
-                                className="text-error font-bold text-xs hover:text-red-700 cursor-pointer"
-                              >
-                                Remove
-                              </button>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Bullet details */}
-                  <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-text-primary mb-3">
-                      Detail bullet points
-                    </h3>
-                    <div className="flex gap-2 mb-4">
-                      <input
-                        type="text"
-                        placeholder="e.g. 100% cashmere, Made in Italy"
-                        value={form.formDetailInput}
-                        onChange={(e) => form.setFormDetailInput(e.target.value)}
-                        className="flex-1 px-4 py-2 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleAddDetailClick}
-                        className="px-4 py-2 bg-bg-ink text-text-inverted rounded-full text-xs hover:bg-text-primary transition-colors cursor-pointer"
-                      >
-                        Add
-                      </button>
-                    </div>
-
-                    <ul className="space-y-1.5">
-                      {form.formDetails.length === 0 ? (
-                        <li className="text-xs text-text-muted italic">No detail bullet points added.</li>
-                      ) : (
-                        form.formDetails.map((detail, index) => (
-                          <li key={index} className="flex items-start justify-between text-xs bg-bg-primary/20 p-2.5 rounded-lg border border-border-subtle">
-                            <span className="flex-1 pr-4 text-text-secondary">{detail}</span>
-                            <button
-                              type="button"
-                              onClick={() => form.setFormDetails((prev) => prev.filter((_, i) => i !== index))}
-                              className="text-error hover:text-red-700 cursor-pointer text-xs"
-                            >
-                              Remove
-                            </button>
-                          </li>
-                        ))
-                      )}
-                    </ul>
-                  </div>
+                  <BulletDetailsFields
+                    formDetailInput={form.formDetailInput}
+                    onFormDetailInputChange={form.setFormDetailInput}
+                    onAddDetail={form.handleAddDetail}
+                    formDetails={form.formDetails}
+                    onRemoveDetail={(index) =>
+                      form.setFormDetails((prev) => prev.filter((_, i) => i !== index))
+                    }
+                  />
                 </div>
               </div>
 

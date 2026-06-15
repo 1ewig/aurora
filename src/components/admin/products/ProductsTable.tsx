@@ -1,50 +1,24 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
 import { type ProductData } from "@/stores/useAdminStore";
 
 interface ProductsTableProps {
-  products: ProductData[];
+  filteredProducts: ProductData[];
   searchQuery: string;
   onSearchChange: (val: string) => void;
-  onAddClick: () => void;
   onEditClick: (product: ProductData) => void;
   onDeleteClick: (product: ProductData) => void;
 }
 
 export function ProductsTable({
-  products,
+  filteredProducts,
   searchQuery,
   onSearchChange,
-  onAddClick,
   onEditClick,
   onDeleteClick,
 }: ProductsTableProps) {
-  // Filter products locally
-  const filteredProducts = products.filter(
-    (p) =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
     <div className="space-y-8">
-      {/* Header Panel */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-border-subtle pb-6">
-        <div>
-          <h1 className="font-display font-black text-3xl uppercase tracking-wider text-text-primary">
-            Inventory Management
-          </h1>
-          <p className="text-text-secondary text-sm">
-            Add, update, or remove items from the catalog.
-          </p>
-        </div>
-        <Button onClick={onAddClick} variant="gold" size="sm">
-          Add Product
-        </Button>
-      </div>
-
       {/* Search Input */}
       <div className="flex justify-end">
         <input

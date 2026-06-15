@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAdminStore, type ProductData } from "@/stores/useAdminStore";
 import { useProductForm } from "@/hooks/useProductForm";
+import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
+import { Button } from "@/components/ui/Button";
 import { ProductsTable } from "./ProductsTable";
 import { ProductFormModal } from "./ProductFormModal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -18,6 +20,17 @@ export function ProductsClient() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductData | null>(null);
   const [productToDelete, setProductToDelete] = useState<ProductData | null>(null);
+
+  const filteredProducts = useMemo(
+    () =>
+      products.filter(
+        (p) =>
+          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.category.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    [products, searchQuery]
+  );
 
   // Setup form hook
   const form = useProductForm(() => {
@@ -66,12 +79,21 @@ export function ProductsClient() {
         </div>
       ) : (
         <>
+          <AdminHeaderPanel
+            title="Inventory Management"
+            description="Add, update, or remove items from the catalog."
+            action={
+              <Button onClick={() => handleOpenModal()} variant="gold" size="sm">
+                Add Product
+              </Button>
+            }
+          />
+
           {/* Products Table */}
           <ProductsTable
-            products={products}
+            filteredProducts={filteredProducts}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
-            onAddClick={() => handleOpenModal()}
             onEditClick={handleOpenModal}
             onDeleteClick={setProductToDelete}
           />
