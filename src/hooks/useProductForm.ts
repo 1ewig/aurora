@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useInsforgeClient } from "@/lib/insforge";
 import { useAdminStore, type ProductData, type SizeStock } from "@/stores/useAdminStore";
+import { categories } from "@/data/products";
 
 export function useProductForm(onSuccess: () => void) {
   const saveProduct = useAdminStore((s) => s.saveProduct);
@@ -9,7 +10,7 @@ export function useProductForm(onSuccess: () => void) {
   const [formId, setFormId] = useState("");
   const [formName, setFormName] = useState("");
   const [formSlug, setFormSlug] = useState("");
-  const [formCategory, setFormCategory] = useState("tops");
+  const [formCategory, setFormCategory] = useState<string>(categories[0]);
   const [formPrice, setFormPrice] = useState("");
   const [formBadge, setFormBadge] = useState("");
   const [formAltText, setFormAltText] = useState("");
@@ -30,6 +31,30 @@ export function useProductForm(onSuccess: () => void) {
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  // Snapshot for change detection
+  const [initialSnapshot, setInitialSnapshot] = useState<string>("");
+
+  function currentSnapshot() {
+    return JSON.stringify({
+      id: formId,
+      name: formName,
+      slug: formSlug,
+      category: formCategory,
+      price: formPrice,
+      badge: formBadge,
+      altText: formAltText,
+      span: formSpan,
+      aspectRatio: formAspectRatio,
+      description: formDescription,
+      details: formDetails,
+      sizes: formSizes,
+      image: mainImageUrl,
+      images: galleryUrls,
+    });
+  }
+
+  const hasChanges = currentSnapshot() !== initialSnapshot;
 
   // Sync auto slug
   useEffect(() => {
@@ -59,11 +84,29 @@ export function useProductForm(onSuccess: () => void) {
       setFormSizes(product.sizes || []);
       setMainImageUrl(product.image);
       setGalleryUrls(product.images || []);
+      setInitialSnapshot(
+        JSON.stringify({
+          id: product.id,
+          name: product.name,
+          slug: product.slug,
+          category: product.category,
+          price: String(product.price),
+          badge: product.badge || "",
+          altText: product.altText || "",
+          span: product.span || "",
+          aspectRatio: product.aspectRatio || "",
+          description: product.description || "",
+          details: product.details || [],
+          sizes: product.sizes || [],
+          image: product.image,
+          images: product.images || [],
+        })
+      );
     } else {
       setFormId("");
       setFormName("");
       setFormSlug("");
-      setFormCategory("tops");
+      setFormCategory(categories[0]);
       setFormPrice("");
       setFormBadge("");
       setFormAltText("");
@@ -78,6 +121,28 @@ export function useProductForm(onSuccess: () => void) {
       ]);
       setMainImageUrl("");
       setGalleryUrls([]);
+      setInitialSnapshot(
+        JSON.stringify({
+          id: "",
+          name: "",
+          slug: "",
+          category: categories[0],
+          price: "",
+          badge: "",
+          altText: "",
+          span: "",
+          aspectRatio: "",
+          description: "",
+          details: [],
+          sizes: [
+            { size: "S", stock: 10 },
+            { size: "M", stock: 10 },
+            { size: "L", stock: 10 },
+          ],
+          image: "",
+          images: [],
+        })
+      );
     }
   }
 
@@ -196,6 +261,7 @@ export function useProductForm(onSuccess: () => void) {
     uploading,
     saving,
     isReady,
+    hasChanges,
     resetForm,
     handleUpload,
     handleSave,
