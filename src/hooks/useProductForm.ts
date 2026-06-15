@@ -153,9 +153,9 @@ export function useProductForm(onSuccess: () => void) {
     setUploading(true);
     try {
       const uploadPromises = Array.from(files).map(async (file) => {
-        const fileExt = file.name.substring(file.name.lastIndexOf("."));
         const idForPath = formId.trim() || "temp";
-        const key = `${idForPath}/${Date.now()}-${Math.floor(Math.random() * 1000)}${fileExt}`;
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+        const key = `${idForPath}/${safeName}`;
 
         const { data, error } = await insforge.storage.from("product-media").upload(key, file);
         if (error) throw error;
