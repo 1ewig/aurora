@@ -169,6 +169,11 @@ export function useProductForm(onSuccess: () => void) {
         setGalleryUrls((prev) => [...prev, ...validUrls]);
       } else {
         setMainImageUrl(validUrls[0] || "");
+        setGalleryUrls((prev) => {
+          const newUrl = validUrls[0] || "";
+          const filtered = prev.filter((u) => u !== newUrl);
+          return [newUrl, ...filtered];
+        });
       }
     } catch (err: any) {
       alert(`Upload failed: ${err.message}`);
