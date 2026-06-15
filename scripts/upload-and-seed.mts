@@ -4,7 +4,7 @@
  *
  * First-time setup / Wiping & Seeding script:
  * - Verifies and wipes/recreates the three storage buckets (product-media, lookbook-media, editorial-media)
- * - Drops and rebuilds all database tables (products, product_images, product_sizes, product_details, profiles, orders, lookbook_slides, editorial_content)
+ * - Drops and rebuilds all database tables (products, product_images, product_sizes, product_details, orders, lookbook_slides, editorial_content)
  * - Recursively scans and uploads all local assets to storage
  * - Seeds all catalog, lookbook slides, and editorial content into the database
  *
@@ -359,7 +359,6 @@ async function seed() {
     DROP TABLE IF EXISTS product_sizes CASCADE;
     DROP TABLE IF EXISTS product_details CASCADE;
     DROP TABLE IF EXISTS products CASCADE;
-    DROP TABLE IF EXISTS public.profiles CASCADE;
     DROP TABLE IF EXISTS public.orders CASCADE;
     DROP TABLE IF EXISTS public.lookbook_slides CASCADE;
     DROP TABLE IF EXISTS public.editorial_content CASCADE;
