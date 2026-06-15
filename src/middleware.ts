@@ -27,7 +27,12 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isAdminPath) {
-    if (!isAdmin(request.cookies.get("better-auth.user_email")?.value)) {
+    const baseUrl = process.env.BETTER_AUTH_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+    const res = await fetch(`${baseUrl}/api/auth/get-session`, {
+      headers: { cookie: request.headers.get('cookie') || '' },
+    });
+    const session = res.ok ? await res.json() : null;
+    if (!isAdmin(session?.user?.email)) {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
