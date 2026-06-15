@@ -1,19 +1,23 @@
 const { Pool } = require('pg');
+const fs = require('fs');
+const path = require('path');
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:454201376c783709e954b9395916246d@4eu5wk8i.us-east.database.insforge.app:5432/insforge?sslmode=verify-full';
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  console.error('Set DATABASE_URL environment variable');
+  process.exit(1);
+}
+
 const pool = new Pool({ connectionString: DATABASE_URL });
 
 async function run() {
   try {
-    // Drop old tables
-    await pool.query('DROP TABLE IF EXISTS better_auth.verification CASCADE');
-    await pool.query('DROP TABLE IF EXISTS better_auth.account CASCADE');
-    await pool.query('DROP TABLE IF EXISTS better_auth.session CASCADE');
-    await pool.query('DROP TABLE IF EXISTS better_auth.user CASCADE');
-    console.log('Dropped old snake_case tables');
+    // 1. Create better_auth schema and BA tables
+    console.log('Creating BA schema...');
+    await pool.query('CREATE SCHEMA IF NOT EXISTS better_auth');
 
-    // Recreate with camelCase columns (BA expects these)
-    await pool.query(`CREATE TABLE better_auth.user (
+    console.log('Creating BA tables...');
+    await pool.query(`CREATE TABLE IF NOT EXISTS better_auth.user (
       id TEXT PRIMARY KEY,
       name TEXT,
       email TEXT NOT NULL UNIQUE,
@@ -22,8 +26,7 @@ async function run() {
       "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )`);
-
-    await pool.query(`CREATE TABLE better_auth.session (
+    await pool.query(`CREATE TABLE IF NOT EXISTS better_auth.session (
       id TEXT PRIMARY KEY,
       "expiresAt" TIMESTAMPTZ NOT NULL,
       token TEXT NOT NULL UNIQUE,
@@ -33,8 +36,7 @@ async function run() {
       "userAgent" TEXT,
       "userId" TEXT NOT NULL REFERENCES better_auth.user(id) ON DELETE CASCADE
     )`);
-
-    await pool.query(`CREATE TABLE better_auth.account (
+    await pool.query(`CREATE TABLE IF NOT EXISTS better_auth.account (
       id TEXT PRIMARY KEY,
       "accountId" TEXT NOT NULL,
       "providerId" TEXT NOT NULL,
@@ -49,8 +51,7 @@ async function run() {
       "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )`);
-
-    await pool.query(`CREATE TABLE better_auth.verification (
+    await pool.query(`CREATE TABLE IF NOT EXISTS better_auth.verification (
       id TEXT PRIMARY KEY,
       identifier TEXT NOT NULL,
       value TEXT NOT NULL,
@@ -59,11 +60,19 @@ async function run() {
       "updatedAt" TIMESTAMPTZ
     )`);
 
-    console.log('Created BA tables with camelCase columns');
+    // 2. Run app schema migration (products, profiles, orders, RLS, etc.)
+    const migrationPath = path.join(__dirname, '..', 'migrations', '20260614145429_better-auth-setup.sql');
+    const migrationSql = fs.readFileSync(migrationPath, 'utf8');
+    await pool.query(migrationSql);
+    console.log('App schema migration applied');
+
+    console.log('Database setup complete.');
   } catch (e) {
-    console.error('Error:', e.message);
+    console.error('Setup failed:', e.message);
+    process.exit(1);
   } finally {
     await pool.end();
   }
 }
+
 run();

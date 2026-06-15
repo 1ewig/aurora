@@ -37,12 +37,27 @@ BEGIN
   END IF;
 END $$;
 
-ALTER TABLE public.profiles ALTER COLUMN id TYPE TEXT;
-ALTER TABLE public.profiles ALTER COLUMN id DROP DEFAULT;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'profiles' AND column_name = 'id' AND data_type = 'uuid'
+  ) THEN
+    ALTER TABLE public.profiles ALTER COLUMN id TYPE TEXT;
+    ALTER TABLE public.profiles ALTER COLUMN id DROP DEFAULT;
+    UPDATE public.profiles SET legacy_user_id = id::UUID WHERE legacy_user_id IS NULL;
+  END IF;
+END $$;
 
-UPDATE public.profiles SET legacy_user_id = id::UUID WHERE legacy_user_id IS NULL;
-
-ALTER TABLE public.orders ALTER COLUMN user_id TYPE TEXT USING user_id::TEXT;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'orders' AND column_name = 'user_id' AND data_type = 'uuid'
+  ) THEN
+    ALTER TABLE public.orders ALTER COLUMN user_id TYPE TEXT USING user_id::TEXT;
+  END IF;
+END $$;
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
