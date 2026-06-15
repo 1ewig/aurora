@@ -69,12 +69,14 @@ npx @insforge/cli secrets get ANON_KEY
 
 Get the **database connection string** — open the InsForge Dashboard, navigate to your project, and find the **Database** section. Look for the PostgreSQL connection string (it looks like `postgresql://username:password@host:port/database?sslmode=require`).
 
-You now have three values:
+You now have these values:
 
 | Variable | Where to find it |
 |---|---|
 | `DATABASE_URL` | InsForge Dashboard → Database section |
 | `NEXT_PUBLIC_INSFORGE_URL` | `.insforge/project.json` → `oss_host` |
+| `NEXT_PUBLIC_INSFORGE_ANON_KEY` | `npx @insforge/cli secrets get ANON_KEY` |
+| `INSFORGE_API_KEY` | `.insforge/project.json` → `api_key` |
 | `INSFORGE_JWT_SECRET` | `npx @insforge/cli secrets get JWT_SECRET` |
 | `BETTER_AUTH_SECRET` | Generate: `openssl rand -base64 32` |
 | `BETTER_AUTH_URL` | `http://localhost:3000` (dev) or production URL |
@@ -114,6 +116,8 @@ Then edit `.env.local` and fill in the credentials from Step 4:
 DATABASE_URL="postgresql://username:password@host:port/database?sslmode=require"
 
 NEXT_PUBLIC_INSFORGE_URL="https://your-appkey.us-east.insforge.app"
+NEXT_PUBLIC_INSFORGE_ANON_KEY="your-public-anon-key"
+INSFORGE_API_KEY="your-admin-service-key"
 
 BETTER_AUTH_SECRET="your-base64-secret"
 BETTER_AUTH_URL="http://localhost:3000"
@@ -184,6 +188,8 @@ npm run build
 If you're deploying to Vercel or another platform, set these environment variables there:
 - `DATABASE_URL`
 - `NEXT_PUBLIC_INSFORGE_URL`
+- `NEXT_PUBLIC_INSFORGE_ANON_KEY`
+- `INSFORGE_API_KEY`
 - `BETTER_AUTH_SECRET`
 - `BETTER_AUTH_URL`
 - `NEXT_PUBLIC_BETTER_AUTH_URL`
