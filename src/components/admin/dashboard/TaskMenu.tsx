@@ -9,7 +9,7 @@ export function TaskMenu() {
       
       <div className="flex flex-col gap-3">
         <Link
-          href="/admin/products"
+          href="/admin/inventory"
           className="p-4 bg-bg-primary/40 rounded-xl border border-border-subtle hover:border-accent-primary transition-all flex items-center justify-between group"
         >
           <div>
