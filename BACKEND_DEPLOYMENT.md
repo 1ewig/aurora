@@ -73,10 +73,13 @@ You now have three values:
 
 | Variable | Where to find it |
 |---|---|
-| `NEXT_PUBLIC_INSFORGE_URL` | `.insforge/project.json` → `oss_host` |
-| `NEXT_PUBLIC_INSFORGE_ANON_KEY` | `npx @insforge/cli secrets get ANON_KEY` |
-| `NEXT_PUBLIC_INSFORGE_API_KEY` | `.insforge/project.json` → `api_key` |
 | `DATABASE_URL` | InsForge Dashboard → Database section |
+| `NEXT_PUBLIC_INSFORGE_URL` | `.insforge/project.json` → `oss_host` |
+| `INSFORGE_JWT_SECRET` | `npx @insforge/cli secrets get JWT_SECRET` |
+| `BETTER_AUTH_SECRET` | Generate: `openssl rand -base64 32` |
+| `BETTER_AUTH_URL` | `http://localhost:3000` (dev) or production URL |
+| `NEXT_PUBLIC_BETTER_AUTH_URL` | Same as `BETTER_AUTH_URL` |
+| `NEXT_PUBLIC_ADMIN_EMAILS` | Comma-separated admin email addresses |
 
 ---
 
@@ -111,7 +114,13 @@ Then edit `.env.local` and fill in the credentials from Step 4:
 DATABASE_URL="postgresql://username:password@host:port/database?sslmode=require"
 
 NEXT_PUBLIC_INSFORGE_URL="https://your-appkey.us-east.insforge.app"
-NEXT_PUBLIC_INSFORGE_ANON_KEY="your-anon-key"
+
+BETTER_AUTH_SECRET="your-base64-secret"
+BETTER_AUTH_URL="http://localhost:3000"
+NEXT_PUBLIC_BETTER_AUTH_URL="http://localhost:3000"
+
+INSFORGE_JWT_SECRET="your-insforge-jwt-secret"
+NEXT_PUBLIC_ADMIN_EMAILS="admin@example.com"
 ```
 
 > The `DATABASE_URL` must use `sslmode=require` (InsForge requires it).
@@ -130,7 +139,8 @@ This performs a completely automated setup and seeding:
 1. **Multi-Bucket Verification & Wipe**: Checks and prepares three buckets: `product-media`, `lookbook-media`, and `editorial-media`. If missing, it creates them. If they exist with data, it wipes them to prevent name collisions.
 2. **Recursive Image Scan & Route**: Uploads all local assets recursively to their corresponding storage buckets (`/images/lookbook/*` -> `lookbook-media`, `/images/editorial/*` -> `editorial-media`, and products -> `product-media`).
 3. **Database Schema Creation**: Automatically drops existing tables and executes [`scripts/create-tables.sql`](file:///c:/Users/moshu%20moshu/Desktop/aurora/scripts/create-tables.sql) to build the database from scratch.
-4. **Data Seeding**: Seeds all products, gallery image relations, sizes, detail bullets, lookbook slides, and editorial content.
+4. **Better Auth Tables**: Creates the `better_auth` schema with `user`, `session`, `account`, and `verification` tables (isolated from PostgREST — only accessible via direct Postgres connection).
+5. **Data Seeding**: Seeds all products, gallery image relations, sizes, detail bullets, lookbook slides, and editorial content.
 
 ---
 
@@ -171,10 +181,14 @@ Open [http://localhost:3000](http://localhost:3000) and check:
 npm run build
 ```
 
-If you're deploying to Vercel or another platform, set the same three environment variables there:
-- `NEXT_PUBLIC_INSFORGE_URL`
-- `NEXT_PUBLIC_INSFORGE_ANON_KEY`
+If you're deploying to Vercel or another platform, set these environment variables there:
 - `DATABASE_URL`
+- `NEXT_PUBLIC_INSFORGE_URL`
+- `BETTER_AUTH_SECRET`
+- `BETTER_AUTH_URL`
+- `NEXT_PUBLIC_BETTER_AUTH_URL`
+- `INSFORGE_JWT_SECRET`
+- `NEXT_PUBLIC_ADMIN_EMAILS`
 
 ---
 
@@ -198,6 +212,9 @@ Everything else is committed to the repository and ready to use.
 |---|---|---|
 | `insforge: command not found` | CLI not installed | Use `npx @insforge/cli ...` (no global install needed) |
 | `DATABASE_URL not found` | `.env.local` missing or misconfigured | Copy `.env.example` → `.env.local` and fill in the values |
+| Auth redirects to login loop | `BETTER_AUTH_URL` or `NEXT_PUBLIC_BETTER_AUTH_URL` mismatch | Ensure both match your deployment URL exactly (no trailing slash) |
+| Session invalidated on re-deploy | `BETTER_AUTH_SECRET` changed between deploys | Keep the same secret across all environments |
+| `relation "better_auth.user" does not exist` | BA tables not created | Run `npx tsx scripts/upload-and-seed.mts` to seed the full schema |
 | `relation "products" does not exist` | Tables not created | Run `npx tsx scripts/upload-and-seed.mts` to automatically build schema |
 | `bucket product-media does not exist` | Bucket not created | Run `npx tsx scripts/upload-and-seed.mts` to automatically create buckets |
 | Images show as broken | Bucket is private | Buckets are public by default, but verify: if private, run setup script to recreate them |
