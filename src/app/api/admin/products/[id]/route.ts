@@ -113,7 +113,8 @@ export async function PUT(
       );
 
       await client.query('DELETE FROM product_images WHERE product_id = $1', [id]);
-      for (const imgUrl of images) {
+      const allImageUrls = [image, ...images.filter((img: string) => img !== image)];
+      for (const imgUrl of allImageUrls) {
         await client.query(
           'INSERT INTO product_images (product_id, image_url) VALUES ($1, $2)',
           [id, imgUrl]
