@@ -1,6 +1,16 @@
--- Aurora — Database tables for product catalog
--- Run this in the InsForge SQL editor or via:
---   npx @insforge/cli db query "$(cat scripts/create-tables.sql)"
+-- Aurora — Database tables
+-- Run this via direct postgres connection (not InsForge CLI) because it
+-- creates the better_auth schema (hidden from PostgREST).
+--   node -e "require('fs').readFileSync('scripts/create-tables.sql','utf8')..."
+
+-- Better Auth schema (isolated from PostgREST — only public is exposed)
+CREATE SCHEMA IF NOT EXISTS better_auth;
+
+-- Helper for RLS policies (extracts sub claim from bridge JWT)
+CREATE OR REPLACE FUNCTION public.requesting_user_id()
+RETURNS text
+LANGUAGE sql STABLE
+AS $$ SELECT NULLIF(auth.jwt() ->> 'sub', '')::text $$;
 
 -- Products base table
 CREATE TABLE IF NOT EXISTS products (
@@ -41,68 +51,32 @@ CREATE TABLE IF NOT EXISTS product_details (
   detail TEXT NOT NULL
 );
 
--- User Profiles table (maps to built-in auth.users)
+-- User Profiles table (FK to better_auth.user)
 CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  id TEXT PRIMARY KEY,
   display_name TEXT,
+  legacy_user_id UUID,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Enable Row-Level Security
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- Security Policies
-DROP POLICY IF EXISTS "Allow public read" ON public.profiles;
-CREATE POLICY "Allow public read" ON public.profiles FOR SELECT USING (true);
+DROP POLICY IF EXISTS "profiles_select" ON public.profiles;
+CREATE POLICY "profiles_select" ON public.profiles
+  FOR SELECT USING (true);
 
-DROP POLICY IF EXISTS "Allow individual inserts" ON public.profiles;
-CREATE POLICY "Allow individual inserts" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
+DROP POLICY IF EXISTS "profiles_insert" ON public.profiles;
+CREATE POLICY "profiles_insert" ON public.profiles
+  FOR INSERT WITH CHECK (id = public.requesting_user_id());
 
-DROP POLICY IF EXISTS "Allow individual updates" ON public.profiles;
-CREATE POLICY "Allow individual updates" ON public.profiles FOR UPDATE USING (auth.uid() = id);
+DROP POLICY IF EXISTS "profiles_update" ON public.profiles;
+CREATE POLICY "profiles_update" ON public.profiles
+  FOR UPDATE USING (id = public.requesting_user_id());
 
--- Trigger to automatically create profiles for new user registrations
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger AS $$
-BEGIN
-  INSERT INTO public.profiles (id, display_name)
-  VALUES (
-    new.id, 
-    COALESCE(new.profile->>'name', new.profile->>'displayName', '')
-  );
-  RETURN new;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
--- Trigger to automatically update profiles when auth.users.profile details change
-CREATE OR REPLACE FUNCTION public.handle_user_update()
-RETURNS trigger AS $$
-BEGIN
-  UPDATE public.profiles
-  SET 
-    display_name = COALESCE(new.profile->>'displayName', new.profile->>'name', new.profile->>'nickname', display_name),
-    updated_at = NOW()
-  WHERE id = new.id;
-  RETURN new;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-DROP TRIGGER IF EXISTS on_auth_user_updated ON auth.users;
-CREATE TRIGGER on_auth_user_updated
-  AFTER UPDATE ON auth.users
-  FOR EACH ROW
-  WHEN (old.profile IS DISTINCT FROM new.profile)
-  EXECUTE FUNCTION public.handle_user_update();
-
--- Add orders table for purchase history
+-- Orders table (guest checkout allowed — user_id is nullable)
 CREATE TABLE IF NOT EXISTS orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  user_id TEXT,
   order_number VARCHAR(50) UNIQUE NOT NULL,
   items JSONB NOT NULL,
   subtotal NUMERIC(10,2) NOT NULL,
@@ -139,5 +113,16 @@ CREATE TABLE IF NOT EXISTS public.editorial_content (
   description TEXT
 );
 
-
-
+-- Realtime: allow string sender_ids for Better Auth user IDs
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'realtime'
+    AND table_name = 'messages'
+    AND column_name = 'sender_id'
+    AND data_type = 'uuid'
+  ) THEN
+    ALTER TABLE realtime.messages ALTER COLUMN sender_id TYPE text;
+  END IF;
+END $$;

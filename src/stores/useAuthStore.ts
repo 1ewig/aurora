@@ -77,7 +77,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return { error };
       }
 
-      const needsVerification = !data?.user?.emailVerified;
+      const needsVerification = false;
 
       if (data?.user) {
         set({
