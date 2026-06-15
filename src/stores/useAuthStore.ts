@@ -14,16 +14,36 @@ export interface Profile {
   displayName: string;
 }
 
+function mapBetterAuthError(error: any): string {
+  if (!error) return "Something went wrong.";
+  const msg = (error.message || "").toLowerCase();
+  const status = error.status;
+  const code = (error.code || "").toLowerCase();
+
+  if (status === 403 || code === "email_not_verified") return "Please verify your email before signing in.";
+  if (code === "user_not_found") return "No account found with this email address.";
+  if (code === "invalid_password") return "Incorrect password. Try again or reset your password.";
+  if (code === "invalid_token" || msg.includes("invalid token")) return "This link is invalid or has expired.";
+  if (code === "invalid_email" || msg.includes("invalid email")) return "This email address is not valid.";
+  if (code === "weak_password" || msg.includes("password is too short")) return "Password must be at least 8 characters.";
+  if (code === "rate_limit" || msg.includes("rate limit") || msg.includes("too many requests")) return "Too many attempts. Please wait a moment and try again.";
+  if (msg.includes("already") && (msg.includes("exist") || msg.includes("registered") || msg.includes("taken"))) return "An account with this email already exists.";
+  if (msg.includes("account") && msg.includes("not found")) return "No account found with this email address.";
+  if (msg.includes("reset") && msg.includes("password") && msg.includes("expired")) return "This password reset link has expired. Please request a new one.";
+
+  return error.message || "Something went wrong.";
+}
+
 interface AuthState {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
   error: string | null;
-  signIn: (email: string, password: string) => Promise<{ error: any; needsVerification?: boolean }>;
+  signIn: (email: string, password: string) => Promise<{ error: any; needsVerification?: boolean; needsReset?: boolean }>;
   signUp: (email: string, password: string, name?: string) => Promise<{ error: any; needsVerification?: boolean }>;
   signOut: () => Promise<void>;
   updateProfile: (profile: Partial<Profile>) => Promise<{ error: any }>;
-  verifyEmail: (email: string, otp: string, name?: string) => Promise<{ error: any }>;
+  verifyEmail: (email: string, token: string) => Promise<{ error: any }>;
   resendVerification: (email: string) => Promise<{ error: any }>;
   sendResetPasswordEmail: (email: string) => Promise<{ error: any }>;
   exchangeResetPasswordToken: (email: string, code: string) => Promise<{ token?: string; error: any }>;
@@ -44,9 +64,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const { data, error } = await authClient.signIn.email({ email, password });
       if (error) {
-        const message = error.message || 'Invalid email or password.';
+        const message = mapBetterAuthError(error);
+        const isUnverified = error.status === 403 || (error.message || "").toLowerCase().includes("verify");
+        const isWrongPassword = (error.message || "").toLowerCase().includes("password");
         set({ loading: false, error: message });
-        return { error, needsVerification: message.toLowerCase().includes('verify') };
+        return { error, needsVerification: isUnverified, needsReset: isWrongPassword };
       }
 
       const user = data?.user
@@ -59,11 +81,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       } else {
         set({ user: null, profile: null, loading: false });
       }
-      return { error: null, needsVerification: false };
+      return { error: null, needsVerification: false, needsReset: false };
     } catch (err: any) {
       const message = err.message || 'Failed to sign in.';
       set({ loading: false, error: message });
-      return { error: { message }, needsVerification: false };
+      return { error: { message }, needsVerification: false, needsReset: false };
     }
   },
 
@@ -72,28 +94,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const { data, error } = await authClient.signUp.email({ email, password, name: name || '' });
       if (error) {
-        let message = error.message || 'Failed to sign up.';
+        const message = mapBetterAuthError(error);
         set({ loading: false, error: message });
-        return { error };
+        return { error: message, needsVerification: false };
       }
 
-      const needsVerification = false;
-
-      if (data?.user) {
+      if (data?.user && data.user.emailVerified) {
         set({
           user: { id: data.user.id, email: data.user.email, name: data.user.name, emailVerified: data.user.emailVerified, image: data.user.image },
           profile: { displayName: name || '' },
           loading: false,
         });
-      } else {
-        set({ loading: false });
+        return { error: null, needsVerification: false };
       }
 
-      return { error: null, needsVerification };
+      set({ loading: false });
+      return { error: null, needsVerification: true };
     } catch (err: any) {
-      const message = err.message || 'Failed to sign up.';
+      const message = mapBetterAuthError(err);
       set({ loading: false, error: message });
-      return { error: { message } };
+      return { error: message, needsVerification: false };
     }
   },
 
@@ -125,30 +145,36 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  verifyEmail: async (email, _otp, _name) => {
+  verifyEmail: async (_email, token) => {
+    if (!token) {
+      set({ error: "No verification token provided.", loading: false });
+      return { error: { message: "No verification token provided." } };
+    }
     set({ loading: true, error: null });
     try {
-      const callbackURL = `${window.location.origin}/profile`;
-      const { error } = await authClient.sendVerificationEmail({ email, callbackURL });
+      const { error } = await authClient.verifyEmail({ query: { token } });
       if (error) {
-        set({ loading: false, error: error.message || 'Failed to send verification email.' });
-        return { error };
+        const message = mapBetterAuthError(error);
+        set({ loading: false, error: message });
+        return { error: message };
       }
       set({ loading: false });
       return { error: null };
     } catch (err: any) {
-      set({ loading: false, error: err.message || 'Verification failed.' });
-      return { error: { message: err.message } };
+      const message = mapBetterAuthError(err);
+      set({ loading: false, error: message });
+      return { error: { message } };
     }
   },
 
   resendVerification: async (email) => {
     set({ loading: true, error: null });
     try {
-      const callbackURL = `${window.location.origin}/profile`;
+      const callbackURL = `${window.location.origin}/verify?email=${encodeURIComponent(email)}&status=success`;
       const { error } = await authClient.sendVerificationEmail({ email, callbackURL });
       if (error) {
-        set({ loading: false, error: error.message || 'Failed to resend verification email.' });
+        const message = mapBetterAuthError(error);
+        set({ loading: false, error: message });
         return { error };
       }
       set({ loading: false });
@@ -165,8 +191,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const redirectTo = `${window.location.origin}/reset-password`;
       const { error } = await authClient.requestPasswordReset({ email, redirectTo });
       if (error) {
-        set({ loading: false, error: error.message || 'Failed to send reset password email.' });
-        return { error };
+        const message = mapBetterAuthError(error);
+        set({ loading: false, error: message });
+        return { error: message };
       }
       set({ loading: false });
       return { error: null };
@@ -176,29 +203,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  exchangeResetPasswordToken: async (_email, code) => {
-    set({ loading: true, error: null });
-    try {
-      const { error } = await authClient.resetPassword({ newPassword: code });
-      if (error) {
-        set({ loading: false, error: error.message || 'Failed to exchange reset password token.' });
-        return { error };
-      }
-      set({ loading: false });
-      return { token: code, error: null };
-    } catch (err: any) {
-      set({ loading: false, error: err.message });
-      return { error: err };
-    }
+  exchangeResetPasswordToken: async (_email, _code) => {
+    return { token: "", error: { message: "Not needed with link-based reset" } };
   },
 
   resetPassword: async (newPassword, token) => {
     set({ loading: true, error: null });
     try {
-      const { error } = await authClient.resetPassword({ newPassword, ...(token ? { token } : {}) });
+      const { error } = await authClient.resetPassword({ newPassword, token });
       if (error) {
-        set({ loading: false, error: error.message || 'Failed to reset password.' });
-        return { error };
+        const message = mapBetterAuthError(error);
+        set({ loading: false, error: message });
+        return { error: message };
       }
       set({ loading: false });
       return { error: null };
