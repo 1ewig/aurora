@@ -6,6 +6,52 @@
 -- Better Auth schema (isolated from PostgREST — only public is exposed)
 CREATE SCHEMA IF NOT EXISTS better_auth;
 
+-- Better Auth tables (camelCase columns, isolated from PostgREST)
+CREATE TABLE IF NOT EXISTS better_auth."user" (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  "emailVerified" BOOLEAN NOT NULL DEFAULT false,
+  image TEXT,
+  "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now()),
+  "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+CREATE TABLE IF NOT EXISTS better_auth.session (
+  id TEXT PRIMARY KEY,
+  "expiresAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+  "ipAddress" TEXT,
+  "userAgent" TEXT,
+  "userId" TEXT NOT NULL REFERENCES better_auth."user"(id) ON DELETE CASCADE,
+  "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now()),
+  "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+CREATE TABLE IF NOT EXISTS better_auth.account (
+  id TEXT PRIMARY KEY,
+  "accountId" TEXT NOT NULL,
+  "providerId" TEXT NOT NULL,
+  "userId" TEXT NOT NULL REFERENCES better_auth."user"(id) ON DELETE CASCADE,
+  "accessToken" TEXT,
+  "refreshToken" TEXT,
+  "accessTokenExpiresAt" TIMESTAMP WITH TIME ZONE,
+  "refreshTokenExpiresAt" TIMESTAMP WITH TIME ZONE,
+  "scope" TEXT,
+  "idToken" TEXT,
+  password TEXT,
+  "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now()),
+  "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+CREATE TABLE IF NOT EXISTS better_auth.verification (
+  id TEXT PRIMARY KEY,
+  identifier TEXT NOT NULL,
+  value TEXT NOT NULL,
+  "expiresAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+  "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now()),
+  "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
 -- Helper for RLS policies (extracts sub claim from bridge JWT)
 CREATE OR REPLACE FUNCTION public.requesting_user_id()
 RETURNS text
