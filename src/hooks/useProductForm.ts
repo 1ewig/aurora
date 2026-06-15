@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { insforge } from "@/utils/insforge/client";
+import { useInsforgeClient } from "@/lib/insforge";
 import { useAdminStore, type ProductData, type SizeStock } from "@/stores/useAdminStore";
 
 export function useProductForm(onSuccess: () => void) {
   const saveProduct = useAdminStore((s) => s.saveProduct);
+  const { client: insforge, isReady } = useInsforgeClient();
 
   const [formId, setFormId] = useState("");
   const [formName, setFormName] = useState("");
@@ -194,6 +195,7 @@ export function useProductForm(onSuccess: () => void) {
     galleryUrls, setGalleryUrls,
     uploading,
     saving,
+    isReady,
     resetForm,
     handleUpload,
     handleSave,

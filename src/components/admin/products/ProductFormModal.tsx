@@ -222,8 +222,9 @@ export function ProductFormModal({
                         <input
                           type="file"
                           accept="image/*"
+                          disabled={!form.isReady}
                           onChange={(e) => form.handleUpload(e.target.files, false)}
-                          className="text-xs text-text-secondary file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border file:border-border-medium file:text-xs file:font-semibold file:bg-white hover:file:bg-bg-primary file:cursor-pointer"
+                          className="text-xs text-text-secondary file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border file:border-border-medium file:text-xs file:font-semibold file:bg-white hover:file:bg-bg-primary file:cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                         />
                         {form.mainImageUrl && (
                           <img
@@ -244,8 +245,9 @@ export function ProductFormModal({
                           type="file"
                           accept="image/*"
                           multiple
+                          disabled={!form.isReady}
                           onChange={(e) => form.handleUpload(e.target.files, true)}
-                          className="text-xs text-text-secondary file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border file:border-border-medium file:text-xs file:font-semibold file:bg-white hover:file:bg-bg-primary file:cursor-pointer"
+                          className="text-xs text-text-secondary file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border file:border-border-medium file:text-xs file:font-semibold file:bg-white hover:file:bg-bg-primary file:cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                         />
                         <div className="flex gap-2 overflow-x-auto py-1">
                           {form.galleryUrls.map((url, index) => (
