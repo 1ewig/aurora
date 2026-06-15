@@ -153,6 +153,8 @@ ${all.map(serializeProduct).join(',\n')}
 //  Buckets Configuration
 // ════════════════════════════════════════════════════════
 
+const BUCKET = 'product-media';
+
 const BUCKETS = {
   products: 'product-media',
   lookbook: 'lookbook-media',
@@ -182,6 +184,24 @@ function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: st
 function buildStorageUrl(bucketName: string, bucketKey: string): string {
   const encodedKey = bucketKey.split('/').map(encodeURIComponent).join('%2F');
   return `${ossHost}/api/storage/buckets/${bucketName}/objects/${encodedKey}`;
+}
+
+function getStorageKeyFromUrl(url: string): string | null {
+  if (!url) return null;
+  const prefix = '/api/storage/buckets/product-media/objects/';
+  const index = url.indexOf(prefix);
+  if (index !== -1) {
+    const encodedKey = url.substring(index + prefix.length).split('?')[0];
+    try {
+      return decodeURIComponent(encodedKey);
+    } catch {
+      return encodedKey;
+    }
+  }
+  if (url.startsWith('/images/')) {
+    return url.replace(/^\/images\//, '');
+  }
+  return null;
 }
 
 // ════════════════════════════════════════════════════════
@@ -539,15 +559,55 @@ async function deleteProductInteractively() {
   saveProductsLocal(newHero, newFeatured, newAll);
   console.log(`\nSuccessfully deleted from local definition file.`);
 
-  // 2. Delete from DB
-  console.log("\nDeleting product from Database...");
+  // 2. Wipe associated storage images + delete from DB
+  console.log("\nConnecting to database...");
   const client = new Client({ connectionString: DATABASE_URL });
   await client.connect();
-  
+
+  // Gather all image URLs for this product
+  const imageUrls = new Set<string>();
+  const { rows: productRows } = await client.query('SELECT image FROM products WHERE id = $1', [target.id]);
+  if (productRows.length > 0 && productRows[0].image) {
+    imageUrls.add(productRows[0].image);
+  }
+  const { rows: galleryRows } = await client.query('SELECT image_url FROM product_images WHERE product_id = $1', [target.id]);
+  for (const row of galleryRows) {
+    if (row.image_url) imageUrls.add(row.image_url);
+  }
+
+  // Remove orphaned storage keys
+  const admin = createAdminClient({ baseUrl: ossHost, apiKey });
+  console.log(`Checking storage usage for ${imageUrls.size} asset(s)...`);
+  for (const url of imageUrls) {
+    const { rows: usageRows } = await client.query(
+      `SELECT COUNT(*) as count FROM (
+        SELECT 1 FROM products WHERE image = $1 AND id <> $2
+        UNION ALL
+        SELECT 1 FROM product_images WHERE image_url = $1 AND product_id <> $2
+      ) as usages`,
+      [url, target.id]
+    );
+    const count = parseInt(usageRows[0].count, 10);
+    if (count === 0) {
+      const storageKey = getStorageKeyFromUrl(url);
+      if (storageKey) {
+        console.log(`  Deleting unused storage key: "${storageKey}"...`);
+        const { error } = await admin.storage.from(BUCKET).remove(storageKey);
+        if (error) {
+          console.warn(`  Warning: failed to delete "${storageKey}" from storage:`, error.message);
+        } else {
+          console.log(`  ✓ Wiped from storage.`);
+        }
+      }
+    } else {
+      console.log(`  Skipping storage deletion for "${url}" (used by ${count} other product(s)).`);
+    }
+  }
+
   await client.query('DELETE FROM products WHERE id = $1', [target.id]);
   await client.end();
-  
-  console.log("\nProduct successfully deleted from database and local data!");
+
+  console.log(`\n=== Success! Product "${target.name}" (ID: ${target.id}) and its unused media have been wiped. ===`);
 }
 
 async function runSyncCatalog() {
