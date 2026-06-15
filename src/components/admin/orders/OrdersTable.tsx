@@ -1,6 +1,7 @@
 "use client";
 
 import { type OrderData } from "@/stores/useAdminStore";
+import { OrderStatusBadge } from "@/components/ui/OrderStatusBadge";
 
 interface OrdersTableProps {
   orders: OrderData[];
@@ -23,41 +24,8 @@ export function OrdersTable({
   onStatusUpdate,
   updatingStatusId,
 }: OrdersTableProps) {
-  // Filter and search orders locally
-  const filteredOrders = orders.filter((o) => {
-    const matchesStatus = filterStatus === "all" || o.status === filterStatus;
-    const matchesSearch =
-      o.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.shippingAddress.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.shippingAddress.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      o.shippingAddress.lastName.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
-
-  function getStatusStyles(status: string) {
-    const styles: Record<string, string> = {
-      pending: "bg-amber-50 text-amber-700 border-amber-200",
-      confirmed: "bg-indigo-50 text-indigo-700 border-indigo-200",
-      shipped: "bg-blue-50 text-blue-700 border-blue-200",
-      delivered: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      cancelled: "bg-gray-100 text-gray-500 border-gray-300",
-    };
-    return styles[status] || "bg-gray-50 text-gray-700 border-gray-200";
-  }
-
   return (
     <div className="space-y-8">
-      {/* Header Panel */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-border-subtle pb-6">
-        <div>
-          <h1 className="font-display font-black text-3xl uppercase tracking-wider text-text-primary">
-            Order Processing
-          </h1>
-          <p className="text-text-secondary text-sm">
-            Fulfill pending purchases and process order statuses.
-          </p>
-        </div>
-      </div>
 
       {/* Filter and Search Panel */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -89,7 +57,7 @@ export function OrdersTable({
       </div>
 
       {/* Orders Table */}
-      {filteredOrders.length === 0 ? (
+      {orders.length === 0 ? (
         <div className="p-20 text-center text-text-secondary text-sm border border-border-subtle rounded-2xl bg-white">
           No orders found matching the filter criteria.
         </div>
@@ -108,7 +76,7 @@ export function OrdersTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-border-subtle">
-              {filteredOrders.map((o) => {
+              {orders.map((o) => {
                 const totalItems = o.items.reduce((sum, item) => sum + item.quantity, 0);
                 const orderDate = new Date(o.createdAt).toLocaleDateString("en-US", {
                   year: "numeric",
@@ -146,9 +114,7 @@ export function OrdersTable({
                       ${o.total.toFixed(2)}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 rounded text-[10px] font-semibold border uppercase ${getStatusStyles(o.status)}`}>
-                        {o.status}
-                      </span>
+                      <OrderStatusBadge status={o.status} />
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="inline-flex gap-2">

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useAdminStore } from "@/stores/useAdminStore";
 import { useOrderProcessing } from "@/hooks/useOrderProcessing";
+import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { OrdersTable } from "./OrdersTable";
 import { OrderDetailModal } from "./OrderDetailModal";
 
@@ -14,7 +15,7 @@ export function OrdersClient() {
   const updateOrderStatus = useAdminStore((s) => s.updateOrderStatus);
 
   // Setup hook for order details, filters, and searches
-  const orderHook = useOrderProcessing();
+  const orderHook = useOrderProcessing(orders);
 
   // Load orders on component mount
   useEffect(() => {
@@ -33,9 +34,14 @@ export function OrdersClient() {
         </div>
       ) : (
         <>
+          <AdminHeaderPanel
+            title="Order Processing"
+            description="Fulfill pending purchases and process order statuses."
+          />
+
           {/* Orders list table */}
           <OrdersTable
-            orders={orders}
+            orders={orderHook.filteredOrders}
             filterStatus={orderHook.filterStatus}
             onFilterStatusChange={orderHook.setFilterStatus}
             searchQuery={orderHook.searchQuery}

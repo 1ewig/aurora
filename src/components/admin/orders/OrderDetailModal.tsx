@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { type OrderData } from "@/stores/useAdminStore";
+import { OrderStatusBadge } from "@/components/ui/OrderStatusBadge";
 
 interface OrderDetailModalProps {
   order: OrderData | null;
@@ -20,17 +21,6 @@ export function OrderDetailModal({
   updatingStatusId,
 }: OrderDetailModalProps) {
   if (!order) return null;
-
-  function getStatusStyles(status: string) {
-    const styles: Record<string, string> = {
-      pending: "bg-amber-50 text-amber-700 border-amber-200",
-      confirmed: "bg-indigo-50 text-indigo-700 border-indigo-200",
-      shipped: "bg-blue-50 text-blue-700 border-blue-200",
-      delivered: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      cancelled: "bg-gray-100 text-gray-500 border-gray-300",
-    };
-    return styles[status] || "bg-gray-50 text-gray-700 border-gray-200";
-  }
 
   return (
     <AnimatePresence>
@@ -171,9 +161,7 @@ export function OrderDetailModal({
                   <div className="border border-border-subtle p-4 rounded-2xl space-y-3 bg-bg-primary/10">
                     <div className="text-xs flex items-center justify-between">
                       <span className="text-text-secondary">Current Status:</span>
-                      <span className={`px-2.5 py-0.5 rounded text-[10px] font-semibold border uppercase ${getStatusStyles(order.status)}`}>
-                        {order.status}
-                      </span>
+                      <OrderStatusBadge status={order.status} />
                     </div>
                     <div className="grid grid-cols-2 gap-2 pt-2">
                       {order.status === "pending" && (
