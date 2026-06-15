@@ -65,7 +65,7 @@ export default function AdminLayout({
     <div className="min-h-screen bg-bg-primary flex flex-col md:flex-row">
       {/* Sidebar Panel */}
       <aside className="w-full md:w-64 bg-bg-secondary border-b md:border-b-0 md:border-r border-border-subtle p-6 flex flex-col gap-8 md:fixed md:top-0 md:bottom-0 md:left-0 z-30">
-        <div>
+        <div className="text-center">
           <Link
             href="/"
             className="font-display font-black text-xl tracking-[0.15em] uppercase text-text-primary hover:text-accent-primary transition-colors"
@@ -91,7 +91,7 @@ export default function AdminLayout({
                 className={`flex items-center gap-3 text-xs sm:text-sm transition-all duration-300 font-semibold uppercase tracking-wider px-4 py-3 rounded-full ${
                   isActive
                     ? "bg-bg-ink text-text-inverted"
-                    : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
+                    : "text-text-secondary border border-border-medium hover:text-text-primary hover:bg-bg-primary/50"
                 }`}
               >
                 {item.icon}

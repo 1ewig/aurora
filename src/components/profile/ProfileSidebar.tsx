@@ -18,7 +18,7 @@ export function ProfileSidebar({ onClose }: ProfileSidebarProps) {
     <div className="h-full flex flex-col justify-between p-6 sm:p-8">
       <div>
         {/* Logo and Brand */}
-        <div className="mb-8 px-2">
+        <div className="mb-8 px-2 text-center">
           <Link
             href="/"
             onClick={onClose}
@@ -38,7 +38,7 @@ export function ProfileSidebar({ onClose }: ProfileSidebarProps) {
             onClick={onClose}
             className={`flex items-center gap-3 text-xs sm:text-sm transition-all duration-300 font-semibold uppercase tracking-wider px-4 py-3 rounded-full ${isProfileActive
                 ? "bg-bg-ink text-text-inverted"
-                : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
+                : "text-text-secondary border border-border-medium hover:text-text-primary hover:bg-bg-primary/50"
               }`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 shrink-0">
@@ -52,7 +52,7 @@ export function ProfileSidebar({ onClose }: ProfileSidebarProps) {
             onClick={onClose}
             className={`flex items-center gap-3 text-xs sm:text-sm transition-all duration-300 font-semibold uppercase tracking-wider px-4 py-3 rounded-full ${isOrdersActive
                 ? "bg-bg-ink text-text-inverted"
-                : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
+                : "text-text-secondary border border-border-medium hover:text-text-primary hover:bg-bg-primary/50"
               }`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 shrink-0">
