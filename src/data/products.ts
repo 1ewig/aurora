@@ -476,4 +476,25 @@ export const allProducts: Product[] = [
     ],
     sizes: sizeOptions.apparel,
   },
+  {
+    id: "p19",
+    slug: "stone-linen-trousers",
+    name: "Stone Linen Trousers",
+    category: "Trousers",
+    price: 380,
+    badge: "New",
+    image: "/images/products/stone-linen-trousers.webp",
+    images: ["/images/products/stone-linen-trousers.webp"],
+    altText: "Stone beige linen wide-leg trousers on seamless background",
+    description: "Effortlessly relaxed wide-leg trousers cut from pure Belgian linen. The high-rise silhouette with a fluid drape and centre-crease detail transitions seamlessly from desk to dinner.",
+    details: [
+      "100% Belgian linen",
+      "High-rise wide-leg cut with centre crease",
+      "Side pockets and concealed zip fly",
+      "Lightweight breathable weave — ideal for warmer months",
+      "Machine washable on gentle cycle",
+      "Made in Portugal"
+    ],
+    sizes: sizeOptions.apparel,
+  },
 ];

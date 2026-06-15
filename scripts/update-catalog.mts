@@ -14,7 +14,7 @@ import { createAdminClient } from '@insforge/sdk';
 import { Client } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
-import readline from 'readline';
+import * as readline from 'readline';
 
 // Reads definitions
 import { heroProducts, featuredProducts, allProducts, type Product } from '../src/data/products';

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { type ProductData } from "@/stores/useAdminStore";
 import { useProductForm } from "@/hooks/useProductForm";
+import { categories } from "@/data/products";
 
 interface ProductFormModalProps {
   isOpen: boolean;
@@ -110,16 +111,15 @@ export function ProductFormModal({
                       <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary mb-1.5">
                         Category
                       </label>
-                      <select
-                        value={form.formCategory}
-                        onChange={(e) => form.setFormCategory(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
-                      >
-                        <option value="tops">Tops</option>
-                        <option value="bottoms">Bottoms</option>
-                        <option value="outerwear">Outerwear</option>
-                        <option value="accessories">Accessories</option>
-                      </select>
+                        <select
+                          value={form.formCategory}
+                          onChange={(e) => form.setFormCategory(e.target.value)}
+                          className="w-full px-4 py-2.5 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
+                        >
+                          {categories.map((cat) => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                        </select>
                     </div>
 
                     <div>
