@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAdminStore } from "@/stores/useAdminStore";
+import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { MetricsGrid } from "./MetricsGrid";
 import { RecentOrdersList } from "./RecentOrdersList";
 import { TaskMenu } from "./TaskMenu";
@@ -35,15 +36,10 @@ export function DashboardClient() {
 
   return (
     <div className="space-y-10 pb-12">
-      {/* Header Panel */}
-      <div className="border-b border-border-subtle pb-6">
-        <h1 className="font-display font-black text-3xl uppercase tracking-wider text-text-primary">
-          Executive Dashboard
-        </h1>
-        <p className="text-text-secondary text-sm">
-          Overview of sales, order cycles, and inventory state.
-        </p>
-      </div>
+      <AdminHeaderPanel
+        title="Executive Dashboard"
+        description="Overview of sales, order cycles, and inventory state."
+      />
 
       {loading && !metrics ? (
         <div className="flex items-center justify-center py-20 text-text-secondary text-sm">
