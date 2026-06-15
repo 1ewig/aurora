@@ -119,6 +119,16 @@ export function LoginForm({
                 {showPassword ? <EyeSlashIcon /> : <EyeIcon />}
               </button>
             </div>
+            <div className="flex justify-end px-1 mt-1.5">
+              <button
+                type="button"
+                onClick={onResetClick}
+                disabled={resetLoading}
+                className="text-xs text-accent-primary font-semibold hover:underline cursor-pointer disabled:opacity-55"
+              >
+                {resetLoading ? "Sending..." : "Forgot Password?"}
+              </button>
+            </div>
           </div>
 
           {formError && (

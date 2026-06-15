@@ -34,18 +34,12 @@ export function LoginClient() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const status = params.get("insforge_status");
-    const type = params.get("insforge_type");
-    const errorMsg = params.get("insforge_error");
+    const token = params.get("token");
+    const status = params.get("status");
 
-    if (type === "verify_email") {
-      if (status === "success") {
-        setSuccessMsg("Your email has been verified successfully! Please log in.");
-        window.history.replaceState({}, document.title, window.location.pathname);
-      } else if (status === "error") {
-        setFormError(errorMsg || "Email verification failed. The link may have expired or is invalid.");
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
+    if (token && status === "success") {
+      setSuccessMsg("Your email has been verified successfully! Please log in.");
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
 
@@ -66,16 +60,14 @@ export function LoginClient() {
       return;
     }
 
-    const { error, needsVerification: reqVerification } = await signIn(email, password);
+    const { error, needsVerification: reqVerification, needsReset } = await signIn(email, password);
     if (error) {
       if (reqVerification) {
-        router.push(`/verify?email=${encodeURIComponent(email)}&type=login`);
+        router.push(`/verify?email=${encodeURIComponent(email)}`);
       } else {
-        const errorMsg = error.message || "Invalid email or password.";
+        const errorMsg = typeof error === "string" ? error : error.message || "Invalid email or password.";
         setFormError(errorMsg);
-        
-        // Show reset option if they entered a wrong password on an existing verified account
-        if (errorMsg.includes("Incorrect password")) {
+        if (needsReset) {
           setShowResetOption(true);
         }
       }
@@ -95,14 +87,12 @@ export function LoginClient() {
     try {
       const { error } = await sendResetPasswordEmail(email);
       if (error) {
-        setFormError(error.message || "Failed to send password reset email.");
+        const msg = typeof error === "string" ? error : error.message || "Failed to send reset email.";
+        setFormError(msg);
       } else {
-        setSuccessMsg("Password reset email sent! Redirecting...");
-        setTimeout(() => {
-          router.push(`/reset-password?email=${encodeURIComponent(email)}`);
-        }, 1500);
+        setSuccessMsg("If an account exists with this email, a password reset link has been sent. Check your inbox.");
       }
-    } catch (err) {
+    } catch {
       setFormError("Failed to initiate password reset.");
     } finally {
       setResetLoading(false);

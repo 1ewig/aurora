@@ -11,6 +11,7 @@ export function RegisterClient() {
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [showEmailSent, setShowEmailSent] = useState(false);
 
   const {
     user,
@@ -51,28 +52,12 @@ export function RegisterClient() {
       return;
     }
 
-    try {
-      const checkRes = await fetch("/api/auth/check-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      if (checkRes.ok) {
-        const checkData = await checkRes.json();
-        if (checkData && checkData.exists && !checkData.verified) {
-          setFormError("This email is registered but not verified yet. Please sign in to verify your account.");
-          return;
-        }
-      }
-    } catch (e) {
-      // Fallback
-    }
-
     const { error, needsVerification: reqVerification } = await signUp(email, password, name);
     if (error) {
-      setFormError(error.message || "Failed to sign up.");
+      setFormError(typeof error === "string" ? error : error.message || "Failed to sign up.");
     } else if (reqVerification) {
-      router.push(`/verify?email=${encodeURIComponent(email)}&type=signup`);
+      setShowEmailSent(true);
+      setSuccessMsg("Account created! Check your email for a verification link.");
     } else {
       setSuccessMsg("Account created successfully! Redirecting...");
       setTimeout(() => {
@@ -81,11 +66,40 @@ export function RegisterClient() {
     }
   };
 
-  if (loading && !successMsg) {
+  if (showEmailSent) {
     return (
-      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
-      </div>
+      <main className="min-h-[90vh] md:min-h-screen bg-bg-primary pt-12 pb-12 px-6 flex flex-col items-center justify-center">
+        <div className="w-full max-w-[440px] mb-4">
+          <button onClick={() => setShowEmailSent(false)} type="button"
+            className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors font-medium cursor-pointer">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+            Back
+          </button>
+        </div>
+        <div className="w-full max-w-[440px] bg-bg-secondary border border-border-subtle p-8 md:p-10 rounded-[24px] shadow-sm text-center">
+          <div className="w-12 h-12 bg-accent-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-6 h-6 text-accent-primary" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+            </svg>
+          </div>
+          <h1 className="font-display font-black text-3xl uppercase tracking-wider mb-2">Check Your Email</h1>
+          <p className="text-text-secondary text-sm">
+            We sent a verification link to<br />
+            <span className="font-medium text-text-primary break-all">{email}</span>.
+          </p>
+          <p className="text-text-secondary text-xs mt-3">
+            Click the link to verify your account and sign in.
+          </p>
+          <div className="mt-6">
+            <button onClick={() => router.push("/login")} type="button"
+              className="text-accent-primary font-semibold text-sm hover:underline cursor-pointer">
+              Go to Sign In
+            </button>
+          </div>
+        </div>
+      </main>
     );
   }
 
