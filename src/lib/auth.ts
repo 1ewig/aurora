@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { Pool } from 'pg';
+import { sendEmail } from './email';
 
 function requireEnv(name: string): string {
   const v = process.env[name];
@@ -14,7 +15,35 @@ pool.on('connect', (client) => {
 
 export const auth = betterAuth({
   database: pool,
-  emailAndPassword: { enabled: true },
   secret: requireEnv('BETTER_AUTH_SECRET'),
   baseURL: requireEnv('BETTER_AUTH_URL'),
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      void sendEmail({
+        to: user.email,
+        subject: 'Reset your Aurora password',
+        text: `Click the link to reset your password: ${url}`,
+      });
+    },
+    onExistingUserSignUp: async ({ user }) => {
+      void sendEmail({
+        to: user.email,
+        subject: 'Sign-up attempt detected',
+        text: 'Someone tried to create an Aurora account using your email address. If this was you, sign in instead. If not, you can ignore this email.',
+      });
+    },
+  },
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      void sendEmail({
+        to: user.email,
+        subject: 'Verify your Aurora email',
+        text: `Click the link to verify your email: ${url}`,
+      });
+    },
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+  },
 });
