@@ -1,7 +1,7 @@
 "use client";
 
 import { ProductCard } from "@/components/ui/ProductCard";
-import { useRelatedProducts } from "@/hooks/useRelatedProducts";
+import { useRelatedProductsQuery } from "@/hooks/queries";
 import type { Product } from "@/data/products";
 
 interface RelatedProductsProps {
@@ -9,7 +9,7 @@ interface RelatedProductsProps {
 }
 
 export function RelatedProducts({ product }: RelatedProductsProps) {
-  const products = useRelatedProducts(product);
+  const { data: products = [] } = useRelatedProductsQuery(product);
 
   return (
     <section aria-labelledby="related-heading" className="py-20 border-t border-border-subtle mt-20">

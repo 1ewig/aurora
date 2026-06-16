@@ -22,6 +22,44 @@ export function useProductsQuery(category?: string) {
   });
 }
 
+export function useFeaturedProductsQuery(count = 3) {
+  return useQuery({
+    queryKey: ['products', 'All'],
+    queryFn: () => fetchProducts(),
+    select: (products) => {
+      if (!products || products.length === 0) return [];
+      const len = products.length;
+      const day = new Date().getDate();
+      const selected: Product[] = [];
+      for (let i = 0; i < Math.min(count, len); i++) {
+        const index = (day + i * 3) % len;
+        selected.push(products[index]);
+      }
+      return selected;
+    },
+  });
+}
+
+export function useRelatedProductsQuery(currentProduct: Product) {
+  return useQuery({
+    queryKey: ['products', 'All'],
+    queryFn: () => fetchProducts(),
+    select: (dbProducts) => {
+      if (!dbProducts || dbProducts.length === 0) return [];
+      const related = dbProducts.filter(
+        (p) => p.category === currentProduct.category && p.slug !== currentProduct.slug
+      );
+
+      if (related.length > 0) {
+        return related.slice(0, 4);
+      }
+
+      return dbProducts.filter((p) => p.slug !== currentProduct.slug).slice(0, 4);
+    },
+  });
+}
+
+
 async function fetchProductDetails(slug: string): Promise<Product> {
   const response = await fetch(`/api/products/${encodeURIComponent(slug)}`);
   if (!response.ok) {

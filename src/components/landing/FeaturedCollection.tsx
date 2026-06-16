@@ -5,11 +5,11 @@ import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { Button } from "@/components/ui/Button";
-import { useFeaturedProducts } from "@/hooks/useFeaturedProducts";
+import { useFeaturedProductsQuery } from "@/hooks/queries";
 import { staggerContainer, scaleIn } from "@/animations/variants";
 
 export function FeaturedCollection() {
-  const { featured } = useFeaturedProducts(3);
+  const { data: featured = [] } = useFeaturedProductsQuery(3);
   return (
     <section
       id="collection"
