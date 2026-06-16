@@ -9,7 +9,7 @@ CREATE SCHEMA IF NOT EXISTS better_auth;
 -- Better Auth tables (camelCase columns, isolated from PostgREST)
 CREATE TABLE IF NOT EXISTS better_auth."user" (
   id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
+  name TEXT,
   email TEXT NOT NULL UNIQUE,
   "emailVerified" BOOLEAN NOT NULL DEFAULT false,
   image TEXT,
@@ -20,11 +20,12 @@ CREATE TABLE IF NOT EXISTS better_auth."user" (
 CREATE TABLE IF NOT EXISTS better_auth.session (
   id TEXT PRIMARY KEY,
   "expiresAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+  token TEXT NOT NULL,
+  "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now()),
+  "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now()),
   "ipAddress" TEXT,
   "userAgent" TEXT,
-  "userId" TEXT NOT NULL REFERENCES better_auth."user"(id) ON DELETE CASCADE,
-  "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now()),
-  "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now())
+  "userId" TEXT NOT NULL REFERENCES better_auth."user"(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS better_auth.account (
@@ -48,8 +49,8 @@ CREATE TABLE IF NOT EXISTS better_auth.verification (
   identifier TEXT NOT NULL,
   value TEXT NOT NULL,
   "expiresAt" TIMESTAMP WITH TIME ZONE NOT NULL,
-  "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now()),
-  "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now())
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
 -- Helper for RLS policies (extracts sub claim from bridge JWT)
