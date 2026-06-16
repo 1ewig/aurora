@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { navLinks } from "@/data/navigation";
 import { useCartStore } from "@/stores/useCartStore";
-import { useNavbarScroll } from "@/hooks/useNavbarScroll";
+import { useNavbarScroll } from "@/hooks/ui/useNavbarScroll";
 import { navbarReveal } from "@/animations/variants";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";

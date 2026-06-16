@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useRouter } from "next/navigation";
-import { useNavbarScroll } from "@/hooks/useNavbarScroll";
+import { useNavbarScroll } from "@/hooks/ui/useNavbarScroll";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 
 function MenuIcon() {

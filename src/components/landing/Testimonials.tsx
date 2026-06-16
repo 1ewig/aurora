@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { useCarousel } from "@/hooks/useCarousel";
+import { useCarousel } from "@/hooks/ui/useCarousel";
 import { testimonials } from "@/data/testimonials";
 
 export function Testimonials() {

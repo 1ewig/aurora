@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import { useBodyScrollLock } from "@/hooks/ui/useBodyScrollLock";
 
 interface SizeGuideModalProps {
   isOpen: boolean;

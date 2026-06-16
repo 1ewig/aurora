@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
-import { useCarousel } from "@/hooks/useCarousel";
+import { useCarousel } from "@/hooks/ui/useCarousel";
 import { getStorageUrl } from "@/utils/insforge";
 import { useLookbookQuery } from "@/hooks/queries";
 import Link from "next/link";

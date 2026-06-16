@@ -5,7 +5,7 @@ import Image from "next/image";
 import { type Order } from "@/hooks/queries";
 
 import { formatCurrency } from "@/utils/formatCurrency";
-import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
+import { useBodyScrollLock } from "@/hooks/ui/useBodyScrollLock";
 
 interface OrderDetailModalProps {
   isOpen: boolean;
