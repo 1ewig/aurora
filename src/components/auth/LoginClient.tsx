@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { useSignIn } from "@/hooks/useSignIn";
 import { LoginForm } from "./LoginForm";
 
 export function LoginClient() {
@@ -19,9 +18,10 @@ export function LoginClient() {
     error: storeError,
     clearError,
     sendResetPasswordEmail,
+    signIn,
   } = useAuthStore();
-  const signIn = useSignIn();
   const router = useRouter();
+
 
   useEffect(() => {
     clearError();
