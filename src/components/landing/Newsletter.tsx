@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/landing/Newsletter.tsx
+ *
+ * Newsletter sign-up section with form submission, loading state, and success animation.
+ */
+
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -5,6 +11,7 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { useNewsletterSubmit } from "@/hooks/useNewsletterSubmit";
 import { staggerContainer, fadeInUp } from "@/animations/variants";
 
+/** Newsletter subscription form with email validation, loading state, and success animation. */
 export function Newsletter() {
   const { email, setEmail, submitted, loading, handleSubmit } = useNewsletterSubmit();
 

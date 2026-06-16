@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/landing/ProductGrid.tsx
+ *
+ * Filterable product grid with category pills and animated transitions.
+ */
+
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,6 +15,7 @@ import { springSmooth } from "@/animations/transitions";
 
 const aspectRatios = ["aspect-[3/4]", "aspect-[4/5]", "aspect-[2/3]", "aspect-[3/4]"];
 
+/** Filterable full-collection product grid with category filtering and staggered card animations. */
 export function ProductGrid() {
   const { activeCategory, setActiveCategory, filtered, categories } = useProductFilter();
 

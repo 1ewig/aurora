@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/admin/dashboard/MetricsGrid.tsx
+ *
+ * Dashboard metrics cards displaying sales, orders, pending, and low-stock counts.
+ */
 "use client";
 
 import { motion } from "framer-motion";
@@ -45,6 +50,7 @@ const itemVariants = {
 };
 
 
+/** Renders a grid of dashboard metric cards (total sales, orders, pending, low-stock). */
 export function MetricsGrid({ metrics }: MetricsGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

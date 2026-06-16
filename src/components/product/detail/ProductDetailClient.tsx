@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/product/detail/ProductDetailClient.tsx
+ *
+ * Main client component for the product detail page; orchestrates sub-components.
+ */
 "use client";
 
 import { notFound } from "next/navigation";
@@ -15,6 +20,7 @@ interface ProductDetailClientProps {
   slug: string;
 }
 
+/** Renders the product detail page layout with gallery, info, actions, tabs, and related products. */
 export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const { data: product, isLoading, error } = useProductDetailsQuery(slug);
   const isSizeGuideOpen = useProductStore((s) => s.isSizeGuideOpen);

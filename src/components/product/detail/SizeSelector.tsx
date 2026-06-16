@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/product/detail/SizeSelector.tsx
+ *
+ * Size picker buttons with a link to open the size guide modal.
+ */
 "use client";
 
 import { cn } from "@/utils/cn";
@@ -9,6 +14,7 @@ interface SizeSelectorProps {
   onOpenSizeGuide: () => void;
 }
 
+/** Renders a row of selectable size buttons and a "Size Guide" link. */
 export function SizeSelector({ sizes, selectedSize, onChange, onOpenSizeGuide }: SizeSelectorProps) {
   return (
     <div className="space-y-3">

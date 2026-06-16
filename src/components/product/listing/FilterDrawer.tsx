@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/product/listing/FilterDrawer.tsx
+ *
+ * Slide-out drawer for category and sort filters on mobile/tablet.
+ */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -13,6 +18,7 @@ interface FilterDrawerProps {
   onApply: (category: string, sortBy: string) => void;
 }
 
+/** Renders an animated side drawer with category and sort selection controls. */
 export function FilterDrawer({
   isOpen,
   onClose,

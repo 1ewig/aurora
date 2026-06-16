@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/landing/ui/CascadeCards.tsx
+ *
+ * Animated cascading product card fan layout used in the hero section.
+ */
+
 "use client";
 
 import Image from "next/image";
@@ -23,6 +29,7 @@ const mobilePositions = [
   { left: "45%", top: "0px",   zIndex: 20 },
 ];
 
+/** Cascading product card fan showing products with staggered entry and hover animations. */
 export function CascadeCards({ products }: CascadeCardsProps) {
   return (
     <>

@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/auth/VerifyClient.tsx
+ *
+ * Client component that handles email-verification flows. Reads the email and
+ * token from query params, auto-verifies if a token is present, and supports
+ * resending the verification email.
+ */
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
@@ -76,6 +83,7 @@ function VerifyContent() {
   );
 }
 
+/** Wraps VerifyContent in a Suspense boundary for useSearchParams support. */
 export function VerifyClient() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-bg-primary flex items-center justify-center"><div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin"></div></div>}>

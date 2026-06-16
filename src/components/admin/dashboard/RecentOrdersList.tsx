@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/admin/dashboard/RecentOrdersList.tsx
+ *
+ * Displays a compact list of the most recent orders on the dashboard.
+ */
 import Link from "next/link";
 import { type RecentOrder } from "@/stores/useAdminStore";
 import { OrderStatusBadge } from "@/components/ui/OrderStatusBadge";
@@ -6,6 +11,7 @@ interface RecentOrdersListProps {
   recentOrders: RecentOrder[];
 }
 
+/** Renders a list of recent orders with order number, customer, total, and status badge. */
 export function RecentOrdersList({ recentOrders }: RecentOrdersListProps) {
   return (
     <div className="bg-bg-secondary border border-border-subtle rounded-2xl p-6 shadow-sm space-y-4">

@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/admin/inventory/BulletDetailsFields.tsx
+ *
+ * Manages bullet-point detail items for a product.
+ */
 interface BulletDetailsFieldsProps {
   formDetailInput: string;
   onFormDetailInputChange: (val: string) => void;
@@ -6,6 +11,7 @@ interface BulletDetailsFieldsProps {
   onRemoveDetail: (index: number) => void;
 }
 
+/** Renders an input and list for adding/removing detail bullet points. */
 export function BulletDetailsFields({
   formDetailInput,
   onFormDetailInputChange,

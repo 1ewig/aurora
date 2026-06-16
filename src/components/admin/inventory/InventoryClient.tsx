@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/admin/inventory/InventoryClient.tsx
+ *
+ * Inventory management page with product table, add/edit modal, and delete confirmation.
+ */
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
@@ -10,6 +15,7 @@ import { InventoryTable } from "./InventoryTable";
 import { ProductFormModal } from "./ProductFormModal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
+/** Renders the inventory management page with search, filter, table, add/edit modal, and delete dialog. */
 export function InventoryClient() {
   const products = useAdminStore((s) => s.products);
   const loading = useAdminStore((s) => s.loading);

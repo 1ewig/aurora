@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/profile/ProfileForm.tsx
+ *
+ * Profile edit form with display name field, status messages, and sign-out confirmation.
+ */
 "use client";
 
 import { useState } from "react";
@@ -16,6 +21,7 @@ interface ProfileFormProps {
   onSubmit: (e: React.FormEvent) => void;
 }
 
+/** Renders the profile edit form with email, display name, save/sign-out actions, and a confirmation dialog. */
 export function ProfileForm({
   userEmail,
   onSignOut,

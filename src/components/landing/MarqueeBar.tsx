@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/landing/MarqueeBar.tsx
+ *
+ * Infinite horizontal scrolling marquee bar showcasing brand keywords.
+ */
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -13,6 +19,7 @@ const marqueeItems = [
   "Free Returns",
 ];
 
+/** Infinite-scroll marquee bar animating brand keywords horizontally. */
 export function MarqueeBar() {
   return (
     <div

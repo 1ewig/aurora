@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/landing/ui/MentionBadge.tsx
+ *
+ * Animated floating social mention badge with configurable appearance.
+ */
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -9,6 +15,7 @@ interface MentionBadgeProps {
   dark?: boolean;
 }
 
+/** Floating animated badge displaying a social handle with configurable color scheme. */
 export function MentionBadge({
   handle,
   style,

@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/product/detail/ProductActions.tsx
+ *
+ * Add-to-bag and buy-now action buttons with size selection.
+ */
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -7,6 +12,7 @@ import { SizeSelector } from "./SizeSelector";
 import { Button } from "@/components/ui/Button";
 import type { Product } from "@/data/products";
 
+/** Renders size selector and add-to-bag / buy-now action buttons. */
 export function ProductActions({ product }: { product: Product }) {
   const router = useRouter();
 

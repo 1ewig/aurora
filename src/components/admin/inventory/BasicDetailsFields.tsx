@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/admin/inventory/BasicDetailsFields.tsx
+ *
+ * Form fields for product identity, pricing, and display metadata.
+ */
 import { categories } from "@/data/products";
 
 interface BasicDetailsFieldsProps {
@@ -22,6 +27,7 @@ interface BasicDetailsFieldsProps {
   onFormAltTextChange: (val: string) => void;
 }
 
+/** Renders input fields for product ID, name, slug, category, price, badge, span, aspect ratio, and alt text. */
 export function BasicDetailsFields(props: BasicDetailsFieldsProps) {
   return (
     <div className="space-y-4">

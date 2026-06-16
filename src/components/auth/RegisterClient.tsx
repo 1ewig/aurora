@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/auth/RegisterClient.tsx
+ *
+ * Client component that manages the user registration flow. Collects name, email,
+ * and password, calls the auth store to sign up, and shows a verification-prompt
+ * screen when email confirmation is required.
+ */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { RegisterForm } from "./RegisterForm";
 
+/** Client-side registration orchestrator with form state, validation, and auth-store integration. */
 export function RegisterClient() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

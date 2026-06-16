@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/checkout/CheckoutSuccess.tsx
+ *
+ * Order-confirmation view displayed after a successful (mock) checkout. Shows
+ * purchased items, pricing breakdown, and a reference number.
+ */
 "use client";
 
 import Image from "next/image";
@@ -27,6 +33,7 @@ interface CheckoutSuccessProps {
   total: number;
 }
 
+/** Order success UI — item list, pricing totals, masked card info, and a reference number. */
 export function CheckoutSuccess({
   orderNumber,
   maskedEmail,

@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/landing/Testimonials.tsx
+ *
+ * Customer testimonial carousel with quote rotations and navigation controls.
+ */
+
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -5,6 +11,7 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { useCarousel } from "@/hooks/ui/useCarousel";
 import { testimonials } from "@/data/testimonials";
 
+/** Testimonial carousel displaying customer quotes with auto-advance, prev/next, and dot navigation. */
 export function Testimonials() {
   const { current, next, prev, goTo } = useCarousel({
     length: testimonials.length,

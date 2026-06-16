@@ -1,6 +1,12 @@
+/**
+ * Aurora — src/components/product/detail/ProductInfo.tsx
+ *
+ * Displays product name, category, badge, price, and description.
+ */
 import { formatCurrency } from "@/utils/formatCurrency";
 import type { Product } from "@/data/products";
 
+/** Renders the product heading, badge, category, price, and description. */
 export function ProductInfo({ product }: { product: Product }) {
   return (
     <div className="space-y-6">

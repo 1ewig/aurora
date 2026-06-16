@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/auth/LoginClient.tsx
+ *
+ * Client component that orchestrates the login flow. Manages form state, handles
+ * email/password sign-in, redirects upon success, and delegates rendering to LoginForm.
+ */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { LoginForm } from "./LoginForm";
 
+/** Client-side login orchestrator with form state, validation, and auth-store integration. */
 export function LoginClient() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

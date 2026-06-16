@@ -1,9 +1,15 @@
+/**
+ * Aurora — src/components/product/listing/PageHeader.tsx
+ *
+ * Page heading with eyebrow label and responsive category title.
+ */
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 
 interface PageHeaderProps {
   category: string;
 }
 
+/** Renders the catalog page header with an eyebrow label and the current category heading. */
 export function PageHeader({ category }: PageHeaderProps) {
   return (
     <div>

@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/auth/RegisterForm.tsx
+ *
+ * Presentational form for creating a new account. Collects name, email, and
+ * password with show/hide toggle and links to the sign-in page.
+ */
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -32,6 +38,7 @@ function EyeSlashIcon() {
   );
 }
 
+/** Registration form UI — name, email, password fields with validation and submit. */
 export function RegisterForm({
   name,
   setName,

@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/product/listing/CategoryPageClient.tsx
+ *
+ * Resolves a URL category slug to a display name and renders ProductListing.
+ */
 "use client";
 
 import { use } from "react";
@@ -16,6 +21,7 @@ interface CategoryPageClientProps {
   params: Promise<{ category: string }>;
 }
 
+/** Renders the category page by mapping the URL slug to a display name and rendering ProductListing. */
 export default function CategoryPageClient({ params }: CategoryPageClientProps) {
   const { category: categorySlug } = use(params);
   const categoryName = categoryMap[categorySlug.toLowerCase()];

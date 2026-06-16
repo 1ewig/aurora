@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/product/detail/SizeGuideModal.tsx
+ *
+ * Modal displaying apparel or belt size guide with inch/cm unit toggle.
+ */
 "use client";
 
 import { useState } from "react";
@@ -10,6 +15,7 @@ interface SizeGuideModalProps {
   category: string;
 }
 
+/** Renders an animated size-guide modal with apparel or belt sizing tables and a unit switcher. */
 export function SizeGuideModal({ isOpen, onClose, category }: SizeGuideModalProps) {
   const [unit, setUnit] = useState<"in" | "cm">("cm");
 

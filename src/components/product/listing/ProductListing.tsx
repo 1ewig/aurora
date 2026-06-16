@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/product/listing/ProductListing.tsx
+ *
+ * Full product listing page with search, filter, sort, and product grid.
+ */
 "use client";
 
 import { useState } from "react";
@@ -11,6 +16,7 @@ interface ProductListingProps {
   onCategoryChange?: (category: string) => void;
 }
 
+/** Renders the full product listing with search bar, filter drawer, and animated product grid. */
 export function ProductListing({ initialCategory = "All", onCategoryChange }: ProductListingProps) {
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 

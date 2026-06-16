@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/profile/ProfileSidebar.tsx
+ *
+ * Sidebar navigation for profile and orders pages.
+ */
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -8,6 +13,7 @@ interface ProfileSidebarProps {
   onClose?: () => void;
 }
 
+/** Renders a sidebar nav with profile and orders links, and a "Back to Shop" action. */
 export function ProfileSidebar({ onClose }: ProfileSidebarProps) {
   const pathname = usePathname();
 

@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/admin/inventory/InventoryTable.tsx
+ *
+ * Searchable, filterable product table with edit/delete actions.
+ */
 "use client";
 
 import { type ProductData } from "@/stores/useAdminStore";
@@ -15,6 +20,7 @@ interface InventoryTableProps {
 }
 
 
+/** Renders a product table with search, category filter, and edit/delete row actions. */
 export function InventoryTable({
   filteredProducts,
   searchQuery,

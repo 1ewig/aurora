@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/profile/ProfileClient.tsx
+ *
+ * Profile page logic: auth guard, display name state, and update/sign-out handlers.
+ */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -5,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { ProfileWorkspace } from "./ProfileWorkspace";
 
+/** Renders the profile page with auth guard, display name editing, and sign-out flow. */
 export function ProfileClient() {
   const { user, profile, loading, updateProfile, signOut } = useAuthStore();
   const router = useRouter();

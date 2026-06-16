@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/landing/LookbookSlider.tsx
+ *
+ * Full-screen lookbook carousel with animated slide transitions and dot navigation.
+ */
+
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,6 +13,7 @@ import { getStorageUrl } from "@/utils/insforge";
 import { useLookbookQuery } from "@/hooks/queries";
 import Link from "next/link";
 
+/** Full-screen lookbook carousel with auto-advance, prev/next controls, and dot navigation. */
 export function LookbookSlider() {
   const { data: dbSlides = [] } = useLookbookQuery();
 

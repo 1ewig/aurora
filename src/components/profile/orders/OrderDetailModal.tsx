@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/profile/orders/OrderDetailModal.tsx
+ *
+ * Modal displaying full order details, items, shipping, and payment breakdown.
+ */
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,6 +18,7 @@ interface OrderDetailModalProps {
   order: Order;
 }
 
+/** Renders an animated modal with order items, shipping address, and payment detail breakdown. */
 export function OrderDetailModal({ isOpen, onClose, order }: OrderDetailModalProps) {
   useBodyScrollLock(isOpen);
 

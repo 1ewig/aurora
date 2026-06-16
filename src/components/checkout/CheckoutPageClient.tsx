@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/checkout/CheckoutPageClient.tsx
+ *
+ * Top-level checkout page client. Routes between the empty-cart view, the
+ * checkout form, and the order-success confirmation based on state.
+ */
 "use client";
 
 import { useState } from "react";
@@ -7,6 +13,7 @@ import { CheckoutSuccess } from "@/components/checkout/CheckoutSuccess";
 import { OrderSummaryContainer } from "@/components/checkout/OrderSummaryContainer";
 import { CartEmptyState } from "@/components/checkout/CartEmptyState";
 
+/** Checkout page root — conditionally renders empty state, form, or success confirmation. */
 export default function CheckoutPageClient() {
   const items = useCartStore((s) => s.items);
   const [hasOrdered, setHasOrdered] = useState(false);

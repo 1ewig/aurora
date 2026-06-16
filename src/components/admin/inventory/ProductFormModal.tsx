@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/admin/inventory/ProductFormModal.tsx
+ *
+ * Modal dialog for creating or editing a product with full form sections.
+ */
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,6 +21,7 @@ interface ProductFormModalProps {
   form: ReturnType<typeof useProductForm>;
 }
 
+/** Renders an animated modal with basic details, media uploads, size/stock, and bullet-point fields. */
 export function ProductFormModal({
   isOpen,
   onClose,

@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/profile/orders/OrdersClient.tsx
+ *
+ * Purchase history page with loading, empty, and error states.
+ */
 "use client";
 
 import { motion } from "framer-motion";
@@ -7,6 +12,7 @@ import { useOrders } from "@/hooks/queries";
 import { Button } from "@/components/ui/Button";
 import { OrderCard } from "./OrderCard";
 
+/** Renders the purchase history page with order cards, handling loading, empty, and error states. */
 export function OrdersClient() {
   const { data: orders, isLoading, error } = useOrders();
 

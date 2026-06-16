@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/profile/orders/OrderCard.tsx
+ *
+ * Clickable order summary card that opens the order detail modal.
+ */
 "use client";
 
 import { useState } from "react";
@@ -13,6 +18,7 @@ interface OrderCardProps {
   order: Order;
 }
 
+/** Renders an order summary card with item previews and opens a detail modal on click. */
 export function OrderCard({ order }: OrderCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 

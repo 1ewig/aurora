@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/product/listing/ProductGrid.tsx
+ *
+ * Animated responsive product grid with staggered card entry.
+ */
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,6 +17,7 @@ interface ProductGridProps {
   isLoading?: boolean;
 }
 
+/** Renders a responsive grid of ProductCards with staggered entrance animations and loading skeleton. */
 export function ProductGrid({ products, isLoading }: ProductGridProps) {
   if (isLoading) {
     return (

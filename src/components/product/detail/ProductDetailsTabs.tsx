@@ -1,8 +1,14 @@
+/**
+ * Aurora — src/components/product/detail/ProductDetailsTabs.tsx
+ *
+ * Tabbed section for product details and shipping/returns info.
+ */
 "use client";
 
 import { useProductStore } from "@/stores/useProductStore";
 import type { Product } from "@/data/products";
 
+/** Renders tabbed content toggling between product details and shipping/returns information. */
 export function ProductDetailsTabs({ product }: { product: Product }) {
   const activeTab = useProductStore((s) => s.activeTabs[product.id]) || "details";
   const setActiveTab = useProductStore((s) => s.setActiveTab);

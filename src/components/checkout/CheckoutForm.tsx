@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/checkout/CheckoutForm.tsx
+ *
+ * Client-side checkout form that collects contact, shipping, and mock payment
+ * details. Integrates with the useCheckoutForm hook for validation and submission.
+ */
 "use client";
 
 import { useCheckoutForm } from "@/hooks/useCheckoutForm";
@@ -30,6 +36,7 @@ function FieldError({ show, message }: { show: boolean; message?: string }) {
   return <p className="text-error text-[11px] mt-1">{message}</p>;
 }
 
+/** Checkout form — contact info, shipping address, and mock credit-card fields with validation. */
 export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
   const {
     email, setEmail,

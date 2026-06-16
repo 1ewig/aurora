@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/auth/VerifyForm.tsx
+ *
+ * Presentational form for email-verification prompts. Shows a masked-email
+ * message, a resend button with countdown, and a success state after verification.
+ */
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -21,6 +27,7 @@ function maskEmail(rawEmail: string) {
   return `${name[0]}***${name[name.length - 1]}@${domain}`;
 }
 
+/** Verify-email form UI — masked email display, resend button with cooldown, and success view. */
 export function VerifyForm({
   email,
   formError,

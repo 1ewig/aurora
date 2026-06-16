@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/product/detail/ImageGallery.tsx
+ *
+ * Product image gallery with main viewer and thumbnail row.
+ */
 "use client";
 
 import { useState } from "react";
@@ -11,6 +16,7 @@ interface ImageGalleryProps {
   altText: string;
 }
 
+/** Renders a main product image with animated transitions and thumbnail selectors. */
 export function ImageGallery({ images, altText }: ImageGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 

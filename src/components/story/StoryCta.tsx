@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/story/StoryCta.tsx
+ *
+ * Call-to-action section linking to the full product collection.
+ */
+
 "use client";
 
 import Link from "next/link";
@@ -5,6 +11,7 @@ import { motion } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Button } from "@/components/ui/Button";
 
+/** Call-to-action banner inviting users to shop the collection with a gold accent CTA. */
 export function StoryCta() {
   return (
     <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto pt-20">

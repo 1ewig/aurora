@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/auth/LoginForm.tsx
+ *
+ * Presentational form for signing in with email and password. Includes show/hide
+ * password toggle, forgot-password action, and links to registration.
+ */
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -32,6 +38,7 @@ function EyeSlashIcon() {
   );
 }
 
+/** Login form UI — email, password, validation messages, and submit/reset actions. */
 export function LoginForm({
   email,
   setEmail,

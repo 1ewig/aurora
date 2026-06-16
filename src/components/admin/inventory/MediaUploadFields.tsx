@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/admin/inventory/MediaUploadFields.tsx
+ *
+ * Form fields for product description, main image upload, and gallery image uploads.
+ */
 interface MediaUploadFieldsProps {
   formDescription: string;
   onFormDescriptionChange: (val: string) => void;
@@ -9,6 +14,7 @@ interface MediaUploadFieldsProps {
   onRemoveGalleryImage: (index: number) => void;
 }
 
+/** Renders textarea for description and file inputs for main and gallery images. */
 export function MediaUploadFields({
   formDescription,
   onFormDescriptionChange,

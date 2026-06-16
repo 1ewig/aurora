@@ -1,6 +1,13 @@
+/**
+ * Aurora — src/components/checkout/CartEmptyState.tsx
+ *
+ * Static empty-state view shown when the user's shopping bag has no items.
+ * Displays a message and a link to the products catalog.
+ */
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 
+/** Empty cart placeholder with a prompt to browse the collection. */
 export function CartEmptyState() {
   return (
     <div className="max-w-md mx-auto text-center py-20 space-y-6">

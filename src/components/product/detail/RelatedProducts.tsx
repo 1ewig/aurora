@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/product/detail/RelatedProducts.tsx
+ *
+ * Displays a grid of related product cards based on the current product.
+ */
 "use client";
 
 import { ProductCard } from "@/components/ui/ProductCard";
@@ -8,6 +13,7 @@ interface RelatedProductsProps {
   product: Product;
 }
 
+/** Renders a grid of related product cards, fetching them via the related products query. */
 export function RelatedProducts({ product }: RelatedProductsProps) {
   const { data: products = [] } = useRelatedProductsQuery(product);
 

@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/landing/DesignerStory.tsx
+ *
+ * Designer story section with parallax image and brand narrative about the founder.
+ */
+
 "use client";
 
 import { useRef } from "react";
@@ -9,6 +15,7 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { staggerContainer, fadeInUp } from "@/animations/variants";
 import { getStorageUrl } from "@/utils/insforge";
 
+/** Designer story section showcasing the founder and brand philosophy with parallax scrolling imagery. */
 export function DesignerStory() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({

@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/product/listing/CategoryFilter.tsx
+ *
+ * Dropdown select for filtering products by category.
+ */
 "use client";
 
 interface CategoryFilterProps {
@@ -6,6 +11,7 @@ interface CategoryFilterProps {
   onChange: (category: string) => void;
 }
 
+/** Renders a styled <select> element for category filtering. */
 export function CategoryFilter({ categories, activeCategory, onChange }: CategoryFilterProps) {
   return (
     <div className="relative">

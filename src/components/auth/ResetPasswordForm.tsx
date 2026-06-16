@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/auth/ResetPasswordForm.tsx
+ *
+ * Presentational form for setting a new password after a reset link is verified.
+ * Includes show/hide toggles for both password fields and a back-to-sign-in action.
+ */
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
@@ -32,6 +38,7 @@ function EyeSlashIcon() {
   );
 }
 
+/** Reset password form UI — new password, confirm password, validation, and submit. */
 export function ResetPasswordForm({
   email,
   newPassword,

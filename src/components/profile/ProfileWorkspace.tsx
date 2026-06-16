@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/profile/ProfileWorkspace.tsx
+ *
+ * Profile workspace layout wrapping the profile form with a heading.
+ */
 "use client";
 
 import { motion } from "framer-motion";
@@ -14,6 +19,7 @@ interface ProfileWorkspaceProps {
   handleUpdate: (e: React.FormEvent) => void;
 }
 
+/** Renders the profile workspace with an animated heading and the ProfileForm. */
 export function ProfileWorkspace({
   userEmail,
   onSignOut,

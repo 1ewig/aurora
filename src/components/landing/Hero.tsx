@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/landing/Hero.tsx
+ *
+ * Landing page hero section with animated headline, cascade product cards, and CTAs.
+ */
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -9,6 +15,7 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { AnimatedText } from "@/components/ui/AnimatedText";
 import { useProductsQuery } from "@/hooks/queries";
 
+/** Landing page hero with animated headline, cascade cards, and call-to-action buttons. */
 export function Hero() {
   const { data: products = [] } = useProductsQuery();
   const heroProductsList = products.filter((p) =>

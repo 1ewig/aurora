@@ -1,9 +1,16 @@
+/**
+ * Aurora — src/components/story/ParallaxBreakout.tsx
+ *
+ * Full-width breakout section with editorial background image and overlay brand tagline.
+ */
+
 "use client";
 
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { getStorageUrl } from "@/utils/insforge";
 import { useLookbookQuery } from "@/hooks/queries";
 
+/** Full-width breakout section with editorial background image and centered brand tagline. */
 export function ParallaxBreakout() {
   const { data: dbSlides = [] } = useLookbookQuery();
   const slide3 = dbSlides.find(s => s.slideNumber === 3);

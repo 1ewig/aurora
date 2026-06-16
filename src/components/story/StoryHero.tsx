@@ -1,9 +1,16 @@
+/**
+ * Aurora — src/components/story/StoryHero.tsx
+ *
+ * Story page hero with eyebrow label, large title, and brand pull quote.
+ */
+
 "use client";
 
 import { motion } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { fadeInUp, staggerContainer } from "@/animations/variants";
 
+/** Story page hero section introducing the brand narrative with a title and pull quote. */
 export function StoryHero() {
   return (
     <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto py-12 md:py-20 text-center space-y-6">

@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/story/AtelierSection.tsx
+ *
+ * Atelier story section with editorial imagery and brand narrative about craftsmanship and mills.
+ */
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -7,6 +13,7 @@ import { fadeInUp, staggerContainer } from "@/animations/variants";
 import { getStorageUrl } from "@/utils/insforge";
 import { useEditorialQuery } from "@/hooks/queries";
 
+/** Atelier section detailing the brand's partnerships with historic family-owned mills. */
 export function AtelierSection() {
   const { data: editorialItems = [] } = useEditorialQuery();
   const loomItem = editorialItems.find(item => item.id === 'loom');

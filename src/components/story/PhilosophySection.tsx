@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/story/PhilosophySection.tsx
+ *
+ * Brand philosophy section with editorial image and core beliefs narrative.
+ */
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -6,6 +12,7 @@ import { fadeInUp, staggerContainer } from "@/animations/variants";
 import { getStorageUrl } from "@/utils/insforge";
 import { useEditorialQuery } from "@/hooks/queries";
 
+/** Brand philosophy section presenting the founding conviction, design ethos, and pull quote. */
 export function PhilosophySection() {
   const { data: editorialItems = [] } = useEditorialQuery();
   const designerItem = editorialItems.find(item => item.id === 'designer');

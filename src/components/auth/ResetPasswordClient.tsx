@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/auth/ResetPasswordClient.tsx
+ *
+ * Client component that handles the password-reset flow. Reads the email and
+ * reset token from query params, collects a new password, and calls the auth
+ * store to update credentials.
+ */
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
@@ -77,6 +84,7 @@ function ResetPasswordContent() {
   );
 }
 
+/** Wraps ResetPasswordContent in a Suspense boundary for useSearchParams support. */
 export function ResetPasswordClient() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-bg-primary flex items-center justify-center"><div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin"></div></div>}>

@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/admin/inventory/SizeStockFields.tsx
+ *
+ * Form section for adding, editing, and removing product sizes with stock levels.
+ */
 import { type SizeStock } from "@/stores/useAdminStore";
 
 interface SizeStockFieldsProps {
@@ -11,6 +16,7 @@ interface SizeStockFieldsProps {
   onRemoveSize: (size: string) => void;
 }
 
+/** Renders inputs for adding new sizes and a list of existing sizes with editable stock and remove action. */
 export function SizeStockFields({
   newSizeName,
   onNewSizeNameChange,

@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/landing/FeaturedCollection.tsx
+ *
+ * Featured collection product grid section displaying curated products.
+ */
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -8,6 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { useFeaturedProductsQuery } from "@/hooks/queries";
 import { staggerContainer, scaleIn } from "@/animations/variants";
 
+/** Featured collection grid displaying curated products with animation. */
 export function FeaturedCollection() {
   const { data: featured = [] } = useFeaturedProductsQuery(3);
   return (

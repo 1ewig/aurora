@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/product/listing/SortFilter.tsx
+ *
+ * Dropdown select for sorting the product listing.
+ */
 "use client";
 
 interface SortFilterProps {
@@ -5,6 +10,7 @@ interface SortFilterProps {
   onChange: (value: string) => void;
 }
 
+/** Renders a styled <select> element for sort-order selection. */
 export function SortFilter({ value, onChange }: SortFilterProps) {
   const options = [
     { value: "featured", label: "Featured" },

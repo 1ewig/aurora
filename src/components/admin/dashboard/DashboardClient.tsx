@@ -1,3 +1,8 @@
+/**
+ * Aurora — src/components/admin/dashboard/DashboardClient.tsx
+ *
+ * Admin dashboard page composing metrics, recent orders, and task menu.
+ */
 "use client";
 
 import { useEffect } from "react";
@@ -8,6 +13,7 @@ import { MetricsGrid } from "./MetricsGrid";
 import { RecentOrdersList } from "./RecentOrdersList";
 import { TaskMenu } from "./TaskMenu";
 
+/** Renders the executive dashboard with metrics grid, recent orders feed, and quick tasks. */
 export function DashboardClient() {
   const metrics = useAdminStore((s) => s.metrics);
   const recentOrders = useAdminStore((s) => s.recentOrders);

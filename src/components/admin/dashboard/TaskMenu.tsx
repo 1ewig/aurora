@@ -1,5 +1,11 @@
+/**
+ * Aurora — src/components/admin/dashboard/TaskMenu.tsx
+ *
+ * Quick-link task menu for catalog editing, order fulfillment, and site navigation.
+ */
 import Link from "next/link";
 
+/** Renders operational task links (Catalog Editor, Order Fulfillment, View Customer Site). */
 export function TaskMenu() {
   return (
     <div className="bg-bg-secondary border border-border-subtle rounded-2xl p-6 shadow-sm space-y-5">

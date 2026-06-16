@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/checkout/OrderSummary.tsx
+ *
+ * Presentational component that lists cart items with images, quantities, and
+ * prices alongside a full pricing breakdown (subtotal, shipping, tax, total).
+ */
 import Image from "next/image";
 import Link from "next/link";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -11,6 +17,7 @@ interface OrderSummaryProps {
   total: number;
 }
 
+/** Order summary sidebar — item list, quantities, and pricing breakdown. */
 export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSummaryProps) {
   if (items.length === 0) {
     return (
