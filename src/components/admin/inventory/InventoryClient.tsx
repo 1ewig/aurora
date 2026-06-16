@@ -5,11 +5,12 @@ import { useAdminStore, type ProductData } from "@/stores/useAdminStore";
 import { useProductForm } from "@/hooks/useProductForm";
 import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { Button } from "@/components/ui/Button";
-import { ProductsTable } from "./ProductsTable";
+import { InventoryTable } from "./InventoryTable";
+
 import { ProductFormModal } from "./ProductFormModal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
-export function ProductsClient() {
+export function InventoryClient() {
   const products = useAdminStore((s) => s.products);
   const loading = useAdminStore((s) => s.loading);
   const error = useAdminStore((s) => s.error);
@@ -98,7 +99,7 @@ export function ProductsClient() {
           />
 
            {/* Products Table */}
-          <ProductsTable
+          <InventoryTable
             filteredProducts={filteredProducts}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}

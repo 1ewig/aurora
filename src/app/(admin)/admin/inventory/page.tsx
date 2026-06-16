@@ -1,4 +1,4 @@
-import { ProductsClient } from '@/components/admin/products/ProductsClient';
+import { InventoryClient } from '@/components/admin/inventory/InventoryClient';
 
 export const metadata = {
   title: 'Inventory | Admin | Aurora',
@@ -6,5 +6,6 @@ export const metadata = {
 };
 
 export default function AdminProductsPage() {
-  return <ProductsClient />;
+  return <InventoryClient />;
 }
+

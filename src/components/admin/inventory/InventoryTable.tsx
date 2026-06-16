@@ -4,7 +4,7 @@ import { type ProductData } from "@/stores/useAdminStore";
 import { categories } from "@/data/products";
 
 
-interface ProductsTableProps {
+interface InventoryTableProps {
   filteredProducts: ProductData[];
   searchQuery: string;
   onSearchChange: (val: string) => void;
@@ -14,7 +14,8 @@ interface ProductsTableProps {
   onDeleteClick: (product: ProductData) => void;
 }
 
-export function ProductsTable({
+
+export function InventoryTable({
   filteredProducts,
   searchQuery,
   onSearchChange,
@@ -22,7 +23,8 @@ export function ProductsTable({
   onCategoryChange,
   onEditClick,
   onDeleteClick,
-}: ProductsTableProps) {
+}: InventoryTableProps) {
+
   return (
     <div className="space-y-8">
       {/* Search & Filter Controls */}
