@@ -56,7 +56,8 @@ As features grew, we undertook a thorough cleanup to align with strict coding st
 | **Framework** | Next.js 15 (App Router, SSR) | Page rendering, Edge middleware, server routes |
 | **Language** | TypeScript 5.x & React 19 | Static typing and component architecture |
 | **Database** | PostgreSQL | Relational storage for products, lookbook, and orders |
-| **BaaS & Infrastucture** | InsForge | Authentication, multi-bucket storage, database APIs |
+| **Authentication** | Better Auth | Session token management, email verification, password reset flows |
+| **BaaS & Infrastructure** | InsForge | PostgreSQL hosting, multi-bucket storage, database APIs |
 | **State Management** | Zustand & TanStack Query v5 | Global client-state and cached server-state synchronization |
 | **Styling** | Tailwind CSS 4 | Modern, utility-driven layout and typography |
 | **Animation** | Framer Motion 12 | Fluid transitions, lookbook slides, and interactive UI |
@@ -80,10 +81,16 @@ Follow these steps to run the Aurora storefront locally:
     ```
 
 3.  **Configure environment variables:**
-    Create a `.env.local` file in the project root and add your InsForge credentials:
+    Create a `.env.local` file in the project root and configure your database, InsForge keys, and Better Auth credentials (see `.env.example` for details):
     ```env
-    NEXT_PUBLIC_INSFORGE_URL=https://<your-project-id>.us-east.insforge.app
-    NEXT_PUBLIC_INSFORGE_ANON_KEY=<your-anon-public-key>
+    DATABASE_URL="postgresql://username:password@host:port/database"
+
+    NEXT_PUBLIC_INSFORGE_URL="https://your-project.database.insforge.app"
+    NEXT_PUBLIC_INSFORGE_ANON_KEY="your-public-anon-key"
+
+    BETTER_AUTH_SECRET="generate-with: openssl rand -base64 32"
+    BETTER_AUTH_URL="http://localhost:3000"
+    NEXT_PUBLIC_BETTER_AUTH_URL="http://localhost:3000"
     ```
 
 4.  **Run the development server:**
