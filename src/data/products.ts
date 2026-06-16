@@ -25,11 +25,6 @@ export const categories = [
 
 export type Category = (typeof categories)[number];
 
-const sizeOptions = {
-  apparel: ["XS", "S", "M", "L", "XL"],
-  accessories: ["One Size"],
-};
-
 export const heroProducts: Product[] = [
   {
     id: "h1",

@@ -170,7 +170,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   resendVerification: async (email) => {
     set({ loading: true, error: null });
     try {
-      const callbackURL = `${window.location.origin}/verify?email=${encodeURIComponent(email)}&status=success`;
+      const callbackURL = `${window.location.origin}/profile`;
       const { error } = await authClient.sendVerificationEmail({ email, callbackURL });
       if (error) {
         const message = mapBetterAuthError(error);

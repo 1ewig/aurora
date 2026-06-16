@@ -121,7 +121,7 @@ export function VerifyForm({
         <div className="text-center space-y-3">
           <p className="text-sm text-text-secondary">Didn't receive the email?</p>
           <Button
-            variant="outline"
+            variant="ghost"
             fullWidth
             size="md"
             onClick={handleResendClick}
