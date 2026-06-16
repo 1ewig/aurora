@@ -81,7 +81,7 @@ You now have these values:
 | `BETTER_AUTH_SECRET` | Generate: `openssl rand -base64 32` |
 | `BETTER_AUTH_URL` | `http://localhost:3000` (dev) or production URL |
 | `NEXT_PUBLIC_BETTER_AUTH_URL` | Same as `BETTER_AUTH_URL` |
-| `NEXT_PUBLIC_ADMIN_EMAILS` | Comma-separated admin email addresses |
+| `ADMIN_EMAILS` | Comma-separated admin email addresses (private server-side variable) |
 
 ---
 
@@ -124,7 +124,7 @@ BETTER_AUTH_URL="http://localhost:3000"
 NEXT_PUBLIC_BETTER_AUTH_URL="http://localhost:3000"
 
 INSFORGE_JWT_SECRET="your-insforge-jwt-secret"
-NEXT_PUBLIC_ADMIN_EMAILS="admin@example.com"
+ADMIN_EMAILS="admin@example.com"
 ```
 
 > The `DATABASE_URL` must use `sslmode=require` (InsForge requires it).
@@ -194,7 +194,7 @@ If you're deploying to Vercel or another platform, set these environment variabl
 - `BETTER_AUTH_URL`
 - `NEXT_PUBLIC_BETTER_AUTH_URL`
 - `INSFORGE_JWT_SECRET`
-- `NEXT_PUBLIC_ADMIN_EMAILS`
+- `ADMIN_EMAILS`
 
 ---
 

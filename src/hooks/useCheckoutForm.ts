@@ -127,10 +127,10 @@ export function useCheckoutForm(onOrderPlaced?: (
         cardNumber,
         maskCardNumber(cardNumber),
         itemsSnapshot,
-        subtotal,
-        shipping,
-        tax,
-        total
+        data.subtotal ?? subtotal,
+        data.shipping ?? shipping,
+        data.tax ?? tax,
+        data.total ?? total
       );
 
       clearCart();

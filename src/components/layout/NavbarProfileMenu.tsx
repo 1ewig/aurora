@@ -2,12 +2,10 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { isAdmin } from "@/utils/auth";
-
 interface NavbarProfileMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  user: { name?: string | null; email: string } | null;
+  user: { name?: string | null; email: string; isAdmin?: boolean | null } | null;
   profile: { displayName: string } | null;
   onSignOutClick: () => void;
 }
@@ -35,7 +33,7 @@ export function NavbarProfileMenu({
             <p className="text-[10px] text-text-secondary uppercase tracking-wider font-semibold mb-0.5">Logged in as</p>
             <p className="text-sm font-medium text-text-primary truncate">{profile?.displayName || user.name || user.email}</p>
           </div>
-          {isAdmin(user.email) && (
+          {user.isAdmin && (
             <Link
               href="/admin"
               onClick={onClose}

@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     }
 
     for (const item of items) {
-      if (typeof item.price !== "number" || item.price < 0 || !Number.isInteger(item.quantity) || item.quantity < 1) {
+      if (!item.id || typeof item.quantity !== "number" || !Number.isInteger(item.quantity) || item.quantity < 1) {
         return NextResponse.json(
           { error: "Invalid item data" },
           { status: 400 }
@@ -86,50 +86,115 @@ export async function POST(request: Request) {
     const session = await auth.api.getSession({ headers: await headers() });
     const userId = session?.user?.id ?? null;
 
-    const subtotal = items.reduce(
-      (sum: number, item: any) => sum + item.price * item.quantity,
-      0
-    );
-    const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
-    const tax = Math.round(subtotal * 0.08 * 100) / 100;
-    const total = subtotal + shipping + tax;
+    const client = await pool.connect();
+    let order;
+    let subtotal = 0;
+    const verifiedItems = [];
 
-    const orderNumber = generateOrderNumber();
+    try {
+      await client.query("BEGIN");
 
-    const result = await pool.query(
-      `INSERT INTO orders (user_id, order_number, items, subtotal, shipping, tax, total, shipping_address, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
-       RETURNING id, order_number, created_at`,
-      [
-        userId,
-        orderNumber,
-        JSON.stringify(items),
-        subtotal,
-        shipping,
-        tax,
-        total,
-        JSON.stringify(shippingAddress),
-      ]
-    );
+      for (const item of items) {
+        // Query correct price and details from products
+        const productRes = await client.query(
+          "SELECT price, name, slug, image FROM products WHERE id = $1",
+          [item.id]
+        );
+        const product = productRes.rows[0];
+        if (!product) {
+          throw new Error(`Product not found: ${item.name || item.id}`);
+        }
 
-    const order = result.rows[0];
+        const dbPrice = Number(product.price);
+
+        // Lock product size stock to prevent race conditions
+        const sizeRes = await client.query(
+          "SELECT stock FROM product_sizes WHERE product_id = $1 AND size = $2 FOR UPDATE",
+          [item.id, item.size || ""]
+        );
+        const sizeInfo = sizeRes.rows[0];
+        if (!sizeInfo) {
+          throw new Error(`Size "${item.size}" not found for product "${product.name}".`);
+        }
+
+        if (sizeInfo.stock < item.quantity) {
+          throw new Error(`Insufficient stock for "${product.name}" (Size: ${item.size}). Only ${sizeInfo.stock} available.`);
+        }
+
+        // Decrement stock
+        await client.query(
+          "UPDATE product_sizes SET stock = stock - $1 WHERE product_id = $2 AND size = $3",
+          [item.quantity, item.id, item.size || ""]
+        );
+
+        subtotal += dbPrice * item.quantity;
+        verifiedItems.push({
+          id: item.id,
+          slug: product.slug,
+          name: product.name,
+          size: item.size || "",
+          price: dbPrice,
+          image: product.image,
+          quantity: item.quantity,
+        });
+      }
+
+      const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
+      const tax = Math.round(subtotal * 0.08 * 100) / 100;
+      const total = subtotal + shipping + tax;
+
+      const orderNumber = generateOrderNumber();
+
+      const result = await client.query(
+        `INSERT INTO orders (user_id, order_number, items, subtotal, shipping, tax, total, shipping_address, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
+         RETURNING id, order_number, created_at, subtotal, shipping, tax, total`,
+        [
+          userId,
+          orderNumber,
+          JSON.stringify(verifiedItems),
+          subtotal,
+          shipping,
+          tax,
+          total,
+          JSON.stringify(shippingAddress),
+        ]
+      );
+
+      order = result.rows[0];
+      await client.query("COMMIT");
+    } catch (txErr: any) {
+      await client.query("ROLLBACK");
+      console.error("Order transaction failed:", txErr);
+      return NextResponse.json(
+        { error: txErr.message || "Failed to place order." },
+        { status: 400 }
+      );
+    } finally {
+      client.release();
+    }
+
+    const orderSubtotal = Number(order.subtotal);
+    const orderShipping = Number(order.shipping);
+    const orderTax = Number(order.tax);
+    const orderTotal = Number(order.total);
 
     void sendEmail({
       to: email,
-      subject: `Order Confirmed — ${orderNumber}`,
+      subject: `Order Confirmed — ${order.order_number}`,
       text: orderConfirmationText({
-        orderNumber,
+        orderNumber: order.order_number,
         customerName: `${shippingAddress.firstName || ""} ${shippingAddress.lastName || ""}`.trim() || "Valued Customer",
-        items: items.map((i: any) => ({
+        items: verifiedItems.map((i: any) => ({
           name: i.name,
           size: i.size || "",
           quantity: i.quantity,
           price: formatCurrency(i.price),
         })),
-        subtotal: formatCurrency(subtotal),
-        shipping: shipping === 0 ? "Complimentary" : formatCurrency(shipping),
-        tax: formatCurrency(tax),
-        total: formatCurrency(total),
+        subtotal: formatCurrency(orderSubtotal),
+        shipping: orderShipping === 0 ? "Complimentary" : formatCurrency(orderShipping),
+        tax: formatCurrency(orderTax),
+        total: formatCurrency(orderTotal),
         shippingAddress: {
           firstName: shippingAddress.firstName || "",
           lastName: shippingAddress.lastName || "",
@@ -139,18 +204,18 @@ export async function POST(request: Request) {
         },
       }),
       html: orderConfirmationHtml({
-        orderNumber,
+        orderNumber: order.order_number,
         customerName: `${shippingAddress.firstName || ""} ${shippingAddress.lastName || ""}`.trim() || "Valued Customer",
-        items: items.map((i: any) => ({
+        items: verifiedItems.map((i: any) => ({
           name: i.name,
           size: i.size || "",
           quantity: i.quantity,
           price: formatCurrency(i.price),
         })),
-        subtotal: formatCurrency(subtotal),
-        shipping: shipping === 0 ? "Complimentary" : formatCurrency(shipping),
-        tax: formatCurrency(tax),
-        total: formatCurrency(total),
+        subtotal: formatCurrency(orderSubtotal),
+        shipping: orderShipping === 0 ? "Complimentary" : formatCurrency(orderShipping),
+        tax: formatCurrency(orderTax),
+        total: formatCurrency(orderTotal),
         shippingAddress: {
           firstName: shippingAddress.firstName || "",
           lastName: shippingAddress.lastName || "",
@@ -165,6 +230,10 @@ export async function POST(request: Request) {
       id: order.id,
       orderNumber: order.order_number,
       createdAt: order.created_at,
+      subtotal: orderSubtotal,
+      shipping: orderShipping,
+      tax: orderTax,
+      total: orderTotal,
     });
   } catch (error) {
     console.error("Failed to create order:", error);

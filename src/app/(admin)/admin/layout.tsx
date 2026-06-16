@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuthStore } from "@/stores/useAuthStore";
-import { isAdmin } from "@/utils/auth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { AdminSidebar } from "@/components/ui/AdminSidebar";
@@ -16,7 +15,7 @@ export default function AdminLayout({
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && (!user || !isAdmin(user.email))) {
+    if (!loading && (!user || !user.isAdmin)) {
       router.push("/");
     }
   }, [user, loading, router]);
@@ -29,7 +28,7 @@ export default function AdminLayout({
     );
   }
 
-  if (!user || !isAdmin(user.email)) {
+  if (!user || !user.isAdmin) {
     return null;
   }
 

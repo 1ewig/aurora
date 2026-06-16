@@ -8,7 +8,7 @@ export function normalizeProfile(data: any): Profile {
 
 export function isAdmin(email?: string): boolean {
   if (!email) return false;
-  const adminEmailsStr = process.env.NEXT_PUBLIC_ADMIN_EMAILS || "";
+  const adminEmailsStr = process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "";
   const adminEmails = adminEmailsStr.split(",").map((e) => e.trim().toLowerCase());
   return adminEmails.includes(email.toLowerCase());
 }

@@ -8,6 +8,7 @@ export interface User {
   name?: string | null;
   emailVerified?: boolean | null;
   image?: string | null;
+  isAdmin?: boolean | null;
 }
 
 export interface Profile {
@@ -75,14 +76,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         : null;
 
       if (user) {
-        const profile = normalizeProfile({ displayName: user.name || '' });
-        set({ user, profile, loading: false });
+        const roleRes = await fetch("/api/auth/role").catch(() => null);
+        const roleData = roleRes && roleRes.ok ? await roleRes.json() : { isAdmin: false };
+        const profile = normalizeProfile({ displayName: user.name || "" });
+        set({
+          user: { ...user, isAdmin: roleData.isAdmin },
+          profile,
+          loading: false,
+        });
       } else {
         set({ user: null, profile: null, loading: false });
       }
       return { error: null, needsVerification: false };
     } catch (err: any) {
-      const message = err.message || 'Failed to sign in.';
+      const message = err.message || "Failed to sign in.";
       set({ loading: false, error: message });
       return { error: { message }, needsVerification: false };
     }
@@ -91,7 +98,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   signUp: async (email, password, name) => {
     set({ loading: true, error: null });
     try {
-      const { data, error } = await authClient.signUp.email({ email, password, name: name || '' });
+      const { data, error } = await authClient.signUp.email({ email, password, name: name || "" });
       if (error) {
         const message = mapBetterAuthError(error);
         set({ loading: false, error: message });
@@ -99,9 +106,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
 
       if (data?.user && data.user.emailVerified) {
+        const roleRes = await fetch("/api/auth/role").catch(() => null);
+        const roleData = roleRes && roleRes.ok ? await roleRes.json() : { isAdmin: false };
         set({
-          user: { id: data.user.id, email: data.user.email, name: data.user.name, emailVerified: data.user.emailVerified, image: data.user.image },
-          profile: { displayName: name || '' },
+          user: {
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.name,
+            emailVerified: data.user.emailVerified,
+            image: data.user.image,
+            isAdmin: roleData.isAdmin,
+          },
+          profile: { displayName: name || "" },
           loading: false,
         });
         return { error: null, needsVerification: false };
