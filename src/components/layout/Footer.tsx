@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/layout/Footer.tsx
+ *
+ * Site footer with brand statement, navigation columns, social links, and legal.
+ */
+
 import Link from "next/link";
 import { footerNav } from "@/data/navigation";
 

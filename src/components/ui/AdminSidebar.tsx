@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/ui/AdminSidebar.tsx
+ *
+ * Admin panel sidebar navigation with route highlighting.
+ * Links to Dashboard, Inventory, Orders, and Users.
+ */
+
 "use client";
 
 import { usePathname } from "next/navigation";

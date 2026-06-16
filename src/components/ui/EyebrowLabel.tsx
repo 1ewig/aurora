@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/ui/EyebrowLabel.tsx
+ *
+ * Small uppercase label used as section headers (muted or gold accent).
+ */
+
 import { cn } from "@/utils/cn";
 
 interface EyebrowLabelProps {
@@ -6,6 +12,7 @@ interface EyebrowLabelProps {
   className?: string;
 }
 
+/** Small uppercase label for section headings. */
 export function EyebrowLabel({
   children,
   color = "muted",

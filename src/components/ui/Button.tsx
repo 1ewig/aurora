@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/ui/Button.tsx
+ *
+ * Reusable button primitive with spring-scale motion feedback.
+ * Variants: filled, ghost, gold, icon | Sizes: sm, md, lg
+ */
+
 "use client";
 
 import { motion, type HTMLMotionProps } from "framer-motion";
@@ -14,6 +21,7 @@ interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
   className?: string;
 }
 
+/** Visual styles per variant. */
 const buttonStyles: Record<ButtonVariant, string> = {
   filled:
     "bg-bg-ink text-text-inverted hover:bg-text-primary border border-bg-ink",
@@ -23,12 +31,14 @@ const buttonStyles: Record<ButtonVariant, string> = {
   icon: "bg-white border border-border-subtle hover:border-border-medium",
 };
 
+/** Padding and font-size per size tier. */
 const sizeStyles: Record<ButtonSize, string> = {
   sm: "px-5 py-2.5 text-sm",
   md: "px-7 py-3.5 text-sm",
   lg: "px-9 py-4 text-base",
 };
 
+/** Primary CTA button with spring-scale feedback on hover and tap. */
 export function Button({
   variant = "filled",
   size = "md",

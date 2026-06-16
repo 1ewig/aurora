@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/layout/Navbar.tsx
+ *
+ * Fixed top navigation with scroll-reactive background, cart drawer toggle,
+ * user profile dropdown, and mobile menu trigger.
+ */
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";

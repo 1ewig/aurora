@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/layout/MobileMenu.tsx
+ *
+ * Full-screen overlay menu for mobile navigation with staggered link animations.
+ */
+
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";

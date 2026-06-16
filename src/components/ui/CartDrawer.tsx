@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/ui/CartDrawer.tsx
+ *
+ * Slide-in cart drawer with item list, quantity controls, and checkout CTA.
+ */
+
 "use client";
 
 import Link from "next/link";
@@ -8,6 +14,7 @@ import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { drawerSlide } from "@/animations/variants";
 
+/** Cart slide-out drawer with line items, quantity adjusters, and total. */
 export function CartDrawer() {
   const { isOpen, closeCart, items, removeItem, updateQuantity, totalItems, totalPrice } =
     useCartStore();

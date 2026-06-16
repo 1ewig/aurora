@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/ui/OrderStatusBadge.tsx
+ *
+ * Colored badge displaying order status with semantic color coding.
+ */
+
 interface OrderStatusBadgeProps {
   status: string;
 }

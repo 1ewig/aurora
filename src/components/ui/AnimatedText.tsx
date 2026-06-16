@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/ui/AnimatedText.tsx
+ *
+ * Text reveal animation — slides content up with opacity when it scrolls into view.
+ */
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -11,6 +17,7 @@ interface AnimatedTextProps {
   as?: "h1" | "h2" | "h3" | "p" | "span" | "div";
 }
 
+/** Animated text that reveals on scroll with a vertical slide-up. */
 export function AnimatedText({
   children,
   delay = 0,

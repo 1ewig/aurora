@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/ui/ConfirmDialog.tsx
+ *
+ * Modal confirmation dialog with animated backdrop and scale entrance.
+ */
+
 "use client";
 
 import { motion, AnimatePresence, type Variants } from "framer-motion";
@@ -12,6 +18,8 @@ interface ConfirmDialogProps {
   onConfirm: () => void;
   onCancel: () => void;
 }
+
+export function ConfirmDialog({
 
 const backdropVariants: Variants = {
   hidden: { opacity: 0 },

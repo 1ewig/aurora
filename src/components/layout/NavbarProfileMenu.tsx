@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/layout/NavbarProfileMenu.tsx
+ *
+ * Dropdown menu for authenticated users — profile link, orders, admin panel, sign out.
+ */
+
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";

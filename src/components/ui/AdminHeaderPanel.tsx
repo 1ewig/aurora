@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/ui/AdminHeaderPanel.tsx
+ *
+ * Page header for admin panel pages — title, description, and optional action button.
+ */
+
 interface AdminHeaderPanelProps {
   title: string;
   description: string;

@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/ui/OptimizedImage.tsx
+ *
+ * Wrapper around Next.js Image with sensible defaults (fill, lazy loading, 100 quality).
+ */
+
 import Image from "next/image";
 
 interface OptimizedImageProps {
@@ -9,6 +15,7 @@ interface OptimizedImageProps {
   sizes?: string;
 }
 
+/** Optimized Next.js Image with fill layout and high quality defaults. */
 export function OptimizedImage({ src, alt, className, loading = "lazy", style, sizes = "100vw" }: OptimizedImageProps) {
   return (
     <Image

@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/ui/ProductCard.tsx
+ *
+ * Product card with image reveal animation, badge, category, and price.
+ */
+
 "use client";
 
 import Image from "next/image";
@@ -13,6 +19,7 @@ interface ProductCardProps {
   aspectRatio?: string;
 }
 
+/** Product card with image reveal, badge overlay, and price display. */
 export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCardProps) {
   return (
     <article aria-label={`${product.name} — ${formatCurrency(product.price)}`}>
