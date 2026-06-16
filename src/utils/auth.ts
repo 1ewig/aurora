@@ -1,11 +1,19 @@
+/**
+ * Aurora — src/utils/auth.ts
+ *
+ * Auth utility helpers: profile normalization and admin email checks.
+ */
+
 import type { Profile } from "@/stores/useAuthStore";
 
+/** Normalizes a provider's raw profile data into a consistent Profile shape. */
 export function normalizeProfile(data: any): Profile {
   return {
     displayName: data?.displayName || data?.profile?.displayName || data?.nickname || data?.name || "",
   };
 }
 
+/** Checks whether an email belongs to an admin (via ADMIN_EMAILS env var). */
 export function isAdmin(email?: string): boolean {
   if (!email) return false;
   const adminEmailsStr = process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "";

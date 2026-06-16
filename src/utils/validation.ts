@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/utils/validation.ts
+ *
+ * Checkout form field validation with per-field error messages.
+ * Supports email, name, address, ZIP, card number, expiry, and CVC.
+ */
+
 export interface FieldErrors {
   email?: string;
   firstName?: string;
@@ -10,6 +17,7 @@ export interface FieldErrors {
   cardCVC?: string;
 }
 
+/** Validates a single form field and returns an error message or undefined. */
 export function validateField(field: string, value: string): string | undefined {
   const trimmed = value.trim();
 
@@ -71,6 +79,7 @@ export function validateField(field: string, value: string): string | undefined 
   }
 }
 
+/** Validates all fields in a record and returns a map of field-level errors. */
 export function validateAll(values: Record<string, string>): FieldErrors {
   const errors: FieldErrors = {};
   for (const field of Object.keys(values)) {

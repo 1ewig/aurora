@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/lib/email.ts
+ *
+ * Nodemailer-based transactional email sender via Brevo (Sendinblue) SMTP.
+ * Gracefully skips sending when SMTP is not configured (e.g. development).
+ */
+
 import nodemailer from "nodemailer";
 
 const host = process.env.BREVO_SMTP_HOST || "";
@@ -7,12 +14,14 @@ const pass = process.env.BREVO_SMTP_PASS || "";
 const fromEmail = process.env.BREVO_FROM_EMAIL || "";
 const fromName = process.env.BREVO_FROM_NAME || "";
 
+/** Checks whether all required SMTP env vars are present. */
 function isConfigured(): boolean {
   return !!(host && user && pass && fromEmail);
 }
 
 let transporter: nodemailer.Transporter | null = null;
 
+/** Lazy-initialized Nodemailer transporter singleton. */
 function getTransporter(): nodemailer.Transporter {
   if (!transporter) {
     transporter = nodemailer.createTransport({
@@ -32,6 +41,7 @@ export interface SendEmailOptions {
   html?: string;
 }
 
+/** Sends a transactional email via Brevo SMTP. Silently skips if unconfigured. */
 export async function sendEmail(options: SendEmailOptions): Promise<void> {
   if (!isConfigured()) {
     console.warn(

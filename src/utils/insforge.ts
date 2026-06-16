@@ -1,3 +1,11 @@
+/**
+ * Aurora — src/utils/insforge.ts
+ *
+ * Maps local `/images/...` paths to InsForge Storage object URLs and vice versa.
+ * Routes assets to the correct bucket based on path prefix (product, lookbook, editorial).
+ */
+
+/** Resolves a local image path to its full InsForge Storage URL. */
 export function getStorageUrl(localPath: string): string {
   if (!localPath || !localPath.startsWith('/images/')) {
     return localPath;
@@ -19,6 +27,7 @@ export function getStorageUrl(localPath: string): string {
   return `${insforgeUrl}/api/storage/buckets/${bucketName}/objects/${encodedKey}`;
 }
 
+/** Extracts a storage object key from a full InsForge Storage URL. Falls back to local path parsing. */
 export function getStorageKeyFromUrl(url: string): string | null {
   if (!url) return null;
   

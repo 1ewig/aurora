@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/utils/pricing.ts
+ *
+ * Order pricing calculator: free shipping over $500, 8% tax, total summation.
+ */
+
+/** Computes shipping, tax, and total from a subtotal amount. */
 export function calculateOrderPricing(subtotal: number) {
   const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
   const tax = Math.round(subtotal * 0.08 * 100) / 100;

@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/utils/db.ts
+ *
+ * PostgreSQL connection pool shared across API routes and server code.
+ * Configures SSL conditionally and uses a short idle timeout for build compatibility.
+ */
+
 import { Pool } from 'pg';
 
 const connectionString = process.env.DATABASE_URL;

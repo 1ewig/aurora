@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/lib/email-templates.ts
+ *
+ * Order confirmation email templates — HTML and plain-text variants.
+ * Used by the order-processing flow to notify customers of successful purchases.
+ */
+
 export interface OrderConfirmationData {
   orderNumber: string;
   customerName: string;
@@ -15,6 +22,7 @@ export interface OrderConfirmationData {
   };
 }
 
+/** Builds a styled HTML email for order confirmation. */
 export function orderConfirmationHtml(data: OrderConfirmationData): string {
   const itemsHtml = data.items
     .map(
@@ -92,6 +100,7 @@ export function orderConfirmationHtml(data: OrderConfirmationData): string {
 </html>`;
 }
 
+/** Builds a plain-text email for order confirmation (fallback / non-HTML clients). */
 export function orderConfirmationText(data: OrderConfirmationData): string {
   const itemsList = data.items
     .map((item) => `  ${item.name} (Size: ${item.size} × ${item.quantity}) — ${item.price}`)

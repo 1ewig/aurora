@@ -1,7 +1,16 @@
+/**
+ * Aurora — src/lib/auth.ts
+ *
+ * Better Auth server configuration with email/password authentication,
+ * email verification, and password reset flows. Uses a dedicated
+ * PostgreSQL pool scoped to the `better_auth` schema.
+ */
+
 import { betterAuth } from 'better-auth';
 import { Pool } from 'pg';
 import { sendEmail } from './email';
 
+/** Reads a required env var or throws. */
 function requireEnv(name: string): string {
   const v = process.env[name];
   if (!v) throw new Error(`Missing required env var: ${name}`);
@@ -13,6 +22,7 @@ pool.on('connect', (client) => {
   client.query('SET search_path TO better_auth, public').catch(() => {});
 });
 
+/** Better Auth server instance. */
 export const auth = betterAuth({
   database: pool,
   secret: requireEnv('BETTER_AUTH_SECRET'),
