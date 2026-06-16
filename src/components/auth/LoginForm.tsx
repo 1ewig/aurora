@@ -11,7 +11,6 @@ interface LoginFormProps {
   formError: string;
   successMsg?: string;
   onSubmit: (e: React.FormEvent) => void;
-  showResetOption?: boolean;
   onResetClick?: () => void;
   resetLoading?: boolean;
 }
@@ -41,7 +40,6 @@ export function LoginForm({
   formError,
   successMsg,
   onSubmit,
-  showResetOption,
   onResetClick,
   resetLoading,
 }: LoginFormProps) {
@@ -132,20 +130,8 @@ export function LoginForm({
           </div>
 
           {formError && (
-            <div className="space-y-2 px-1">
-              <div className="text-xs text-error font-medium">
-                {formError}
-              </div>
-              {showResetOption && onResetClick && (
-                <button
-                  type="button"
-                  onClick={onResetClick}
-                  disabled={resetLoading}
-                  className="text-xs text-accent-primary font-semibold hover:underline block cursor-pointer text-left disabled:opacity-55"
-                >
-                  {resetLoading ? "Sending reset email..." : "Forgot Password? Click here to reset your password."}
-                </button>
-              )}
+            <div className="text-xs text-error font-medium px-1">
+              {formError}
             </div>
           )}
 

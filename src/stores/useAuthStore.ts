@@ -39,7 +39,7 @@ interface AuthState {
   profile: Profile | null;
   loading: boolean;
   error: string | null;
-  signIn: (email: string, password: string) => Promise<{ error: any; needsVerification?: boolean; needsReset?: boolean }>;
+  signIn: (email: string, password: string) => Promise<{ error: any; needsVerification?: boolean }>;
   signUp: (email: string, password: string, name?: string) => Promise<{ error: any; needsVerification?: boolean }>;
   signOut: () => Promise<void>;
   updateProfile: (profile: Partial<Profile>) => Promise<{ error: any }>;
@@ -66,9 +66,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (error) {
         const message = mapBetterAuthError(error);
         const isUnverified = error.status === 403 || (error.message || "").toLowerCase().includes("verify");
-        const isWrongPassword = (error.message || "").toLowerCase().includes("password");
         set({ loading: false, error: message });
-        return { error, needsVerification: isUnverified, needsReset: isWrongPassword };
+        return { error, needsVerification: isUnverified };
       }
 
       const user = data?.user
@@ -81,11 +80,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       } else {
         set({ user: null, profile: null, loading: false });
       }
-      return { error: null, needsVerification: false, needsReset: false };
+      return { error: null, needsVerification: false };
     } catch (err: any) {
       const message = err.message || 'Failed to sign in.';
       set({ loading: false, error: message });
-      return { error: { message }, needsVerification: false, needsReset: false };
+      return { error: { message }, needsVerification: false };
     }
   },
 

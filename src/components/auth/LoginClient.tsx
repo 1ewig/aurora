@@ -11,7 +11,6 @@ export function LoginClient() {
   const [password, setPassword] = useState("");
   const [formError, setFormError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-  const [showResetOption, setShowResetOption] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
 
   const {
@@ -27,10 +26,6 @@ export function LoginClient() {
   useEffect(() => {
     clearError();
   }, [clearError]);
-
-  useEffect(() => {
-    setShowResetOption(false);
-  }, [email, password]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -53,23 +48,19 @@ export function LoginClient() {
     e.preventDefault();
     setFormError("");
     setSuccessMsg("");
-    setShowResetOption(false);
 
     if (!email || !password) {
       setFormError("Please fill in all fields.");
       return;
     }
 
-    const { error, needsVerification: reqVerification, needsReset } = await signIn(email, password);
+    const { error, needsVerification: reqVerification } = await signIn(email, password);
     if (error) {
       if (reqVerification) {
         router.push(`/verify?email=${encodeURIComponent(email)}`);
       } else {
         const errorMsg = typeof error === "string" ? error : error.message || "Invalid email or password.";
         setFormError(errorMsg);
-        if (needsReset) {
-          setShowResetOption(true);
-        }
       }
     } else {
       router.push("/profile");
@@ -116,7 +107,6 @@ export function LoginClient() {
       formError={formError || storeError || ""}
       successMsg={successMsg}
       onSubmit={handleSubmit}
-      showResetOption={showResetOption}
       onResetClick={handleResetClick}
       resetLoading={resetLoading}
     />
