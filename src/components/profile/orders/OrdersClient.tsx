@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useOrders } from "@/hooks/useOrders";
+import { useOrders } from "@/hooks/queries";
+
 import { Button } from "@/components/ui/Button";
 import { OrderCard } from "./OrderCard";
 

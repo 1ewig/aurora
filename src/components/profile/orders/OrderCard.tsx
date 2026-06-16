@@ -4,7 +4,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { type Order } from "@/hooks/useOrders";
+import { type Order } from "@/hooks/queries";
+
 import { formatCurrency } from "@/utils/formatCurrency";
 import { OrderDetailModal } from "./OrderDetailModal";
 

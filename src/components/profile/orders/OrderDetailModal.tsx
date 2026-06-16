@@ -2,7 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { type Order } from "@/hooks/useOrders";
+import { type Order } from "@/hooks/queries";
+
 import { formatCurrency } from "@/utils/formatCurrency";
 import { useBodyScrollLock } from "@/hooks/useBodyScrollLock";
 
