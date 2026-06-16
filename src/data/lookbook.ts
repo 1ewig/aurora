@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/data/lookbook.ts
+ *
+ * Lookbook slide data for the homepage slider carousel.
+ * Each slide represents a curated editorial image.
+ */
+
 export interface LookbookSlide {
   id?: number;
   slideNumber: number;

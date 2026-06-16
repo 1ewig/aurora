@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/data/navigation.ts
+ *
+ * Navigation link data for the navbar and footer columns.
+ */
+
 export interface NavLink {
   label: string;
   href: string;
@@ -8,6 +14,7 @@ export interface FooterColumn {
   links: NavLink[];
 }
 
+/** Top-level navigation links shown in the navbar. */
 export const navLinks: NavLink[] = [
   { label: "Shop All", href: "/products" },
   { label: "Collections", href: "/#collection" },
@@ -16,6 +23,7 @@ export const navLinks: NavLink[] = [
   { label: "Contact", href: "/#newsletter" },
 ];
 
+/** Footer column links organized by section (Shop, Aurora, Help). */
 export const footerNav: FooterColumn[] = [
   {
     title: "Shop",

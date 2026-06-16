@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/data/editorial.ts
+ *
+ * Editorial content for the brand story page — designer narrative,
+ * atelier imagery, and brand philosophy sections.
+ */
+
 export interface EditorialItem {
   id: string;
   originalImage: string;

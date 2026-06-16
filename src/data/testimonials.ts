@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/data/testimonials.ts
+ *
+ * Customer testimonials displayed on the homepage.
+ * Each entry includes a quote, attribution, and accent color.
+ */
+
 export interface Testimonial {
   id: string;
   quote: string;

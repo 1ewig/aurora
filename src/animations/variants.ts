@@ -1,16 +1,26 @@
+/**
+ * Aurora — src/animations/variants.ts
+ *
+ * Framer Motion animation variants for entry/exit transitions used across the app.
+ * Includes fade, slide, scale, card cascade, drawer, and menu animations.
+ */
+
 import type { Variants } from "framer-motion";
 
+/** Spring config for card entrance animations. */
 export const springCardEnter = {
   type: "spring" as const,
   stiffness: 260,
   damping: 26,
 };
 
+/** Easing for card exit animations. */
 export const springCardExit = {
   duration: 0.3,
   ease: [0.55, 0.06, 0.68, 0.19] as const,
 };
 
+/** Fades in while sliding upward. Used for section reveals. */
 export const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: {
@@ -20,11 +30,13 @@ export const fadeInUp: Variants = {
   },
 };
 
+/** Simple fade-in. */
 export const fadeIn: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.8 } },
 };
 
+/** Staggers children entrance with delay between each. */
 export const staggerContainer: Variants = {
   hidden: {},
   visible: {
@@ -32,6 +44,7 @@ export const staggerContainer: Variants = {
   },
 };
 
+/** Slides in from the left. */
 export const slideInLeft: Variants = {
   hidden: { opacity: 0, x: -60 },
   visible: {
@@ -41,6 +54,7 @@ export const slideInLeft: Variants = {
   },
 };
 
+/** Slides in from the right. */
 export const slideInRight: Variants = {
   hidden: { opacity: 0, x: 60 },
   visible: {
@@ -50,6 +64,7 @@ export const slideInRight: Variants = {
   },
 };
 
+/** Scales in from 88% with an overshoot ease. */
 export const scaleIn: Variants = {
   hidden: { opacity: 0, scale: 0.88 },
   visible: {
@@ -59,11 +74,13 @@ export const scaleIn: Variants = {
   },
 };
 
+/** Returns a rotation angle for a cascade card based on its index. */
 export const getCardRotation = (index: number): number => {
   const rotations = [-10, -5, 0, 6, 12, 18];
   return rotations[index] ?? 0;
 };
 
+/** Staggered cascade entrance for a stack of cards with rotation. */
 export const cardCascade = (index: number): Variants => ({
   hidden: {
     opacity: 0,
@@ -82,6 +99,7 @@ export const cardCascade = (index: number): Variants => ({
   },
 });
 
+/** Floating/keyframe animation for mention badges. */
 export const mentionFloat = {
   animate: {
     y: [0, -8, 0],
@@ -89,6 +107,7 @@ export const mentionFloat = {
   },
 };
 
+/** Navbar slide-down reveal on page load. */
 export const navbarReveal: Variants = {
   hidden: { y: -100, opacity: 0 },
   visible: {
@@ -98,6 +117,7 @@ export const navbarReveal: Variants = {
   },
 };
 
+/** Cart drawer slide in from the right edge. */
 export const drawerSlide: Variants = {
   hidden: { x: "100%" },
   visible: {
@@ -110,6 +130,7 @@ export const drawerSlide: Variants = {
   },
 };
 
+/** Full-screen overlay menu entrance/exit. */
 export const overlayMenu: Variants = {
   hidden: { x: "100%", opacity: 0 },
   visible: {
@@ -124,6 +145,7 @@ export const overlayMenu: Variants = {
   },
 };
 
+/** Mobile menu item slide-in from the right. */
 export const menuItemVariant: Variants = {
   hidden: { opacity: 0, x: 40 },
   visible: {
@@ -133,6 +155,7 @@ export const menuItemVariant: Variants = {
   },
 };
 
+/** Card entrance with alternating offset based on index. */
 export function cardEnter(index: number): Variants {
   const isEven = index % 2 === 0;
   return {
@@ -155,6 +178,7 @@ export function cardEnter(index: number): Variants {
   };
 }
 
+/** Card exit variant — shrinks and fades downward. */
 export const cardExit: Variants = {
   hidden: { opacity: 1, scale: 1, y: 0 },
   visible: { opacity: 1, scale: 1, y: 0 },
@@ -166,6 +190,7 @@ export const cardExit: Variants = {
   },
 };
 
+/** Subtle scale reveal for product card images. */
 export const cardImageReveal: Variants = {
   hidden: { scale: 1.08 },
   visible: {

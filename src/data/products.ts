@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/data/products.ts
+ *
+ * Product type definitions and static catalog data for the storefront.
+ * Categories, hero products, and the full product listing.
+ */
+
 export interface Product {
   id: string;
   slug: string;
