@@ -1,5 +1,12 @@
+/**
+ * Aurora — src/app/(store)/not-found.tsx
+ *
+ * Custom 404 page for the store route group.
+ */
+
 import Link from "next/link";
 
+/** Custom 404 not-found page for the store route group. */
 export default function NotFound() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-bg-primary px-6">

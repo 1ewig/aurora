@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/app/(user)/profile/ProfileLayoutClient.tsx
+ *
+ * Client component for the profile layout shell with responsive sidebar.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -8,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useNavbarScroll } from "@/hooks/ui/useNavbarScroll";
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 
+/** Hamburger menu icon for mobile navigation. */
 function MenuIcon() {
   return (
     <div className="w-5 h-4 flex flex-col justify-between">
@@ -18,6 +25,7 @@ function MenuIcon() {
   );
 }
 
+/** Profile layout with desktop sidebar and mobile drawer. */
 export function ProfileLayoutClient({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore();
   const router = useRouter();

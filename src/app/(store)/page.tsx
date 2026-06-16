@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/app/(store)/page.tsx
+ *
+ * Home / landing page composing hero, featured collection, lookbook, and editorial sections.
+ */
+
 import { Hero } from "@/components/landing/Hero";
 import { MarqueeBar } from "@/components/landing/MarqueeBar";
 import { FeaturedCollection } from "@/components/landing/FeaturedCollection";
@@ -6,6 +12,7 @@ import { DesignerStory } from "@/components/landing/DesignerStory";
 import { Testimonials } from "@/components/landing/Testimonials";
 import { Newsletter } from "@/components/landing/Newsletter";
 
+/** Home/landing page composing all landing sections. */
 export default function HomePage() {
   return (
     <main id="main-content" tabIndex={-1}>

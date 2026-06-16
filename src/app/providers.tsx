@@ -1,9 +1,16 @@
+/**
+ * Aurora — src/app/providers.tsx
+ *
+ * Root providers wrapper that sets up React Query and auth initialization.
+ */
+
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { useInitializeAuth } from "@/hooks/useInitializeAuth";
 
+/** Root providers component wrapping the app with React Query and auth initialization. */
 export default function Providers({ children }: { children: React.ReactNode }) {
   useInitializeAuth();
 

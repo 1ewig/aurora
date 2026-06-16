@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/app/(store)/products/[slug]/page.tsx
+ *
+ * Individual product detail page with dynamic metadata from the database.
+ */
+
 import { pool } from "@/utils/db";
 import { ProductDetailClient } from "@/components/product/detail/ProductDetailClient";
 
@@ -7,6 +13,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+/** Generate dynamic metadata based on the product slug. */
 export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   try {
@@ -25,6 +32,7 @@ export async function generateMetadata({ params }: PageProps) {
   }
 }
 
+/** Product detail page for a single product identified by slug. */
 export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
   return <ProductDetailClient slug={slug} />;

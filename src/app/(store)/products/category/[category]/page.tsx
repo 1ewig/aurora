@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/app/(store)/products/category/[category]/page.tsx
+ *
+ * Category-based product listing page.
+ */
+
 import type { Metadata } from "next";
 import CategoryPageClient from "@/components/product/listing/CategoryPageClient";
 
@@ -13,6 +19,7 @@ interface CategoryPageProps {
   params: Promise<{ category: string }>;
 }
 
+/** Generate metadata based on the category slug. */
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { category } = await params;
   const categoryName = categoryMap[category.toLowerCase()] || "Collection";
@@ -22,6 +29,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   };
 }
 
+/** Category product listing page. */
 export default async function CategoryPage({ params }: CategoryPageProps) {
   return <CategoryPageClient params={params} />;
 }

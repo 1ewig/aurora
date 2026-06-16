@@ -1,9 +1,16 @@
+/**
+ * Aurora — src/app/(user)/layout.tsx
+ *
+ * Auth-gated layout that redirects unauthenticated users to the login page.
+ */
+
 "use client";
 
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
+/** Auth-gated layout that redirects unauthenticated users to login. */
 export default function UserLayout({
   children,
 }: {

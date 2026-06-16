@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/app/layout.tsx
+ *
+ * Root layout loading global fonts, metadata, viewport, and provider wrappers.
+ */
+
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
@@ -15,6 +21,7 @@ const playfairDisplay = Playfair_Display({
   display: "swap",
 });
 
+/** Application-level metadata for SEO and social sharing. */
 export const metadata: Metadata = {
   title: "Aurora — Premium Clothing",
   description:
@@ -27,11 +34,13 @@ export const metadata: Metadata = {
   },
 };
 
+/** Application viewport configuration for responsive rendering. */
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
 };
 
+/** Root layout wrapping all pages with fonts, providers, and base HTML structure. */
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {

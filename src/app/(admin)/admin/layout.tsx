@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/app/(admin)/admin/layout.tsx
+ *
+ * Admin layout with auth guard and sidebar navigation.
+ */
+
 "use client";
 
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -5,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { AdminSidebar } from "@/components/ui/AdminSidebar";
 
+/** Admin layout with authentication guard and sidebar navigation. */
 export default function AdminLayout({
   children,
 }: {
