@@ -1,3 +1,12 @@
+/**
+ * Aurora — src/app/api/admin/users/[id]/route.ts
+ *
+ * GET /api/admin/users/:id — returns user details or sessions (with ?include=sessions).
+ * PATCH /api/admin/users/:id — updates allowed user fields.
+ * DELETE /api/admin/users/:id — deletes a user (self-deletion blocked).
+ * Admin-only endpoints.
+ */
+
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { auth } from '@/lib/auth';

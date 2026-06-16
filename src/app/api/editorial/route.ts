@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/app/api/editorial/route.ts
+ *
+ * GET /api/editorial — returns editorial content for the brand story page.
+ */
+
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 

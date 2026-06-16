@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/app/api/orders/route.ts
+ *
+ * Order API — GET returns the current user's orders, POST creates a new order
+ * with stock validation, inventory deduction, and email confirmation.
+ */
+
 import { NextResponse } from "next/server";
 import { pool } from "@/utils/db";
 import { auth } from "@/lib/auth";
@@ -6,6 +13,7 @@ import { sendEmail } from "@/lib/email";
 import { orderConfirmationHtml, orderConfirmationText } from "@/lib/email-templates";
 import { formatCurrency } from "@/utils/formatCurrency";
 
+/** Generates a unique order number in the format AUR-YYYY-NNNNNN. */
 function generateOrderNumber(): string {
   const year = new Date().getFullYear();
   const num = Math.floor(100000 + Math.random() * 900000);

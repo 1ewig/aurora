@@ -1,3 +1,12 @@
+/**
+ * Aurora — src/middleware.ts
+ *
+ * Next.js middleware for route protection.
+ * - Redirects unauthenticated users to /login
+ * - Blocks non-admin users from /admin routes
+ * - Uses Better Auth session cookie for auth checks
+ */
+
 import { NextResponse, type NextRequest } from "next/server";
 import { isAdmin } from "@/utils/auth";
 

@@ -1,3 +1,11 @@
+/**
+ * Aurora — src/app/api/admin/products/[id]/route.ts
+ *
+ * PUT /api/admin/products/:id — updates a product with its images, sizes, and details.
+ * DELETE /api/admin/products/:id — deletes a product and cleans up unused storage assets.
+ * Admin-only endpoints with transactional DB operations.
+ */
+
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { auth } from '@/lib/auth';
@@ -11,6 +19,7 @@ const admin = createAdminClient({
   apiKey: process.env.INSFORGE_API_KEY || ''
 });
 
+/** Deletes a storage object if no other product references it. */
 async function deleteUnusedImage(client: any, url: string, productId: string) {
   const { rows } = await client.query(
     `SELECT COUNT(*) as count FROM (

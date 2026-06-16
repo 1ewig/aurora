@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/app/api/lookbook/route.ts
+ *
+ * GET /api/lookbook — returns lookbook slides ordered by slide number.
+ */
+
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 

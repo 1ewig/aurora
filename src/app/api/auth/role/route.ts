@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/app/api/auth/role/route.ts
+ *
+ * GET /api/auth/role — returns whether the current user is an admin.
+ * Used by the auth store and middleware to gate admin functionality.
+ */
+
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/utils/auth";
 import { headers } from "next/headers";

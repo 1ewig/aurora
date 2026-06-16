@@ -1,3 +1,11 @@
+/**
+ * Aurora — src/app/api/admin/products/route.ts
+ *
+ * GET /api/admin/products — returns all products with images, sizes, and details.
+ * POST /api/admin/products — creates a new product with full nested data.
+ * Admin-only endpoints.
+ */
+
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { auth } from '@/lib/auth';

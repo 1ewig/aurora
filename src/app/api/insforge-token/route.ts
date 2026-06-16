@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/app/api/insforge-token/route.ts
+ *
+ * GET /api/insforge-token — returns a signed JWT for the InsForge bridge,
+ * allowing the browser client to authenticate with InsForge services.
+ */
+
 import { auth } from '@/lib/auth';
 import jwt from 'jsonwebtoken';
 import { headers } from 'next/headers';

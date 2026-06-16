@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/app/api/admin/users/route.ts
+ *
+ * GET /api/admin/users — returns all users with account links and session metadata.
+ * Admin-only.
+ */
+
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { auth } from '@/lib/auth';

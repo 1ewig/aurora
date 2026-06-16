@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/app/api/admin/orders/route.ts
+ *
+ * GET /api/admin/orders — returns all orders for the admin panel.
+ * Admin-only. Includes full order details with shipping info.
+ */
+
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { auth } from '@/lib/auth';

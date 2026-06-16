@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/app/api/admin/orders/[id]/route.ts
+ *
+ * PATCH /api/admin/orders/:id — updates an order's status.
+ * Admin-only. Validates status against allowed transitions.
+ */
+
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { auth } from '@/lib/auth';

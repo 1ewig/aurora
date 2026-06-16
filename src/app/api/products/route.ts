@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/app/api/products/route.ts
+ *
+ * GET /api/products — returns all products, optionally filtered by category.
+ * Maps snake_case DB columns to camelCase for the frontend.
+ */
+
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 

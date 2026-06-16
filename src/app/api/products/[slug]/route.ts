@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/app/api/products/[slug]/route.ts
+ *
+ * GET /api/products/:slug — returns full product details including
+ * images, sizes, and description in a single query.
+ */
+
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 

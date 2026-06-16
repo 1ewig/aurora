@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/app/api/admin/dashboard/route.ts
+ *
+ * GET /api/admin/dashboard — returns aggregate metrics and recent orders.
+ * Admin-only. Requires authentication and admin role.
+ */
+
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { auth } from '@/lib/auth';
