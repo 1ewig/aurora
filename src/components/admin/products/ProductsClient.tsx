@@ -17,6 +17,7 @@ export function ProductsClient() {
   const deleteProduct = useAdminStore((s) => s.deleteProduct);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductData | null>(null);
   const [productToDelete, setProductToDelete] = useState<ProductData | null>(null);
@@ -24,13 +25,20 @@ export function ProductsClient() {
   const filteredProducts = useMemo(
     () =>
       products.filter(
-        (p) =>
-          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          p.category.toLowerCase().includes(searchQuery.toLowerCase())
+        (p) => {
+          const matchesSearch =
+            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.category.toLowerCase().includes(searchQuery.toLowerCase());
+          const matchesCategory =
+            selectedCategory === "All" ||
+            p.category.toLowerCase() === selectedCategory.toLowerCase();
+          return matchesSearch && matchesCategory;
+        }
       ),
-    [products, searchQuery]
+    [products, searchQuery, selectedCategory]
   );
+
 
   // Setup form hook
   const form = useProductForm(() => {
@@ -89,14 +97,17 @@ export function ProductsClient() {
             }
           />
 
-          {/* Products Table */}
+           {/* Products Table */}
           <ProductsTable
             filteredProducts={filteredProducts}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
             onEditClick={handleOpenModal}
             onDeleteClick={setProductToDelete}
           />
+
 
           {/* Form Modal */}
           <ProductFormModal

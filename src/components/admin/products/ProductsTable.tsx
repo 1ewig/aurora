@@ -1,11 +1,15 @@
 "use client";
 
 import { type ProductData } from "@/stores/useAdminStore";
+import { categories } from "@/data/products";
+
 
 interface ProductsTableProps {
   filteredProducts: ProductData[];
   searchQuery: string;
   onSearchChange: (val: string) => void;
+  selectedCategory: string;
+  onCategoryChange: (val: string) => void;
   onEditClick: (product: ProductData) => void;
   onDeleteClick: (product: ProductData) => void;
 }
@@ -14,21 +18,38 @@ export function ProductsTable({
   filteredProducts,
   searchQuery,
   onSearchChange,
+  selectedCategory,
+  onCategoryChange,
   onEditClick,
   onDeleteClick,
 }: ProductsTableProps) {
   return (
     <div className="space-y-8">
-      {/* Search Input */}
-      <div className="flex justify-end">
+      {/* Search & Filter Controls */}
+      <div className="flex flex-col sm:flex-row gap-3 justify-end items-stretch sm:items-center">
+        <select
+          value={selectedCategory}
+          onChange={(e) => onCategoryChange(e.target.value)}
+          className="px-5 py-3 bg-bg-secondary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none transition-colors cursor-pointer"
+        >
+          <option value="All">All Categories</option>
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+
+        </select>
+
         <input
           type="text"
           placeholder="Search product ID, name, or category..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full md:max-w-md px-5 py-3 bg-bg-secondary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none transition-colors"
+          className="w-full sm:max-w-md px-5 py-3 bg-bg-secondary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none transition-colors"
         />
       </div>
+
 
       {/* Main Table */}
       {filteredProducts.length === 0 ? (
