@@ -232,11 +232,16 @@ export const allProducts: Product[] = [
     price: 450,
     
     image: "/images/products/black-tailored-trousers.webp",
-    images: ["/images/products/black-tailored-trousers.webp"],
+    images: [
+      "/images/products/black-tailored-trousers.webp",
+      "/images/products/black-tailored-trousers-2.webp"
+    ],
+
     altText: "Black tailored dress trousers",
     
     
     description: "Crafted from a fine wool and silk blend, these trousers offer a sharp crease, slim-straight leg, and clean waistband details. A foundational piece designed for longevity and timeless appeal.",
+
     details: ["85% wool, 15% silk blend","Mid-rise with structured waist bands","Pressed crease along front and back","Concealed button and zip closure","Dry clean only","Crafted in Italy"],
     sizes: ["XS","S","M","L","XL"],
   },
