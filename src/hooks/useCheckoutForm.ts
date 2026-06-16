@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/hooks/useCheckoutForm.ts
+ *
+ * Checkout form state management with validation, auto-prefill for logged-in users,
+ * order submission, and post-order cleanup (cart clear, query invalidation).
+ */
+
 import { useState, useCallback, useEffect } from "react";
 import { useCartStore } from "@/stores/useCartStore";
 import { useAuthStore } from "@/stores/useAuthStore";

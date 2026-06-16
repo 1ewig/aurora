@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/hooks/queries.ts
+ *
+ * TanStack React Query hooks for products, lookbook, editorial, and orders.
+ * Centralized data-fetching layer with caching and optimistic initial data.
+ */
+
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Product } from '@/data/products';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -15,6 +22,7 @@ async function fetchProducts(category?: string): Promise<Product[]> {
   return response.json();
 }
 
+/** Fetches all products, optionally filtered by category. */
 export function useProductsQuery(category?: string) {
   return useQuery({
     queryKey: ['products', category || 'All'],
@@ -22,6 +30,7 @@ export function useProductsQuery(category?: string) {
   });
 }
 
+/** Returns a deterministic "featured" subset using the current day as a seed. */
 export function useFeaturedProductsQuery(count = 3) {
   return useQuery({
     queryKey: ['products', 'All'],
@@ -40,6 +49,7 @@ export function useFeaturedProductsQuery(count = 3) {
   });
 }
 
+/** Returns up to 4 related products from the same category. */
 export function useRelatedProductsQuery(currentProduct: Product) {
   return useQuery({
     queryKey: ['products', 'All'],
@@ -68,6 +78,7 @@ async function fetchProductDetails(slug: string): Promise<Product> {
   return response.json();
 }
 
+/** Fetches a single product by slug with initial data from cached product list. */
 export function useProductDetailsQuery(slug: string) {
   const queryClient = useQueryClient();
 
@@ -75,7 +86,7 @@ export function useProductDetailsQuery(slug: string) {
     queryKey: ['product', slug],
     queryFn: () => fetchProductDetails(slug),
     enabled: !!slug,
-    staleTime: 0, // Force background refetch to fetch complete details on mount
+    staleTime: 0,
     initialData: () => {
       const cachedQueries = queryClient.getQueriesData<Product[]>({ queryKey: ['products'] });
       for (const [, products] of cachedQueries) {
@@ -105,6 +116,7 @@ async function fetchLookbookSlides(): Promise<any[]> {
   return response.json();
 }
 
+/** Fetches lookbook slides for the homepage slider. */
 export function useLookbookQuery() {
   return useQuery({
     queryKey: ['lookbook'],
@@ -120,6 +132,7 @@ async function fetchEditorialContent(): Promise<any[]> {
   return response.json();
 }
 
+/** Fetches editorial content for the brand story page. */
 export function useEditorialQuery() {
   return useQuery({
     queryKey: ['editorial'],
@@ -159,6 +172,7 @@ export interface Order {
   createdAt: string;
 }
 
+/** Fetches the current user's orders from the API. */
 export function useOrders() {
   const user = useAuthStore((s) => s.user);
 

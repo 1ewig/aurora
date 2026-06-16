@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/hooks/useProductFilter.ts
+ *
+ * Product listing filtering and sorting state — category, sort order, search query.
+ */
+
 import { useState, useMemo, useEffect } from "react";
 import { useProductsQuery } from "@/hooks/queries";
 import { categories } from "@/data/products";
@@ -8,6 +14,7 @@ interface UseProductFilterOptions {
   onCategoryChange?: (category: string) => void;
 }
 
+/** Manages category, sort, and search filters for the products listing page. */
 export function useProductFilter(options: UseProductFilterOptions = {}) {
   const {
     initialCategory = "All",

@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/stores/useAdminStore.ts
+ *
+ * Zustand store for admin panel state — products, orders, dashboard metrics.
+ * Handles CRUD for inventory management and order status updates.
+ */
+
 import { create } from "zustand";
 
 export interface SizeStock {
@@ -92,6 +99,7 @@ interface AdminState {
   deleteProduct: (id: string) => Promise<void>;
 }
 
+/** Admin panel store for product/order/dashboard management. */
 export const useAdminStore = create<AdminState>((set, get) => ({
   products: [],
   orders: [],
@@ -102,6 +110,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
 
   clearError: () => set({ error: null }),
 
+  /** Fetches dashboard metrics and recent orders. */
   fetchDashboard: async () => {
     set({ loading: true, error: null });
     try {
@@ -114,6 +123,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
+  /** Fetches all products for inventory management. */
   fetchProducts: async () => {
     set({ loading: true, error: null });
     try {
@@ -126,6 +136,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
+  /** Fetches all orders for admin view. */
   fetchOrders: async () => {
     set({ loading: true, error: null });
     try {
@@ -138,6 +149,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
+  /** Updates an order's status and syncs local state. */
   updateOrderStatus: async (orderId, status) => {
     set({ loading: true, error: null });
     try {
@@ -160,6 +172,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
+  /** Creates or updates a product, then refreshes the product list. */
   saveProduct: async (product, id) => {
     set({ loading: true, error: null });
     try {
@@ -183,6 +196,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     }
   },
 
+  /** Deletes a product and removes it from local state. */
   deleteProduct: async (id) => {
     set({ loading: true, error: null });
     try {

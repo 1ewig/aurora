@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/stores/useProductStore.ts
+ *
+ * Zustand store for product detail page UI state — size selection, tab switching,
+ * and size guide modal visibility. Transient (no persistence).
+ */
+
 import { create } from "zustand";
 
 interface ProductStore {
@@ -10,6 +17,7 @@ interface ProductStore {
   setSizeGuideOpen: (isOpen: boolean) => void;
 }
 
+/** Transient UI state for product detail interactions. */
 export const useProductStore = create<ProductStore>((set) => ({
   selectedSizes: {},
   activeTabs: {},

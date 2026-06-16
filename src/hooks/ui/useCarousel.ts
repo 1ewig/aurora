@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/hooks/ui/useCarousel.ts
+ *
+ * Auto-advancing carousel with manual navigation (next/prev/goTo).
+ * Pauses auto-advance on manual interaction, resumes after a delay.
+ */
+
 import { useState, useEffect, useCallback } from "react";
 
 interface UseCarouselOptions {
@@ -7,6 +14,7 @@ interface UseCarouselOptions {
   initial?: number;
 }
 
+/** Auto-advancing carousel with manual override and auto-resume. */
 export function useCarousel({
   length,
   interval = 6000,

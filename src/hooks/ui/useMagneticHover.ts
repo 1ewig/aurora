@@ -1,5 +1,13 @@
+/**
+ * Aurora — src/hooks/ui/useMagneticHover.ts
+ *
+ * Magnetic hover effect — element shifts toward the cursor on mouse move,
+ * then snaps back on mouse leave.
+ */
+
 import { useRef, useState } from "react";
 
+/** Returns ref, position offset, and event handlers for a magnetic hover effect. */
 export function useMagneticHover(strength = 0.4) {
   const ref = useRef<HTMLButtonElement | HTMLAnchorElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });

@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/hooks/useUserSessions.ts
+ *
+ * Fetches and exposes active sessions for a given user (admin user detail view).
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -11,6 +17,7 @@ export interface SessionRow {
   userAgent: string | null;
 }
 
+/** Fetches active sessions for a user. Used in the admin user detail modal. */
 export function useUserSessions(userId: string | null) {
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [loading, setLoading] = useState(false);

@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/stores/useAuthStore.ts
+ *
+ * Zustand store for authentication state and operations.
+ * Wraps Better Auth client methods with error mapping and profile normalization.
+ */
+
 import { create } from 'zustand';
 import { authClient } from '@/lib/auth-client';
 import { normalizeProfile } from '@/utils/auth';
@@ -15,6 +22,7 @@ export interface Profile {
   displayName: string;
 }
 
+/** Maps Better Auth error codes/statuses to human-readable messages. */
 function mapBetterAuthError(error: any): string {
   if (!error) return "Something went wrong.";
   const msg = (error.message || "").toLowerCase();
@@ -52,6 +60,7 @@ interface AuthState {
   clearError: () => void;
 }
 
+/** Global auth store wrapping Better Auth with error handling and profile management. */
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   profile: null,

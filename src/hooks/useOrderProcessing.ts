@@ -1,6 +1,13 @@
+/**
+ * Aurora — src/hooks/useOrderProcessing.ts
+ *
+ * Admin order list filtering — status and search query with memoized results.
+ */
+
 import { useState, useMemo } from "react";
 import { type OrderData } from "@/stores/useAdminStore";
 
+/** Filters orders by status and search query with memoized results. */
 export function useOrderProcessing(orders: OrderData[]) {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");

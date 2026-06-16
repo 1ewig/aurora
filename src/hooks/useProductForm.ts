@@ -1,8 +1,16 @@
+/**
+ * Aurora — src/hooks/useProductForm.ts
+ *
+ * Admin product form state — fields, image upload, size/detail management,
+ * change detection, and save logic.
+ */
+
 import { useState, useEffect } from "react";
 import { useInsforgeClient } from "@/lib/insforge";
 import { useAdminStore, type ProductData, type SizeStock } from "@/stores/useAdminStore";
 import { categories } from "@/data/products";
 
+/** Admin product form state and handlers for create/edit workflow. */
 export function useProductForm(onSuccess: () => void) {
   const saveProduct = useAdminStore((s) => s.saveProduct);
   const { client: insforge, isReady } = useInsforgeClient();

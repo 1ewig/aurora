@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/hooks/useInitializeAuth.ts
+ *
+ * Initializes the auth store on mount by fetching the current session
+ * and resolving admin role.
+ */
+
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -5,6 +12,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { authClient } from "@/lib/auth-client";
 import { normalizeProfile } from "@/utils/auth";
 
+/** Fetches the current session and populates the auth store on mount. */
 export function useInitializeAuth() {
   const initialized = useRef(false);
 

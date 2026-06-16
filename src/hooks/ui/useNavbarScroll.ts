@@ -1,5 +1,12 @@
+/**
+ * Aurora — src/hooks/ui/useNavbarScroll.ts
+ *
+ * Produces animated nav styles (background opacity, border, blur) based on scroll position.
+ */
+
 import { useScroll, useTransform } from "framer-motion";
 
+/** Returns motion values for navbar background, border, and blur based on scroll Y. */
 export function useNavbarScroll() {
   const { scrollY } = useScroll();
 
