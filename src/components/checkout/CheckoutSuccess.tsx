@@ -64,7 +64,7 @@ export function CheckoutSuccess({
       </h2>
 
       <p className="text-text-secondary max-w-md mx-auto text-sm md:text-base leading-relaxed">
-        Thank you for your purchase. We are preparing your order. An email confirmation containing details and tracking has been sent to:
+        Thank you for your purchase. We are preparing your order. A confirmation email has been sent to:
         <span className="block font-medium text-text-primary mt-1">{maskedEmail}</span>
       </p>
 

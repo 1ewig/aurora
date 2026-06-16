@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { pool } from "@/utils/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { sendEmail } from "@/lib/email";
+import { orderConfirmationHtml, orderConfirmationText } from "@/lib/email-templates";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 function generateOrderNumber(): string {
   const year = new Date().getFullYear();
@@ -110,6 +113,53 @@ export async function POST(request: Request) {
     );
 
     const order = result.rows[0];
+
+    void sendEmail({
+      to: email,
+      subject: `Order Confirmed — ${orderNumber}`,
+      text: orderConfirmationText({
+        orderNumber,
+        customerName: `${shippingAddress.firstName || ""} ${shippingAddress.lastName || ""}`.trim() || "Valued Customer",
+        items: items.map((i: any) => ({
+          name: i.name,
+          size: i.size || "",
+          quantity: i.quantity,
+          price: formatCurrency(i.price),
+        })),
+        subtotal: formatCurrency(subtotal),
+        shipping: shipping === 0 ? "Complimentary" : formatCurrency(shipping),
+        tax: formatCurrency(tax),
+        total: formatCurrency(total),
+        shippingAddress: {
+          firstName: shippingAddress.firstName || "",
+          lastName: shippingAddress.lastName || "",
+          address: shippingAddress.address || "",
+          city: shippingAddress.city || "",
+          zipCode: shippingAddress.zipCode || "",
+        },
+      }),
+      html: orderConfirmationHtml({
+        orderNumber,
+        customerName: `${shippingAddress.firstName || ""} ${shippingAddress.lastName || ""}`.trim() || "Valued Customer",
+        items: items.map((i: any) => ({
+          name: i.name,
+          size: i.size || "",
+          quantity: i.quantity,
+          price: formatCurrency(i.price),
+        })),
+        subtotal: formatCurrency(subtotal),
+        shipping: shipping === 0 ? "Complimentary" : formatCurrency(shipping),
+        tax: formatCurrency(tax),
+        total: formatCurrency(total),
+        shippingAddress: {
+          firstName: shippingAddress.firstName || "",
+          lastName: shippingAddress.lastName || "",
+          address: shippingAddress.address || "",
+          city: shippingAddress.city || "",
+          zipCode: shippingAddress.zipCode || "",
+        },
+      }),
+    });
 
     return NextResponse.json({
       id: order.id,
