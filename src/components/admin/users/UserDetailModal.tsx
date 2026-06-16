@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/admin/users/UserDetailModal.tsx
+ *
+ * Slide-over detail panel for a single user — profile, linked accounts,
+ * active sessions, and verify/delete actions.
+ */
+
 "use client";
 
 import type { UserRow } from "./UsersClient";
@@ -12,6 +19,7 @@ interface UserDetailModalProps {
   onDelete: (user: UserRow) => void;
 }
 
+/** User detail modal showing profile, linked accounts, sessions, and admin actions. */
 export function UserDetailModal({
   user,
   sessions,

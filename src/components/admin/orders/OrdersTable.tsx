@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/admin/orders/OrdersTable.tsx
+ *
+ * Sortable, filterable orders table with inline status dropdowns
+ * and a "View Details" action that opens OrderDetailModal.
+ */
+
 "use client";
 
 import { type OrderData } from "@/stores/useAdminStore";
@@ -14,6 +21,7 @@ interface OrdersTableProps {
   updatingStatusId: string | null;
 }
 
+/** Filterable, sortable orders table with inline status updates. */
 export function OrdersTable({
   orders,
   filterStatus,

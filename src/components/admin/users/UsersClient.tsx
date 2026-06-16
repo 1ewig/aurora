@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/admin/users/UsersClient.tsx
+ *
+ * User management page — fetch, search, sort, filter, verify,
+ * and delete users with a detail modal and delete confirmation.
+ */
+
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
@@ -6,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { UserDetailModal } from "./UserDetailModal";
 import { useUserSessions } from "@/hooks/useUserSessions";
 
+/** Shape of a user row returned by GET /api/admin/users. */
 export interface UserRow {
   id: string;
   name: string | null;
@@ -22,6 +30,7 @@ export interface UserRow {
 type SortKey = "name" | "email" | "emailVerified" | "createdAt" | "sessionCount";
 type FilterVerified = "all" | "verified" | "unverified";
 
+/** User management page — search, sort, filter, verify, and delete users. */
 export function UsersClient() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);

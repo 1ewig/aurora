@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/admin/orders/OrdersClient.tsx
+ *
+ * Orders management page — fetches all orders, wires filtering/search
+ * via useOrderProcessing, and renders the table + detail modal.
+ */
+
 "use client";
 
 import { useEffect } from "react";
@@ -7,6 +14,7 @@ import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { OrdersTable } from "./OrdersTable";
 import { OrderDetailModal } from "./OrderDetailModal";
 
+/** Orders management page — fetches, filters, and displays orders. */
 export function OrdersClient() {
   const orders = useAdminStore((s) => s.orders);
   const loading = useAdminStore((s) => s.loading);

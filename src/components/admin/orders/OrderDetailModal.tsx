@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/admin/orders/OrderDetailModal.tsx
+ *
+ * Slide-in order detail panel with item breakdown, shipping info,
+ * and inline status update controls.
+ */
+
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,6 +20,7 @@ interface OrderDetailModalProps {
   updatingStatusId: string | null;
 }
 
+/** Order detail slide-over with line items, shipping, totals, and status controls. */
 export function OrderDetailModal({
   order,
   isOpen,
