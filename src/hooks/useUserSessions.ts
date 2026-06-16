@@ -1,0 +1,46 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
+export interface SessionRow {
+  id: string;
+  userId: string;
+  expiresAt: string;
+  createdAt: string;
+  ipAddress: string | null;
+  userAgent: string | null;
+}
+
+export function useUserSessions(userId: string | null) {
+  const [sessions, setSessions] = useState<SessionRow[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!userId) {
+      setSessions([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function load() {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/admin/users/${userId}?include=sessions`);
+        if (res.ok) {
+          const data = await res.json();
+          if (!cancelled) setSessions(data.sessions || []);
+        }
+      } catch {
+        // silently fail
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => { cancelled = true; };
+  }, [userId]);
+
+  return { sessions, loading };
+}
