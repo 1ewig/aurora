@@ -49,8 +49,8 @@ CREATE TABLE IF NOT EXISTS better_auth.verification (
   identifier TEXT NOT NULL,
   value TEXT NOT NULL,
   "expiresAt" TIMESTAMP WITH TIME ZONE NOT NULL,
-  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
-  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+  "createdAt" TIMESTAMP WITH TIME ZONE,
+  "updatedAt" TIMESTAMP WITH TIME ZONE
 );
 
 -- Helper for RLS policies (extracts sub claim from bridge JWT)
