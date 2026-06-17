@@ -31,6 +31,7 @@ export interface ProductData {
 
 export interface OrderItem {
   id: string;
+  slug: string;
   name: string;
   price: number;
   size: string;

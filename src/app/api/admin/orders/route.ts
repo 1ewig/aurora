@@ -43,6 +43,24 @@ export async function GET() {
       total: Number(row.total),
     }));
 
+    const allItemIds = [...new Set(orders.flatMap(o => (o.items as any[]).map(i => i.id)))];
+    if (allItemIds.length > 0) {
+      const imgResult = await pool.query(
+        `SELECT id, image FROM products WHERE id = ANY($1)`,
+        [allItemIds]
+      );
+      const imageMap = Object.fromEntries(
+        imgResult.rows.map(r => [r.id, r.image])
+      );
+      for (const order of orders) {
+        for (const item of order.items as any[]) {
+          if (imageMap[item.id]) {
+            item.image = imageMap[item.id];
+          }
+        }
+      }
+    }
+
     return NextResponse.json(orders);
   } catch (err) {
     console.error('Failed to list orders:', err);

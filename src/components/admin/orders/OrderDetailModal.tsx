@@ -7,6 +7,7 @@
 
 "use client";
 
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { type OrderData } from "@/stores/useAdminStore";
@@ -88,7 +89,7 @@ export function OrderDetailModal({
                         <div className="w-12 h-16 bg-bg-primary rounded-[8px]" />
                       )}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-text-primary text-sm truncate">{item.name}</h4>
+                        <Link href={`/products/${item.slug}`} className="font-semibold text-text-primary text-sm truncate hover:text-accent-primary transition-colors cursor-pointer block">{item.name}</Link>
                         <div className="text-xs text-text-muted mt-1 flex gap-3">
                           <span>Size: {item.size}</span>
                           <span>Qty: {item.quantity}</span>
