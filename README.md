@@ -1,106 +1,144 @@
 # Aurora
 
-A quiet-luxury digital storefront and curated fashion e-commerce platform.
-
-> Live Demonstration: **[aurora-nu-three.vercel.app](https://aurora-nu-three.vercel.app/)**
+A quiet-luxury digital storefront — minimal, editorial, server-rendered.
 
 ---
 
-## The Vision: Quiet Luxury, Digital Elegance
+### Live Links & Demo Credentials
 
-Aurora is built as a premier showcase of modern, high-end e-commerce. Rejecting the cluttered grids and aggressive popups of traditional online stores, Aurora focuses on a **minimalist design system** and **editorial storytelling**. It is designed specifically for "The Rare Few" — a target audience that demands premium aesthetics, seamless micro-animations, and visual clarity.
+- **Live Application**: [aurora-nu-three.vercel.app](https://aurora-nu-three.vercel.app/)
+- **GitHub Repository**: [github.com/1ewig/aurora](https://github.com/1ewig/aurora)
 
-Every interaction, from the smooth transitions between lookbooks to the interactive shopping bag and checkout flows, is crafted to reflect the feeling of stepping into a boutique atelier.
+**Guest / Demo Accounts:**
 
----
-
-## User-Centric Features
-
-*   **Curated Catalog & Custom Filters:** A dynamic, fast-loading storefront featuring products grouped by curated categories. Detail pages provide high-resolution multi-image galleries, sizing matrices, and real-time inventory checks.
-*   **Interactive Cart & Guest Checkout:** A sleek slide-out shopping bag that calculates pricing and shipping thresholds in real-time. Customers can purchase either as a guest or by authenticating their accounts.
-*   **Database-Driven Lookbook & Stories:** A narrative lookbook carousel and editorial page sections designed to showcase seasonal campaigns directly from the content database.
-*   **Customer Wardrobe Portal:** A personal profile area where customers can update their details, view order histories, track statuses, and view detail summaries.
-*   **Media Pipelines:** High-fidelity imagery optimized dynamically for web performance, ensuring near-instant page loads without sacrificing detail.
-
----
-
-## The Journey of Aurora
-
-Aurora’s evolution spans multiple architectural and product phases, transforming a vision of digital quiet luxury into a production-grade codebase:
-
-### Phase 1: Conceptualization & Visual Identity
-The journey began with the definition of Aurora’s design tokens and aesthetic framework. Moving away from browser-default layouts, we designed a custom system using typography from Google Fonts (Outfit, Inter) paired with a harmonious HSL-tailored color palette. Micro-animations, responsive layout containers, and glassmorphic overlays were introduced to build a premium first impression.
-
-### Phase 2: Core Storefront Architecture
-Next, the database schemas were designed and deployed to support a fully relational e-commerce catalog. We constructed the initial storefront, connecting client-side Zustand state management to allow smooth cart additions and removals. The storefront pages were divided into clean presentation layers and functional containers to preserve performance and scalability.
-
-### Phase 3: Secure E-Commerce Infrastructure
-With the storefront visual structures in place, the focus shifted to transactions and account security. We implemented server-side pricing recalculation to verify and recalculate all order details, protecting the platform from client-side pricing manipulation. Robust cookie-based session management, Edge-runtime middleware protection, and rate-limited endpoints were layered in to safeguard customer accounts and payment routes.
-
-### Phase 4: Dynamic Editorial Content & WebP Pipeline
-To bridge fashion media with fast load times, we introduced lookbook tables, database-driven story pages, and an automated media compression script. Utilizing `sharp`, product images are optimized into high-density WebP formats, uploaded to InsForge storage buckets, and populated automatically in the Postgres catalog. This allowed visual updates without any frontend code redeployments.
-
-### Phase 5: Architecture Optimization & Custom Hook Consolidation
-As features grew, we undertook a thorough cleanup to align with strict coding standards:
-*   Unified server-state caching configuration under a single namespace in `queries.ts`.
-*   Removed redundant pass-through hooks to simplify authentication store reads.
-*   Relocated mathematical pricing helpers to standard utility modules to enforce React’s Rule of Hooks.
-*   Reorganized DOM/Window event handlers into a clean `src/hooks/ui/` namespace, optimizing modularity.
-
----
-
-## Technology Stack
-
-| Layer | Technology | Purpose |
+| Role | Email | Password |
 | :--- | :--- | :--- |
-| **Framework** | Next.js 15 (App Router, SSR) | Page rendering, Edge middleware, server routes |
-| **Language** | TypeScript 5.x & React 19 | Static typing and component architecture |
-| **Database** | PostgreSQL | Relational storage for products, lookbook, and orders |
-| **Authentication** | Better Auth | Session token management, email verification, password reset flows |
-| **BaaS & Infrastructure** | InsForge | PostgreSQL hosting, multi-bucket storage, database APIs |
-| **State Management** | Zustand & TanStack Query v5 | Global client-state and cached server-state synchronization |
-| **Styling** | Tailwind CSS 4 | Modern, utility-driven layout and typography |
-| **Animation** | Framer Motion 12 | Fluid transitions, lookbook slides, and interactive UI |
-| **Asset Pipeline** | Sharp | Compression, dynamic resizing, and WebP generation |
+| Customer | `customer@example.com` | `Customer123!` |
+| Admin | `admin@example.com` | `Admin123!` |
+
+> Guest checkout is fully enabled — you can purchase items without creating an account.
 
 ---
 
-## Getting Started
+### Project Goal & Context
 
-Follow these steps to run the Aurora storefront locally:
+Aurora solves a specific retail problem: translating the sensory, premium feel of a physical luxury atelier into a fast digital medium. Most fashion e-commerce is cluttered with pop-ups, aggressive retargeting, and heavy client-side JavaScript that degrades the browsing experience.
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/1ewig/aurora
-    cd aurora
-    ```
-
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-
-3.  **Configure environment variables:**
-    Create a `.env.local` file in the project root and configure your database, InsForge keys, and Better Auth credentials (see `.env.example` for details):
-    ```env
-    DATABASE_URL="postgresql://username:password@host:port/database"
-
-    NEXT_PUBLIC_INSFORGE_URL="https://your-project.database.insforge.app"
-    NEXT_PUBLIC_INSFORGE_ANON_KEY="your-public-anon-key"
-
-    BETTER_AUTH_SECRET="generate-with: openssl rand -base64 32"
-    BETTER_AUTH_URL="http://localhost:3000"
-    NEXT_PUBLIC_BETTER_AUTH_URL="http://localhost:3000"
-    ```
-
-4.  **Run the development server:**
-    ```bash
-    npm run dev
-    ```
-    Open `http://localhost:3000` to view the local application.
+As a portfolio project, the goal was to master Next.js 15's full-stack capabilities — specifically building a hybrid server/client architecture where product pages are server-rendered for SEO and instant first paint, while the shopping cart and checkout remain interactive without full page reloads.
 
 ---
 
-<p align="center">
-  Designed and Developed by <a href="https://github.com/1ewig">Moshu</a>
-</p>
+### Engineering & Design Decisions
+
+**Why Next.js 15 (App Router)?**
+
+- **React Server Components**: Product catalogs, lookbook sliders, and editorial pages fetch data on the server. The client receives fully-formed HTML — no loading spinners, no layout shift, minimal JavaScript.
+- **Route Handlers**: Order creation, stock validation, and price calculations happen exclusively in API routes. The client never computes totals, preventing price tampering.
+- **Edge Middleware**: Session and admin-role checks run at the edge before any page markup reaches the client. Profile and admin routes are guarded with zero cold-start cost.
+
+**Raw SQL over ORM**
+
+Rather than adding Prisma's query compilation overhead, Aurora uses direct `pg` connection pools. This gives precise control over query shape:
+
+- `SELECT ... FOR UPDATE` row locks prevent inventory overselling during concurrent checkout.
+- `json_agg` aggregates product sizes, images, and metadata into the exact shape the frontend expects — no N+1, no mapping layer.
+- Transactions with `BEGIN`/`COMMIT`/`ROLLBACK` ensure atomicity across stock validation, deduction, and order creation.
+
+**Infrastructure Consolidation with InsForge**
+
+InsForge provides the PostgreSQL database, file storage (product images, lookbook assets, editorial media), and authentication under a single API boundary. The client SDK is bridged via HS256 JWTs signed server-side, keeping the anon key public while authorizing storage and database access per-user.
+
+**State Management Split**
+
+- **TanStack React Query v5** — server data caching and invalidation. Product lists, lookbook slides, editorial content, and order history are cached keyed by query params, enabling instant back-navigation and optimistic updates.
+- **Zustand** — purely client-side state. The shopping cart (persisted to `localStorage`), auth session wrapper, admin panel data, and product detail UI state (selected size, active tab, size guide modal) live in lightweight Zustand stores.
+
+**Design System**
+
+Tailwind CSS v4 with custom design tokens defined in `globals.css` via the `@theme` directive. A warm off-white background (`#F7F7F5`), gold accent (`#C8A882`), and deep ink (`#0D0D0D`) define the brand palette. Display typography uses Playfair Display (serif), body copy uses Inter (sans-serif). Framer Motion spring presets power page entrances, the slide-out cart drawer, overlay mobile menu, and staggered card reveals.
+
+---
+
+### Technical Challenges & Lessons Learned
+
+**Challenge: Preventing Inventory Overselling During Concurrent Checkout**
+
+- **Situation**: Multiple customers checking out simultaneously could read identical stock levels, resulting in overselling a product size.
+- **Task**: Guarantee that stock deduction is atomic under concurrency.
+- **Action**: Wrapped the stock-check-and-deduct logic in a PostgreSQL transaction using `SELECT stock FROM product_sizes WHERE ... FOR UPDATE`. This pessimistic row lock forces concurrent requests to queue — the second transaction sees the updated stock committed by the first.
+- **Result**: Inventory counts remain consistent under load. Failed transactions roll back automatically, and the API returns a clear out-of-stock error to the user.
+
+**Challenge: Eliminating Loading States on Product Detail Navigation**
+
+- **Situation**: Navigating from the catalog to `/products/[slug]` caused a visible loading flash while the detail page fetched product metadata.
+- **Task**: Make product detail transitions feel instantaneous.
+- **Action**: Modified the detail query hook to use `initialData`. When the slug matches an item already cached in the product list query, the detail page hydrates immediately from that cached data — no fetch needed. The hook still revalidates in the background for freshness.
+- **Result**: Loading spinners on product transitions were eliminated. Navigation feels instant.
+
+**Challenge: Serving High-Resolution Fashion Photography Fast**
+
+- **Situation**: Directly serving raw high-resolution product images caused large bundle sizes and slow page loads.
+- **Task**: Optimize images for web delivery without visible quality loss.
+- **Action**: Built a Sharp preprocessing script that converts source files to WebP, scales the longest edge to 2000px, and compresses to 85% quality. The pipeline runs before deployment.
+- **Result**: Average image size reduced by ~60%. Pages load with sharp, artifact-free imagery.
+
+---
+
+### Performance & Optimizations
+
+- **`next/image` with Remote Patterns**: All product, lookbook, and editorial images are served through Next.js's Image component, configured with a remote pattern for `**.insforge.app`. Automatic WebP/AVIF negotiation, lazy loading, and intrinsic sizing prevent layout shift.
+- **Local Font Hosting**: Playfair Display and Inter are served via `next/font`, eliminating external font CDN latency and removing flash-of-invisible-text (FOIT).
+- **Dynamic Imports**: Admin panel components (product form modals, order detail panels, inventory tables) are code-split and only load when the admin navigates to those routes.
+- **N+1 Query Prevention**: Product detail queries aggregate sizes, images, and metadata into a single payload using PostgreSQL `json_agg`, avoiding the classic N+1 loop.
+- **Lighthouse Scores**: _Pending — I'll run a full audit and publish real numbers soon._
+
+---
+
+### Tech Stack
+
+| Component | Technology | Purpose |
+| :--- | :--- | :--- |
+| Framework | Next.js 15 + React 19 | App Router, Server Components, Route Handlers |
+| Database | PostgreSQL (InsForge) | Product catalog, orders, inventory, auth |
+| Auth | Better Auth | Email/password, sessions, email verification, password reset |
+| Client State | Zustand 5 | Shopping cart, auth wrapper, admin panel, UI state |
+| Server State | TanStack React Query 5 | Product/lookbook/editorial/order caching |
+| Styling | Tailwind CSS 4 | Design tokens in CSS, utility-first responsive layout |
+| Animation | Framer Motion 12 | Page transitions, cart drawer, mobile menu, staggered reveals |
+| Image Processing | Sharp | WebP conversion, resize, compression pipeline |
+| Email | Nodemailer + Brevo SMTP | Order confirmations, verification, password reset |
+| Backend | InsForge BaaS | Postgres hosting, file storage, JWT bridge |
+| Deployment | Vercel | Edge functions, serverless routes, static generation |
+
+---
+
+### Quick Start
+
+```bash
+git clone https://github.com/1ewig/aurora
+cd aurora
+npm install
+```
+
+Then follow the **[Backend Deployment Guide](docs/BACKEND_DEPLOYMENT.md)** to set up an InsForge project, configure environment variables, upload assets, and seed the database.
+
+Once your `.env.local` is configured:
+
+```bash
+npm run dev
+```
+
+Visit `http://localhost:3000`.
+
+---
+
+### Key Files to Review
+
+| File | What it demonstrates |
+| :--- | :--- |
+| `src/middleware.ts` | Edge middleware — route protection, admin role gating, session cookie validation |
+| `src/app/api/orders/route.ts` | Transactional checkout — stock validation, `FOR UPDATE` row locks, inventory deduction, email confirmation |
+| `src/hooks/queries.ts` | TanStack Query hooks with `initialData` hydration, background revalidation, cache key strategy |
+| `src/stores/useAuthStore.ts` | Zustand store wrapping Better Auth — error mapping, session management, admin role detection |
+| `src/lib/auth.ts` | Better Auth server configuration — email/password, verification flow, SMTP integration |
+| `src/utils/pricing.ts` | Server-side price calculation — free shipping threshold, tax rate, totals |

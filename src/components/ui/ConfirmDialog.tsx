@@ -19,8 +19,6 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
-export function ConfirmDialog({
-
 const backdropVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },
@@ -42,6 +40,7 @@ const dialogVariants: Variants = {
   },
 };
 
+/** Confirmation modal with animated backdrop and scale entrance. */
 export function ConfirmDialog({
   open,
   title,

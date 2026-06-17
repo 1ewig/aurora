@@ -72,7 +72,7 @@ Get the **database connection string** — open the InsForge Dashboard, navigate
 You now have these values:
 
 | Variable | Where to find it |
-|---|---|
+|---|---|---|
 | `DATABASE_URL` | InsForge Dashboard → Database section |
 | `NEXT_PUBLIC_INSFORGE_URL` | `.insforge/project.json` → `oss_host` |
 | `NEXT_PUBLIC_INSFORGE_ANON_KEY` | `npx @insforge/cli secrets get ANON_KEY` |
@@ -81,28 +81,17 @@ You now have these values:
 | `BETTER_AUTH_SECRET` | Generate: `openssl rand -base64 32` |
 | `BETTER_AUTH_URL` | `http://localhost:3000` (dev) or production URL |
 | `NEXT_PUBLIC_BETTER_AUTH_URL` | Same as `BETTER_AUTH_URL` |
-| `ADMIN_EMAILS` | Comma-separated admin email addresses (private server-side variable) |
+| `ADMIN_EMAILS` | Comma-separated admin email addresses |
+| `BREVO_SMTP_HOST` | `smtp-relay.brevo.com` |
+| `BREVO_SMTP_PORT` | `587` |
+| `BREVO_SMTP_USER` | Your Brevo SMTP login email |
+| `BREVO_SMTP_PASS` | Your Brevo SMTP API key |
+| `BREVO_FROM_EMAIL` | Sender email address |
+| `BREVO_FROM_NAME` | `Aurora` |
 
 ---
 
-## Step 5 — Create the storage buckets (Automated)
-
-The application stores assets in three public buckets: `product-media`, `lookbook-media`, and `editorial-media`.
-
-> [!NOTE]
-> This step is fully automated. The seeding script in **Step 7** automatically checks if these buckets exist. If they do not, it creates them and sets them to public. If they do, it wipes them clean to prevent duplicate files. You can skip this entirely.
-
----
-
-## Step 6 — Create database tables (Automated)
-
-> [!NOTE]
-> This step is fully automated. The setup script in **Step 7** automatically loads [`scripts/create-tables.sql`](file:///c:/Users/moshu%20moshu/Desktop/aurora/scripts/create-tables.sql), drops any existing tables, and builds the database schema from scratch. You do not need to run this manually.
-
-
----
-
-## Step 7 — Configure environment variables
+## Step 5 — Configure environment variables
 
 Copy the example env file:
 
@@ -131,7 +120,9 @@ ADMIN_EMAILS="admin@example.com"
 
 ---
 
-## Step 8 — Upload images and seed the database
+## Step 6 — Seed the database and upload assets
+
+> The seeding script automatically creates the three storage buckets (`product-media`, `lookbook-media`, `editorial-media`) and all database tables — you don't need to set them up manually.
 
 For a **first-time setup or clean reset**, run the seeding script:
 
@@ -163,7 +154,7 @@ In this mode:
 
 ---
 
-## Step 9 — Verify the setup
+## Step 7 — Verify the setup
 
 Start the dev server:
 
@@ -179,7 +170,7 @@ Open [http://localhost:3000](http://localhost:3000) and check:
 
 ---
 
-## Step 10 — Build for production
+## Step 8 — Build for production
 
 ```bash
 npm run build
@@ -190,11 +181,17 @@ If you're deploying to Vercel or another platform, set these environment variabl
 - `NEXT_PUBLIC_INSFORGE_URL`
 - `NEXT_PUBLIC_INSFORGE_ANON_KEY`
 - `INSFORGE_API_KEY`
+- `INSFORGE_JWT_SECRET`
 - `BETTER_AUTH_SECRET`
 - `BETTER_AUTH_URL`
 - `NEXT_PUBLIC_BETTER_AUTH_URL`
-- `INSFORGE_JWT_SECRET`
 - `ADMIN_EMAILS`
+- `BREVO_SMTP_HOST`
+- `BREVO_SMTP_PORT`
+- `BREVO_SMTP_USER`
+- `BREVO_SMTP_PASS`
+- `BREVO_FROM_EMAIL`
+- `BREVO_FROM_NAME`
 
 ---
 
