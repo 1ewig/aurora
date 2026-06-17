@@ -197,13 +197,13 @@ export function UsersClient() {
             placeholder="Search by name or email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-bg-primary border border-border-medium rounded-full focus:border-accent-primary focus:outline-none text-sm transition-colors"
+            className="w-full pl-10 pr-4 py-3 bg-bg-secondary border border-border-medium rounded-full focus:border-accent-primary focus:outline-none text-sm transition-colors"
           />
         </div>
         <select
           value={filterVerified}
           onChange={(e) => setFilterVerified(e.target.value as FilterVerified)}
-          className="px-4 py-2.5 bg-bg-primary border border-border-medium rounded-full focus:border-accent-primary focus:outline-none text-sm transition-colors"
+          className="px-5 py-3 bg-bg-secondary border border-border-medium rounded-full focus:border-accent-primary focus:outline-none text-sm transition-colors cursor-pointer"
         >
           <option value="all">All Users</option>
           <option value="verified">Verified</option>
