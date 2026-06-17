@@ -187,7 +187,7 @@ export async function POST(request: Request) {
     const orderTax = Number(order.tax);
     const orderTotal = Number(order.total);
 
-    void sendEmail({
+    await sendEmail({
       to: email,
       subject: `Order Confirmed — ${order.order_number}`,
       text: orderConfirmationText({
