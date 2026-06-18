@@ -70,12 +70,41 @@ graph TD
 
 ---
 
-## ⚙️ Core Engineering Highlights & Design Decisions
+## 🌌 Core Technical & Architectural Talking Points
+
+### 1. Architecture & Design Patterns
+*   **React Server Components (RSC) for Performance & SEO**: Leverages Next.js 15's server rendering to achieve fast first-paint metrics while maintaining full SEO indexability, using carefully scoped client components only where client-side interactivity is required.
+*   **Four-Layer Separation of Concerns**: Enforces strict architectural boundaries (`Pages` ➔ `Containers/Bridges` ➔ `Hooks/Stores` ➔ `Presentational Components`), eliminating tight coupling and enabling a predictable unidirectional data flow.
+*   **Pessimistic Concurrency Control with PostgreSQL Locks**: Prevents inventory overselling during high-volume checkout scenarios by wrapping stock check-and-decrement actions in an atomic database transaction using a row-level lock (`SELECT ... FOR UPDATE`).
+*   **Zero-Latency Page Transitions via TanStack Query**: Implements optimistic cache hydration by pre-loading product details from prior listing queries, eliminating navigation delays and improving perceived performance.
+
+### 2. Backend Engineering
+*   **High-Performance Direct SQL with json_agg Optimization**: Bypasses ORM overhead by utilizing direct raw `pg` connection pools and PostgreSQL's native JSON aggregation (`json_agg`), eliminating N+1 query patterns when compiling relational catalog datasets.
+*   **Edge Middleware Session Security**: Validates user session cookies at the Next.js edge layer before serving page bundles, blocking unauthorized access to `/admin` and `/profile` routes with minimal performance overhead.
+*   **Atomic Order Processing Transactions**: Wraps the entire checkout pipeline (product validation ➔ stock deduction ➔ order insertion ➔ email confirmation dispatch) in a single transaction, guaranteeing complete consistency or an automatic rollback on failure.
+*   **Automated Email Workflows**: Integrates Nodemailer with HTML and plain-text order confirmation templates, dispatching formatted transactional receipts with itemized tallies, shipping metadata, and custom branding.
+
+### 3. Frontend & State Management
+*   **Zustand for Lightweight Global State**: Manages shopping cart with `localStorage` persistence, UI drawer toggles, and authentication state wrappers without Redux boilerplate—reducing client bundle overhead.
+*   **React Query for Server Cache**: Centralizes all API data fetching, handling built-in query caching, background stale revalidation, and optimistic UI transitions.
+*   **Better Auth Integration with Humanized Error Mapping**: Wraps raw auth errors with client-side mappings (e.g. email verification warnings, rate limits, weak passwords) to guide users through error recovery seamlessly.
+*   **Framer Motion for Editorial Animations**: Powers smooth page transitions, lookbook carousel slides, and shopping cart drawer entrances without heavy CSS-in-JS runtimes.
+
+### 4. Performance, UX & DX
+*   **Fully Enabled Guest Checkout**: Allows unauthenticated catalog browsing, variant selection, address input, and order completion to minimize checkout friction and boost conversion rates.
+*   **Intelligent Asset Optimization**: Local font loading eliminates external CDN layout shifts (FOIT/CLS); Sharp pre-compiles images; and Next.js Image optimization serves responsive, edge-constrained WebP/AVIF formats.
+*   **Role-Based Access Control**: Implements edge-gated administrative boundaries, routing non-admin requests away from `/admin/*` views with zero cold-start delay.
+*   **TypeScript-First & ESLint Enforced**: Standardizes complete type safety across Next.js API routes, Zustand stores, and database schemas with strict pre-commit lint rules.
+*   **Declarative Seeding & Setup Pipeline**: Automates local environments using a single command (`npx tsx scripts/upload-and-seed.mts`), which drops/recreates schema tables, configures public S3 buckets, and recursively processes media assets.
+
+---
+
+## ⚙️ Core Engineering Highlights & Code Examples
 
 ### 1. Pessimistic Concurrency & Stock Locks
-To prevent inventory overselling during high-volume checkouts, the application avoids typical check-then-set logic. Instead, checking and deducting stock are wrapped in an atomic PostgreSQL transaction utilizing a pessimistic row-level lock (`SELECT ... FOR UPDATE`).
+To prevent inventory overselling under heavy load, Aurora locks the product sizes database row before validating and decrementing stock.
 
-In [src/app/api/orders/route.ts](src/app/api/orders/route.ts#L118-L136):
+In [src/app/api/orders/route.ts](src/app/api/orders/route.ts#L121-L139):
 ```typescript
 // Lock product size stock to prevent race conditions under load
 const sizeRes = await client.query(
@@ -95,7 +124,7 @@ await client.query(
 ```
 
 ### 2. High-Performance Direct SQL (`json_agg` Optimization)
-Aurora uses direct `pg` connection pools rather than adding an ORM overhead. To prevent N+1 query patterns when rendering complex product detail pages (which require sizes, secondary images, and product detail bullets), PostgreSQL `json_agg` compiles relational datasets into the exact nested JSON structure expected by the frontend.
+Rather than making multiple database requests, PostgreSQL compiles nested relational details directly into a JSON block for the route handler.
 
 In [src/app/api/products/[slug]/route.ts](src/app/api/products/%5Bslug%5D/route.ts#L19-L49):
 ```sql
@@ -118,7 +147,7 @@ WHERE p.slug = $1;
 ```
 
 ### 3. Edge-Gated Security Middleware
-User sessions and administrative screens are secured via Next.js Edge Middleware. Rather than loading page bundles to the client before authenticating, a lightweight fetch check routes requests to the Better Auth engine at the edge, protecting `/admin` and `/profile` subroutes with zero cold-start latency.
+Lightweight Edge functions block unauthenticated or non-admin requests before they load server component bundles.
 
 In [src/middleware.ts](src/middleware.ts#L28-L48):
 ```typescript
@@ -134,30 +163,6 @@ if (!session?.user) {
 }
 if (isAdminPath && !isAdmin(session.user.email)) {
   return NextResponse.redirect(new URL("/", request.url));
-}
-```
-
-### 4. Zero-Latency Page Transitions with TanStack Query
-To achieve instant page navigation, product listings populate detail pages optimistically using local cache lookup. When a customer clicks a product card, the detail view extracts initial details from the query cache list before revalidating the full description in the background.
-
-In [src/hooks/queries.ts](src/hooks/queries.ts#L85-L109):
-```typescript
-export function useProductDetailsQuery(slug: string) {
-  const queryClient = useQueryClient();
-  return useQuery({
-    queryKey: ['product', slug],
-    queryFn: () => fetchProductDetails(slug),
-    initialData: () => {
-      const cachedQueries = queryClient.getQueriesData<Product[]>({ queryKey: ['products'] });
-      for (const [, products] of cachedQueries) {
-        if (products) {
-          const product = products.find((p) => p.slug === slug);
-          if (product) return { ...product, images: product.images || [product.image] };
-        }
-      }
-      return undefined;
-    },
-  });
 }
 ```
 
@@ -213,8 +218,6 @@ cp .env.example .env.local
 ```
 
 ### 3. Database Schema, Storage & Data Seeding
-Aurora utilizes a consolidated database seeding and asset ingestion script. Running this script creates all Postgres tables, sets up three public asset buckets (`product-media`, `lookbook-media`, `editorial-media`), and imports demo files.
-
 Follow the **[Backend Deployment Guide](docs/BACKEND_DEPLOYMENT.md)** to configure your InsForge credentials in `.env.local`. Once ready, execute the onboarding pipeline:
 
 ```bash
@@ -240,12 +243,5 @@ Explore the implementation quality of the core components in this codebase:
 | **[src/hooks/queries.ts](src/hooks/queries.ts)** | Optimistic cache loading, React Query data fetching layer. |
 | **[src/app/api/products/[slug]/route.ts](src/app/api/products/%5Bslug%5D/route.ts)** | PostgreSQL query optimizations (`json_agg` data shaping). |
 | **[src/stores/useAuthStore.ts](src/stores/useAuthStore.ts)** | Zustand client wrapper for session tracking. |
-| **[scripts/upload-and-seed.mts](scripts/upload-and-seed.mts)** | Schema deployer, bucket configuration, and recursive image uploader. |
+| **[scripts/upload-and-seed.mts](scripts/upload-and-seed.mts)** | Schema deployer, S3 bucket config, and media asset ingestion pipeline. |
 | **[scripts/optimize-images.mjs](scripts/optimize-images.mjs)** | Asset WebP preprocessing script utilizing Sharp. |
-
----
-
-## 📈 Optimization & Performance Metrics
-*   **Intelligent Layout Hydration**: Next.js Image optimization (`next/image`) automatically requests WebP/AVIF images from InsForge Storage with intrinsic sizing rules, completely avoiding Cumulative Layout Shift (CLS).
-*   **No Font CDNs**: Fonts (Inter & Playfair Display) are stored locally using `next/font` to eliminate secondary domain connection delays and Flash of Invisible Text (FOIT).
-*   **Lazy Bundle Loading**: Admin features (user grids, product editors, detailed invoice listings) are code-split using dynamic client imports (`next/dynamic`), reducing bundle sizes by ~30% for regular consumers.
