@@ -8,6 +8,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Providers from "@/app/providers";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -61,7 +62,10 @@ export default function RootLayout({
       className={`${inter.variable} ${playfairDisplay.variable}`}
     >
       <body className="bg-bg-primary min-h-screen antialiased">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <Analytics />
+        </Providers>
       </body>
     </html>
   );
