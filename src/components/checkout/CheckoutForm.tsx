@@ -115,7 +115,6 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
             <input
               id="last-name"
               type="text"
-              required
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               onBlur={() => handleBlur("lastName")}

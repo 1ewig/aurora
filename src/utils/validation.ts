@@ -33,7 +33,7 @@ export function validateField(field: string, value: string): string | undefined 
       return undefined;
     }
     case "lastName": {
-      if (!trimmed) return "Last name is required.";
+      if (!trimmed) return undefined;
       if (trimmed.length < 2) return "Last name must be at least 2 characters.";
       return undefined;
     }

@@ -91,6 +91,14 @@ export async function POST(request: Request) {
       );
     }
 
+    const firstName = shippingAddress.firstName?.trim();
+    if (!firstName) {
+      return NextResponse.json(
+        { error: "First name is required" },
+        { status: 400 }
+      );
+    }
+
     const session = await auth.api.getSession({ headers: await headers() });
     const userId = session?.user?.id ?? null;
 
