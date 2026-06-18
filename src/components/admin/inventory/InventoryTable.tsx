@@ -34,7 +34,23 @@ export function InventoryTable({
   return (
     <div className="space-y-8">
       {/* Search & Filter Controls */}
-      <div className="flex flex-col sm:flex-row gap-3 justify-end items-stretch sm:items-center">
+      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+        <div className="relative w-full sm:max-w-md">
+          <svg
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary"
+            fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Search product ID, name, or category..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 bg-bg-secondary border border-border-medium rounded-full focus:border-accent-primary focus:outline-none text-sm transition-colors"
+          />
+        </div>
+
         <select
           value={selectedCategory}
           onChange={(e) => onCategoryChange(e.target.value)}
@@ -52,16 +68,7 @@ export function InventoryTable({
               {cat}
             </option>
           ))}
-
         </select>
-
-        <input
-          type="text"
-          placeholder="Search product ID, name, or category..."
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full sm:max-w-md px-5 py-3 bg-bg-secondary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none transition-colors"
-        />
       </div>
 
 
