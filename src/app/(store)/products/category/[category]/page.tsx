@@ -23,9 +23,24 @@ interface CategoryPageProps {
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { category } = await params;
   const categoryName = categoryMap[category.toLowerCase()] || "Collection";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://aurora-nu-three.vercel.app";
+  const title = `${categoryName} | Aurora`;
+  const description = `Discover our collection of premium ${categoryName.toLowerCase()} designed for the considered wardrobe.`;
+
   return {
-    title: `${categoryName} | Aurora`,
-    description: `Discover our collection of premium ${categoryName.toLowerCase()} designed for the considered wardrobe.`,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      url: `${baseUrl}/products/category/${category}`,
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+    },
   };
 }
 

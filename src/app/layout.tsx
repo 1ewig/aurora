@@ -23,7 +23,10 @@ const playfairDisplay = Playfair_Display({
 
 /** Application-level metadata for SEO and social sharing. */
 export const metadata: Metadata = {
-  title: "Aurora — Premium Clothing",
+  title: {
+    default: "Aurora — Premium Clothing",
+    template: "%s | Aurora",
+  },
   description:
     "Singular pieces for the considered wardrobe. Designed in solitude. Worn with intention.",
   openGraph: {
@@ -31,6 +34,14 @@ export const metadata: Metadata = {
     description:
       "Singular pieces for the considered wardrobe. Designed in solitude. Worn with intention.",
     type: "website",
+    url: "https://aurora-nu-three.vercel.app",
+    siteName: "Aurora",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Aurora — Premium Clothing",
+    description:
+      "Singular pieces for the considered wardrobe. Designed in solitude. Worn with intention.",
   },
 };
 
