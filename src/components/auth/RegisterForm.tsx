@@ -19,6 +19,7 @@ interface RegisterFormProps {
   formError: string;
   successMsg: string;
   onSubmit: (e: React.FormEvent) => void;
+  submitting?: boolean;
 }
 
 function EyeIcon() {
@@ -49,6 +50,7 @@ export function RegisterForm({
   formError,
   successMsg,
   onSubmit,
+  submitting,
 }: RegisterFormProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -145,19 +147,26 @@ export function RegisterForm({
           </div>
 
           {formError && (
-            <div className="text-xs text-error font-medium px-1">
+            <div className="text-xs text-error font-medium text-center px-1">
               {formError}
             </div>
           )}
 
           {successMsg && (
-            <div className="text-xs text-success font-medium px-1">
+            <div className="text-xs text-success font-medium text-center px-1">
               {successMsg}
             </div>
           )}
 
-          <Button type="submit" variant="filled" fullWidth size="md">
-            Sign Up
+          <Button type="submit" variant="filled" fullWidth size="md" disabled={submitting}>
+            {submitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                Creating Account…
+              </span>
+            ) : (
+              "Sign Up"
+            )}
           </Button>
         </form>
 

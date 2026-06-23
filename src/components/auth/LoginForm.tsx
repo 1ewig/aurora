@@ -19,6 +19,7 @@ interface LoginFormProps {
   onSubmit: (e: React.FormEvent) => void;
   onResetClick?: () => void;
   resetLoading?: boolean;
+  submitting?: boolean;
 }
 
 function EyeIcon() {
@@ -49,6 +50,7 @@ export function LoginForm({
   onSubmit,
   onResetClick,
   resetLoading,
+  submitting,
 }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -137,19 +139,26 @@ export function LoginForm({
           </div>
 
           {formError && (
-            <div className="text-xs text-error font-medium px-1">
+            <div className="text-xs text-error font-medium text-center px-1">
               {formError}
             </div>
           )}
 
           {successMsg && (
-            <div className="text-xs text-success font-medium px-1">
+            <div className="text-xs text-success font-medium text-center px-1">
               {successMsg}
             </div>
           )}
 
-          <Button type="submit" variant="filled" fullWidth size="md">
-            Sign In
+          <Button type="submit" variant="filled" fullWidth size="md" disabled={submitting}>
+            {submitting ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                Signing In…
+              </span>
+            ) : (
+              "Sign In"
+            )}
           </Button>
         </form>
 

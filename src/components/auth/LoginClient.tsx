@@ -18,6 +18,7 @@ export function LoginClient() {
   const [formError, setFormError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     user,
@@ -28,7 +29,6 @@ export function LoginClient() {
     signIn,
   } = useAuthStore();
   const router = useRouter();
-
 
   useEffect(() => {
     clearError();
@@ -61,16 +61,21 @@ export function LoginClient() {
       return;
     }
 
-    const { error, needsVerification: reqVerification } = await signIn(email, password);
-    if (error) {
-      if (reqVerification) {
-        router.push(`/verify?email=${encodeURIComponent(email)}`);
+    setSubmitting(true);
+    try {
+      const { error, needsVerification: reqVerification } = await signIn(email, password);
+      if (error) {
+        if (reqVerification) {
+          router.push(`/verify?email=${encodeURIComponent(email)}`);
+        } else {
+          const errorMsg = typeof error === "string" ? error : error.message || "Invalid email or password.";
+          setFormError(errorMsg);
+        }
       } else {
-        const errorMsg = typeof error === "string" ? error : error.message || "Invalid email or password.";
-        setFormError(errorMsg);
+        router.push("/profile");
       }
-    } else {
-      router.push("/profile");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -97,14 +102,6 @@ export function LoginClient() {
     }
   };
 
-  if (loading && !successMsg && !resetLoading) {
-    return (
-      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
   return (
     <LoginForm
       email={email}
@@ -116,6 +113,7 @@ export function LoginClient() {
       onSubmit={handleSubmit}
       onResetClick={handleResetClick}
       resetLoading={resetLoading}
+      submitting={submitting}
     />
   );
 }

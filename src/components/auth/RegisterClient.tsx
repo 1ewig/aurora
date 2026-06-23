@@ -20,6 +20,7 @@ export function RegisterClient() {
   const [formError, setFormError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [showEmailSent, setShowEmailSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     user,
@@ -60,17 +61,22 @@ export function RegisterClient() {
       return;
     }
 
-    const { error, needsVerification: reqVerification } = await signUp(email, password, name);
-    if (error) {
-      setFormError(typeof error === "string" ? error : error.message || "Failed to sign up.");
-    } else if (reqVerification) {
-      setShowEmailSent(true);
-      setSuccessMsg("Account created! Check your email for a verification link.");
-    } else {
-      setSuccessMsg("Account created successfully! Redirecting...");
-      setTimeout(() => {
-        router.push("/profile");
-      }, 1500);
+    setSubmitting(true);
+    try {
+      const { error, needsVerification: reqVerification } = await signUp(email, password, name);
+      if (error) {
+        setFormError(typeof error === "string" ? error : error.message || "Failed to sign up.");
+      } else if (reqVerification) {
+        setShowEmailSent(true);
+        setSuccessMsg("Account created! Check your email for a verification link.");
+      } else {
+        setSuccessMsg("Account created successfully! Redirecting...");
+        setTimeout(() => {
+          router.push("/profile");
+        }, 1500);
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -122,6 +128,7 @@ export function RegisterClient() {
       formError={formError || storeError || ""}
       successMsg={successMsg}
       onSubmit={handleSubmit}
+      submitting={submitting}
     />
   );
 }
