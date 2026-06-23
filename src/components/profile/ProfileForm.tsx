@@ -12,7 +12,7 @@ import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface ProfileFormProps {
   userEmail: string;
-  onSignOut: () => void;
+  onSignOut: () => Promise<void>;
   displayName: string;
   setDisplayName: (val: string) => void;
   statusMsg: string;
@@ -33,6 +33,7 @@ export function ProfileForm({
   onSubmit,
 }: ProfileFormProps) {
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   return (
     <div className="bg-bg-secondary border border-border-subtle p-5 sm:p-6 md:p-8 lg:p-10 rounded-[20px] sm:rounded-[24px] shadow-sm">
       <h3 className="font-display font-bold text-lg sm:text-xl md:text-2xl uppercase tracking-wide mb-4 sm:mb-5 md:mb-6 pb-3 sm:pb-4 border-b border-border-subtle">
@@ -114,13 +115,21 @@ export function ProfileForm({
         open={showSignOutDialog}
         title="Sign Out"
         description="Are you sure you want to sign out of your Aurora wardrobe profile? You will need to sign in again to access your account."
-        confirmLabel="Sign Out"
+        confirmLabel={signingOut ? "Signing Out..." : "Sign Out"}
         cancelLabel="Cancel"
-        onConfirm={() => {
-          setShowSignOutDialog(false);
-          onSignOut();
+        onConfirm={async () => {
+          setSigningOut(true);
+          try {
+            await onSignOut();
+            setShowSignOutDialog(false);
+          } catch {
+            // fail silently
+          } finally {
+            setSigningOut(false);
+          }
         }}
         onCancel={() => setShowSignOutDialog(false)}
+        disabled={signingOut}
       />
     </div>
   );

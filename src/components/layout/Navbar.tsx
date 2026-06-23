@@ -56,6 +56,7 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   const toggleCart = useCartStore((s) => s.toggleCart);
@@ -189,16 +190,24 @@ export function Navbar() {
         open={showSignOutDialog}
         title="Sign Out"
         description="Are you sure you want to sign out of your Aurora wardrobe profile? You will need to sign in again to access your account."
-        confirmLabel="Sign Out"
+        confirmLabel={signingOut ? "Signing Out..." : "Sign Out"}
         cancelLabel="Cancel"
         onConfirm={async () => {
-          setShowSignOutDialog(false);
-          await signOut();
-          if (window.location.pathname.startsWith("/profile")) {
-            window.location.href = "/login";
+          setSigningOut(true);
+          try {
+            await signOut();
+            setShowSignOutDialog(false);
+            if (window.location.pathname.startsWith("/profile")) {
+              window.location.href = "/login";
+            }
+          } catch {
+            // fail silently
+          } finally {
+            setSigningOut(false);
           }
         }}
         onCancel={() => setShowSignOutDialog(false)}
+        disabled={signingOut}
       />
     </>
   );

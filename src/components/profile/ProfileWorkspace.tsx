@@ -10,7 +10,7 @@ import { ProfileForm } from "./ProfileForm";
 
 interface ProfileWorkspaceProps {
   userEmail: string;
-  onSignOut: () => void;
+  onSignOut: () => Promise<void>;
   displayName: string;
   setDisplayName: (val: string) => void;
   statusMsg: string;
