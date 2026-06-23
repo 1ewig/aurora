@@ -93,7 +93,7 @@ graph TD
 ### 4. API & Business Logic Quality
 - Comprehensive per-field validation layer: src/utils/validation.ts validates email format, US ZIP codes (^\d{5}(-\d{4})?$), card numbers (13–19 digits), MM/YY expiry with future-date enforcement, and 3–4 digit CVC.
 - Checkout form with privacy-preserving masking: src/hooks/useCheckoutForm.ts auto-prefills user profile data for logged-in users and masks emails/card numbers before passing them to success callbacks or UI display.
-- Edge-gated route protection via middleware: src/middleware.ts intercepts requests to /profile and /admin/*, fetches the session cookie, and redirects unauthenticated or non-admin users before server component bundles hydrate.
+- Edge-gated route protection via middleware: src/middleware.ts intercepts requests to /profile and /admin/* and redirects unauthenticated users, while client-side layouts and API endpoints enforce strict role-based gating (explorer/admin) using DB-backed queries.
 - Admin-centric centralized state: src/stores/useAdminStore.ts manages products, orders, dashboard metrics, and order status updates with optimistic local state synchronization after PATCH/POST mutations.
 
 ### 5. Developer Experience & Code Quality
