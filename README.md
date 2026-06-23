@@ -73,29 +73,34 @@ graph TD
 ## 🌌 Core Technical & Architectural Talking Points
 
 ### 1. Architecture & Design Patterns
-*   **React Server Components (RSC) for Performance & SEO**: Leverages Next.js 15's server rendering to achieve fast first-paint metrics while maintaining full SEO indexability, using carefully scoped client components only where client-side interactivity is required.
-*   **Four-Layer Separation of Concerns**: Enforces strict architectural boundaries (`Pages` ➔ `Containers/Bridges` ➔ `Hooks/Stores` ➔ `Presentational Components`), eliminating tight coupling and enabling a predictable unidirectional data flow.
-*   **Pessimistic Concurrency Control with PostgreSQL Locks**: Prevents inventory overselling during high-volume checkout scenarios by wrapping stock check-and-decrement actions in an atomic database transaction using a row-level lock (`SELECT ... FOR UPDATE`).
-*   **Zero-Latency Page Transitions via TanStack Query**: Implements optimistic cache hydration by pre-loading product details from prior listing queries, eliminating navigation delays and improving perceived performance.
+- Strict 4-layer separation of concerns with unidirectional data flow: Pages → Containers/Bridges → Hooks/Stores → Presentational Components, formally documented in docs/CODING_STANDARDS.md and enforced by convention rather than tooling.
+- React Server Components (RSC) by default with scoped client interactivity: "use client" is applied only where Framer Motion, state hooks, or event handlers are required, maximizing SSG eligibility and SEO indexability.
+- Pessimistic concurrency control via SELECT ... FOR UPDATE: src/app/api/orders/route.ts wraps stock validation and decrement inside an atomic transaction with a row-level lock, preventing inventory overselling under concurrent checkout load.
+- Guest checkout fully enabled end-to-end: Unauthenticated users can browse, select sizes, enter shipping details, and complete orders without creating an account; the cart and checkout form are fully decoupled from auth requirements.
 
-### 2. Backend Engineering
-*   **High-Performance Direct SQL with json_agg Optimization**: Bypasses ORM overhead by utilizing direct raw `pg` connection pools and PostgreSQL's native JSON aggregation (`json_agg`), eliminating N+1 query patterns when compiling relational catalog datasets.
-*   **Edge Middleware Session Security**: Validates user session cookies at the Next.js edge layer before serving page bundles, blocking unauthorized access to `/admin` and `/profile` routes with minimal performance overhead.
-*   **Atomic Order Processing Transactions**: Wraps the entire checkout pipeline (product validation ➔ stock deduction ➔ order insertion ➔ email confirmation dispatch) in a single transaction, guaranteeing complete consistency or an automatic rollback on failure.
-*   **Automated Email Workflows**: Integrates Nodemailer with HTML and plain-text order confirmation templates, dispatching formatted transactional receipts with itemized tallies, shipping metadata, and custom branding.
+### 2. Backend & Database Engineering
+- Raw pg connection pool (src/utils/db.ts) with conditional SSL (rejectUnauthorized: false for managed DBs) and a 1-second idle timeout designed to allow Next.js build processes to exit cleanly.
+- PostgreSQL json_agg optimization: src/app/api/products/[slug]/route.ts compiles nested product_images, product_sizes, and product_details into a single query response, eliminating N+1 query patterns and reducing round-trips.
+- Atomic order transactions: The POST handler in src/app/api/orders/route.ts wraps product validation, stock deduction, order insertion, and email dispatch in a single BEGIN...COMMIT/ROLLBACK block, guaranteeing consistency or full rollback on failure.
+- Direct SQL parameterization with security-conscious error masking: All API routes use $1, $2 parameter binding to prevent SQL injection, and generic "Failed to fetch..." messages are returned to clients to avoid leaking database schema details.
 
 ### 3. Frontend & State Management
-*   **Zustand for Lightweight Global State**: Manages shopping cart with `localStorage` persistence, UI drawer toggles, and authentication state wrappers without Redux boilerplate—reducing client bundle overhead.
-*   **React Query for Server Cache**: Centralizes all API data fetching, handling built-in query caching, background stale revalidation, and optimistic UI transitions.
-*   **Better Auth Integration with Humanized Error Mapping**: Wraps raw auth errors with client-side mappings (e.g. email verification warnings, rate limits, weak passwords) to guide users through error recovery seamlessly.
-*   **Framer Motion for Editorial Animations**: Powers smooth page transitions, lookbook carousel slides, and shopping cart drawer entrances without heavy CSS-in-JS runtimes.
+- Zustand 5 with localStorage persistence: src/stores/useCartStore.ts uses the persist middleware under the key aurora-cart, enabling cross-session cart recovery without Redux boilerplate or context provider complexity.
+- TanStack React Query 5 centralized caching: src/hooks/queries.ts configures 5-minute staleTime and 10-minute gcTime at the root QueryClient (src/app/providers.tsx), with refetchOnWindowFocus disabled to avoid unnecessary background revalidation.
+- Optimistic initial data hydration: useProductDetailsQuery reads cached product list data from the React Query cache before requesting /api/products/[slug], eliminating navigation delay between listing and detail views.
+- Better Auth with humanized error mapping: src/stores/useAuthStore.ts maps raw auth error codes (email_not_verified, weak_password, rate_limit, expired reset tokens) to user-friendly messages, and augments the session with admin role data from /api/auth/role.
 
-### 4. Performance, UX & DX
-*   **Fully Enabled Guest Checkout**: Allows unauthenticated catalog browsing, variant selection, address input, and order completion to minimize checkout friction and boost conversion rates.
-*   **Intelligent Asset Optimization**: Local font loading eliminates external CDN layout shifts (FOIT/CLS); Sharp pre-compiles images; and Next.js Image optimization serves responsive, edge-constrained WebP/AVIF formats.
-*   **Role-Based Access Control**: Implements edge-gated administrative boundaries, routing non-admin requests away from `/admin/*` views with zero cold-start delay.
-*   **TypeScript-First & ESLint Enforced**: Standardizes complete type safety across Next.js API routes, Zustand stores, and database schemas with strict pre-commit lint rules.
-*   **Declarative Seeding & Setup Pipeline**: Automates local environments using a single command (`npx tsx scripts/upload-and-seed.mts`), which drops/recreates schema tables, configures public S3 buckets, and recursively processes media assets.
+### 4. API & Business Logic Quality
+- Comprehensive per-field validation layer: src/utils/validation.ts validates email format, US ZIP codes (^\d{5}(-\d{4})?$), card numbers (13–19 digits), MM/YY expiry with future-date enforcement, and 3–4 digit CVC.
+- Checkout form with privacy-preserving masking: src/hooks/useCheckoutForm.ts auto-prefills user profile data for logged-in users and masks emails/card numbers before passing them to success callbacks or UI display.
+- Edge-gated route protection via middleware: src/middleware.ts intercepts requests to /profile and /admin/*, fetches the session cookie, and redirects unauthenticated or non-admin users before server component bundles hydrate.
+- Admin-centric centralized state: src/stores/useAdminStore.ts manages products, orders, dashboard metrics, and order status updates with optimistic local state synchronization after PATCH/POST mutations.
+
+### 5. Developer Experience & Code Quality
+- Strict TypeScript compiler hygiene: tsconfig.json enables strict: true, noUnusedLocals, noUnusedParameters, noFallthroughCasesInSwitch, and isolatedModules, with path aliases (@/* → src/*) for clean imports.
+- One-command infrastructure orchestration: scripts/upload-and-seed.mts drops/recreates 7 database tables, wipes and recreates 3 S3-compatible storage buckets, recursively uploads all local assets, and seeds catalog, lookbook, and editorial content.
+- Conventional file and directory organization: One PascalCase component per file, feature-foldered structure (product/detail/, product/listing/, story/, profile/), useXxx.ts hooks pattern, and @/ import prefix convention documented in CODING_STANDARDS.md.
+- Transactional email integration with graceful degradation: src/lib/email.ts lazily initializes a Nodemailer singleton for Brevo SMTP, silently skips sending when env vars are missing (e.g., local dev), and dispatches dual HTML/plain-text order confirmation templates.
 
 ---
 
