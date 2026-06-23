@@ -11,7 +11,7 @@ import Link from "next/link";
 interface NavbarProfileMenuProps {
   isOpen: boolean;
   onClose: () => void;
-  user: { name?: string | null; email: string; isAdmin?: boolean | null } | null;
+  user: { name?: string | null; email: string; role?: string | null; isAdmin?: boolean | null } | null;
   profile: { displayName: string } | null;
   onSignOutClick: () => void;
 }
@@ -39,7 +39,7 @@ export function NavbarProfileMenu({
             <p className="text-[10px] text-text-secondary uppercase tracking-wider font-semibold mb-0.5">Logged in as</p>
             <p className="text-sm font-medium text-text-primary truncate">{profile?.displayName || user.name || user.email}</p>
           </div>
-          {user.isAdmin && (
+          {user.role && user.role !== 'user' && (
             <Link
               href="/admin"
               onClick={onClose}
