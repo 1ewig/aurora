@@ -30,6 +30,7 @@ export function InventoryClient() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductData | null>(null);
   const [productToDelete, setProductToDelete] = useState<ProductData | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const filteredProducts = useMemo(
     () =>
@@ -75,11 +76,15 @@ export function InventoryClient() {
   // Delete product confirmation
   async function handleDeleteConfirm() {
     if (productToDelete) {
+      setDeleting(true);
       try {
         await deleteProduct(productToDelete.id);
         setProductToDelete(null);
+        setIsModalOpen(false);
       } catch (err: any) {
         alert(err.message || "Failed to delete product");
+      } finally {
+        setDeleting(false);
       }
     }
   }
@@ -114,7 +119,6 @@ export function InventoryClient() {
             selectedCategory={selectedCategory}
             onCategoryChange={setSelectedCategory}
             onEditClick={handleOpenModal}
-            onDeleteClick={setProductToDelete}
             isAdmin={isAdmin}
           />
 
@@ -125,6 +129,8 @@ export function InventoryClient() {
             onClose={() => setIsModalOpen(false)}
             editingProduct={editingProduct}
             form={form}
+            onDelete={() => setProductToDelete(editingProduct)}
+            deleting={deleting}
           />
 
           {/* Delete Dialog */}
@@ -132,10 +138,11 @@ export function InventoryClient() {
             open={!!productToDelete}
             title="Delete Product"
             description={`Are you sure you want to permanently delete the product "${productToDelete?.name}"? All sizes, image listings, and unused storage assets will be deleted. This cannot be undone.`}
-            confirmLabel="Delete"
+            confirmLabel={deleting ? "Deleting..." : "Delete"}
             cancelLabel="Cancel"
             onConfirm={handleDeleteConfirm}
             onCancel={() => setProductToDelete(null)}
+            disabled={deleting}
           />
         </>
       )}

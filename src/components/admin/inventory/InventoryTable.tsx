@@ -16,12 +16,11 @@ interface InventoryTableProps {
   selectedCategory: string;
   onCategoryChange: (val: string) => void;
   onEditClick: (product: ProductData) => void;
-  onDeleteClick: (product: ProductData) => void;
   isAdmin: boolean;
 }
 
 
-/** Renders a product table with search, category filter, and edit/delete row actions. */
+/** Renders a product table with search, category filter, and edit row actions. */
 export function InventoryTable({
   filteredProducts,
   searchQuery,
@@ -29,7 +28,6 @@ export function InventoryTable({
   selectedCategory,
   onCategoryChange,
   onEditClick,
-  onDeleteClick,
   isAdmin,
 }: InventoryTableProps) {
 
@@ -150,20 +148,12 @@ export function InventoryTable({
                     </td>
                     <td className="px-6 py-4 text-right">
                       {isAdmin && (
-                        <div className="inline-flex gap-2">
-                          <button
-                            onClick={() => onEditClick(p)}
-                            className="px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-text-primary hover:text-accent-primary transition-colors cursor-pointer"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => onDeleteClick(p)}
-                            className="px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-error hover:text-red-700 transition-colors cursor-pointer"
-                          >
-                            Delete
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => onEditClick(p)}
+                          className="px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-text-primary hover:text-accent-primary transition-colors cursor-pointer"
+                        >
+                          Edit
+                        </button>
                       )}
                     </td>
                   </tr>

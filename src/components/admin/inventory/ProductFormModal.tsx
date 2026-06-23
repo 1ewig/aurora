@@ -19,6 +19,8 @@ interface ProductFormModalProps {
   onClose: () => void;
   editingProduct: ProductData | null;
   form: ReturnType<typeof useProductForm>;
+  onDelete?: () => void;
+  deleting?: boolean;
 }
 
 /** Renders an animated modal with basic details, media uploads, size/stock, and bullet-point fields. */
@@ -27,6 +29,8 @@ export function ProductFormModal({
   onClose,
   editingProduct,
   form,
+  onDelete,
+  deleting,
 }: ProductFormModalProps) {
   return (
     <AnimatePresence>
@@ -132,13 +136,29 @@ export function ProductFormModal({
               </div>
 
               {/* Sticky Footer */}
-              <div className="flex-shrink-0 flex items-center justify-end gap-3 px-6 sm:px-6 py-4 sm:py-4 border-t border-border-subtle">
-                <Button type="button" onClick={onClose} variant="ghost" size="sm">
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={!form.hasChanges || form.uploading || form.saving} variant="gold" size="sm">
-                  {form.uploading ? "Uploading..." : form.saving ? "Saving..." : "Save Product"}
-                </Button>
+              <div className="flex-shrink-0 flex items-center justify-between px-6 sm:px-6 py-4 sm:py-4 border-t border-border-subtle">
+                {editingProduct && onDelete ? (
+                  <Button
+                    type="button"
+                    onClick={onDelete}
+                    disabled={deleting || form.saving || form.uploading}
+                    variant="ghost"
+                    size="sm"
+                    className="border-error text-error hover:bg-error hover:text-white hover:border-error"
+                  >
+                    {deleting ? "Deleting..." : "Delete Product"}
+                  </Button>
+                ) : (
+                  <div />
+                )}
+                <div className="flex items-center gap-3">
+                  <Button type="button" onClick={onClose} disabled={deleting || form.saving || form.uploading} variant="ghost" size="sm">
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={!form.hasChanges || form.uploading || form.saving || deleting} variant="gold" size="sm">
+                    {form.uploading ? "Uploading..." : form.saving ? "Saving..." : "Save Product"}
+                  </Button>
+                </div>
               </div>
             </form>
           </motion.div>

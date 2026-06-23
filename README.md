@@ -23,7 +23,7 @@ Explore the live environment and administration panel using these credentials:
 | Role | Email | Password | Access Privileges |
 | :--- | :--- | :--- | :--- |
 | **Customer** | `customer@example.com` | `Customer123!` | Personal profile, order history, checkout |
-| **Admin** | `admin@example.com` | `Admin123!` | Inventory control, order manager, user table |
+| **Explorer** | `explorer@example.com` | `Explorer123!` | Inventory control, order manager, user table |
 
 > [!TIP]
 > **Guest Checkout** is fully enabled. Users can browse products, select sizes, input address details, and checkout without authenticating or creating an account.

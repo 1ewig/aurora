@@ -17,6 +17,7 @@ interface ConfirmDialogProps {
   cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  disabled?: boolean;
 }
 
 const backdropVariants = {
@@ -49,6 +50,7 @@ export function ConfirmDialog({
   cancelLabel = "Cancel",
   onConfirm,
   onCancel,
+  disabled,
 }: ConfirmDialogProps) {
   return (
     <AnimatePresence>
@@ -95,6 +97,7 @@ export function ConfirmDialog({
             <div className="flex flex-col sm:flex-row gap-3 justify-end">
               <Button
                 onClick={onCancel}
+                disabled={disabled}
                 variant="ghost"
                 size="sm"
                 fullWidth
@@ -103,6 +106,7 @@ export function ConfirmDialog({
               </Button>
               <Button
                 onClick={onConfirm}
+                disabled={disabled}
                 variant="ghost"
                 size="sm"
                 fullWidth
