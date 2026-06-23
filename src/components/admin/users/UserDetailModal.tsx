@@ -17,6 +17,7 @@ interface UserDetailModalProps {
   onClose: () => void;
   onToggleVerify: (user: UserRow, newStatus: boolean) => Promise<void>;
   onDelete: (user: UserRow) => void;
+  isAdmin: boolean;
 }
 
 /** User detail modal showing profile, linked accounts, sessions, and admin actions. */
@@ -27,6 +28,7 @@ export function UserDetailModal({
   onClose,
   onToggleVerify,
   onDelete,
+  isAdmin,
 }: UserDetailModalProps) {
   if (!user) return null;
 
@@ -151,19 +153,23 @@ export function UserDetailModal({
 
         {/* Footer Actions */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-border-subtle bg-bg-primary/30">
-          <button
-            onClick={() => onDelete(user)}
-            className="text-xs font-semibold text-error hover:underline cursor-pointer"
-          >
-            Delete User
-          </button>
-          <div className="flex gap-2">
+          {isAdmin && (
             <button
-              onClick={() => onToggleVerify(user, !user.emailVerified)}
-              className="px-4 py-2 text-xs font-semibold bg-accent-primary/10 text-accent-primary rounded-full hover:bg-accent-primary/20 transition-all cursor-pointer"
+              onClick={() => onDelete(user)}
+              className="text-xs font-semibold text-error hover:underline cursor-pointer"
             >
-              {user.emailVerified ? "Mark Unverified" : "Mark Verified"}
+              Delete User
             </button>
+          )}
+          <div className="flex gap-2 ml-auto">
+            {isAdmin && (
+              <button
+                onClick={() => onToggleVerify(user, !user.emailVerified)}
+                className="px-4 py-2 text-xs font-semibold bg-accent-primary/10 text-accent-primary rounded-full hover:bg-accent-primary/20 transition-all cursor-pointer"
+              >
+                {user.emailVerified ? "Mark Unverified" : "Mark Verified"}
+              </button>
+            )}
             <button
               onClick={onClose}
               className="px-4 py-2 text-xs font-semibold bg-bg-primary border border-border-medium rounded-full hover:bg-bg-secondary transition-all cursor-pointer"

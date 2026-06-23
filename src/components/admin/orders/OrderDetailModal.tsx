@@ -19,6 +19,7 @@ interface OrderDetailModalProps {
   onClose: () => void;
   onStatusUpdate: (orderId: string, status: string) => void;
   updatingStatusId: string | null;
+  isAdmin: boolean;
 }
 
 /** Order detail slide-over with line items, shipping, totals, and status controls. */
@@ -28,6 +29,7 @@ export function OrderDetailModal({
   onClose,
   onStatusUpdate,
   updatingStatusId,
+  isAdmin,
 }: OrderDetailModalProps) {
   if (!order) return null;
 
@@ -163,61 +165,63 @@ export function OrderDetailModal({
                 </div>
 
                 {/* Actions status panel */}
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-text-primary mb-3">
-                    Modify Status
-                  </h3>
-                  <div className="border border-border-subtle p-4 rounded-2xl space-y-3 bg-bg-primary/10">
-                    <div className="text-xs flex items-center justify-between">
-                      <span className="text-text-secondary">Current Status:</span>
-                      <OrderStatusBadge status={order.status} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 pt-2">
-                      {order.status === "pending" && (
-                        <Button
-                          disabled={updatingStatusId === order.id}
-                          onClick={() => onStatusUpdate(order.id, "confirmed")}
-                          variant="gold"
-                          size="sm"
-                          className="text-[10px] py-2 px-3"
-                        >
-                          Confirm Order
-                        </Button>
-                      )}
-                      {order.status === "confirmed" && (
-                        <Button
-                          disabled={updatingStatusId === order.id}
-                          onClick={() => onStatusUpdate(order.id, "shipped")}
-                          variant="filled"
-                          size="sm"
-                          className="text-[10px] py-2 px-3"
-                        >
-                          Mark Shipped
-                        </Button>
-                      )}
-                      {order.status === "shipped" && (
-                        <Button
-                          disabled={updatingStatusId === order.id}
-                          onClick={() => onStatusUpdate(order.id, "delivered")}
-                          variant="gold"
-                          size="sm"
-                          className="text-[10px] py-2 px-3"
-                        >
-                          Mark Delivered
-                        </Button>
-                      )}
-                      {order.status !== "cancelled" && order.status !== "delivered" && (
-                        <button
-                          disabled={updatingStatusId === order.id}
-                          onClick={() => onStatusUpdate(order.id, "cancelled")}
-                          className="px-3 py-2 border border-error text-error text-[10px] font-semibold rounded-full hover:bg-error hover:text-white transition-colors cursor-pointer"
-                        >
-                          Cancel Order
-                        </button>
-                      )}
+                {isAdmin && (
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-text-primary mb-3">
+                      Modify Status
+                    </h3>
+                    <div className="border border-border-subtle p-4 rounded-2xl space-y-3 bg-bg-primary/10">
+                      <div className="text-xs flex items-center justify-between">
+                        <span className="text-text-secondary">Current Status:</span>
+                        <OrderStatusBadge status={order.status} />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 pt-2">
+                        {order.status === "pending" && (
+                          <Button
+                            disabled={updatingStatusId === order.id}
+                            onClick={() => onStatusUpdate(order.id, "confirmed")}
+                            variant="gold"
+                            size="sm"
+                            className="text-[10px] py-2 px-3"
+                          >
+                            Confirm Order
+                          </Button>
+                        )}
+                        {order.status === "confirmed" && (
+                          <Button
+                            disabled={updatingStatusId === order.id}
+                            onClick={() => onStatusUpdate(order.id, "shipped")}
+                            variant="filled"
+                            size="sm"
+                            className="text-[10px] py-2 px-3"
+                          >
+                            Mark Shipped
+                          </Button>
+                        )}
+                        {order.status === "shipped" && (
+                          <Button
+                            disabled={updatingStatusId === order.id}
+                            onClick={() => onStatusUpdate(order.id, "delivered")}
+                            variant="gold"
+                            size="sm"
+                            className="text-[10px] py-2 px-3"
+                          >
+                            Mark Delivered
+                          </Button>
+                        )}
+                        {order.status !== "cancelled" && order.status !== "delivered" && (
+                          <button
+                            disabled={updatingStatusId === order.id}
+                            onClick={() => onStatusUpdate(order.id, "cancelled")}
+                            className="px-3 py-2 border border-error text-error text-[10px] font-semibold rounded-full hover:bg-error hover:text-white transition-colors cursor-pointer"
+                          >
+                            Cancel Order
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
 

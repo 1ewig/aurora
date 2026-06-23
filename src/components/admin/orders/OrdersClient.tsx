@@ -9,6 +9,7 @@
 
 import { useEffect } from "react";
 import { useAdminStore } from "@/stores/useAdminStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useOrderProcessing } from "@/hooks/useOrderProcessing";
 import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { OrdersTable } from "./OrdersTable";
@@ -21,6 +22,7 @@ export function OrdersClient() {
   const error = useAdminStore((s) => s.error);
   const fetchOrders = useAdminStore((s) => s.fetchOrders);
   const updateOrderStatus = useAdminStore((s) => s.updateOrderStatus);
+  const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
 
   // Setup hook for order details, filters, and searches
   const orderHook = useOrderProcessing(orders);
@@ -57,6 +59,7 @@ export function OrdersClient() {
             onViewDetailsClick={orderHook.setSelectedOrder}
             onStatusUpdate={updateOrderStatus}
             updatingStatusId={loading ? "updating" : null}
+            isAdmin={isAdmin}
           />
 
           {/* Detailed order modal details */}
@@ -66,6 +69,7 @@ export function OrdersClient() {
             order={orderHook.selectedOrder}
             onStatusUpdate={updateOrderStatus}
             updatingStatusId={loading ? "updating" : null}
+            isAdmin={isAdmin}
           />
         </>
       )}

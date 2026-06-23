@@ -28,7 +28,7 @@ export function useInitializeAuth() {
 
         if (user) {
           const roleRes = await fetch("/api/auth/role").catch(() => null);
-          const roleData = roleRes && roleRes.ok ? await roleRes.json() : { isAdmin: false };
+          const roleData = roleRes && roleRes.ok ? await roleRes.json() : { isAdmin: false, role: 'user' };
           const profile = normalizeProfile({ displayName: user.name || "" });
           useAuthStore.setState({
             user: {
@@ -38,6 +38,7 @@ export function useInitializeAuth() {
               emailVerified: user.emailVerified,
               image: user.image,
               isAdmin: roleData.isAdmin,
+              role: roleData.role,
             },
             profile,
             loading: false,

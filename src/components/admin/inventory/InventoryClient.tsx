@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useAdminStore, type ProductData } from "@/stores/useAdminStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { useProductForm } from "@/hooks/useProductForm";
 import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { Button } from "@/components/ui/Button";
@@ -22,6 +23,7 @@ export function InventoryClient() {
   const error = useAdminStore((s) => s.error);
   const fetchProducts = useAdminStore((s) => s.fetchProducts);
   const deleteProduct = useAdminStore((s) => s.deleteProduct);
+  const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -97,11 +99,11 @@ export function InventoryClient() {
           <AdminHeaderPanel
             title="Inventory Management"
             description="Add, update, or remove items from the catalog."
-            action={
+            action={isAdmin ? (
               <Button onClick={() => handleOpenModal()} variant="gold" size="sm">
                 Add Product
               </Button>
-            }
+            ) : undefined}
           />
 
            {/* Products Table */}
@@ -113,6 +115,7 @@ export function InventoryClient() {
             onCategoryChange={setSelectedCategory}
             onEditClick={handleOpenModal}
             onDeleteClick={setProductToDelete}
+            isAdmin={isAdmin}
           />
 
 

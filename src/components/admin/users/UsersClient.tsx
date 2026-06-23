@@ -10,6 +10,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { Button } from "@/components/ui/Button";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { UserDetailModal } from "./UserDetailModal";
 import { useUserSessions } from "@/hooks/useUserSessions";
 
@@ -32,6 +33,7 @@ type FilterVerified = "all" | "verified" | "unverified";
 
 /** User management page — search, sort, filter, verify, and delete users. */
 export function UsersClient() {
+  const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -323,12 +325,14 @@ export function UsersClient() {
                           >
                             View
                           </button>
-                          <button
-                            onClick={() => setConfirmDelete(user)}
-                            className="text-xs font-semibold text-error hover:underline cursor-pointer"
-                          >
-                            Delete
-                          </button>
+                          {isAdmin && (
+                            <button
+                              onClick={() => setConfirmDelete(user)}
+                              className="text-xs font-semibold text-error hover:underline cursor-pointer"
+                            >
+                              Delete
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -353,6 +357,7 @@ export function UsersClient() {
         onClose={() => setSelectedUser(null)}
         onToggleVerify={handleToggleVerify}
         onDelete={(u) => { setSelectedUser(null); setConfirmDelete(u); }}
+        isAdmin={isAdmin}
       />
 
       {/* Delete Confirmation */}

@@ -19,6 +19,7 @@ interface OrdersTableProps {
   onViewDetailsClick: (order: OrderData) => void;
   onStatusUpdate: (orderId: string, status: string) => void;
   updatingStatusId: string | null;
+  isAdmin: boolean;
 }
 
 /** Filterable, sortable orders table with inline status updates. */
@@ -31,6 +32,7 @@ export function OrdersTable({
   onViewDetailsClick,
   onStatusUpdate,
   updatingStatusId,
+  isAdmin,
 }: OrdersTableProps) {
   return (
     <div className="space-y-8">
@@ -141,18 +143,20 @@ export function OrdersTable({
                         >
                           View Details
                         </button>
-                        <select
-                          disabled={updatingStatusId === o.id}
-                          value={o.status}
-                          onChange={(e) => onStatusUpdate(o.id, e.target.value)}
-                          className="px-2 py-1 bg-bg-primary border border-border-medium rounded-lg text-xs font-medium focus:outline-none focus:border-accent-primary"
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="confirmed">Confirmed</option>
-                          <option value="shipped">Shipped</option>
-                          <option value="delivered">Delivered</option>
-                          <option value="cancelled">Cancelled</option>
-                        </select>
+                        {isAdmin && (
+                          <select
+                            disabled={updatingStatusId === o.id}
+                            value={o.status}
+                            onChange={(e) => onStatusUpdate(o.id, e.target.value)}
+                            className="px-2 py-1 bg-bg-primary border border-border-medium rounded-lg text-xs font-medium focus:outline-none focus:border-accent-primary"
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
+                        )}
                       </div>
                     </td>
                   </tr>

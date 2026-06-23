@@ -22,7 +22,7 @@ export default function AdminLayout({
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && (!user || !user.isAdmin)) {
+    if (!loading && (!user || user.role === 'user')) {
       router.push("/");
     }
   }, [user, loading, router]);
@@ -35,7 +35,7 @@ export default function AdminLayout({
     );
   }
 
-  if (!user || !user.isAdmin) {
+  if (!user || user.role === 'user') {
     return null;
   }
 

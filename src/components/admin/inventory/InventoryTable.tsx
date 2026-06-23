@@ -17,6 +17,7 @@ interface InventoryTableProps {
   onCategoryChange: (val: string) => void;
   onEditClick: (product: ProductData) => void;
   onDeleteClick: (product: ProductData) => void;
+  isAdmin: boolean;
 }
 
 
@@ -29,6 +30,7 @@ export function InventoryTable({
   onCategoryChange,
   onEditClick,
   onDeleteClick,
+  isAdmin,
 }: InventoryTableProps) {
 
   return (
@@ -147,20 +149,22 @@ export function InventoryTable({
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="inline-flex gap-2">
-                        <button
-                          onClick={() => onEditClick(p)}
-                          className="px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-text-primary hover:text-accent-primary transition-colors cursor-pointer"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => onDeleteClick(p)}
-                          className="px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-error hover:text-red-700 transition-colors cursor-pointer"
-                        >
-                          Delete
-                        </button>
-                      </div>
+                      {isAdmin && (
+                        <div className="inline-flex gap-2">
+                          <button
+                            onClick={() => onEditClick(p)}
+                            className="px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-text-primary hover:text-accent-primary transition-colors cursor-pointer"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => onDeleteClick(p)}
+                            className="px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-error hover:text-red-700 transition-colors cursor-pointer"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 );
