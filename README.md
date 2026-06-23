@@ -224,6 +224,9 @@ Follow the **[Backend Deployment Guide](docs/BACKEND_DEPLOYMENT.md)** to configu
 # Deploy full database structures and store media resources
 npx tsx scripts/upload-and-seed.mts
 
+# Manage admin user accounts and roles
+npx tsx scripts/manage-user.ts
+
 # Start local server
 npm run dev
 ```
@@ -242,6 +245,8 @@ Explore the implementation quality of the core components in this codebase:
 | **[src/app/api/orders/route.ts](src/app/api/orders/route.ts)** | Concurrency transaction logic, email template compiler. |
 | **[src/hooks/queries.ts](src/hooks/queries.ts)** | Optimistic cache loading, React Query data fetching layer. |
 | **[src/app/api/products/[slug]/route.ts](src/app/api/products/%5Bslug%5D/route.ts)** | PostgreSQL query optimizations (`json_agg` data shaping). |
+| **[src/hooks/useUsersManagement.ts](src/hooks/useUsersManagement.ts)** | Custom React hook separating business/state logic from admin user panel. |
 | **[src/stores/useAuthStore.ts](src/stores/useAuthStore.ts)** | Zustand client wrapper for session tracking. |
+| **[scripts/manage-user.ts](scripts/manage-user.ts)** | Comprehensive CLI for user creations, role updating, and account deletion. |
 | **[scripts/upload-and-seed.mts](scripts/upload-and-seed.mts)** | Schema deployer, S3 bucket config, and media asset ingestion pipeline. |
 | **[scripts/optimize-images.mjs](scripts/optimize-images.mjs)** | Asset WebP preprocessing script utilizing Sharp. |
