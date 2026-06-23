@@ -3,27 +3,19 @@
  *
  * Admin dashboard page composing metrics, recent orders, and task menu.
  */
+
 "use client";
 
-import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { useAdminStore } from "@/stores/useAdminStore";
 import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { MetricsGrid } from "./MetricsGrid";
 import { RecentOrdersList } from "./RecentOrdersList";
 import { TaskMenu } from "./TaskMenu";
+import { useAdminDashboard } from "@/hooks/useAdminDashboard";
 
 /** Renders the executive dashboard with metrics grid, recent orders feed, and quick tasks. */
 export function DashboardClient() {
-  const metrics = useAdminStore((s) => s.metrics);
-  const recentOrders = useAdminStore((s) => s.recentOrders);
-  const loading = useAdminStore((s) => s.loading);
-  const error = useAdminStore((s) => s.error);
-  const fetchDashboard = useAdminStore((s) => s.fetchDashboard);
-
-  useEffect(() => {
-    fetchDashboard();
-  }, [fetchDashboard]);
+  const { metrics, recentOrders, loading, error } = useAdminDashboard();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -39,7 +31,6 @@ export function DashboardClient() {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { duration: 0.4 } },
   };
-
 
   return (
     <div className="space-y-10 pb-12">

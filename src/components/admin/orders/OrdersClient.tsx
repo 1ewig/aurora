@@ -1,36 +1,32 @@
 /**
  * Aurora — src/components/admin/orders/OrdersClient.tsx
  *
- * Orders management page — fetches all orders, wires filtering/search
- * via useOrderProcessing, and renders the table + detail modal.
+ * Orders management page — hosts table + detail modal, delegates logic to hook.
  */
 
 "use client";
 
-import { useEffect } from "react";
-import { useAdminStore } from "@/stores/useAdminStore";
-import { useAuthStore } from "@/stores/useAuthStore";
-import { useOrderProcessing } from "@/hooks/useOrderProcessing";
 import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { OrdersTable } from "./OrdersTable";
 import { OrderDetailModal } from "./OrderDetailModal";
+import { useOrdersManagement } from "@/hooks/useOrdersManagement";
 
 /** Orders management page — fetches, filters, and displays orders. */
 export function OrdersClient() {
-  const orders = useAdminStore((s) => s.orders);
-  const loading = useAdminStore((s) => s.loading);
-  const error = useAdminStore((s) => s.error);
-  const fetchOrders = useAdminStore((s) => s.fetchOrders);
-  const updateOrderStatus = useAdminStore((s) => s.updateOrderStatus);
-  const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
-
-  // Setup hook for order details, filters, and searches
-  const orderHook = useOrderProcessing(orders);
-
-  // Load orders on component mount
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+  const {
+    orders,
+    filteredOrders,
+    loading,
+    error,
+    filterStatus,
+    setFilterStatus,
+    searchQuery,
+    setSearchQuery,
+    selectedOrder,
+    setSelectedOrder,
+    updateOrderStatus,
+    isAdmin,
+  } = useOrdersManagement();
 
   return (
     <div className="space-y-8 pb-12">
@@ -51,12 +47,12 @@ export function OrdersClient() {
 
           {/* Orders list table */}
           <OrdersTable
-            orders={orderHook.filteredOrders}
-            filterStatus={orderHook.filterStatus}
-            onFilterStatusChange={orderHook.setFilterStatus}
-            searchQuery={orderHook.searchQuery}
-            onSearchChange={orderHook.setSearchQuery}
-            onViewDetailsClick={orderHook.setSelectedOrder}
+            orders={filteredOrders}
+            filterStatus={filterStatus}
+            onFilterStatusChange={setFilterStatus}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onViewDetailsClick={setSelectedOrder}
             onStatusUpdate={updateOrderStatus}
             updatingStatusId={loading ? "updating" : null}
             isAdmin={isAdmin}
@@ -64,9 +60,9 @@ export function OrdersClient() {
 
           {/* Detailed order modal details */}
           <OrderDetailModal
-            isOpen={!!orderHook.selectedOrder}
-            onClose={() => orderHook.setSelectedOrder(null)}
-            order={orderHook.selectedOrder}
+            isOpen={!!selectedOrder}
+            onClose={() => setSelectedOrder(null)}
+            order={selectedOrder}
             onStatusUpdate={updateOrderStatus}
             updatingStatusId={loading ? "updating" : null}
             isAdmin={isAdmin}
