@@ -140,7 +140,7 @@ async function main() {
     // Insert account row
     await client.query(
       `INSERT INTO better_auth.account (id, "accountId", "providerId", "userId", password, "createdAt", "updatedAt")
-       VALUES ($1, $2, 'email', $3, $4, NOW(), NOW())`,
+       VALUES ($1, $2, 'credential', $3, $4, NOW(), NOW())`,
       [accountId, userId, userId, hashedPassword]
     );
 
