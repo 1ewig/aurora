@@ -7,9 +7,7 @@
 
 "use client";
 
-import type { UserRow } from "./UsersClient";
-
-export type SortKey = "name" | "email" | "emailVerified" | "createdAt" | "sessionCount";
+import type { UserRow, SortKey } from "@/hooks/useUsersManagement";
 
 interface UsersTableProps {
   users: UserRow[];

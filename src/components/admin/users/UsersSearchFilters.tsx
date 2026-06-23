@@ -7,8 +7,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-
-export type FilterVerified = "all" | "verified" | "unverified";
+import type { FilterVerified } from "@/hooks/useUsersManagement";
 
 interface UsersSearchFiltersProps {
   searchQuery: string;

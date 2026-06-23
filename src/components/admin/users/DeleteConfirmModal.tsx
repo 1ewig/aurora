@@ -6,7 +6,7 @@
 
 "use client";
 
-import type { UserRow } from "./UsersClient";
+import type { UserRow } from "@/hooks/useUsersManagement";
 
 interface DeleteConfirmModalProps {
   user: UserRow;
