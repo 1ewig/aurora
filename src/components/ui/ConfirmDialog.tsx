@@ -19,9 +19,9 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
-const backdropVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1 },
+const backdropVariants = {
+  hidden: { opacity: 0, backdropFilter: "blur(0px)", WebkitBackdropFilter: "blur(0px)" },
+  visible: { opacity: 1, backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" },
 };
 
 const dialogVariants: Variants = {
@@ -63,7 +63,7 @@ export function ConfirmDialog({
         >
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50"
             onClick={onCancel}
             variants={backdropVariants}
             initial="hidden"
