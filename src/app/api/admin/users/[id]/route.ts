@@ -9,7 +9,7 @@
 
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
-import { requireAdmin } from '@/utils/admin';
+import { requireAdmin, requireRole } from '@/utils/admin';
 
 export async function GET(
   request: Request,
@@ -17,7 +17,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const { error } = await requireAdmin();
+    const { error } = await requireRole(1);
     if (error) return error;
 
     const url = new URL(request.url);

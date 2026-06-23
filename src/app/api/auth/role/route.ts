@@ -1,8 +1,8 @@
 /**
  * Aurora — src/app/api/auth/role/route.ts
  *
- * GET /api/auth/role — returns whether the current user is an admin.
- * Used by the auth store and middleware to gate admin functionality.
+ * GET /api/auth/role — returns the user's role and whether they are an admin.
+ * Used by the auth store to gate UI elements.
  */
 
 import { auth } from "@/lib/auth";
@@ -16,7 +16,7 @@ export async function GET() {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) {
       return NextResponse.json(
-        { isAdmin: false },
+        { isAdmin: false, role: 'user' },
         { headers: { "Cache-Control": "no-store" } }
       );
     }
@@ -28,7 +28,7 @@ export async function GET() {
     const role = userResult.rows[0]?.role || 'user';
 
     return NextResponse.json(
-      { isAdmin: isAdmin(session.user.email, role) },
+      { isAdmin: isAdmin(session.user.email, role), role },
       { headers: { "Cache-Control": "no-store" } }
     );
   } catch (error) {

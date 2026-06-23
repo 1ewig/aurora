@@ -1,34 +1,40 @@
 /**
  * Aurora — src/utils/admin.ts
  *
- * Server-only admin authorization helpers.
- * Centralizes session verification, DB role lookup, and isAdmin check
- * so individual route files don't need to repeat the pattern.
+ * Server-only authorization helpers with role-based access control.
+ * Each role has a numeric level — guards check that the user's level
+ * meets the minimum required for the operation.
+ *
+ * Level hierarchy:  user=0, explorer=1, admin=10
  */
 
 import { auth } from '@/lib/auth';
 import { pool } from '@/utils/db';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { isAdmin } from '@/utils/auth';
+
+export const ROLE_LEVELS: Record<string, number> = {
+  user: 0,
+  explorer: 1,
+  admin: 10,
+};
+
+const UNAUTHORIZED = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+const FORBIDDEN = NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
 /**
- * Fetches the current session and verifies the user has an admin role.
- * Queries the DB-backed `role` column on `better_auth."user"`.
+ * Fetches the current session and verifies the user's role level meets
+ * the required minimum. Queries the DB-backed `role` column.
  *
- * Returns the user object on success, or a 401/500 NextResponse on failure.
+ * @param minLevel — minimum role level required (defaults to admin=10)
  */
-export async function requireAdmin(): Promise<{
-  user: any;
-  error?: NextResponse;
-}> {
+export async function requireRole(
+  minLevel: number = 10
+): Promise<{ user: any; role: string; error?: NextResponse }> {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) {
-      return {
-        user: null,
-        error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }),
-      };
+      return { user: null, role: 'user', error: UNAUTHORIZED };
     }
 
     const userResult = await pool.query(
@@ -36,20 +42,27 @@ export async function requireAdmin(): Promise<{
       [session.user.id]
     );
     const role = userResult.rows[0]?.role || 'user';
+    const level = ROLE_LEVELS[role] ?? 0;
 
-    if (!isAdmin(session.user.email, role)) {
-      return {
-        user: null,
-        error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }),
-      };
+    if (level < minLevel) {
+      return { user: null, role, error: FORBIDDEN };
     }
 
-    return { user: session.user };
+    return { user: session.user, role };
   } catch (err) {
-    console.error('requireAdmin error:', err);
+    console.error('requireRole error:', err);
     return {
       user: null,
+      role: 'user',
       error: NextResponse.json({ error: 'Internal server error' }, { status: 500 }),
     };
   }
+}
+
+/**
+ * Convenience wrapper — requires admin level (default, used in mutation endpoints).
+ */
+export async function requireAdmin(): Promise<{ user: any; error?: NextResponse }> {
+  const result = await requireRole(10);
+  return { user: result.user, error: result.error };
 }

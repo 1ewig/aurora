@@ -16,6 +16,7 @@ export interface User {
   emailVerified?: boolean | null;
   image?: string | null;
   isAdmin?: boolean | null;
+  role?: string | null;
 }
 
 export interface Profile {
@@ -86,10 +87,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       if (user) {
         const roleRes = await fetch("/api/auth/role").catch(() => null);
-        const roleData = roleRes && roleRes.ok ? await roleRes.json() : { isAdmin: false };
+        const roleData = roleRes && roleRes.ok ? await roleRes.json() : { isAdmin: false, role: 'user' };
         const profile = normalizeProfile({ displayName: user.name || "" });
         set({
-          user: { ...user, isAdmin: roleData.isAdmin },
+          user: { ...user, isAdmin: roleData.isAdmin, role: roleData.role },
           profile,
           loading: false,
         });
@@ -116,7 +117,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       if (data?.user && data.user.emailVerified) {
         const roleRes = await fetch("/api/auth/role").catch(() => null);
-        const roleData = roleRes && roleRes.ok ? await roleRes.json() : { isAdmin: false };
+        const roleData = roleRes && roleRes.ok ? await roleRes.json() : { isAdmin: false, role: 'user' };
         set({
           user: {
             id: data.user.id,
@@ -125,6 +126,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             emailVerified: data.user.emailVerified,
             image: data.user.image,
             isAdmin: roleData.isAdmin,
+            role: roleData.role,
           },
           profile: { displayName: name || "" },
           loading: false,
