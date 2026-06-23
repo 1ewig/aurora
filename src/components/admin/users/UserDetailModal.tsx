@@ -7,7 +7,7 @@
 
 "use client";
 
-import type { UserRow } from "./UsersClient";
+import type { UserRow } from "@/hooks/useUsersManagement";
 import type { SessionRow } from "@/hooks/useUserSessions";
 
 interface UserDetailModalProps {
@@ -46,10 +46,10 @@ export function UserDetailModal({
     });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-12 md:pt-20 pb-12 px-4 bg-black/40 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl flex flex-col max-h-[85vh] overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border-subtle">
+        <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-border-subtle">
           <h2 className="font-display font-bold text-lg uppercase tracking-wider">User Details</h2>
           <button
             onClick={onClose}
@@ -61,7 +61,8 @@ export function UserDetailModal({
           </button>
         </div>
 
-        <div className="px-6 py-5 space-y-6">
+        {/* Scrollable Body */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
           {/* Profile Section */}
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 rounded-full bg-bg-primary border border-border-subtle flex items-center justify-center text-text-secondary text-lg font-bold uppercase shrink-0 overflow-hidden">
@@ -100,14 +101,14 @@ export function UserDetailModal({
             </div>
             {isAdmin ? (
               <select
-                value={user.role || 'user'}
+                value={user.role || "user"}
                 onChange={(e) => onRoleChange(user, e.target.value)}
                 className="px-4 py-2 bg-white border border-border-medium rounded-full text-xs font-semibold focus:border-accent-primary focus:outline-none cursor-pointer appearance-none pr-8"
                 style={{
                   backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B6B6B' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/></svg>")`,
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "right 0.75rem center",
-                  backgroundSize: "0.85rem"
+                  backgroundSize: "0.85rem",
                 }}
               >
                 <option value="user">User</option>
@@ -116,7 +117,7 @@ export function UserDetailModal({
               </select>
             ) : (
               <span className="text-xs font-mono font-bold uppercase tracking-wider bg-bg-primary border border-border-subtle px-2.5 py-1 rounded-full">
-                {user.role || 'user'}
+                {user.role || "user"}
               </span>
             )}
           </div>
@@ -187,7 +188,7 @@ export function UserDetailModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-border-subtle bg-bg-primary/30">
+        <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-t border-border-subtle bg-bg-primary/30">
           {isAdmin && (
             <button
               onClick={() => onDelete(user)}
@@ -203,7 +204,11 @@ export function UserDetailModal({
                 onClick={() => onToggleVerify(user, !user.emailVerified)}
                 className="px-4 py-2 text-xs font-semibold bg-accent-primary/10 text-accent-primary rounded-full hover:bg-accent-primary/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {updatingVerifyId === user.id ? "Updating..." : (user.emailVerified ? "Mark Unverified" : "Mark Verified")}
+                {updatingVerifyId === user.id
+                  ? "Updating..."
+                  : user.emailVerified
+                  ? "Mark Unverified"
+                  : "Mark Verified"}
               </button>
             )}
             <button
