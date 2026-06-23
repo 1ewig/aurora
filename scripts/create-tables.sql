@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS better_auth."user" (
   email TEXT NOT NULL UNIQUE,
   "emailVerified" BOOLEAN NOT NULL DEFAULT false,
   image TEXT,
+  role TEXT NOT NULL DEFAULT 'user',
   "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now()),
   "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT timezone('utc'::text, now())
 );

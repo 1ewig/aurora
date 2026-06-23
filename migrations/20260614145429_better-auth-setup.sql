@@ -34,6 +34,9 @@ DROP TRIGGER IF EXISTS on_auth_user_updated ON auth.users;
 DROP FUNCTION IF EXISTS public.handle_new_user();
 DROP FUNCTION IF EXISTS public.handle_user_update();
 
+ALTER TABLE better_auth."user" ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'user';
+CREATE INDEX IF NOT EXISTS idx_user_role ON better_auth."user"(role);
+
 GRANT USAGE ON SCHEMA public TO authenticated;
 GRANT SELECT, INSERT, UPDATE ON public.orders TO authenticated;
 

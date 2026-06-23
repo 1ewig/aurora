@@ -55,8 +55,8 @@ interface AuthState {
   verifyEmail: (email: string, token: string) => Promise<{ error: any }>;
   resendVerification: (email: string) => Promise<{ error: any }>;
   sendResetPasswordEmail: (email: string) => Promise<{ error: any }>;
-  exchangeResetPasswordToken: (email: string, code: string) => Promise<{ token?: string; error: any }>;
   resetPassword: (newPassword: string, token: string) => Promise<{ error: any }>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<{ error: any }>;
   clearError: () => void;
 }
 
@@ -227,14 +227,27 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  exchangeResetPasswordToken: async (_email, _code) => {
-    return { token: "", error: { message: "Not needed with link-based reset" } };
-  },
-
   resetPassword: async (newPassword, token) => {
     set({ loading: true, error: null });
     try {
       const { error } = await authClient.resetPassword({ newPassword, token });
+      if (error) {
+        const message = mapBetterAuthError(error);
+        set({ loading: false, error: message });
+        return { error: message };
+      }
+      set({ loading: false });
+      return { error: null };
+    } catch (err: any) {
+      set({ loading: false, error: err.message });
+      return { error: err };
+    }
+  },
+
+  changePassword: async (currentPassword, newPassword) => {
+    set({ loading: true, error: null });
+    try {
+      const { error } = await authClient.changePassword({ currentPassword, newPassword });
       if (error) {
         const message = mapBetterAuthError(error);
         set({ loading: false, error: message });

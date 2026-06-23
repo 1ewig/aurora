@@ -7,6 +7,7 @@
 
 import { auth } from "@/lib/auth";
 import { isAdmin } from "@/utils/auth";
+import { pool } from "@/utils/db";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -20,8 +21,14 @@ export async function GET() {
       );
     }
 
+    const userResult = await pool.query(
+      `SELECT role FROM better_auth."user" WHERE id = $1`,
+      [session.user.id]
+    );
+    const role = userResult.rows[0]?.role || 'user';
+
     return NextResponse.json(
-      { isAdmin: isAdmin(session.user.email) },
+      { isAdmin: isAdmin(session.user.email, role) },
       { headers: { "Cache-Control": "no-store" } }
     );
   } catch (error) {

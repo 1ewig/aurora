@@ -13,10 +13,16 @@ export function normalizeProfile(data: any): Profile {
   };
 }
 
-/** Checks whether an email belongs to an admin (via ADMIN_EMAILS env var). */
-export function isAdmin(email?: string): boolean {
+/** Checks whether a user is an admin.
+ *
+ *  Priority order:
+ *  1. DB-backed `role` column (from `better_auth."user"`) when provided
+ *  2. Legacy `ADMIN_EMAILS` env-var whitelist (backward compat during migration)
+ */
+export function isAdmin(email?: string, role?: string): boolean {
+  if (role) return role === 'admin';
   if (!email) return false;
-  const adminEmailsStr = process.env.ADMIN_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "";
+  const adminEmailsStr = process.env.ADMIN_EMAILS || "";
   const adminEmails = adminEmailsStr.split(",").map((e) => e.trim().toLowerCase());
   return adminEmails.includes(email.toLowerCase());
 }

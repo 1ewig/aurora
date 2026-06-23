@@ -7,16 +7,12 @@
 
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
-import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
-import { isAdmin } from '@/utils/auth';
+import { requireAdmin } from '@/utils/admin';
 
 export async function GET() {
   try {
-    const session = await auth.api.getSession({ headers: await headers() });
-    if (!session?.user || !isAdmin(session.user.email)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const { error } = await requireAdmin();
+    if (error) return error;
 
     const result = await pool.query(`
       SELECT

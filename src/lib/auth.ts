@@ -57,6 +57,8 @@ export const auth = betterAuth({
       '/sign-up/email': { window: 60, max: 5 },
       '/forget-password': { window: 60, max: 3 },
       '/reset-password': { window: 60, max: 5 },
+      '/send-verification-email': { window: 60, max: 3 },
+      '/verify-email': { window: 60, max: 5 },
       '/get-session': false,
     },
   },
@@ -78,19 +80,21 @@ export const auth = betterAuth({
     autoSignIn: false,
     resetPasswordTokenExpiresIn: 3600,
     sendResetPassword: async ({ user, url }) => {
-      await sendEmail({
+      const { sent, error } = await sendEmail({
         to: user.email,
         subject: 'Reset your Aurora password',
         text: `Click the link to reset your password: ${url}`,
         html: resetHtml(url),
       });
+      if (!sent) throw new Error(error || 'Failed to send password reset email');
     },
     onExistingUserSignUp: async ({ user }) => {
-      await sendEmail({
+      const { sent } = await sendEmail({
         to: user.email,
         subject: 'Sign-up attempt detected',
         text: 'Someone tried to create an Aurora account using your email address. If this was you, sign in instead. If not, you can ignore this email.',
       });
+      if (!sent) console.warn('[auth] Failed to send sign-up alert email');
     },
   },
 
@@ -100,12 +104,13 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
     expiresIn: 3600,
     sendVerificationEmail: async ({ user, url }) => {
-      await sendEmail({
+      const { sent, error } = await sendEmail({
         to: user.email,
         subject: 'Verify your Aurora email',
         text: `Click the link to verify your email: ${url}`,
         html: verifyHtml(url),
       });
+      if (!sent) throw new Error(error || 'Failed to send verification email');
     },
   },
 
