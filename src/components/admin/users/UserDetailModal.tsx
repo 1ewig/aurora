@@ -16,8 +16,10 @@ interface UserDetailModalProps {
   sessionsLoading: boolean;
   onClose: () => void;
   onToggleVerify: (user: UserRow, newStatus: boolean) => Promise<void>;
+  onRoleChange: (user: UserRow, newRole: string) => Promise<void>;
   onDelete: (user: UserRow) => void;
   isAdmin: boolean;
+  updatingVerifyId: string | null;
 }
 
 /** User detail modal showing profile, linked accounts, sessions, and admin actions. */
@@ -27,8 +29,10 @@ export function UserDetailModal({
   sessionsLoading,
   onClose,
   onToggleVerify,
+  onRoleChange,
   onDelete,
   isAdmin,
+  updatingVerifyId,
 }: UserDetailModalProps) {
   if (!user) return null;
 
@@ -84,6 +88,37 @@ export function UserDetailModal({
                 {user.createdAt !== user.updatedAt && ` · Updated ${formatDate(user.updatedAt)}`}
               </p>
             </div>
+          </div>
+
+          {/* User Role */}
+          <div className="border border-border-subtle p-4 rounded-2xl bg-bg-primary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-text-secondary">User Role</h4>
+              <p className="text-[11px] text-text-muted mt-0.5">
+                Controls administrative and layout capabilities.
+              </p>
+            </div>
+            {isAdmin ? (
+              <select
+                value={user.role || 'user'}
+                onChange={(e) => onRoleChange(user, e.target.value)}
+                className="px-4 py-2 bg-white border border-border-medium rounded-full text-xs font-semibold focus:border-accent-primary focus:outline-none cursor-pointer appearance-none pr-8"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B6B6B' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/></svg>")`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 0.75rem center",
+                  backgroundSize: "0.85rem"
+                }}
+              >
+                <option value="user">User</option>
+                <option value="explorer">Explorer</option>
+                <option value="admin">Admin</option>
+              </select>
+            ) : (
+              <span className="text-xs font-mono font-bold uppercase tracking-wider bg-bg-primary border border-border-subtle px-2.5 py-1 rounded-full">
+                {user.role || 'user'}
+              </span>
+            )}
           </div>
 
           {/* Accounts */}
@@ -164,10 +199,11 @@ export function UserDetailModal({
           <div className="flex gap-2 ml-auto">
             {isAdmin && (
               <button
+                disabled={updatingVerifyId === user.id}
                 onClick={() => onToggleVerify(user, !user.emailVerified)}
-                className="px-4 py-2 text-xs font-semibold bg-accent-primary/10 text-accent-primary rounded-full hover:bg-accent-primary/20 transition-all cursor-pointer"
+                className="px-4 py-2 text-xs font-semibold bg-accent-primary/10 text-accent-primary rounded-full hover:bg-accent-primary/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {user.emailVerified ? "Mark Unverified" : "Mark Verified"}
+                {updatingVerifyId === user.id ? "Updating..." : (user.emailVerified ? "Mark Unverified" : "Mark Verified")}
               </button>
             )}
             <button

@@ -21,6 +21,7 @@ export async function GET() {
         u.email,
         u."emailVerified" AS "emailVerified",
         u.image,
+        u.role,
         u."createdAt" AS "createdAt",
         u."updatedAt" AS "updatedAt",
         COALESCE(

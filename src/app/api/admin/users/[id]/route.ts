@@ -36,7 +36,7 @@ export async function GET(
     }
 
     const userResult = await pool.query(
-      `SELECT id, name, email, "emailVerified", image, "createdAt", "updatedAt"
+      `SELECT id, name, email, "emailVerified", image, role, "createdAt", "updatedAt"
        FROM better_auth."user" WHERE id = $1`,
       [id]
     );
@@ -60,10 +60,14 @@ export async function PATCH(
     if (error) return error;
 
     const body = await request.json();
-    const allowedFields = ['name', 'emailVerified'] as const;
+    const allowedFields = ['name', 'emailVerified', 'role'] as const;
     const updates: string[] = [];
     const values: any[] = [];
     let idx = 1;
+
+    if ('role' in body && !['user', 'explorer', 'admin'].includes(body.role)) {
+      return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
+    }
 
     for (const field of allowedFields) {
       if (field in body) {
