@@ -128,11 +128,11 @@ export function LookbookSlider() {
                 </figcaption>
 
                 {/* Watch/shop button overlay */}
-                <div className="absolute bottom-8 left-8">
+                <div className="absolute bottom-16 right-8">
                   {slide.link ? (
                     <Link href={slide.link} className="inline-block">
                       <button className="px-5 py-2 rounded-full border border-white/50 text-white text-sm font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors cursor-pointer">
-                        Shop Look
+                        Shop Now
                       </button>
                     </Link>
                   ) : (
