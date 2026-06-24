@@ -1,19 +1,20 @@
 /**
  * Aurora — src/components/landing/LookbookSlider.tsx
  *
- * Full-screen lookbook carousel with animated slide transitions and dot navigation.
+ * Full-screen lookbook carousel with Embla, autoplay, prev/next, and dot navigation.
  */
 
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
-import { useCarousel } from "@/hooks/ui/useCarousel";
 import { getStorageUrl } from "@/utils/insforge";
 import { useLookbookQuery } from "@/hooks/queries";
 import Link from "next/link";
 
-/** Full-screen lookbook carousel with auto-advance, prev/next controls, and dot navigation. */
+/** Full-screen lookbook carousel with auto-advance and dot navigation. */
 export function LookbookSlider() {
   const { data: dbSlides = [] } = useLookbookQuery();
 
@@ -43,21 +44,53 @@ export function LookbookSlider() {
       altText: "Model in structured black blazer on rooftop at blue hour",
       title: "Look 05 — Blue Hour",
     },
-    {
-      imageUrl: getStorageUrl("/images/lookbook/lookbook-6.webp"),
-      altText: "Model in champagne slip dress in gallery-white studio space",
-      title: "Look 06 — The Studio",
-    },
   ];
 
-  const slides = dbSlides.length > 0 ? dbSlides : fallbackSlides;
+  const slides = dbSlides.length > 0 ? dbSlides.slice(0, 5) : fallbackSlides;
 
-  const { current, direction, next, prev, goTo } = useCarousel({
-    length: slides.length,
-    interval: 6000,
-    autoResumeDelay: 10000,
-  });
+  const autoplay = useMemo(
+    () => Autoplay({ delay: 6000, stopOnInteraction: true }),
+    []
+  );
 
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [autoplay]);
+
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const resumeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on("select", onSelect);
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
+  const scheduleResume = useCallback(() => {
+    clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => {
+      autoplay.play();
+    }, 10000);
+  }, [autoplay]);
+
+  useEffect(() => {
+    return () => clearTimeout(resumeTimerRef.current);
+  }, []);
+
+  const scrollTo = useCallback(
+    (index: number) => {
+      if (!emblaApi) return;
+      emblaApi.scrollTo(index);
+      scheduleResume();
+    },
+    [emblaApi, scheduleResume]
+  );
 
   return (
     <section
@@ -70,65 +103,49 @@ export function LookbookSlider() {
         Lookbook — Aurora SS 2026
       </h2>
 
-      {/* Slide Container */}
       <div className="relative aspect-[4/5] md:aspect-[16/9]">
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.figure
-            key={current}
-            custom={direction}
-            initial={{ opacity: 0, x: direction * 60 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: direction * -60 }}
-            transition={{ duration: 0.65, ease: [0.25, 0.46, 0.45, 0.94] }}
-            aria-label={`Look ${current + 1} of ${slides.length}`}
-            className="absolute inset-0"
-          >
-            <OptimizedImage
-              src={slides[current].imageUrl}
-              alt={slides[current].altText}
-              className="w-full h-full object-cover object-center"
-            />
+        {/* Embla viewport */}
+        <div ref={emblaRef} className="overflow-hidden h-full">
+          <div className="flex h-full">
+            {slides.map((slide, i) => (
+              <figure
+                key={i}
+                className="relative flex-[0_0_100%] min-w-0 h-full"
+                aria-label={`Look ${i + 1} of ${slides.length}`}
+              >
+                <OptimizedImage
+                  src={slide.imageUrl}
+                  alt={slide.altText}
+                  className="w-full h-full object-cover object-center"
+                />
 
-            {/* Gradient scrim */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                {/* Gradient scrim */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-            {/* Caption */}
-            <figcaption className="absolute bottom-8 right-8 text-white/70 text-xs tracking-[0.15em] uppercase font-mono">
-              {slides[current].title} / {current + 1} of {slides.length}
-            </figcaption>
+                {/* Caption */}
+                <figcaption className="absolute bottom-8 right-8 text-white/70 text-xs tracking-[0.15em] uppercase font-mono">
+                  {slide.title ?? `Look 0${i + 1}`} / {i + 1} of {slides.length}
+                </figcaption>
 
-            {/* Watch button overlay */}
-            <div className="absolute bottom-8 left-8">
-              {slides[current].link ? (
-                <Link href={slides[current].link} className="inline-block">
-                  <button className="px-5 py-2 rounded-full border border-white/50 text-white text-sm font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors cursor-pointer">
-                    Shop Look
-                  </button>
-                </Link>
-              ) : (
-                <button className="px-5 py-2 rounded-full border border-white/50 text-white text-sm font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors">
-                  Watch
-                </button>
-              )}
-            </div>
-          </motion.figure>
-        </AnimatePresence>
+                {/* Watch/shop button overlay */}
+                <div className="absolute bottom-8 left-8">
+                  {slide.link ? (
+                    <Link href={slide.link} className="inline-block">
+                      <button className="px-5 py-2 rounded-full border border-white/50 text-white text-sm font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors cursor-pointer">
+                        Shop Look
+                      </button>
+                    </Link>
+                  ) : (
+                    <button className="px-5 py-2 rounded-full border border-white/50 text-white text-sm font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors">
+                      Watch
+                    </button>
+                  )}
+                </div>
+              </figure>
+            ))}
+          </div>
+        </div>
 
-        {/* Prev/Next Controls */}
-        <button
-          aria-label="Previous slide"
-          onClick={prev}
-          className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 border border-white/30 text-white backdrop-blur-sm hover:bg-white/20 transition-colors flex items-center justify-center z-10"
-        >
-          ←
-        </button>
-        <button
-          aria-label="Next slide"
-          onClick={next}
-          className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 border border-white/30 text-white backdrop-blur-sm hover:bg-white/20 transition-colors flex items-center justify-center z-10"
-        >
-          →
-        </button>
       </div>
 
       {/* Dot Indicators */}
@@ -141,11 +158,11 @@ export function LookbookSlider() {
           <button
             key={i}
             role="tab"
-            aria-selected={i === current}
+            aria-selected={i === selectedIndex}
             aria-label={`Go to slide ${i + 1}`}
-            onClick={() => goTo(i)}
+            onClick={() => scrollTo(i)}
             className={`h-[3px] rounded-full transition-all duration-300 ${
-              i === current
+              i === selectedIndex
                 ? "w-6 bg-accent-primary"
                 : "w-2 bg-white/30"
             }`}
