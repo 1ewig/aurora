@@ -120,11 +120,19 @@ ADMIN_EMAILS="admin@example.com"
 
 ---
 
-## Step 6 — Seed the database and upload assets
+## Step 6 — Set up the database and seed assets
 
-> The seeding script automatically creates the three storage buckets (`product-media`, `lookbook-media`, `editorial-media`) and all database tables — you don't need to set them up manually.
+For a **first-time setup or clean reset**, you must initialize both the authentication schema and seed the catalog/media assets.
 
-For a **first-time setup or clean reset**, run the seeding script:
+### 1. Initialize Better Auth Schema & Tables
+Run the database setup script to create the `better_auth` schema and its core tables (`user`, `session`, `account`, `verification`) and run the setup migrations:
+
+```bash
+node scripts/setup-db.js
+```
+
+### 2. Seed Database Catalog & Upload Assets
+Run the seeding script to create storage buckets, build the catalog tables, upload files, and seed all products:
 
 ```bash
 npx tsx scripts/upload-and-seed.mts
@@ -133,9 +141,8 @@ npx tsx scripts/upload-and-seed.mts
 This performs a completely automated setup and seeding:
 1. **Multi-Bucket Verification & Wipe**: Checks and prepares three buckets: `product-media`, `lookbook-media`, and `editorial-media`. If missing, it creates them. If they exist with data, it wipes them to prevent name collisions.
 2. **Recursive Image Scan & Route**: Uploads all local assets recursively to their corresponding storage buckets (`/images/lookbook/*` -> `lookbook-media`, `/images/editorial/*` -> `editorial-media`, and products -> `product-media`).
-3. **Database Schema Creation**: Automatically drops existing tables and executes [`scripts/create-tables.sql`](file:///c:/Users/moshu%20moshu/Desktop/aurora/scripts/create-tables.sql) to build the database from scratch.
-4. **Better Auth Tables**: Creates the `better_auth` schema with `user`, `session`, `account`, and `verification` tables (isolated from PostgREST — only accessible via direct Postgres connection).
-5. **Data Seeding**: Seeds all products, gallery image relations, sizes, detail bullets, lookbook slides, and editorial content.
+3. **Database Schema Creation**: Automatically drops existing tables and executes [`scripts/create-tables.sql`](file:///c:/Users/moshu%20moshu/Desktop/aurora/scripts/create-tables.sql) to build the database from scratch (excluding the Better Auth tables, which are handled in the previous step).
+4. **Data Seeding**: Seeds all products, gallery image relations, sizes, detail bullets, lookbook slides, and editorial content.
 
 ---
 
@@ -217,7 +224,7 @@ Everything else is committed to the repository and ready to use.
 | `DATABASE_URL not found` | `.env.local` missing or misconfigured | Copy `.env.example` → `.env.local` and fill in the values |
 | Auth redirects to login loop | `BETTER_AUTH_URL` or `NEXT_PUBLIC_BETTER_AUTH_URL` mismatch | Ensure both match your deployment URL exactly (no trailing slash) |
 | Session invalidated on re-deploy | `BETTER_AUTH_SECRET` changed between deploys | Keep the same secret across all environments |
-| `relation "better_auth.user" does not exist` | BA tables not created | Run `npx tsx scripts/upload-and-seed.mts` to seed the full schema |
+| `relation "better_auth.user" does not exist` | BA tables not created | Run `node scripts/setup-db.js` to initialize authentication schema and tables |
 | `relation "products" does not exist` | Tables not created | Run `npx tsx scripts/upload-and-seed.mts` to automatically build schema |
 | `bucket product-media does not exist` | Bucket not created | Run `npx tsx scripts/upload-and-seed.mts` to automatically create buckets |
 | Images show as broken | Bucket is private | Buckets are public by default, but verify: if private, run setup script to recreate them |

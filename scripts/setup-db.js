@@ -60,6 +60,13 @@ async function run() {
       "updatedAt" TIMESTAMPTZ
     )`);
 
+    await pool.query(`CREATE TABLE IF NOT EXISTS better_auth."rateLimit" (
+      id TEXT PRIMARY KEY,
+      key TEXT NOT NULL,
+      count INTEGER NOT NULL,
+      "lastRequest" BIGINT NOT NULL
+    )`);
+
     // 2. Run app schema migration (products, profiles, orders, RLS, etc.)
     const migrationPath = path.join(__dirname, '..', 'migrations', '20260614145429_better-auth-setup.sql');
     const migrationSql = fs.readFileSync(migrationPath, 'utf8');
