@@ -72,7 +72,7 @@ Get the **database connection string** — open the InsForge Dashboard, navigate
 You now have these values:
 
 | Variable | Where to find it |
-|---|---|---|
+|---|---|
 | `DATABASE_URL` | InsForge Dashboard → Database section |
 | `NEXT_PUBLIC_INSFORGE_URL` | `.insforge/project.json` → `oss_host` |
 | `NEXT_PUBLIC_INSFORGE_ANON_KEY` | `npx @insforge/cli secrets get ANON_KEY` |
@@ -88,6 +88,10 @@ You now have these values:
 | `BREVO_SMTP_PASS` | Your Brevo SMTP API key |
 | `BREVO_FROM_EMAIL` | Sender email address |
 | `BREVO_FROM_NAME` | `Aurora` |
+| `LEMON_SQUEEZY_API_KEY` | Lemon Squeezy Dashboard → Settings → API (create key) |
+| `LEMON_SQUEEZY_STORE_ID` | Lemon Squeezy Dashboard → Settings → Store (numerical ID) |
+| `LEMON_SQUEEZY_WEBHOOK_SECRET` | Custom random string of your choice (6-40 chars) |
+| `NEXT_PUBLIC_LS_ORDER_VARIANT_ID` | Lemon Squeezy Dashboard → Products → variant ID |
 
 ---
 
@@ -114,6 +118,12 @@ NEXT_PUBLIC_BETTER_AUTH_URL="http://localhost:3000"
 
 INSFORGE_JWT_SECRET="your-insforge-jwt-secret"
 ADMIN_EMAILS="admin@example.com"
+
+# Lemon Squeezy Sandbox
+LEMON_SQUEEZY_API_KEY="your-ls-test-api-key"
+LEMON_SQUEEZY_STORE_ID="your-ls-test-store-id"
+LEMON_SQUEEZY_WEBHOOK_SECRET="your-ls-test-webhook-signing-secret"
+NEXT_PUBLIC_LS_ORDER_VARIANT_ID="your-ls-test-product-variant-id"
 ```
 
 > The `DATABASE_URL` must use `sslmode=require` (InsForge requires it).
@@ -199,6 +209,10 @@ If you're deploying to Vercel or another platform, set these environment variabl
 - `BREVO_SMTP_PASS`
 - `BREVO_FROM_EMAIL`
 - `BREVO_FROM_NAME`
+- `LEMON_SQUEEZY_API_KEY`
+- `LEMON_SQUEEZY_STORE_ID`
+- `LEMON_SQUEEZY_WEBHOOK_SECRET`
+- `NEXT_PUBLIC_LS_ORDER_VARIANT_ID`
 
 ---
 
@@ -229,3 +243,23 @@ Everything else is committed to the repository and ready to use.
 | `bucket product-media does not exist` | Bucket not created | Run `npx tsx scripts/upload-and-seed.mts` to automatically create buckets |
 | Images show as broken | Bucket is private | Buckets are public by default, but verify: if private, run setup script to recreate them |
 | Build fails with type errors | Check for missing types | Run `npm install` again |
+
+---
+
+## Step 9 — Configure Lemon Squeezy Webhooks
+
+To capture sandbox payment events and fulfill orders automatically, setup the webhook endpoint:
+
+1. **Expose Local Development Port:** Expose port 3000 using ngrok or similar tunneling tools:
+   ```bash
+   npx ngrok http 3000
+   ```
+2. **Register URL in Dashboard:**
+   * Go to your Lemon Squeezy Dashboard → **Settings ➔ Webhooks**.
+   * Click **+ Add Webhook**.
+   * **Callback URL**: 
+     - Development: `https://<your-ngrok-subdomain>.ngrok-free.dev/api/webhooks/lemonsqueezy`
+     - Production: `https://<your-domain>/api/webhooks/lemonsqueezy`
+   * **Signing Secret**: Set the exact same string configured in your `LEMON_SQUEEZY_WEBHOOK_SECRET` variable.
+   * **Events**: Check the **`order_created`** event.
+   * Click **Save**.
