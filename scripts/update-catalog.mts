@@ -3,7 +3,7 @@
  * ==================
  *
  * All-rounder catalog management script.
- * Can sync full catalog, add new products, modify existing products, or delete products interactively.
+ * Can sync full catalog, add new products, or delete products interactively.
  * Auto-synchronizes local src/data/products.ts and updates the InsForge database/storage.
  *
  * Usage:
@@ -433,93 +433,7 @@ async function addProductInteractively() {
   console.log("\nSuccessfully added new product(s) to the database and storage!");
 }
 
-async function modifyProductInteractively() {
-  console.log("\n--- MODIFY PRODUCT ---");
-  const allMerged = Array.from(new Map([...allProducts, ...heroProducts, ...featuredProducts].map(p => [p.id, p])).values());
-  
-  if (allMerged.length === 0) {
-    console.log("No products available to modify.");
-    return;
-  }
 
-  console.log("Available Products:");
-  allMerged.forEach((p, idx) => {
-    console.log(`  [${idx + 1}] ID: ${p.id} | ${p.name} (${p.category})`);
-  });
-
-  const choiceInput = await askQuestion(`Select a product to modify (1-${allMerged.length}): `);
-  const choiceIdx = parseInt(choiceInput) - 1;
-  if (isNaN(choiceIdx) || choiceIdx < 0 || choiceIdx >= allMerged.length) {
-    console.error("Invalid choice.");
-    return;
-  }
-
-  const target = allMerged[choiceIdx];
-  console.log(`\nModifying: ${target.name} (${target.id})`);
-
-  const name = await askQuestion(`Enter New Name [Current: ${target.name}]: `) || target.name;
-  const slug = await askQuestion(`Enter New Slug [Current: ${target.slug}]: `) || target.slug;
-  
-  console.log(`Categories:\n1. Outerwear\n2. Knitwear\n3. Trousers\n4. Dresses\n5. Accessories`);
-  const catChoice = await askQuestion(`Select Category (1-5) [Current: ${target.category}]: `);
-  let category = target.category;
-  if (catChoice === "1") category = "Outerwear";
-  else if (catChoice === "2") category = "Knitwear";
-  else if (catChoice === "3") category = "Trousers";
-  else if (catChoice === "4") category = "Dresses";
-  else if (catChoice === "5") category = "Accessories";
-
-  const priceInput = await askQuestion(`Enter Price [Current: ${target.price}]: `);
-  const price = priceInput ? parseFloat(priceInput) : target.price;
-
-  const badge = await askQuestion(`Enter Badge [Current: ${target.badge || 'None'}]: `) || target.badge;
-  const image = await askQuestion(`Enter Image Path [Current: ${target.image}]: `) || target.image;
-  const altText = await askQuestion(`Enter Alt Text [Current: ${target.altText}]: `) || target.altText;
-  const description = await askQuestion(`Enter Description [Current: ${target.description || 'None'}]: `) || target.description;
-
-  const detailsInput = await askQuestion(`Enter Details (comma-separated) [Current: ${target.details?.join(', ') || 'None'}]: `);
-  const details = detailsInput ? detailsInput.split(',').map(s => s.trim()) : target.details;
-
-  const customSizes = await askQuestion(`Enter Sizes (comma-separated) [Current: ${target.sizes?.join(', ') || 'None'}]: `);
-  const sizes = customSizes ? customSizes.split(',').map(s => s.trim()) : target.sizes;
-
-  const updatedProduct: Product = {
-    ...target,
-    name, slug, category, price,
-    ...(badge ? { badge } : {}),
-    image,
-    images: [image],
-    altText,
-    ...(description ? { description } : {}),
-    ...(details && details.length > 0 ? { details } : {}),
-    sizes,
-  };
-
-  // Update in-memory lists
-  const updateList = (list: Product[]) => {
-    const idx = list.findIndex(p => p.id === target.id);
-    if (idx !== -1) list[idx] = updatedProduct;
-  };
-  updateList(allProducts);
-  updateList(heroProducts);
-  updateList(featuredProducts);
-
-  // 1. Save locally
-  saveProductsLocal(heroProducts, featuredProducts, allProducts);
-  console.log(`\nSuccessfully updated local definition in src/data/products.ts.`);
-
-  // 2. Sync to DB & Storage
-  console.log("\nSyncing modifications to Database & Storage...");
-  const admin = createAdminClient({ baseUrl: ossHost, apiKey });
-  const client = new Client({ connectionString: DATABASE_URL });
-  await client.connect();
-
-  const urlMap = await uploadCatalogImages(admin, [updatedProduct]);
-  await syncProductToDb(client, updatedProduct, urlMap);
-
-  await client.end();
-  console.log("\nProduct successfully modified locally and synced to remote!");
-}
 
 async function deleteProductInteractively() {
   console.log("\n--- DELETE PRODUCT ---");
@@ -705,18 +619,15 @@ async function main() {
   console.log("Choose the operation to perform:");
   console.log("  1. Sync full catalog from files to Database & Storage");
   console.log("  2. Add a new product interactively");
-  console.log("  3. Modify an existing product interactively");
-  console.log("  4. Delete a product interactively");
-  console.log("  5. Exit");
+  console.log("  3. Delete a product interactively");
+  console.log("  4. Exit");
 
-  const choice = await askQuestion("\nEnter option (1-5): ");
+  const choice = await askQuestion("\nEnter option (1-4): ");
   if (choice === "1") {
     await runSyncCatalog();
   } else if (choice === "2") {
     await addProductInteractively();
   } else if (choice === "3") {
-    await modifyProductInteractively();
-  } else if (choice === "4") {
     await deleteProductInteractively();
   } else {
     console.log("Exiting.");
