@@ -15,8 +15,8 @@ import { formatCurrency } from "@/utils/formatCurrency";
 interface CheckoutSuccessProps {
   orderNumber: string;
   maskedEmail: string;
-  cardNumber: string;
-  maskedCardNumber: string;
+  cardNumber?: string;
+  maskedCardNumber?: string;
   items: Array<{
     id: string;
     slug: string;
@@ -37,7 +37,6 @@ interface CheckoutSuccessProps {
 export function CheckoutSuccess({
   orderNumber,
   maskedEmail,
-  cardNumber,
   maskedCardNumber,
   items,
   subtotal,
@@ -57,14 +56,7 @@ export function CheckoutSuccess({
         </svg>
       </div>
 
-      <div className="bg-accent-secondary/20 border border-accent-primary/20 rounded-lg px-4 py-3 mb-6">
-        <p className="text-xs font-semibold text-accent-primary uppercase tracking-wider">
-          Demo Site Notice
-        </p>
-        <p className="text-xs text-text-secondary mt-1">
-          This is a dummy e-commerce site built for learning purposes. No real order has been placed.
-        </p>
-      </div>
+
 
       <h2 className="font-display font-black text-3xl tracking-tight text-text-primary">
         Order Received
@@ -128,7 +120,7 @@ export function CheckoutSuccess({
         <span className="text-text-primary font-bold">{orderNumber}</span>
       </div>
 
-      {cardNumber && (
+      {maskedCardNumber && (
         <p className="text-xs text-text-muted">
           Charged to: <span className="font-mono">{maskedCardNumber}</span>
         </p>

@@ -13,17 +13,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { validateField, validateAll, type FieldErrors } from "@/utils/validation";
 
-export function useCheckoutForm(onOrderPlaced?: (
-  orderNumber: string,
-  maskedEmail: string,
-  cardNumber: string,
-  maskedCardNumber: string,
-  items: any[],
-  subtotal: number,
-  shipping: number,
-  tax: number,
-  total: number
-) => void) {
+export function useCheckoutForm() {
   const queryClient = useQueryClient();
   const user = useAuthStore((s) => s.user);
   const profile = useAuthStore((s) => s.profile);
@@ -54,8 +44,6 @@ export function useCheckoutForm(onOrderPlaced?: (
   const [touched, setTouched] = useState<Set<string>>(new Set());
 
   const [loading, setLoading] = useState(false);
-  const [orderNumber, setOrderNumber] = useState("");
-  const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
   const markTouched = useCallback((field: string) => {
@@ -133,6 +121,25 @@ export function useCheckoutForm(onOrderPlaced?: (
 
       setLoading(false);
 
+      // Store the checkout data in sessionStorage in case they get redirected
+      const subtotal = cartItemsSnapshot.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
+      const tax = Math.round(subtotal * 0.08 * 100) / 100;
+      const total = subtotal + shipping + tax;
+
+      const checkoutData = {
+        orderNumber: "Pending Fulfillment",
+        maskedEmail: maskEmail(email),
+        cardNumber: "•••• •••• •••• 4242",
+        maskedCardNumber: "•••• •••• •••• 4242",
+        items: cartItemsSnapshot,
+        subtotal,
+        shipping,
+        tax,
+        total,
+      };
+      sessionStorage.setItem("ls_checkout_data", JSON.stringify(checkoutData));
+
       // Re-initialize overlay script manually
       if (window.createLemonSqueezy) {
         window.createLemonSqueezy();
@@ -143,26 +150,6 @@ export function useCheckoutForm(onOrderPlaced?: (
         window.LemonSqueezy.Setup({
           eventHandler: (event) => {
             if (event.event === "Checkout.Success") {
-              const subtotal = cartItemsSnapshot.reduce((sum, item) => sum + item.price * item.quantity, 0);
-              const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
-              const tax = Math.round(subtotal * 0.08 * 100) / 100;
-              const total = subtotal + shipping + tax;
-
-              setOrderNumber("Pending Fulfillment");
-              setSuccess(true);
-              
-              onOrderPlaced?.(
-                "Pending Fulfillment",
-                maskEmail(email),
-                "•••• •••• •••• 4242",
-                "•••• •••• •••• 4242",
-                cartItemsSnapshot,
-                subtotal,
-                shipping,
-                tax,
-                total
-              );
-
               clearCart();
               queryClient.invalidateQueries({ queryKey: ["orders"] });
             }
@@ -194,7 +181,7 @@ export function useCheckoutForm(onOrderPlaced?: (
     setCity: (v: string) => setAndValidate("city", v, setCity),
     zipCode,
     setZipCode: (v: string) => setAndValidate("zipCode", v, setZipCode),
-    loading, orderNumber, success, items, handlePlaceOrder,
+    loading, items, handlePlaceOrder,
     error, setError,
     fieldErrors, handleBlur, touched,
   };

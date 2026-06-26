@@ -9,20 +9,6 @@
 import { useCheckoutForm } from "@/hooks/useCheckoutForm";
 import { Button } from "@/components/ui/Button";
 
-interface CheckoutFormProps {
-  onOrderPlaced?: (
-    orderNumber: string,
-    maskedEmail: string,
-    cardNumber: string,
-    maskedCardNumber: string,
-    items: any[],
-    subtotal: number,
-    shipping: number,
-    tax: number,
-    total: number
-  ) => void;
-}
-
 function fieldClass(hasError: boolean) {
   return `w-full px-4 py-3 rounded-md bg-white border focus:outline-none transition-colors text-sm text-text-primary ${
     hasError
@@ -37,7 +23,7 @@ function FieldError({ show, message }: { show: boolean; message?: string }) {
 }
 
 /** Checkout form — contact info, shipping address, and mock credit-card fields with validation. */
-export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
+export function CheckoutForm() {
   const {
     email, setEmail,
     firstName, setFirstName,
@@ -45,15 +31,11 @@ export function CheckoutForm({ onOrderPlaced }: CheckoutFormProps) {
     address, setAddress,
     city, setCity,
     zipCode, setZipCode,
-    loading, success, error,
+    loading, error,
     items,
     handlePlaceOrder,
     fieldErrors, handleBlur, touched,
-  } = useCheckoutForm(onOrderPlaced);
-
-  if (success) {
-    return null;
-  }
+  } = useCheckoutForm();
 
   if (items.length === 0) {
     return null;
