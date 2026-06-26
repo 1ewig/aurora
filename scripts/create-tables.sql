@@ -62,11 +62,21 @@ CREATE TABLE IF NOT EXISTS orders (
   total NUMERIC(10,2) NOT NULL,
   shipping_address JSONB NOT NULL,
   status VARCHAR(20) NOT NULL DEFAULT 'pending',
+  payment_provider VARCHAR(50),
+  ls_order_id TEXT UNIQUE,
+  ls_order_number INTEGER,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_order_number ON orders(order_number);
+
+-- Processed webhooks for idempotency (Lemon Squeezy integration)
+CREATE TABLE IF NOT EXISTS processed_webhooks (
+  id SERIAL PRIMARY KEY,
+  ls_event_id TEXT UNIQUE NOT NULL,
+  processed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
 -- Lookbook slides table
 CREATE TABLE IF NOT EXISTS public.lookbook_slides (

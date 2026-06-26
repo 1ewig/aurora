@@ -9,6 +9,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Providers from "@/app/providers";
 import { Analytics } from "@vercel/analytics/next";
+import Script from "next/script";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -66,6 +67,10 @@ export default function RootLayout({
           {children}
           <Analytics />
         </Providers>
+        <Script
+          src="https://app.lemonsqueezy.com/js/lemon.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

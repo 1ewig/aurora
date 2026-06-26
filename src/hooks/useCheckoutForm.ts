@@ -1,8 +1,10 @@
 /**
  * Aurora — src/hooks/useCheckoutForm.ts
  *
- * Checkout form state management with validation, auto-prefill for logged-in users,
- * order submission, and post-order cleanup (cart clear, query invalidation).
+ * Checkout form state management for Lemon Squeezy sandbox payments:
+ * - Collects and validates shipping address.
+ * - Programmatically initiates checkout sessions.
+ * - Integrates with LemonSqueezy client overlay modal.
  */
 
 import { useState, useCallback, useEffect } from "react";
@@ -32,6 +34,9 @@ export function useCheckoutForm(onOrderPlaced?: (
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [zipCode, setZipCode] = useState("");
 
   // Prefill email and name if user is logged in
   useEffect(() => {
@@ -44,12 +49,6 @@ export function useCheckoutForm(onOrderPlaced?: (
       if (parts.length > 1) setLastName(parts.slice(1).join(" "));
     }
   }, [user, profile]);
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [zipCode, setZipCode] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardExpiry, setCardExpiry] = useState("");
-  const [cardCVC, setCardCVC] = useState("");
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Set<string>>(new Set());
@@ -76,7 +75,14 @@ export function useCheckoutForm(onOrderPlaced?: (
   }, []);
 
   const fields: Record<string, string> = {
-    email, firstName, lastName, address, city, zipCode, cardNumber, cardExpiry, cardCVC,
+    email, firstName, lastName, address, city, zipCode,
+  };
+
+  const maskEmail = (rawEmail: string) => {
+    const [name, domain] = rawEmail.split("@");
+    if (!domain) return rawEmail;
+    const maskedName = name[0] + "***" + name[name.length - 1];
+    return `${maskedName}@${domain}`;
   };
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
@@ -93,19 +99,21 @@ export function useCheckoutForm(onOrderPlaced?: (
 
     setLoading(true);
 
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
-    const tax = Math.round(subtotal * 0.08 * 100) / 100;
-    const total = subtotal + shipping + tax;
-
-    const itemsSnapshot = items.map((item) => ({ ...item }));
+    const variantId = process.env.NEXT_PUBLIC_LS_ORDER_VARIANT_ID || "12345";
+    const cartItemsSnapshot = items.map((item) => ({ ...item }));
+    const cartItemsPayload = items.map((item) => ({
+      internalProductId: item.id,
+      quantity: item.quantity,
+      size: item.size,
+    }));
 
     try {
-      const res = await fetch("/api/orders", {
+      const res = await fetch("/api/checkout/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: itemsSnapshot,
+          variantId,
+          cartItems: cartItemsPayload,
           shippingAddress: {
             email,
             firstName,
@@ -120,45 +128,57 @@ export function useCheckoutForm(onOrderPlaced?: (
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to place order.");
+        throw new Error(data.error || "Failed to create checkout session.");
       }
 
-      const orderNum = data.orderNumber || "";
-      setOrderNumber(orderNum);
-      setSuccess(true);
       setLoading(false);
 
-      onOrderPlaced?.(
-        orderNum,
-        maskEmail(email),
-        cardNumber,
-        maskCardNumber(cardNumber),
-        itemsSnapshot,
-        data.subtotal ?? subtotal,
-        data.shipping ?? shipping,
-        data.tax ?? tax,
-        data.total ?? total
-      );
+      // Re-initialize overlay script manually
+      if (window.createLemonSqueezy) {
+        window.createLemonSqueezy();
+      }
 
-      clearCart();
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      // Configure the event handler to capture success events from the iframe
+      if (window.LemonSqueezy) {
+        window.LemonSqueezy.Setup({
+          eventHandler: (event) => {
+            if (event.event === "Checkout.Success") {
+              const subtotal = cartItemsSnapshot.reduce((sum, item) => sum + item.price * item.quantity, 0);
+              const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
+              const tax = Math.round(subtotal * 0.08 * 100) / 100;
+              const total = subtotal + shipping + tax;
+
+              setOrderNumber("Pending Fulfillment");
+              setSuccess(true);
+              
+              onOrderPlaced?.(
+                "Pending Fulfillment",
+                maskEmail(email),
+                "•••• •••• •••• 4242",
+                "•••• •••• •••• 4242",
+                cartItemsSnapshot,
+                subtotal,
+                shipping,
+                tax,
+                total
+              );
+
+              clearCart();
+              queryClient.invalidateQueries({ queryKey: ["orders"] });
+            }
+          }
+        });
+
+        // Open the Lemon Squeezy overlay modal directly
+        window.LemonSqueezy.Url.Open(data.checkoutUrl);
+      } else {
+        // Fallback redirect if Overlay fails to initialize
+        window.location.href = data.checkoutUrl;
+      }
     } catch (err: any) {
-      setError(err.message || "Something went wrong. Please try again.");
+      setError(err.message || "Failed to initiate payment. Please try again.");
       setLoading(false);
     }
-  };
-
-  const maskEmail = (rawEmail: string) => {
-    const [name, domain] = rawEmail.split("@");
-    if (!domain) return rawEmail;
-    const maskedName = name[0] + "***" + name[name.length - 1];
-    return `${maskedName}@${domain}`;
-  };
-
-  const maskCardNumber = (rawCard: string) => {
-    const cleaned = rawCard.replace(/\s+/g, "");
-    if (cleaned.length < 4) return "****";
-    return `•••• •••• •••• ${cleaned.slice(-4)}`;
   };
 
   return {
@@ -174,12 +194,6 @@ export function useCheckoutForm(onOrderPlaced?: (
     setCity: (v: string) => setAndValidate("city", v, setCity),
     zipCode,
     setZipCode: (v: string) => setAndValidate("zipCode", v, setZipCode),
-    cardNumber,
-    setCardNumber: (v: string) => setAndValidate("cardNumber", v, setCardNumber),
-    cardExpiry,
-    setCardExpiry: (v: string) => setAndValidate("cardExpiry", v, setCardExpiry),
-    cardCVC,
-    setCardCVC: (v: string) => setAndValidate("cardCVC", v, setCardCVC),
     loading, orderNumber, success, items, handlePlaceOrder,
     error, setError,
     fieldErrors, handleBlur, touched,
