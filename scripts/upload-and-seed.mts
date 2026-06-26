@@ -22,6 +22,7 @@ import { execSync } from 'child_process';
 import { heroProducts, featuredProducts, allProducts, type Product } from '../src/data/products';
 import { lookbookSlides } from '../src/data/lookbook';
 import { editorialItems } from '../src/data/editorial';
+import { heroSlides } from '../src/data/hero';
 
 // ════════════════════════════════════════════════════════
 //  Credential loading
@@ -92,6 +93,7 @@ const BUCKETS = {
   products: 'product-media',
   lookbook: 'lookbook-media',
   editorial: 'editorial-media',
+  hero: 'hero-media',
 };
 
 function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: string } {
@@ -104,6 +106,11 @@ function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: st
     return {
       bucket: BUCKETS.editorial,
       storageKey: localRelPath.replace(/^\/images\/editorial\//, ''),
+    };
+  } else if (localRelPath.startsWith('/images/hero/')) {
+    return {
+      bucket: BUCKETS.hero,
+      storageKey: localRelPath.replace(/^\/images\/hero\//, ''),
     };
   } else {
     const key = localRelPath.replace(/^\/images\//, '');
@@ -283,6 +290,11 @@ async function seed() {
     allImagePaths.add(item.originalImage);
   }
 
+  // Add hero images
+  for (const slide of heroSlides) {
+    allImagePaths.add(slide.originalImage);
+  }
+
   // Scan directories for other public images
   const publicDir = path.resolve(process.cwd(), 'public');
   const imagesDir = path.resolve(publicDir, 'images');
@@ -362,6 +374,7 @@ async function seed() {
     DROP TABLE IF EXISTS public.orders CASCADE;
     DROP TABLE IF EXISTS public.lookbook_slides CASCADE;
     DROP TABLE IF EXISTS public.editorial_content CASCADE;
+    DROP TABLE IF EXISTS public.hero_slides CASCADE;
   `);
 
   const schemaSql = fs.readFileSync(path.resolve(process.cwd(), 'scripts', 'create-tables.sql'), 'utf-8');
@@ -434,6 +447,17 @@ async function seed() {
       `INSERT INTO editorial_content (id, original_image, image_url, alt_text, title, description)
        VALUES ($1, $2, $3, $4, $5, $6)`,
       [item.id, item.originalImage, imageUrl, item.altText, item.title, item.description || null]
+    );
+  }
+
+  // ── Seeding Hero Slides ──
+  console.log("Seeding hero slides...");
+  for (const slide of heroSlides) {
+    const imageUrl = urlMap.get(slide.originalImage) || slide.originalImage;
+    await client.query(
+      `INSERT INTO hero_slides (slide_number, original_image, image_url, alt_text, title, link)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [slide.slideNumber, slide.originalImage, imageUrl, slide.altText, slide.title || null, slide.link || null]
     );
   }
 

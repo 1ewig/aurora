@@ -100,6 +100,18 @@ CREATE TABLE IF NOT EXISTS public.editorial_content (
   description TEXT
 );
 
+-- Hero images table
+CREATE TABLE IF NOT EXISTS public.hero_slides (
+  id SERIAL PRIMARY KEY,
+  slide_number INT UNIQUE NOT NULL,
+  original_image TEXT NOT NULL,
+  image_url TEXT NOT NULL,
+  alt_text TEXT NOT NULL,
+  title VARCHAR(255),
+  link VARCHAR(255)
+);
+
+
 -- Realtime: allow string sender_ids for Better Auth user IDs
 DO $$
 BEGIN

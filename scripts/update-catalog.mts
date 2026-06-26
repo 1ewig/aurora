@@ -20,6 +20,7 @@ import * as readline from 'readline';
 import { heroProducts, featuredProducts, allProducts, type Product } from '../src/data/products';
 import { lookbookSlides } from '../src/data/lookbook';
 import { editorialItems } from '../src/data/editorial';
+import { heroSlides } from '../src/data/hero';
 
 // ════════════════════════════════════════════════════════
 //  Interactive Input Helpers
@@ -159,6 +160,7 @@ const BUCKETS = {
   products: 'product-media',
   lookbook: 'lookbook-media',
   editorial: 'editorial-media',
+  hero: 'hero-media',
 };
 
 function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: string } {
@@ -171,6 +173,11 @@ function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: st
     return {
       bucket: BUCKETS.editorial,
       storageKey: localRelPath.replace(/^\/images\/editorial\//, ''),
+    };
+  } else if (localRelPath.startsWith('/images/hero/')) {
+    return {
+      bucket: BUCKETS.hero,
+      storageKey: localRelPath.replace(/^\/images\/hero\//, ''),
     };
   } else {
     const key = localRelPath.replace(/^\/images\//, '');
@@ -285,6 +292,9 @@ async function uploadCatalogImages(
   }
   for (const e of editorialList) {
     if (e.originalImage) imagePaths.add(e.originalImage);
+  }
+  for (const slide of heroSlides) {
+    if (slide.originalImage) imagePaths.add(slide.originalImage);
   }
 
   console.log(`Syncing ${imagePaths.size} media assets in parallel...`);
@@ -600,6 +610,29 @@ async function runSyncCatalog() {
         `INSERT INTO editorial_content (id, original_image, image_url, alt_text, title, description)
          VALUES ($1, $2, $3, $4, $5, $6)`,
         [item.id, item.originalImage, imageUrl, item.altText, item.title, item.description || null]
+      );
+    }
+  }
+
+  console.log("\n=== Phase 6: Syncing hero slides ===");
+  for (const slide of heroSlides) {
+    const imageUrl = urlMap.get(slide.originalImage) || slide.originalImage;
+    console.log(`Syncing hero slide: ${slide.slideNumber}`);
+
+    const { rows } = await client.query('SELECT 1 FROM hero_slides WHERE slide_number = $1', [slide.slideNumber]);
+    if (rows.length > 0) {
+      console.log(`  -> Hero slide ${slide.slideNumber} exists. Running UPDATE...`);
+      await client.query(
+        `UPDATE hero_slides SET original_image = $1, image_url = $2, alt_text = $3, title = $4, link = $5
+         WHERE slide_number = $6`,
+        [slide.originalImage, imageUrl, slide.altText, slide.title || null, slide.link || null, slide.slideNumber]
+      );
+    } else {
+      console.log(`  -> Hero slide ${slide.slideNumber} is new. Running INSERT...`);
+      await client.query(
+        `INSERT INTO hero_slides (slide_number, original_image, image_url, alt_text, title, link)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [slide.slideNumber, slide.originalImage, imageUrl, slide.altText, slide.title || null, slide.link || null]
       );
     }
   }
