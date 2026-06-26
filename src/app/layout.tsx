@@ -61,6 +61,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${playfairDisplay.variable}`}
+      data-scroll-behavior="smooth"
     >
       <body className="bg-bg-primary min-h-screen antialiased">
         <Providers>

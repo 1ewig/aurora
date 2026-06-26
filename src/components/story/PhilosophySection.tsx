@@ -36,6 +36,7 @@ export function PhilosophySection() {
           alt={altText}
           className="w-full h-full object-cover object-top"
           loading="eager"
+          sizes="(max-width: 1023px) 100vw, 45vw"
         />
       </motion.div>
       <motion.div

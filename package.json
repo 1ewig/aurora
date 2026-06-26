@@ -3,10 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@insforge/sdk": "^1.3.1",
@@ -18,16 +18,15 @@
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.38.0",
     "jsonwebtoken": "^9.0.3",
-    "next": "15.5.19",
+    "next": "16.2.9",
     "nodemailer": "^9.0.0",
     "pg": "^8.21.0",
-    "react": "19.2.6",
-    "react-dom": "19.2.6",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "tailwind-merge": "3.4.0",
     "zustand": "^5.0.13"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.5",
     "@next/eslint-plugin-next": "^16.2.7",
     "@tailwindcss/postcss": "4.1.17",
     "@types/jsonwebtoken": "^9.0.10",

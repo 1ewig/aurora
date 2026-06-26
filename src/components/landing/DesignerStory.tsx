@@ -42,6 +42,7 @@ export function DesignerStory() {
             alt="Aurora's creative director photographed in her design studio, examining fabric swatches"
             className="w-full h-full object-cover object-top"
             loading="eager"
+            sizes="(max-width: 1023px) 100vw, 50vw"
           />
         </motion.div>
         {/* Warm color overlay */}
