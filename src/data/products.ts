@@ -40,8 +40,8 @@ export const heroProducts: Product[] = [
     category: "Outerwear",
     price: 1290,
     badge: "New",
-    image: "/images/products/hero-product-1.webp",
-    images: ["/images/products/hero-product-1.webp"],
+    image: "/images/products/ivory-wool-overcoat.webp",
+    images: ["/images/products/ivory-wool-overcoat.webp"],
     altText: "Ivory cream wool overcoat on seamless white background",
     
     
@@ -56,8 +56,8 @@ export const heroProducts: Product[] = [
     category: "Knitwear",
     price: 485,
     
-    image: "/images/products/hero-product-2.webp",
-    images: ["/images/products/hero-product-2.webp"],
+    image: "/images/products/camel-cashmere-turtleneck.webp",
+    images: ["/images/products/camel-cashmere-turtleneck.webp"],
     altText: "Camel cashmere turtleneck sweater folded on marble surface",
     
     
@@ -72,8 +72,8 @@ export const heroProducts: Product[] = [
     category: "Outerwear",
     price: 890,
     badge: "Limited",
-    image: "/images/products/hero-product-3.webp",
-    images: ["/images/products/hero-product-3.webp"],
+    image: "/images/products/ecru-linen-blazer.webp",
+    images: ["/images/products/ecru-linen-blazer.webp"],
     altText: "Ecru linen blazer on ghost mannequin with side lighting",
     
     
@@ -88,8 +88,8 @@ export const heroProducts: Product[] = [
     category: "Trousers",
     price: 395,
     
-    image: "/images/products/hero-product-4.webp",
-    images: ["/images/products/hero-product-4.webp"],
+    image: "/images/products/charcoal-wide-leg-trousers.webp",
+    images: ["/images/products/charcoal-wide-leg-trousers.webp"],
     altText: "Charcoal wide-leg tailored trousers styled with white shirt",
     
     
@@ -104,8 +104,8 @@ export const heroProducts: Product[] = [
     category: "Dresses",
     price: 720,
     badge: "New",
-    image: "/images/products/hero-product-5.webp",
-    images: ["/images/products/hero-product-5.webp"],
+    image: "/images/products/champagne-silk-slip-dress.webp",
+    images: ["/images/products/champagne-silk-slip-dress.webp"],
     altText: "Champagne gold silk slip dress hanging on brass rail",
     
     
@@ -123,8 +123,8 @@ export const featuredProducts: Product[] = [
     category: "Outerwear",
     price: 1290,
     badge: "New",
-    image: "/images/products/hero-product-1.webp",
-    images: ["/images/products/hero-product-1.webp"],
+    image: "/images/products/ivory-wool-overcoat.webp",
+    images: ["/images/products/ivory-wool-overcoat.webp"],
     altText: "Ivory cream wool overcoat",
     span: "lg:col-span-2",
     aspectRatio: "aspect-[3/4]",
@@ -139,8 +139,8 @@ export const featuredProducts: Product[] = [
     category: "Outerwear",
     price: 890,
     badge: "Limited",
-    image: "/images/products/hero-product-3.webp",
-    images: ["/images/products/hero-product-3.webp"],
+    image: "/images/products/ecru-linen-blazer.webp",
+    images: ["/images/products/ecru-linen-blazer.webp"],
     altText: "Ecru linen blazer",
     span: "lg:col-span-1",
     aspectRatio: "aspect-square",
@@ -155,8 +155,8 @@ export const featuredProducts: Product[] = [
     category: "Dresses",
     price: 720,
     badge: "New",
-    image: "/images/products/hero-product-5.webp",
-    images: ["/images/products/hero-product-5.webp"],
+    image: "/images/products/champagne-silk-slip-dress.webp",
+    images: ["/images/products/champagne-silk-slip-dress.webp"],
     altText: "Champagne silk slip dress",
     span: "lg:col-span-2",
     aspectRatio: "aspect-[3/4]",
