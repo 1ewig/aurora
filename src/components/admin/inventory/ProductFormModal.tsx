@@ -5,7 +5,6 @@
  */
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { type ProductData } from "@/stores/useAdminStore";
 import { type useProductForm } from "@/hooks/useProductForm";
@@ -33,23 +32,17 @@ export function ProductFormModal({
   deleting,
 }: ProductFormModalProps) {
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-6 md:p-10 flex items-center justify-center">
           {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             className="fixed inset-0 bg-black/55 backdrop-blur-sm"
             onClick={onClose}
           />
 
           {/* Dialog Content */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 15 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 15 }}
+          <div
             className="relative w-full max-w-4xl bg-bg-secondary border border-border-subtle rounded-[24px] shadow-2xl"
           >
             <form
@@ -161,9 +154,9 @@ export function ProductFormModal({
                 </div>
               </div>
             </form>
-          </motion.div>
+          </div>
         </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }

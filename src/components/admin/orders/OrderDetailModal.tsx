@@ -8,7 +8,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+// framer-motion animation removed
 import { Button } from "@/components/ui/Button";
 import { type OrderData } from "@/stores/useAdminStore";
 import { OrderStatusBadge } from "@/components/ui/OrderStatusBadge";
@@ -34,23 +34,17 @@ export function OrderDetailModal({
   if (!order) return null;
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
         <div className="fixed inset-0 z-50 p-4 sm:p-6 md:p-10 flex items-center justify-center">
           {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             className="fixed inset-0 bg-black/55 backdrop-blur-sm"
             onClick={onClose}
           />
 
           {/* Dialog Content */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 15 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 15 }}
+          <div
             className="relative w-full max-w-4xl bg-bg-secondary border border-border-subtle rounded-[24px] shadow-2xl flex flex-col max-h-[85vh] overflow-hidden"
           >
             {/* Header */}
@@ -238,9 +232,9 @@ export function OrderDetailModal({
                 Close Detail
               </Button>
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
-    </AnimatePresence>
+    </>
   );
 }
