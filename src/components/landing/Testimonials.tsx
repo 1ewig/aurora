@@ -10,21 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { useCarousel } from "@/hooks/ui/useCarousel";
 import { testimonials } from "@/data/testimonials";
-
-const slideVariants = {
-  enter: (direction: number) => ({
-    x: direction > 0 ? 80 : -80,
-    opacity: 0,
-  }),
-  center: {
-    x: 0,
-    opacity: 1,
-  },
-  exit: (direction: number) => ({
-    x: direction > 0 ? -80 : 80,
-    opacity: 0,
-  }),
-};
+import { testimonialSlide } from "@/animations/variants";
 
 /** Testimonial carousel displaying customer quotes with auto-advance, prev/next, and dot navigation. */
 export function Testimonials() {
@@ -60,7 +46,7 @@ export function Testimonials() {
           <motion.blockquote
             key={t.id}
             custom={direction}
-            variants={slideVariants}
+            variants={testimonialSlide}
             initial="enter"
             animate="center"
             exit="exit"

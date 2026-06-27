@@ -198,3 +198,19 @@ export const cardImageReveal: Variants = {
     transition: { duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] },
   },
 };
+
+/** Direction-aware horizontal sliding for quote/testimonial carousels. */
+export const testimonialSlide: Variants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 80 : -80,
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? -80 : 80,
+    opacity: 0,
+  }),
+};
