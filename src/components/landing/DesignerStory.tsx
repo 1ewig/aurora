@@ -32,7 +32,7 @@ export function DesignerStory() {
       ref={ref}
     >
       {/* Image Column */}
-      <div className="relative overflow-hidden aspect-square lg:aspect-auto lg:h-auto">
+      <div className="relative overflow-hidden aspect-square lg:aspect-auto lg:h-auto lg:order-last">
         <motion.div
           className="absolute inset-0 w-full h-full"
           style={{ y: imageY }}
@@ -58,7 +58,7 @@ export function DesignerStory() {
 
       {/* Text Column */}
       <motion.div
-        className="flex flex-col justify-center px-8 md:px-12 xl:px-20 py-20 bg-bg-primary"
+        className="flex flex-col justify-center px-8 md:px-12 xl:px-20 py-20 bg-bg-primary lg:order-first"
         variants={staggerContainer}
         initial="hidden"
         whileInView="visible"
