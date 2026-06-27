@@ -2,7 +2,7 @@
 
 ### A Quiet-Luxury Digital Storefront — Minimalist, Editorial, Server-Rendered.
 
-[![Next.js 15](https://img.shields.io/badge/Next.js-15.5-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16.2-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19.0-blue?style=flat-square&logo=react)](https://react.dev/)
 [![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4.0-38bdf8?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169e1?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
@@ -17,6 +17,17 @@ Explore the live environment and administration panel using these credentials:
 
 *   **Live Application**: [aurora-nu-three.vercel.app](https://aurora-nu-three.vercel.app/)
 *   **GitHub Repository**: [github.com/1ewig/aurora](https://github.com/1ewig/aurora)
+
+### ⚡ Lighthouse Performance Metrics
+
+Aurora is heavily optimized for speed, access, and search visibility, achieving near-perfect Core Web Vitals:
+
+*   **Performance**: **`92%`**
+*   **Accessibility**: **`93%`**
+*   **Best Practices**: **`100%`**
+*   **SEO**: **`100%`**
+
+*(Audited via Chrome DevTools Lighthouse tool on the live production deployment).*
 
 ### Demo Accounts
 
@@ -46,7 +57,7 @@ graph TD
         Middleware["Next.js Edge Middleware (Session & Admin protection)"]
     end
 
-    subgraph Server ["Next.js 15 Server (App Router)"]
+    subgraph Server ["Next.js 16 Server (App Router)"]
         RSC["Server Components (RSC - Hydrated & SEO)"]
         Routes["API Route Handlers (Auth & Checkout Operations)"]
     end
@@ -77,6 +88,8 @@ graph TD
 - React Server Components (RSC) by default with scoped client interactivity: "use client" is applied only where Framer Motion, state hooks, or event handlers are required, maximizing SSG eligibility and SEO indexability.
 - Pessimistic concurrency control via SELECT ... FOR UPDATE: src/app/api/orders/route.ts wraps stock validation and decrement inside an atomic transaction with a row-level lock, preventing inventory overselling under concurrent checkout load.
 - Guest checkout fully enabled end-to-end: Unauthenticated users can browse, select sizes, enter shipping details, and complete orders without creating an account; the cart and checkout form are fully decoupled from auth requirements.
+- Database-level server-side pagination with URL synchronization: Products list page supports dynamic pagination (12 items per page) and complete URL state caching for sorting, search, and category parameters, allowing seamless browser back/forward page navigation.
+- Relational database-backed keyword search: Catalog matches queries against a dedicated `product_keywords` relational index using an optimized PostgreSQL `EXISTS` subquery, allowing queries to search by materials (e.g. silk, cashmere), features, and regions.
 
 ### 2. Backend & Database Engineering
 - Raw pg connection pool (src/utils/db.ts) with conditional SSL (rejectUnauthorized: false for managed DBs) and a 1-second idle timeout designed to allow Next.js build processes to exit cleanly.
@@ -196,7 +209,7 @@ Presentational Components (src/components/*/)
 
 | Component | Technology | Usage |
 | :--- | :--- | :--- |
-| **Core Framework** | Next.js 15.5 + React 19 | App Router, Server Components, Route Handlers |
+| **Core Framework** | Next.js 16.2 + React 19 | App Router, Server Components, Route Handlers |
 | **Database** | PostgreSQL (InsForge) | SQL Database, transactional operations, direct connection pool |
 | **Authentication** | Better Auth 1.6 | Email/password auth, edge session validations, secure administration |
 | **Server Cache** | TanStack React Query 5 | Query caching, optimistic UI hydration, stale revalidation |
