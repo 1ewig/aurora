@@ -11,9 +11,24 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { useCarousel } from "@/hooks/ui/useCarousel";
 import { testimonials } from "@/data/testimonials";
 
+const slideVariants = {
+  enter: (direction: number) => ({
+    x: direction > 0 ? 80 : -80,
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+  },
+  exit: (direction: number) => ({
+    x: direction > 0 ? -80 : 80,
+    opacity: 0,
+  }),
+};
+
 /** Testimonial carousel displaying customer quotes with auto-advance, prev/next, and dot navigation. */
 export function Testimonials() {
-  const { current, next, prev, goTo } = useCarousel({
+  const { current, direction, next, prev, goTo } = useCarousel({
     length: testimonials.length,
     autoResumeDelay: 12000,
   });
@@ -25,7 +40,7 @@ export function Testimonials() {
       id="testimonials"
       aria-labelledby="testimonials-heading"
       aria-roledescription="testimonial carousel"
-      className="py-32 bg-white"
+      className="py-32 bg-white overflow-hidden"
     >
       <div className="max-w-4xl mx-auto px-6 text-center">
         <motion.div
@@ -36,17 +51,19 @@ export function Testimonials() {
         >
           <EyebrowLabel>Worn &amp; Loved</EyebrowLabel>
         </motion.div>
-
+ 
         <h2 id="testimonials-heading" className="sr-only">
           Customer Testimonials
         </h2>
-
-        <AnimatePresence mode="wait">
+ 
+        <AnimatePresence mode="wait" custom={direction}>
           <motion.blockquote
             key={t.id}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -24 }}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
             transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
             cite={t.source}
             className="mt-12"
