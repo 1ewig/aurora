@@ -25,7 +25,7 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
     <article aria-label={`${product.name} — ${formatCurrency(product.price)}`}>
       <Link href={`/products/${product.slug}`} className="block">
         <div
-          className="relative overflow-hidden rounded-[20px] bg-white cursor-pointer group transition-all duration-300"
+          className="relative overflow-hidden rounded-[20px] bg-white cursor-pointer group transition-all duration-300 border border-transparent hover:border-accent-primary"
           style={{
             boxShadow:
               "0 2px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
