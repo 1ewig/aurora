@@ -2,12 +2,15 @@
 
 ### A Quiet-Luxury Digital Storefront — Minimalist, Editorial, Server-Rendered.
 
+![Aurora Storefront Preview](public/images/storefront-preview.png)
+
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.2-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19.0-blue?style=flat-square&logo=react)](https://react.dev/)
 [![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4.0-38bdf8?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169e1?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
 [![InsForge BaaS](https://img.shields.io/badge/BaaS-InsForge-FF6B6B?style=flat-square)](https://insforge.dev)
 [![Better Auth](https://img.shields.io/badge/Auth-Better_Auth-E26D5C?style=flat-square)](https://www.better-auth.com/)
+[![Lemon Squeezy](https://img.shields.io/badge/Payments-Lemon_Squeezy-yellow?style=flat-square)](https://www.lemonsqueezy.com/)
 
 ---
 
@@ -193,6 +196,7 @@ Presentational Components (src/components/*/)
 | **Animations** | Framer Motion 12 | Smooth page entrances, cart drawers, lookbook sliders |
 | **Image Preprocessor**| Sharp | Automated asset WebP conversions and edge constraint scaling |
 | **Notifications** | Nodemailer + SMTP | Automated transactional order confirmations and auth updates |
+| **Payments Integration**| Lemon Squeezy Sandbox | Payment overlay modal, webhooks processing, receipt generation |
 
 ---
 
