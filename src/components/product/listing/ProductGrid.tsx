@@ -36,6 +36,22 @@ export function ProductGrid({ products, isLoading }: ProductGridProps) {
     );
   }
 
+  if (!isLoading && products.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-6 text-center bg-bg-secondary border border-border-subtle rounded-[24px] shadow-sm max-w-md mx-auto my-8">
+        <div className="w-12 h-12 rounded-full bg-bg-primary flex items-center justify-center mb-4 text-text-secondary">
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <h3 className="font-sans font-semibold text-lg text-text-primary mb-1">No Products Found</h3>
+        <p className="text-text-secondary text-sm max-w-xs leading-relaxed">
+          We couldn't find any products matching your search terms or filters. Try adjusting your keyword search or clear the filter.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
