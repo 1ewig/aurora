@@ -33,7 +33,14 @@ export async function GET(request: Request) {
 
       if (search && search.trim() !== '') {
         params.push(`%${search.trim()}%`);
-        whereClauses.push(`(name ILIKE $${params.length} OR description ILIKE $${params.length})`);
+        whereClauses.push(`(
+          name ILIKE $${params.length} OR 
+          description ILIKE $${params.length} OR 
+          EXISTS (
+            SELECT 1 FROM product_keywords pk 
+            WHERE pk.product_id = products.id AND pk.keyword ILIKE $${params.length}
+          )
+        )`);
       }
 
       const whereSql = whereClauses.length > 0 ? ` WHERE ${whereClauses.join(' AND ')}` : '';

@@ -370,6 +370,7 @@ async function seed() {
     DROP TABLE IF EXISTS product_images CASCADE;
     DROP TABLE IF EXISTS product_sizes CASCADE;
     DROP TABLE IF EXISTS product_details CASCADE;
+    DROP TABLE IF EXISTS product_keywords CASCADE;
     DROP TABLE IF EXISTS products CASCADE;
     DROP TABLE IF EXISTS public.orders CASCADE;
     DROP TABLE IF EXISTS public.lookbook_slides CASCADE;
@@ -424,6 +425,58 @@ async function seed() {
       await client.query(
         `INSERT INTO product_details (product_id, detail) VALUES ${detParams}`,
         [product.id, ...details],
+      );
+    }
+
+    // Collect/Generate keywords
+    const keywordsSet = new Set<string>();
+
+    // 1. Add manual keywords if defined
+    if (product.keywords) {
+      for (const kw of product.keywords) {
+        if (kw?.trim()) {
+          keywordsSet.add(kw.trim().toLowerCase());
+        }
+      }
+    }
+
+    // 2. Auto-generate keywords as fallback/additions:
+    // Tokenize product name (filter out short words)
+    const nameTokens = product.name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .split(/\s+/);
+    for (const t of nameTokens) {
+      if (t.length > 2) keywordsSet.add(t);
+    }
+
+    // Add category as keyword
+    if (product.category) {
+      keywordsSet.add(product.category.toLowerCase());
+    }
+
+    // Extract interesting words from details list (e.g. fabric names)
+    if (product.details) {
+      for (const det of product.details) {
+        const detTokens = det
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .split(/\s+/);
+        for (const t of detTokens) {
+          // Add common descriptive/material keywords
+          if (['silk', 'wool', 'linen', 'cashmere', 'cotton', 'leather', 'denim', 'shearling', 'alpaca', 'mohair'].includes(t)) {
+            keywordsSet.add(t);
+          }
+        }
+      }
+    }
+
+    const keywords = Array.from(keywordsSet);
+    if (keywords.length > 0) {
+      const kwPlaceholders = keywords.map((_, i) => `($1, $${i + 2})`).join(', ');
+      await client.query(
+        `INSERT INTO product_keywords (product_id, keyword) VALUES ${kwPlaceholders} ON CONFLICT DO NOTHING`,
+        [product.id, ...keywords]
       );
     }
   }

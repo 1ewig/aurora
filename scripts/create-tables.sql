@@ -50,6 +50,16 @@ CREATE TABLE IF NOT EXISTS product_details (
   detail TEXT NOT NULL
 );
 
+-- Product search keywords (one-to-many)
+CREATE TABLE IF NOT EXISTS product_keywords (
+  id SERIAL PRIMARY KEY,
+  product_id VARCHAR(50) REFERENCES products(id) ON DELETE CASCADE,
+  keyword VARCHAR(100) NOT NULL,
+  UNIQUE(product_id, keyword)
+);
+
+CREATE INDEX IF NOT EXISTS idx_product_keywords_val ON product_keywords(keyword);
+
 -- Orders table (guest checkout allowed — user_id is nullable)
 CREATE TABLE IF NOT EXISTS orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
