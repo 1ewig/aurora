@@ -20,8 +20,27 @@ function generateOrderNumber(): string {
   return `AUR-${year}-${num}`;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const lsOrderId = searchParams.get("lsOrderId");
+
+    if (lsOrderId) {
+      const result = await pool.query(
+        "SELECT order_number FROM orders WHERE ls_order_id = $1",
+        [lsOrderId]
+      );
+
+      if ((result.rowCount ?? 0) === 0) {
+        return NextResponse.json(
+          { error: "Order not found" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({ orderNumber: result.rows[0].order_number });
+    }
+
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) {
       return NextResponse.json(

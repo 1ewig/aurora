@@ -69,7 +69,7 @@ export async function createCheckout(
           },
         },
         product_options: {
-          redirect_url: `${appUrl}/checkout/success`,
+          redirect_url: `${appUrl}/checkout/success?order_id=[order_id]`,
           receipt_thank_you_note: "Thank you for shopping at Aurora! Your order is being processed. 🎉",
           ...(payload.description ? { description: payload.description } : {}),
         },
