@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/product/listing/PageHeader";
 import { FilterDrawer } from "@/components/product/listing/FilterDrawer";
 import { ProductGrid } from "@/components/product/listing/ProductGrid";
 import { useProductFilter } from "@/hooks/useProductFilter";
+import { Pagination } from "@/components/ui/Pagination";
 
 interface ProductListingProps {
   initialCategory?: string;
@@ -22,22 +23,21 @@ export function ProductListing({ initialCategory = "All", onCategoryChange }: Pr
 
   const {
     activeCategory,
-    handleCategoryChange,
     sortBy,
-    setSortBy,
+    applyFilters,
     searchQuery,
     setSearchQuery,
+    handleSearchSubmit,
+    handleClearSearch,
     filtered,
     categories,
     isLoading,
+    totalPages,
+    currentPage,
+    onPageChange,
   } = useProductFilter({
     initialCategory,
-    onCategoryChange: (name) => {
-      onCategoryChange?.(name);
-      const slug = name === "All" ? "" : name.toLowerCase();
-      const url = slug ? `/products/category/${slug}` : "/products";
-      window.history.pushState(null, "", url);
-    },
+    onCategoryChange,
   });
 
   return (
@@ -48,30 +48,34 @@ export function ProductListing({ initialCategory = "All", onCategoryChange }: Pr
           
           <div className="flex items-center gap-3 w-full md:w-auto">
             {/* Search Input Container */}
-            <div className="relative flex-1 md:w-80 md:flex-initial">
-              <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-text-secondary">
+            <form onSubmit={handleSearchSubmit} className="relative flex-1 md:w-80 md:flex-initial">
+              <button
+                type="submit"
+                className="absolute inset-y-0 left-4 flex items-center text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
+                aria-label="Submit search"
+              >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-              </span>
+              </button>
               <input
                 type="text"
                 placeholder="Search catalog..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-5 py-3 bg-bg-secondary border border-border-medium rounded-full text-sm placeholder-text-muted text-text-primary focus:border-text-primary focus:outline-none transition-colors duration-300"
+                className="w-full pl-11 pr-10 py-3 bg-bg-secondary border border-border-medium rounded-full text-sm placeholder-text-muted text-text-primary focus:border-text-primary focus:outline-none transition-colors duration-300"
               />
               {searchQuery && (
                 <button
                   type="button"
-                  onClick={() => setSearchQuery("")}
+                  onClick={handleClearSearch}
                   className="absolute inset-y-0 right-4 flex items-center text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
                   aria-label="Clear search"
                 >
                   ✕
                 </button>
               )}
-            </div>
+            </form>
 
             {/* Filter Toggle Button */}
             <button
@@ -88,6 +92,15 @@ export function ProductListing({ initialCategory = "All", onCategoryChange }: Pr
         </div>
 
         <ProductGrid products={filtered} isLoading={isLoading} />
+
+        {/* Dynamic Pagination Control */}
+        {!isLoading && totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
+        )}
       </div>
 
       <FilterDrawer
@@ -97,8 +110,7 @@ export function ProductListing({ initialCategory = "All", onCategoryChange }: Pr
         activeCategory={activeCategory}
         sortBy={sortBy}
         onApply={(category, sort) => {
-          handleCategoryChange(category);
-          setSortBy(sort);
+          applyFilters(category, sort);
         }}
       />
     </main>

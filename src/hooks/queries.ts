@@ -30,6 +30,48 @@ export function useProductsQuery(category?: string) {
   });
 }
 
+export interface PaginatedProductsParams {
+  category?: string;
+  page?: number;
+  limit?: number;
+  search?: string;
+  sortBy?: string;
+}
+
+export interface PaginatedProductsResponse {
+  products: Product[];
+  total: number;
+}
+
+async function fetchPaginatedProducts({
+  category,
+  page = 1,
+  limit = 12,
+  search,
+  sortBy,
+}: PaginatedProductsParams): Promise<PaginatedProductsResponse> {
+  const params = new URLSearchParams();
+  if (category && category !== 'All') params.append('category', category);
+  params.append('page', page.toString());
+  params.append('limit', limit.toString());
+  if (search && search.trim() !== '') params.append('search', search);
+  if (sortBy) params.append('sortBy', sortBy);
+
+  const response = await fetch(`/api/products?${params.toString()}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch paginated products');
+  }
+  return response.json();
+}
+
+/** Fetches a paginated, filtered, and sorted subset of products from the server. */
+export function usePaginatedProductsQuery(params: PaginatedProductsParams) {
+  return useQuery<PaginatedProductsResponse>({
+    queryKey: ['products', 'paginated', params],
+    queryFn: () => fetchPaginatedProducts(params),
+  });
+}
+
 /** Returns a deterministic "featured" subset using the current day as a seed. */
 export function useFeaturedProductsQuery(count = 3) {
   return useQuery({
