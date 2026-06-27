@@ -38,15 +38,17 @@ export function ProductActions({ product }: { product: Product }) {
   };
 
   const handleBuyNow = () => {
-    addItem({
-      id: product.id,
-      slug: product.slug,
-      name: product.name,
-      price: product.price,
-      size: selectedSize,
-      image: product.image,
-      category: product.category,
-    });
+    if (!isInCart) {
+      addItem({
+        id: product.id,
+        slug: product.slug,
+        name: product.name,
+        price: product.price,
+        size: selectedSize,
+        image: product.image,
+        category: product.category,
+      });
+    }
     router.push("/checkout");
   };
 
