@@ -12,6 +12,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { VerifyForm } from "./VerifyForm";
 
+const COOLDOWN_KEY = "aurora_verify_cooldown";
+const COOLDOWN_DURATION = 60;
+
+function getStoredCooldown(): number {
+  try {
+    const stored = localStorage.getItem(COOLDOWN_KEY);
+    if (!stored) return 0;
+    const elapsed = (Date.now() - parseInt(stored, 10)) / 1000;
+    return Math.max(0, Math.round(COOLDOWN_DURATION - elapsed));
+  } catch {
+    return 0;
+  }
+}
+
 function VerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -20,7 +34,7 @@ function VerifyContent() {
 
   const [formError, setFormError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendCooldown, setResendCooldown] = useState(getStoredCooldown);
   const [verified, setVerified] = useState(false);
 
   const { verifyEmail, resendVerification, loading, error: storeError, clearError } = useAuthStore();
@@ -58,9 +72,11 @@ function VerifyContent() {
     const { error } = await resendVerification(email);
     if (error) {
       setFormError(typeof error === "string" ? error : error.message || "Failed to resend.");
+      localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
       setResendCooldown(60);
     } else {
       setSuccessMsg("Verification email sent! Check your inbox.");
+      localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
       setResendCooldown(60);
     }
   };
