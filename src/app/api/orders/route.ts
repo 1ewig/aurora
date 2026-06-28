@@ -13,6 +13,11 @@ import { sendEmail } from "@/lib/email";
 import { orderConfirmationHtml, orderConfirmationText } from "@/lib/email-templates";
 import { formatCurrency } from "@/utils/formatCurrency";
 
+/** Strips HTML tags and trims user-supplied strings to prevent XSS. */
+function sanitize(s: string): string {
+  return s.trim().replace(/<[^>]*>/g, "").slice(0, 200);
+}
+
 /** Generates a unique order number in the format AUR-YYYY-NNNNNN. */
 function generateOrderNumber(): string {
   const year = new Date().getFullYear();
@@ -118,6 +123,44 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!shippingAddress.lastName?.trim()) {
+      return NextResponse.json(
+        { error: "Last name is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!shippingAddress.address?.trim()) {
+      return NextResponse.json(
+        { error: "Street address is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!shippingAddress.city?.trim()) {
+      return NextResponse.json(
+        { error: "City is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!shippingAddress.zipCode?.trim()) {
+      return NextResponse.json(
+        { error: "ZIP code is required" },
+        { status: 400 }
+      );
+    }
+
+    // Sanitize address fields before storage and email use
+    const sanitizedAddress = {
+      email: shippingAddress.email.trim(),
+      firstName: sanitize(shippingAddress.firstName),
+      lastName: sanitize(shippingAddress.lastName || ""),
+      address: sanitize(shippingAddress.address),
+      city: sanitize(shippingAddress.city),
+      zipCode: shippingAddress.zipCode.trim(),
+    };
+
     const session = await auth.api.getSession({ headers: await headers() });
     const userId = session?.user?.id ?? null;
 
@@ -192,7 +235,7 @@ export async function POST(request: Request) {
           shipping,
           tax,
           total,
-          JSON.stringify(shippingAddress),
+          JSON.stringify(sanitizedAddress),
         ]
       );
 
@@ -219,7 +262,7 @@ export async function POST(request: Request) {
       subject: `Order Confirmed — ${order.order_number}`,
       text: orderConfirmationText({
         orderNumber: order.order_number,
-        customerName: `${shippingAddress.firstName || ""} ${shippingAddress.lastName || ""}`.trim() || "Valued Customer",
+        customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
         items: verifiedItems.map((i: any) => ({
           name: i.name,
           size: i.size || "",
@@ -231,16 +274,16 @@ export async function POST(request: Request) {
         tax: formatCurrency(orderTax),
         total: formatCurrency(orderTotal),
         shippingAddress: {
-          firstName: shippingAddress.firstName || "",
-          lastName: shippingAddress.lastName || "",
-          address: shippingAddress.address || "",
-          city: shippingAddress.city || "",
-          zipCode: shippingAddress.zipCode || "",
+          firstName: sanitizedAddress.firstName,
+          lastName: sanitizedAddress.lastName,
+          address: sanitizedAddress.address,
+          city: sanitizedAddress.city,
+          zipCode: sanitizedAddress.zipCode,
         },
       }),
       html: orderConfirmationHtml({
         orderNumber: order.order_number,
-        customerName: `${shippingAddress.firstName || ""} ${shippingAddress.lastName || ""}`.trim() || "Valued Customer",
+        customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
         items: verifiedItems.map((i: any) => ({
           name: i.name,
           size: i.size || "",
@@ -252,11 +295,11 @@ export async function POST(request: Request) {
         tax: formatCurrency(orderTax),
         total: formatCurrency(orderTotal),
         shippingAddress: {
-          firstName: shippingAddress.firstName || "",
-          lastName: shippingAddress.lastName || "",
-          address: shippingAddress.address || "",
-          city: shippingAddress.city || "",
-          zipCode: shippingAddress.zipCode || "",
+          firstName: sanitizedAddress.firstName,
+          lastName: sanitizedAddress.lastName,
+          address: sanitizedAddress.address,
+          city: sanitizedAddress.city,
+          zipCode: sanitizedAddress.zipCode,
         },
       }),
     });

@@ -145,17 +145,10 @@ export function OrderDetailModal({
                       </div>
                       <div>
                         <div className="font-bold text-text-primary">Address</div>
-                        <div>{order.shippingAddress.addressLine1}</div>
-                        {order.shippingAddress.addressLine2 && (
-                          <div>{order.shippingAddress.addressLine2}</div>
-                        )}
+                        <div>{order.shippingAddress.address}</div>
                         <div>
-                          {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}
+                          {order.shippingAddress.city}, {order.shippingAddress.zipCode}
                         </div>
-                      </div>
-                      <div>
-                        <div className="font-bold text-text-primary">Phone Number</div>
-                        <div>{order.shippingAddress.phone}</div>
                       </div>
                       <div>
                         <div className="font-bold text-text-primary">Email Address</div>

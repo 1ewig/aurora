@@ -10,6 +10,10 @@ import { createCheckout } from "@/lib/lemonsqueezy";
 import { headers } from "next/headers";
 import { pool } from "@/utils/db";
 
+function sanitize(s: string): string {
+  return s.trim().replace(/<[^>]*>/g, "").slice(0, 200);
+}
+
 export interface CheckoutSessionRequest {
   variantId: string;
   cartItems: Array<{
@@ -79,6 +83,25 @@ export async function POST(req: NextRequest) {
     const total = subtotal + shipping + tax;
     const totalCents = Math.round(total * 100);
 
+    const address = body.shippingAddress;
+
+    if (!address.email?.trim() || !address.firstName?.trim() || !address.lastName?.trim() ||
+        !address.address?.trim() || !address.city?.trim() || !address.zipCode?.trim()) {
+      return NextResponse.json(
+        { error: "All shipping address fields are required." },
+        { status: 400 }
+      );
+    }
+
+    const sanitizedAddress = {
+      email: address.email.trim(),
+      firstName: sanitize(address.firstName),
+      lastName: sanitize(address.lastName),
+      address: sanitize(address.address),
+      city: sanitize(address.city),
+      zipCode: address.zipCode.trim(),
+    };
+
     const description = itemsDescriptionParts.join(", ");
 
     const checkoutData = await createCheckout({
@@ -87,7 +110,7 @@ export async function POST(req: NextRequest) {
       userEmail: session?.user?.email,
       userName: session?.user?.name,
       cartItems: body.cartItems,
-      shippingAddress: body.shippingAddress,
+      shippingAddress: sanitizedAddress,
       totalPriceCents: totalCents,
       description,
     });

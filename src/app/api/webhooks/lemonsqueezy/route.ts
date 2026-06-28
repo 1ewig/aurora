@@ -16,6 +16,10 @@ import { sendEmail } from "@/lib/email";
 import { orderConfirmationHtml, orderConfirmationText } from "@/lib/email-templates";
 import { formatCurrency } from "@/utils/formatCurrency";
 
+function sanitize(s: string): string {
+  return s.trim().replace(/<[^>]*>/g, "").slice(0, 200);
+}
+
 // ─── HMAC Verification ────────────────────────────────────────────────────────
 
 function verifySignature(rawBody: string, signatureHeader: string): boolean {
@@ -112,6 +116,15 @@ async function handleOrderCreated(payload: any) {
 
   const shippingAddress = customData.shipping_address ? JSON.parse(customData.shipping_address) : {};
 
+  const sanitizedAddress = {
+    email: (shippingAddress.email || "").trim(),
+    firstName: sanitize(shippingAddress.firstName || ""),
+    lastName: sanitize(shippingAddress.lastName || ""),
+    address: sanitize(shippingAddress.address || ""),
+    city: sanitize(shippingAddress.city || ""),
+    zipCode: (shippingAddress.zipCode || "").trim(),
+  };
+
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -186,7 +199,7 @@ async function handleOrderCreated(payload: any) {
         shipping,
         tax,
         total,
-        JSON.stringify(shippingAddress),
+        JSON.stringify(sanitizedAddress),
         lsOrderId,
         lsOrderNumber,
       ]
@@ -210,7 +223,7 @@ async function handleOrderCreated(payload: any) {
       subject: `Order Confirmed — AUR-LS-${lsOrderNumber}`,
       text: orderConfirmationText({
         orderNumber: `AUR-LS-${lsOrderNumber}`,
-        customerName: `${shippingAddress.firstName || ""} ${shippingAddress.lastName || ""}`.trim() || "Valued Customer",
+        customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
         items: verifiedItems.map((i: any) => ({
           name: i.name,
           size: i.size || "",
@@ -222,16 +235,16 @@ async function handleOrderCreated(payload: any) {
         tax: formatCurrency(tax),
         total: formatCurrency(total),
         shippingAddress: {
-          firstName: shippingAddress.firstName || "",
-          lastName: shippingAddress.lastName || "",
-          address: shippingAddress.address || "",
-          city: shippingAddress.city || "",
-          zipCode: shippingAddress.zipCode || "",
+          firstName: sanitizedAddress.firstName,
+          lastName: sanitizedAddress.lastName,
+          address: sanitizedAddress.address,
+          city: sanitizedAddress.city,
+          zipCode: sanitizedAddress.zipCode,
         },
       }),
       html: orderConfirmationHtml({
         orderNumber: `AUR-LS-${lsOrderNumber}`,
-        customerName: `${shippingAddress.firstName || ""} ${shippingAddress.lastName || ""}`.trim() || "Valued Customer",
+        customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
         items: verifiedItems.map((i: any) => ({
           name: i.name,
           size: i.size || "",
@@ -243,11 +256,11 @@ async function handleOrderCreated(payload: any) {
         tax: formatCurrency(tax),
         total: formatCurrency(total),
         shippingAddress: {
-          firstName: shippingAddress.firstName || "",
-          lastName: shippingAddress.lastName || "",
-          address: shippingAddress.address || "",
-          city: shippingAddress.city || "",
-          zipCode: shippingAddress.zipCode || "",
+          firstName: sanitizedAddress.firstName,
+          lastName: sanitizedAddress.lastName,
+          address: sanitizedAddress.address,
+          city: sanitizedAddress.city,
+          zipCode: sanitizedAddress.zipCode,
         },
       }),
     }).catch((emailErr) => {

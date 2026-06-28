@@ -43,12 +43,9 @@ export interface ShippingAddress {
   email: string;
   firstName: string;
   lastName: string;
-  addressLine1: string;
-  addressLine2?: string;
+  address: string;
   city: string;
-  state: string;
-  postalCode: string;
-  phone: string;
+  zipCode: string;
 }
 
 export interface OrderData {
