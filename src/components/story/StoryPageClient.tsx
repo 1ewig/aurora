@@ -15,7 +15,7 @@ import { StoryCta } from "@/components/story/StoryCta";
 /** Story page layout composing hero, philosophy, parallax, atelier, and CTA sections. */
 export default function StoryPageClient() {
   return (
-    <main id="main-content" tabIndex={-1} className="pt-28 pb-32">
+    <main id="main-content" tabIndex={-1}>
       <StoryHero />
       <PhilosophySection />
       <ParallaxBreakout />

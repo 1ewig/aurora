@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/Button";
 /** Call-to-action banner inviting users to shop the collection with a gold accent CTA. */
 export function StoryCta() {
   return (
-    <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto pt-20">
+    <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto py-16">
       <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
         whileInView={{ opacity: 1, scale: 1 }}

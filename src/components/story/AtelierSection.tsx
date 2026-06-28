@@ -28,7 +28,7 @@ export function AtelierSection() {
   const foldingAlt = foldingItem?.altText || "Cashmere folding";
 
   return (
-    <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto py-12">
+    <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto py-16">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
         <motion.div
           variants={staggerContainer}

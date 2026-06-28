@@ -18,7 +18,7 @@ export function ParallaxBreakout() {
   const alt = slide3?.altText || "Extrafine fabric detail view";
 
   return (
-    <section className="my-20 relative h-[70vh] md:h-[85vh] bg-border-subtle overflow-hidden">
+    <section className="py-16 relative h-[70vh] md:h-[85vh] bg-border-subtle overflow-hidden">
       <OptimizedImage
         src={src}
         alt={alt}

@@ -23,7 +23,7 @@ export function PhilosophySection() {
   const description = designerItem?.description || "Elena Voss founded Aurora on a simple yet profound premise: every design decision has a ripple effect. We believe that true luxury isn't about excess or ostentation. It is found in precision, in solitude, and in the choices made before a garment ever reaches the atelier floor.";
 
   return (
-    <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center py-12">
+    <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center py-16">
       <motion.div
         initial={{ opacity: 0, x: -30 }}
         whileInView={{ opacity: 1, x: 0 }}
@@ -44,7 +44,7 @@ export function PhilosophySection() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-10% 0px" }}
-        className="lg:col-span-6 space-y-6 lg:pl-6"
+        className="lg:col-span-6 space-y-6"
       >
         <motion.div variants={fadeInUp}>
           <h2 className="font-display font-black text-3xl md:text-4xl tracking-tight text-text-primary">
