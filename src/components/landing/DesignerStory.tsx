@@ -6,8 +6,7 @@
 
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { Button } from "@/components/ui/Button";
@@ -17,45 +16,12 @@ import { getStorageUrl } from "@/utils/insforge";
 
 /** Designer story section showcasing the founder and brand philosophy with parallax scrolling imagery. */
 export function DesignerStory() {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const imageY = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
-
   return (
     <section
       id="story"
       aria-labelledby="story-heading"
       className="grid grid-cols-1 lg:grid-cols-2 min-h-[90vh] bg-bg-primary"
-      ref={ref}
     >
-      {/* Image Column */}
-      <div className="relative overflow-hidden aspect-square lg:aspect-auto lg:h-auto lg:order-last">
-        <motion.div
-          className="absolute inset-0 w-full h-full"
-          style={{ y: imageY }}
-        >
-          <OptimizedImage
-            src={getStorageUrl("/images/editorial/designer.webp")}
-            alt="Aurora's creative director photographed in her design studio, examining fabric swatches"
-            className="w-full h-full object-cover object-top"
-            loading="eager"
-            sizes="(max-width: 1023px) 100vw, 50vw"
-          />
-        </motion.div>
-        {/* Warm color overlay */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "rgba(200,168,130,0.08)",
-            mixBlendMode: "multiply",
-          }}
-        />
-      </div>
-
       {/* Text Column */}
       <motion.div
         className="flex flex-col justify-center px-8 md:px-12 xl:px-20 py-20 bg-bg-primary lg:order-first"
@@ -124,6 +90,28 @@ export function DesignerStory() {
           </Link>
         </motion.div>
       </motion.div>
+
+      {/* Image Column */}
+      <div className="relative overflow-hidden aspect-square lg:aspect-auto lg:h-auto lg:order-last">
+        <div className="absolute inset-0 w-full h-full">
+          <OptimizedImage
+            src={getStorageUrl("/images/editorial/designer.webp")}
+            alt="Aurora's creative director photographed in her design studio, examining fabric swatches"
+            className="w-full h-full object-cover object-top"
+            loading="eager"
+            sizes="(max-width: 1023px) 100vw, 50vw"
+          />
+        </div>
+        {/* Warm color overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "rgba(200,168,130,0.08)",
+            mixBlendMode: "multiply",
+          }}
+        />
+      </div>
     </section>
   );
 }
