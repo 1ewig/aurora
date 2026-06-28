@@ -10,6 +10,10 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 
+interface SessionResponse {
+  user: { id: string; email: string } | null;
+}
+
 const protectedPaths = ["/profile", "/admin"];
 
 function isProtectedPath(pathname: string): boolean {
@@ -29,7 +33,7 @@ export async function proxy(request: NextRequest) {
   const sessionRes = await fetch(`${baseUrl}/api/auth/get-session`, {
     headers: { cookie: request.headers.get('cookie') || '' },
   });
-  const session = sessionRes.ok ? await sessionRes.json() : null;
+  const session: SessionResponse | null = sessionRes.ok ? await sessionRes.json() : null;
 
   if (!session?.user) {
     const loginUrl = new URL("/login", request.url);

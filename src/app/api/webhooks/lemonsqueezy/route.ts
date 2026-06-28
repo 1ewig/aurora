@@ -20,6 +20,16 @@ function sanitize(s: string): string {
   return s.trim().replace(/<[^>]*>/g, "").slice(0, 200);
 }
 
+interface VerifiedItem {
+  id: string;
+  slug: string;
+  name: string;
+  size: string;
+  price: number;
+  image: string;
+  quantity: number;
+}
+
 // ─── HMAC Verification ────────────────────────────────────────────────────────
 
 function verifySignature(rawBody: string, signatureHeader: string): boolean {
@@ -129,7 +139,7 @@ async function handleOrderCreated(payload: any) {
   try {
     await client.query("BEGIN");
 
-    const verifiedItems = [];
+    const verifiedItems: VerifiedItem[] = [];
     let subtotal = 0;
 
     for (const item of cartItems) {
@@ -224,7 +234,7 @@ async function handleOrderCreated(payload: any) {
       text: orderConfirmationText({
         orderNumber: `AUR-LS-${lsOrderNumber}`,
         customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
-        items: verifiedItems.map((i: any) => ({
+        items: verifiedItems.map((i) => ({
           name: i.name,
           size: i.size || "",
           quantity: i.quantity,
@@ -245,7 +255,7 @@ async function handleOrderCreated(payload: any) {
       html: orderConfirmationHtml({
         orderNumber: `AUR-LS-${lsOrderNumber}`,
         customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
-        items: verifiedItems.map((i: any) => ({
+        items: verifiedItems.map((i) => ({
           name: i.name,
           size: i.size || "",
           quantity: i.quantity,

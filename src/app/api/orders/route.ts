@@ -13,6 +13,16 @@ import { sendEmail } from "@/lib/email";
 import { orderConfirmationHtml, orderConfirmationText } from "@/lib/email-templates";
 import { formatCurrency } from "@/utils/formatCurrency";
 
+interface VerifiedItem {
+  id: string;
+  slug: string;
+  name: string;
+  size: string;
+  price: number;
+  image: string;
+  quantity: number;
+}
+
 /** Strips HTML tags and trims user-supplied strings to prevent XSS. */
 function sanitize(s: string): string {
   return s.trim().replace(/<[^>]*>/g, "").slice(0, 200);
@@ -167,7 +177,7 @@ export async function POST(request: Request) {
     const client = await pool.connect();
     let order;
     let subtotal = 0;
-    const verifiedItems = [];
+    const verifiedItems: VerifiedItem[] = [];
 
     try {
       await client.query("BEGIN");
@@ -263,7 +273,7 @@ export async function POST(request: Request) {
       text: orderConfirmationText({
         orderNumber: order.order_number,
         customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
-        items: verifiedItems.map((i: any) => ({
+        items: verifiedItems.map((i) => ({
           name: i.name,
           size: i.size || "",
           quantity: i.quantity,
@@ -284,7 +294,7 @@ export async function POST(request: Request) {
       html: orderConfirmationHtml({
         orderNumber: order.order_number,
         customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
-        items: verifiedItems.map((i: any) => ({
+        items: verifiedItems.map((i) => ({
           name: i.name,
           size: i.size || "",
           quantity: i.quantity,
