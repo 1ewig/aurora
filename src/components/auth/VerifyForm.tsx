@@ -57,7 +57,7 @@ export function VerifyForm({
     finally { setResending(false); }
   };
 
-  if (loading && !verified) {
+  if (loading && !verified && !resending) {
     return (
       <main className="min-h-[90vh] md:min-h-screen bg-bg-primary pt-12 pb-12 px-6 flex flex-col items-center justify-center">
         <div className="flex flex-col items-center gap-4">
