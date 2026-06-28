@@ -6,7 +6,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { type Order } from "@/hooks/queries";
@@ -30,9 +29,7 @@ export function OrderCard({ order }: OrderCardProps) {
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
+      <div
         onClick={() => setIsModalOpen(true)}
         className="bg-bg-secondary border border-border-subtle rounded-[20px] p-5 sm:p-6 shadow-sm cursor-pointer hover:border-text-primary hover:shadow-md transition-all duration-300 group"
       >
@@ -91,7 +88,7 @@ export function OrderCard({ order }: OrderCardProps) {
             View details &rarr;
           </span>
         </div>
-      </motion.div>
+      </div>
 
       <OrderDetailModal
         isOpen={isModalOpen}

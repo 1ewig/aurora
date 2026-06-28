@@ -5,7 +5,6 @@
  */
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { useOrders } from "@/hooks/queries";
 
@@ -18,8 +17,26 @@ export function OrdersClient() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[40vh]">
-        <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
+      <div className="animate-pulse space-y-4 sm:space-y-5">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div
+            key={i}
+            className="bg-bg-secondary border border-border-subtle p-6 rounded-[20px] shadow-sm space-y-4"
+          >
+            <div className="flex justify-between items-start">
+              <div className="space-y-2">
+                <div className="h-4 w-32 bg-bg-primary rounded" />
+                <div className="h-3 w-24 bg-bg-primary rounded" />
+              </div>
+              <div className="h-6 w-20 bg-bg-primary rounded-full" />
+            </div>
+            <div className="h-px bg-border-subtle" />
+            <div className="flex justify-between items-center">
+              <div className="h-4 w-28 bg-bg-primary rounded" />
+              <div className="h-4 w-20 bg-bg-primary rounded" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
@@ -69,10 +86,7 @@ export function OrdersClient() {
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      <div
         className="mb-6 sm:mb-8 lg:mb-12"
       >
         <h1 className="font-display font-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase tracking-wider">
@@ -81,7 +95,7 @@ export function OrdersClient() {
         <p className="text-text-secondary text-xs sm:text-sm md:text-base mt-1 max-w-xl">
           A record of your past orders and shipments.
         </p>
-      </motion.div>
+      </div>
 
       {mainContent}
     </>

@@ -12,7 +12,7 @@ import { ProfileWorkspace } from "./ProfileWorkspace";
 
 /** Renders the profile page with auth guard, display name editing, and sign-out flow. */
 export function ProfileClient() {
-  const { user, profile, loading, updateProfile, signOut } = useAuthStore();
+  const { user, profile, updateProfile, signOut } = useAuthStore();
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -24,12 +24,6 @@ export function ProfileClient() {
   const [statusMsg, setStatusMsg] = useState("");
   const [statusType, setStatusType] = useState<"success" | "error" | "">("");
   const [updating, setUpdating] = useState(false);
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
-  }, [user, loading, router]);
 
   useEffect(() => {
     if (profile) {
@@ -58,13 +52,7 @@ export function ProfileClient() {
     }
   };
 
-  if (loading || !user) {
-    return (
-      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+  if (!user) return null;
 
   return (
     <ProfileWorkspace
