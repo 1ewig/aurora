@@ -6,16 +6,31 @@
 "use client";
 
 import Link from "next/link";
-import { useOrders } from "@/hooks/queries";
+import { useState, useEffect } from "react";
+import { useOrders, type Order } from "@/hooks/queries";
 
 import { Button } from "@/components/ui/Button";
 import { OrderCard } from "./OrderCard";
 
 /** Renders the purchase history page with order cards, handling loading, empty, and error states. */
 export function OrdersClient() {
-  const { data: orders, isLoading, error } = useOrders();
+  const [page, setPage] = useState(0);
+  const [allOrders, setAllOrders] = useState<Order[]>([]);
+  const { data, isLoading, error } = useOrders(page);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (data) {
+      setAllOrders((prev) =>
+        page === 0 ? data.orders : [...prev, ...data.orders]
+      );
+    }
+  }, [data]);
+
+  const hasMore = data ? allOrders.length < data.total : false;
+
+  const handleLoadMore = () => setPage((p) => p + 1);
+
+  if (isLoading && allOrders.length === 0) {
     return (
       <div className="animate-pulse space-y-4 sm:space-y-5">
         {Array.from({ length: 3 }).map((_, i) => (
@@ -41,10 +56,9 @@ export function OrdersClient() {
     );
   }
 
-  // Content area
   let mainContent;
 
-  if (error) {
+  if (error && allOrders.length === 0) {
     mainContent = (
       <div className="flex flex-col items-center justify-center min-h-[40vh] text-center bg-bg-secondary border border-border-subtle p-8 rounded-[24px] shadow-sm">
         <p className="text-error text-sm font-medium mb-4">
@@ -55,7 +69,7 @@ export function OrdersClient() {
         </Link>
       </div>
     );
-  } else if (!orders || orders.length === 0) {
+  } else if (allOrders.length === 0 && !isLoading) {
     mainContent = (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center bg-bg-secondary border border-border-subtle p-8 rounded-[24px] shadow-sm">
         <div className="w-16 h-16 rounded-full bg-border-subtle flex items-center justify-center mb-4">
@@ -74,12 +88,24 @@ export function OrdersClient() {
         </Link>
       </div>
     );
-  } else {
+  } else if (allOrders.length > 0) {
     mainContent = (
       <div className="space-y-4 sm:space-y-5">
-        {orders.map((order) => (
+        {allOrders.map((order) => (
           <OrderCard key={order.id} order={order} />
         ))}
+        {hasMore && (
+          <div className="flex justify-center pt-4">
+            <Button
+              onClick={handleLoadMore}
+              variant="ghost"
+              size="sm"
+              disabled={isLoading}
+            >
+              {isLoading ? "Loading..." : "Load More"}
+            </Button>
+          </div>
+        )}
       </div>
     );
   }

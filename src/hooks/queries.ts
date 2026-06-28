@@ -214,16 +214,17 @@ export interface Order {
   createdAt: string;
 }
 
-/** Fetches the current user's orders from the API. */
-export function useOrders() {
+/** Fetches the current user's orders with pagination. */
+export function useOrders(page = 0, limit = 50) {
   const user = useAuthStore((s) => s.user);
 
-  return useQuery<Order[]>({
-    queryKey: ["orders", user?.id],
+  return useQuery<{ orders: Order[]; total: number }>({
+    queryKey: ["orders", user?.id, page],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!user?.id) return { orders: [], total: 0 };
 
-      const res = await fetch(`/api/orders?userId=${encodeURIComponent(user.id)}`);
+      const offset = page * limit;
+      const res = await fetch(`/api/orders?limit=${limit}&offset=${offset}`);
       if (!res.ok) {
         throw new Error("Failed to fetch orders");
       }

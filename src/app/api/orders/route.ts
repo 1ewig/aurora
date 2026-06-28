@@ -64,12 +64,22 @@ export async function GET(request: Request) {
       );
     }
 
+    const limit = Math.min(Number(searchParams.get("limit")) || 50, 100);
+    const offset = Number(searchParams.get("offset")) || 0;
+
+    const countRes = await pool.query(
+      "SELECT COUNT(*) FROM orders WHERE user_id = $1",
+      [session.user.id]
+    );
+    const total = parseInt(countRes.rows[0].count, 10);
+
     const result = await pool.query(
       `SELECT id, user_id, order_number, items, subtotal, shipping, tax, total, shipping_address, status, created_at
        FROM orders
        WHERE user_id = $1
-       ORDER BY created_at DESC`,
-      [session.user.id]
+       ORDER BY created_at DESC
+       LIMIT $2 OFFSET $3`,
+      [session.user.id, limit, offset]
     );
 
     const orders = result.rows.map((row) => ({
@@ -86,7 +96,7 @@ export async function GET(request: Request) {
       createdAt: row.created_at,
     }));
 
-    return NextResponse.json(orders);
+    return NextResponse.json({ orders, total });
   } catch (error) {
     console.error("Failed to fetch orders:", error);
     return NextResponse.json(
