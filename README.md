@@ -11,6 +11,7 @@
 [![InsForge BaaS](https://img.shields.io/badge/BaaS-InsForge-FF6B6B?style=flat-square)](https://insforge.dev)
 [![Better Auth](https://img.shields.io/badge/Auth-Better_Auth-E26D5C?style=flat-square)](https://www.better-auth.com/)
 [![Lemon Squeezy](https://img.shields.io/badge/Payments-Lemon_Squeezy-yellow?style=flat-square)](https://www.lemonsqueezy.com/)
+[![Vercel Analytics](https://img.shields.io/badge/Analytics-Vercel-black?style=flat-square&logo=vercel)](https://vercel.com/analytics)
 
 ---
 
@@ -196,6 +197,7 @@ Presentational Components (src/components/*/)
 | **Image Preprocessor**| Sharp | Automated asset WebP conversions and edge constraint scaling |
 | **Notifications** | Nodemailer + SMTP | Automated transactional order confirmations and auth updates |
 | **Payments Integration**| Lemon Squeezy Sandbox | Payment overlay modal, webhooks processing, receipt generation |
+| **Analytics** | Vercel Analytics | Production user insights, traffic tracking, and performance monitoring |
 
 ---
 
