@@ -73,6 +73,26 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
+
+      // Validate stock availability
+      const sizeRes = await pool.query(
+        "SELECT stock FROM product_sizes WHERE product_id = $1 AND size = $2",
+        [item.internalProductId, item.size || ""]
+      );
+      const sizeInfo = sizeRes.rows[0];
+      if (!sizeInfo) {
+        return NextResponse.json(
+          { error: `Size "${item.size}" not found for product "${dbProd.name}".` },
+          { status: 400 }
+        );
+      }
+      if (sizeInfo.stock < item.quantity) {
+        return NextResponse.json(
+          { error: `Insufficient stock for "${dbProd.name}" (Size: ${item.size}). Only ${sizeInfo.stock} available.` },
+          { status: 400 }
+        );
+      }
+
       subtotal += dbProd.price * item.quantity;
       itemsDescriptionParts.push(`${item.quantity}x ${dbProd.name} (${item.size})`);
     }

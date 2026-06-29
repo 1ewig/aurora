@@ -130,18 +130,24 @@ export function useProductDetailsQuery(slug: string) {
     enabled: !!slug,
     staleTime: 0,
     initialData: () => {
-      const cachedQueries = queryClient.getQueriesData<Product[]>({ queryKey: ['products'] });
-      for (const [, products] of cachedQueries) {
-        if (products) {
-          const product = products.find((p) => p.slug === slug);
-          if (product) {
-            return {
-              ...product,
-              images: product.images || [product.image],
-              description: product.description || '',
-              details: product.details || [],
-              sizes: product.sizes || [],
-            };
+      const cachedQueries = queryClient.getQueriesData<any>({ queryKey: ['products'] });
+      for (const [, data] of cachedQueries) {
+        if (data) {
+          const list = Array.isArray(data)
+            ? data
+            : (data && typeof data === 'object' && Array.isArray(data.products) ? data.products : null);
+
+          if (list) {
+            const product = list.find((p: any) => p.slug === slug);
+            if (product) {
+              return {
+                ...product,
+                images: product.images || [product.image],
+                description: product.description || '',
+                details: product.details || [],
+                sizes: product.sizes || [],
+              };
+            }
           }
         }
       }
