@@ -72,26 +72,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing event ID." }, { status: 400 });
     }
 
-    // 3. Idempotency protection check
-    const checkRes = await pool.query(
-      "SELECT 1 FROM processed_webhooks WHERE ls_event_id = $1",
-      [lsEventId]
-    );
-
-    if ((checkRes.rowCount ?? 0) > 0) {
-      console.log(`[LS Webhook] Event ${lsEventId} was already processed. Skipping.`);
-      return NextResponse.json({ received: true }, { status: 200 });
-    }
-
-    // 4. Mark event processed
-    await pool.query(
-      "INSERT INTO processed_webhooks (ls_event_id) VALUES ($1) ON CONFLICT DO NOTHING",
-      [lsEventId]
-    );
-
-    // 5. Handle event
+    // 3. Handle event inside transaction with idempotency protection
     if (eventName === "order_created") {
-      await handleOrderCreated(payload);
+      await handleOrderCreated(payload, lsEventId);
     }
 
     return NextResponse.json({ received: true }, { status: 200 });
@@ -104,7 +87,7 @@ export async function POST(req: NextRequest) {
 
 // ─── Order Creation Handler ──────────────────────────────────────────────────
 
-async function handleOrderCreated(payload: any) {
+async function handleOrderCreated(payload: any, lsEventId: string) {
   const attrs = payload.data?.attributes;
   const customData = payload.meta?.custom_data ?? {};
 
@@ -138,6 +121,21 @@ async function handleOrderCreated(payload: any) {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+
+    // Check and insert idempotency key inside the transaction
+    const checkRes = await client.query(
+      `INSERT INTO processed_webhooks (ls_event_id) 
+       VALUES ($1) 
+       ON CONFLICT (ls_event_id) DO NOTHING 
+       RETURNING 1`,
+      [lsEventId]
+    );
+
+    if ((checkRes.rowCount ?? 0) === 0) {
+      console.log(`[LS Webhook] Event ${lsEventId} was already processed. Skipping.`);
+      await client.query("COMMIT");
+      return;
+    }
 
     const verifiedItems: VerifiedItem[] = [];
     let subtotal = 0;
