@@ -15,7 +15,7 @@ import * as readline from 'readline';
 import { hashPassword } from 'better-auth/crypto';
 import * as crypto from 'crypto';
 
-const VALID_ROLES = ['user', 'explorer', 'admin'] as const;
+const VALID_ROLES = ['user', 'admin'] as const;
 type Role = (typeof VALID_ROLES)[number];
 
 // ── Credential loading (mirrors set-role.ts) ──

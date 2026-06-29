@@ -122,7 +122,6 @@ export function UserDetailModal({
                     }}
                   >
                     <option value="user">User</option>
-                    <option value="explorer">Explorer</option>
                     <option value="admin">Admin</option>
                   </select>
                 ) : (

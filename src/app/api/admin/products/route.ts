@@ -8,11 +8,11 @@
 
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
-import { requireAdmin, requireRole } from '@/utils/admin';
+import { requireAdmin } from '@/utils/admin';
 
 export async function GET() {
   try {
-    const { error } = await requireRole(1);
+    const { error } = await requireAdmin();
     if (error) return error;
 
     const result = await pool.query(`

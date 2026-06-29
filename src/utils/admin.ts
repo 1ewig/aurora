@@ -15,7 +15,6 @@ import { NextResponse } from 'next/server';
 
 export const ROLE_LEVELS: Record<string, number> = {
   user: 0,
-  explorer: 1,
   admin: 10,
 };
 

@@ -9,7 +9,7 @@
 
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
-import { requireAdmin, requireRole } from '@/utils/admin';
+import { requireAdmin } from '@/utils/admin';
 
 export async function GET(
   request: Request,
@@ -17,7 +17,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const { error } = await requireRole(1);
+    const { error } = await requireAdmin();
     if (error) return error;
 
     const url = new URL(request.url);
@@ -65,7 +65,7 @@ export async function PATCH(
     const values: any[] = [];
     let idx = 1;
 
-    if ('role' in body && !['user', 'explorer', 'admin'].includes(body.role)) {
+    if ('role' in body && !['user', 'admin'].includes(body.role)) {
       return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
     }
 
