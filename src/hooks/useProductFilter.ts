@@ -43,7 +43,7 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", newPage.toString());
-    router.push(pathname + "?" + params.toString(), { scroll: false });
+    router.push(pathname + "?" + params.toString());
   };
 
   // Submit search query to the URL
@@ -56,7 +56,7 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
       params.delete("search");
     }
     params.set("page", "1"); // Reset page to 1
-    router.push(pathname + "?" + params.toString(), { scroll: false });
+    router.push(pathname + "?" + params.toString());
   };
 
   // Clear search query and reload results
@@ -65,7 +65,7 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
     const params = new URLSearchParams(searchParams.toString());
     params.delete("search");
     params.set("page", "1"); // Reset page to 1
-    router.push(pathname + "?" + params.toString(), { scroll: false });
+    router.push(pathname + "?" + params.toString());
   };
 
   // Apply both category and sorting concurrently to avoid double navigation push
@@ -79,7 +79,7 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
     params.set("sortBy", newSortBy);
     params.set("page", "1"); // Reset page to 1
 
-    router.push(`${url}?${params.toString()}`, { scroll: false });
+    router.push(`${url}?${params.toString()}`);
     onCategoryChange?.(category);
   };
 
@@ -105,7 +105,7 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", "1"); // Reset page to 1
 
-    router.push(`${url}?${params.toString()}`, { scroll: false });
+    router.push(`${url}?${params.toString()}`);
     onCategoryChange?.(category);
   };
 
