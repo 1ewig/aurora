@@ -113,11 +113,17 @@ export function useCheckoutForm() {
         }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        throw new Error(data.error || "Failed to create checkout session.");
+        let errMsg = "Failed to create checkout session.";
+        try {
+          const data = await res.json();
+          errMsg = data.error || errMsg;
+        } catch {
+          errMsg = `HTTP error ${res.status}: ${res.statusText || "Server error"}`;
+        }
+        throw new Error(errMsg);
       }
+      const data = await res.json();
 
       setLoading(false);
 

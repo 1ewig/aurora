@@ -156,8 +156,17 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
+      if (!res.ok) {
+        let errMsg = "Failed to update order status";
+        try {
+          const data = await res.json();
+          errMsg = data.error || errMsg;
+        } catch {
+          errMsg = `HTTP error ${res.status}: ${res.statusText || "Server error"}`;
+        }
+        throw new Error(errMsg);
+      }
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to update order status");
 
       set((state) => ({
         orders: state.orders.map((o) => (o.id === orderId ? { ...o, status: status as any } : o)),
@@ -183,8 +192,17 @@ export const useAdminStore = create<AdminState>((set, get) => ({
         body: JSON.stringify(product),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to save product");
+      if (!res.ok) {
+        let errMsg = "Failed to save product";
+        try {
+          const data = await res.json();
+          errMsg = data.error || errMsg;
+        } catch {
+          errMsg = `HTTP error ${res.status}: ${res.statusText || "Server error"}`;
+        }
+        throw new Error(errMsg);
+      }
+      await res.json();
       
       set({ loading: false });
       await get().fetchProducts();
@@ -199,8 +217,17 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to delete product");
+      if (!res.ok) {
+        let errMsg = "Failed to delete product";
+        try {
+          const data = await res.json();
+          errMsg = data.error || errMsg;
+        } catch {
+          errMsg = `HTTP error ${res.status}: ${res.statusText || "Server error"}`;
+        }
+        throw new Error(errMsg);
+      }
+      await res.json();
 
       set((state) => ({
         products: state.products.filter((p) => p.id !== id),
