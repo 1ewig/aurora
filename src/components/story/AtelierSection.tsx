@@ -11,21 +11,22 @@ import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { fadeInUp, staggerContainer } from "@/animations/variants";
 import { getStorageUrl } from "@/utils/insforge";
-import { useEditorialQuery } from "@/hooks/queries";
+import type { EditorialItem } from "@/data/editorial";
+
+interface AtelierSectionProps {
+  loomContent?: EditorialItem;
+  foldingContent?: EditorialItem;
+}
 
 /** Atelier section detailing the brand's partnerships with historic family-owned mills. */
-export function AtelierSection() {
-  const { data: editorialItems = [] } = useEditorialQuery();
-  const loomItem = editorialItems.find(item => item.id === 'loom');
-  const foldingItem = editorialItems.find(item => item.id === 'folding');
+export function AtelierSection({ loomContent, foldingContent }: AtelierSectionProps) {
+  const loomImg = loomContent?.imageUrl || getStorageUrl("/images/editorial/loom.webp");
+  const loomAlt = loomContent?.altText || "Wool loom detail";
+  const loomTitle = loomContent?.title || "The Historic Mills";
+  const loomDesc = loomContent?.description || "A garment is only as good as the fibers it's made from. We work exclusively with generational family-owned mills in Biella, Italy for our virgin wool blends, and heritage spinning ateliers in Scotland for Mongolian cashmere.";
 
-  const loomImg = loomItem?.imageUrl || getStorageUrl("/images/editorial/loom.webp");
-  const loomAlt = loomItem?.altText || "Wool loom detail";
-  const loomTitle = loomItem?.title || "The Historic Mills";
-  const loomDesc = loomItem?.description || "A garment is only as good as the fibers it's made from. We work exclusively with generational family-owned mills in Biella, Italy for our virgin wool blends, and heritage spinning ateliers in Scotland for Mongolian cashmere.";
-
-  const foldingImg = foldingItem?.imageUrl || getStorageUrl("/images/editorial/folding.webp");
-  const foldingAlt = foldingItem?.altText || "Cashmere folding";
+  const foldingImg = foldingContent?.imageUrl || getStorageUrl("/images/editorial/folding.webp");
+  const foldingAlt = foldingContent?.altText || "Cashmere folding";
 
   return (
     <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto py-16">

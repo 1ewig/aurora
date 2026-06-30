@@ -10,17 +10,18 @@ import { motion } from "framer-motion";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { fadeInUp, staggerContainer } from "@/animations/variants";
 import { getStorageUrl } from "@/utils/insforge";
-import { useEditorialQuery } from "@/hooks/queries";
+import type { EditorialItem } from "@/data/editorial";
+
+interface PhilosophySectionProps {
+  content?: EditorialItem;
+}
 
 /** Brand philosophy section presenting the founding conviction, design ethos, and pull quote. */
-export function PhilosophySection() {
-  const { data: editorialItems = [] } = useEditorialQuery();
-  const designerItem = editorialItems.find(item => item.id === 'designer');
-
-  const imageUrl = designerItem?.imageUrl || getStorageUrl("/images/editorial/designer.webp");
-  const altText = designerItem?.altText || "Creative director sketching designs in studio";
-  const title = designerItem?.title || "The Conviction";
-  const description = designerItem?.description || "Elena Voss founded Aurora on a simple yet profound premise: every design decision has a ripple effect. We believe that true luxury isn't about excess or ostentation. It is found in precision, in solitude, and in the choices made before a garment ever reaches the atelier floor.";
+export function PhilosophySection({ content }: PhilosophySectionProps) {
+  const imageUrl = content?.imageUrl || getStorageUrl("/images/editorial/designer.webp");
+  const altText = content?.altText || "Creative director sketching designs in studio";
+  const title = content?.title || "The Conviction";
+  const description = content?.description || "Elena Voss founded Aurora on a simple yet profound premise: every design decision has a ripple effect. We believe that true luxury isn't about excess or ostentation. It is found in precision, in solitude, and in the choices made before a garment ever reaches the atelier floor.";
 
   return (
     <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center py-16">

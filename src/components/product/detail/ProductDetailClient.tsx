@@ -5,9 +5,11 @@
  */
 "use client";
 
-import { notFound } from "next/navigation";
-import { useProductDetailsQuery } from "@/hooks/queries";
+import { notFound, useRouter } from "next/navigation";
+import { useMemo } from "react";
+import { useProductDetailsQuery, useProductsQuery } from "@/hooks/queries";
 import { useProductStore } from "@/stores/useProductStore";
+import { useCartStore } from "@/stores/useCartStore";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { ImageGallery } from "./ImageGallery";
 import { ProductInfo } from "./ProductInfo";
@@ -22,9 +24,18 @@ interface ProductDetailClientProps {
 
 /** Renders the product detail page layout with gallery, info, actions, tabs, and related products. */
 export function ProductDetailClient({ slug }: ProductDetailClientProps) {
+  const router = useRouter();
   const { data: product, isLoading, error } = useProductDetailsQuery(slug);
+  const { data: allProducts = [] } = useProductsQuery();
+
   const isSizeGuideOpen = useProductStore((s) => s.isSizeGuideOpen);
   const setSizeGuideOpen = useProductStore((s) => s.setSizeGuideOpen);
+  const selectedSizes = useProductStore((s) => s.selectedSizes);
+  const setSelectedSize = useProductStore((s) => s.setSelectedSize);
+  const activeTabs = useProductStore((s) => s.activeTabs);
+  const setActiveTab = useProductStore((s) => s.setActiveTab);
+  const addItem = useCartStore((s) => s.addItem);
+  const cartItems = useCartStore((s) => s.items);
 
   if (isLoading) {
     return (
@@ -59,6 +70,48 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
     notFound();
   }
 
+  const selectedSize = selectedSizes[product.id] || product.sizes?.[0] || "M";
+  const isInCart = cartItems.some(
+    (item) => item.id === product.id && item.size === selectedSize
+  );
+  const activeTab = activeTabs[product.id] || "details";
+
+  const handleAddToBag = () => {
+    addItem({
+      id: product.id,
+      slug: product.slug,
+      name: product.name,
+      price: product.price,
+      size: selectedSize,
+      image: product.image,
+      category: product.category,
+    });
+  };
+
+  const handleBuyNow = () => {
+    if (!isInCart) {
+      addItem({
+        id: product.id,
+        slug: product.slug,
+        name: product.name,
+        price: product.price,
+        size: selectedSize,
+        image: product.image,
+        category: product.category,
+      });
+    }
+    router.push("/checkout");
+  };
+
+  const relatedProducts = useMemo(() => {
+    if (allProducts.length === 0) return [];
+    const sameCategory = allProducts.filter(
+      (p) => p.category === product.category && p.slug !== product.slug
+    );
+    if (sameCategory.length > 0) return sameCategory.slice(0, 4);
+    return allProducts.filter((p) => p.slug !== product.slug).slice(0, 4);
+  }, [allProducts, product]);
+
   return (
     <main id="main-content" tabIndex={-1} className="pt-24 pb-16 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
       {/* Breadcrumbs */}
@@ -74,13 +127,25 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
         {/* Right Side - Info & Purchasing */}
         <div className="lg:col-span-7 space-y-8 lg:sticky lg:top-24">
           <ProductInfo product={product} />
-          <ProductActions product={product} />
-          <ProductDetailsTabs product={product} />
+          <ProductActions
+            product={product}
+            selectedSize={selectedSize}
+            isInCart={isInCart}
+            onAddToBag={handleAddToBag}
+            onBuyNow={handleBuyNow}
+            onSizeChange={(size) => setSelectedSize(product.id, size)}
+            onOpenSizeGuide={() => setSizeGuideOpen(true)}
+          />
+          <ProductDetailsTabs
+            product={product}
+            activeTab={activeTab}
+            onTabChange={(tab) => setActiveTab(product.id, tab)}
+          />
         </div>
       </div>
 
       {/* Related Products Grid */}
-      <RelatedProducts product={product} />
+      {relatedProducts.length > 0 && <RelatedProducts products={relatedProducts} />}
 
       <SizeGuideModal
         isOpen={isSizeGuideOpen}

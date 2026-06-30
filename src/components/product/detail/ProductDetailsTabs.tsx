@@ -5,14 +5,16 @@
  */
 "use client";
 
-import { useProductStore } from "@/stores/useProductStore";
 import type { Product } from "@/data/products";
 
-/** Renders tabbed content toggling between product details and shipping/returns information. */
-export function ProductDetailsTabs({ product }: { product: Product }) {
-  const activeTab = useProductStore((s) => s.activeTabs[product.id]) || "details";
-  const setActiveTab = useProductStore((s) => s.setActiveTab);
+interface ProductDetailsTabsProps {
+  product: Product;
+  activeTab: string;
+  onTabChange: (tab: "details" | "shipping") => void;
+}
 
+/** Renders tabbed content toggling between product details and shipping/returns information. */
+export function ProductDetailsTabs({ product, activeTab, onTabChange }: ProductDetailsTabsProps) {
   return (
     <div className="border-t border-border-subtle pt-6">
       <div className="flex border-b border-border-subtle mb-4" role="tablist" aria-label="Product extra information tabs">
@@ -20,7 +22,7 @@ export function ProductDetailsTabs({ product }: { product: Product }) {
           type="button"
           role="tab"
           aria-selected={activeTab === "details" ? "true" : "false"}
-          onClick={() => setActiveTab(product.id, "details")}
+          onClick={() => onTabChange("details")}
           className={`pb-3 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all mr-6 cursor-pointer ${
             activeTab === "details"
               ? "border-text-primary text-text-primary"
@@ -33,7 +35,7 @@ export function ProductDetailsTabs({ product }: { product: Product }) {
           type="button"
           role="tab"
           aria-selected={activeTab === "shipping" ? "true" : "false"}
-          onClick={() => setActiveTab(product.id, "shipping")}
+          onClick={() => onTabChange("shipping")}
           className={`pb-3 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all cursor-pointer ${
             activeTab === "shipping"
               ? "border-text-primary text-text-primary"

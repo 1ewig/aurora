@@ -3,20 +3,16 @@
  *
  * Displays a grid of related product cards based on the current product.
  */
-"use client";
 
 import { ProductCard } from "@/components/ui/ProductCard";
-import { useRelatedProductsQuery } from "@/hooks/queries";
 import type { Product } from "@/data/products";
 
 interface RelatedProductsProps {
-  product: Product;
+  products: Product[];
 }
 
-/** Renders a grid of related product cards, fetching them via the related products query. */
-export function RelatedProducts({ product }: RelatedProductsProps) {
-  const { data: products = [] } = useRelatedProductsQuery(product);
-
+/** Renders a grid of related product cards. */
+export function RelatedProducts({ products }: RelatedProductsProps) {
   return (
     <section aria-labelledby="related-heading" className="py-20 border-t border-border-subtle mt-20">
       <div className="max-w-[1400px] mx-auto">
@@ -24,7 +20,7 @@ export function RelatedProducts({ product }: RelatedProductsProps) {
           Related Pieces
         </h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-          {products.slice(0, 4).map((relatedProduct) => (
+          {products.map((relatedProduct) => (
             <ProductCard key={relatedProduct.id} product={relatedProduct} />
           ))}
         </div>

@@ -2,7 +2,8 @@
  * Aurora — src/components/layout/Navbar.tsx
  *
  * Fixed top navigation with scroll-reactive background, cart drawer toggle,
- * user profile dropdown, and mobile menu trigger.
+ * user profile dropdown, and mobile menu trigger. Receives all dynamic data
+ * via props from NavbarContainer.
  */
 
 "use client";
@@ -58,7 +59,7 @@ export function Navbar() {
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+
   const toggleCart = useCartStore((s) => s.toggleCart);
   const items = useCartStore((s) => s.items);
   const count = items.reduce((sum, i) => sum + i.quantity, 0);
@@ -67,6 +68,7 @@ export function Navbar() {
   const profile = useAuthStore((s) => s.profile);
   const signOut = useAuthStore((s) => s.signOut);
 
+  const { navBg, navBorder, navBlur } = useNavbarScroll();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -79,8 +81,6 @@ export function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  const { navBg, navBorder, navBlur } = useNavbarScroll();
   return (
     <>
       <motion.header

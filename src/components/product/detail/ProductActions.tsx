@@ -5,60 +5,37 @@
  */
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useCartStore } from "@/stores/useCartStore";
-import { useProductStore } from "@/stores/useProductStore";
 import { SizeSelector } from "./SizeSelector";
 import { Button } from "@/components/ui/Button";
 import type { Product } from "@/data/products";
 
+interface ProductActionsProps {
+  product: Product;
+  selectedSize: string;
+  isInCart: boolean;
+  onAddToBag: () => void;
+  onBuyNow: () => void;
+  onSizeChange: (size: string) => void;
+  onOpenSizeGuide: () => void;
+}
+
 /** Renders size selector and add-to-bag / buy-now action buttons. */
-export function ProductActions({ product }: { product: Product }) {
-  const router = useRouter();
-
-  const selectedSize = useProductStore((s) => s.selectedSizes[product.id]) || product.sizes?.[0] || "M";
-  const setSelectedSize = useProductStore((s) => s.setSelectedSize);
-  const setIsSizeGuideOpen = useProductStore((s) => s.setSizeGuideOpen);
-
-  const addItem = useCartStore((s) => s.addItem);
-  const isInCart = useCartStore((s) =>
-    s.items.some((item) => item.id === product.id && item.size === selectedSize)
-  );
-
-  const handleAddToBag = () => {
-    addItem({
-      id: product.id,
-      slug: product.slug,
-      name: product.name,
-      price: product.price,
-      size: selectedSize,
-      image: product.image,
-      category: product.category,
-    });
-  };
-
-  const handleBuyNow = () => {
-    if (!isInCart) {
-      addItem({
-        id: product.id,
-        slug: product.slug,
-        name: product.name,
-        price: product.price,
-        size: selectedSize,
-        image: product.image,
-        category: product.category,
-      });
-    }
-    router.push("/checkout");
-  };
-
+export function ProductActions({
+  product,
+  selectedSize,
+  isInCart,
+  onAddToBag,
+  onBuyNow,
+  onSizeChange,
+  onOpenSizeGuide,
+}: ProductActionsProps) {
   return (
     <div className="space-y-6 border-t border-border-subtle pt-6">
       <SizeSelector
         sizes={product.sizes || []}
         selectedSize={selectedSize}
-        onChange={(size) => setSelectedSize(product.id, size)}
-        onOpenSizeGuide={() => setIsSizeGuideOpen(true)}
+        onChange={onSizeChange}
+        onOpenSizeGuide={onOpenSizeGuide}
       />
 
       <div className="flex flex-col sm:flex-row gap-3 pt-4">
@@ -66,7 +43,7 @@ export function ProductActions({ product }: { product: Product }) {
           variant="ghost"
           size="lg"
           fullWidth
-          onClick={handleAddToBag}
+          onClick={onAddToBag}
           disabled={isInCart}
           className="py-4 font-semibold uppercase tracking-wider text-xs disabled:opacity-75 disabled:cursor-not-allowed"
         >
@@ -76,7 +53,7 @@ export function ProductActions({ product }: { product: Product }) {
           variant="filled"
           size="lg"
           fullWidth
-          onClick={handleBuyNow}
+          onClick={onBuyNow}
           className="py-4 font-semibold uppercase tracking-wider text-xs"
         >
           Buy Now

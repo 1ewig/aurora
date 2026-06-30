@@ -5,10 +5,10 @@
  */
 "use client";
 
-import { ProductListing } from "@/components/product/listing/ProductListing";
+import { ProductListingClient } from "@/components/product/listing/ProductListingClient";
 
 /** Renders the all-products listing page. */
 export default function ProductsPageClient() {
-  return <ProductListing initialCategory="All" />;
+  return <ProductListingClient initialCategory="All" />;
 }
 

@@ -6,14 +6,14 @@
  */
 "use client";
 
-import { useCartStore } from "@/stores/useCartStore";
+import { useCheckoutForm } from "@/hooks/useCheckoutForm";
 import { CheckoutForm } from "@/components/checkout/CheckoutForm";
 import { OrderSummaryContainer } from "@/components/checkout/OrderSummaryContainer";
 import { CartEmptyState } from "@/components/checkout/CartEmptyState";
 
 /** Checkout page root — conditionally renders empty state or form. */
 export default function CheckoutPageClient() {
-  const items = useCartStore((s) => s.items);
+  const { items, setError: _, ...formProps } = useCheckoutForm();
 
   if (items.length === 0) {
     return (
@@ -44,7 +44,7 @@ export default function CheckoutPageClient() {
             <OrderSummaryContainer />
           </div>
           <div className="lg:col-span-7">
-            <CheckoutForm />
+            <CheckoutForm {...formProps} />
           </div>
         </div>
       </div>

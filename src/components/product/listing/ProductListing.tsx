@@ -1,44 +1,55 @@
 /**
  * Aurora — src/components/product/listing/ProductListing.tsx
  *
- * Full product listing page with search, filter, sort, and product grid.
+ * Presentational product listing page with search, filter, sort, and product grid.
+ * Receives all state and handlers via props from ProductListingContainer.
  */
 "use client";
 
-import { useState } from "react";
 import { PageHeader } from "@/components/product/listing/PageHeader";
 import { FilterDrawer } from "@/components/product/listing/FilterDrawer";
 import { ProductGrid } from "@/components/product/listing/ProductGrid";
-import { useProductFilter } from "@/hooks/useProductFilter";
 import { Pagination } from "@/components/ui/Pagination";
+import type { Product } from "@/data/products";
 
 interface ProductListingProps {
-  initialCategory?: string;
-  onCategoryChange?: (category: string) => void;
+  activeCategory: string;
+  sortBy: string;
+  applyFilters: (category: string, sort: string) => void;
+  searchQuery: string;
+  setSearchQuery: (q: string) => void;
+  handleSearchSubmit: (e?: React.FormEvent) => void;
+  handleClearSearch: () => void;
+  filtered: Product[];
+  isLoading: boolean;
+  totalPages: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
+  categories: readonly string[];
+  isFilterDrawerOpen: boolean;
+  onOpenFilterDrawer: () => void;
+  onCloseFilterDrawer: () => void;
 }
 
 /** Renders the full product listing with search bar, filter drawer, and animated product grid. */
-export function ProductListing({ initialCategory = "All", onCategoryChange }: ProductListingProps) {
-  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-
-  const {
-    activeCategory,
-    sortBy,
-    applyFilters,
-    searchQuery,
-    setSearchQuery,
-    handleSearchSubmit,
-    handleClearSearch,
-    filtered,
-    categories,
-    isLoading,
-    totalPages,
-    currentPage,
-    onPageChange,
-  } = useProductFilter({
-    initialCategory,
-    onCategoryChange,
-  });
+export function ProductListing({
+  activeCategory,
+  sortBy,
+  applyFilters,
+  searchQuery,
+  setSearchQuery,
+  handleSearchSubmit,
+  handleClearSearch,
+  filtered,
+  categories,
+  isLoading,
+  totalPages,
+  currentPage,
+  onPageChange,
+  isFilterDrawerOpen,
+  onOpenFilterDrawer,
+  onCloseFilterDrawer,
+}: ProductListingProps) {
 
   return (
     <main id="main-content" tabIndex={-1} className="pt-28 pb-32">
@@ -80,7 +91,7 @@ export function ProductListing({ initialCategory = "All", onCategoryChange }: Pr
             {/* Filter Toggle Button */}
             <button
               type="button"
-              onClick={() => setIsFilterDrawerOpen(true)}
+              onClick={onOpenFilterDrawer}
               className="p-3 bg-bg-secondary border border-border-medium rounded-full text-text-primary hover:border-text-primary transition-all duration-300 flex items-center justify-center cursor-pointer shadow-sm focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2"
               aria-label="Open filters"
             >
@@ -105,7 +116,7 @@ export function ProductListing({ initialCategory = "All", onCategoryChange }: Pr
 
       <FilterDrawer
         isOpen={isFilterDrawerOpen}
-        onClose={() => setIsFilterDrawerOpen(false)}
+        onClose={onCloseFilterDrawer}
         categories={categories}
         activeCategory={activeCategory}
         sortBy={sortBy}

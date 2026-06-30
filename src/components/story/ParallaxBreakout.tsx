@@ -8,14 +8,15 @@
 
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { getStorageUrl } from "@/utils/insforge";
-import { useLookbookQuery } from "@/hooks/queries";
+
+interface ParallaxBreakoutProps {
+  slide?: { imageUrl?: string; altText?: string };
+}
 
 /** Full-width breakout section with editorial background image and centered brand tagline. */
-export function ParallaxBreakout() {
-  const { data: dbSlides = [] } = useLookbookQuery();
-  const slide3 = dbSlides.find(s => s.slideNumber === 3);
-  const src = slide3?.imageUrl || getStorageUrl("/images/lookbook/lookbook-3.webp");
-  const alt = slide3?.altText || "Extrafine fabric detail view";
+export function ParallaxBreakout({ slide }: ParallaxBreakoutProps) {
+  const src = slide?.imageUrl || getStorageUrl("/images/lookbook/lookbook-3.webp");
+  const alt = slide?.altText || "Extrafine fabric detail view";
 
   return (
     <section className="py-16 relative h-[70vh] md:h-[85vh] bg-border-subtle overflow-hidden">

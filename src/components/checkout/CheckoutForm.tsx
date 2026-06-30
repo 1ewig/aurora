@@ -1,13 +1,13 @@
 /**
  * Aurora — src/components/checkout/CheckoutForm.tsx
  *
- * Client-side checkout form that collects contact, shipping, and mock payment
- * details. Integrates with the useCheckoutForm hook for validation and submission.
+ * Presentational checkout form that collects contact and shipping details.
+ * Receives all state and handlers via props from CheckoutFormContainer.
  */
 "use client";
 
-import { useCheckoutForm } from "@/hooks/useCheckoutForm";
 import { Button } from "@/components/ui/Button";
+import type { FieldErrors } from "@/utils/validation";
 
 function fieldClass(hasError: boolean) {
   return `w-full px-4 py-3 rounded-md bg-white border focus:outline-none transition-colors text-sm text-text-primary ${
@@ -22,24 +22,39 @@ function FieldError({ show, message }: { show: boolean; message?: string }) {
   return <p className="text-error text-[11px] mt-1">{message}</p>;
 }
 
-/** Checkout form — contact info, shipping address, and mock credit-card fields with validation. */
-export function CheckoutForm() {
-  const {
-    email, setEmail,
-    firstName, setFirstName,
-    lastName, setLastName,
-    address, setAddress,
-    city, setCity,
-    zipCode, setZipCode,
-    loading, error,
-    items,
-    handlePlaceOrder,
-    fieldErrors, handleBlur, touched,
-  } = useCheckoutForm();
+interface CheckoutFormProps {
+  email: string;
+  setEmail: (v: string) => void;
+  firstName: string;
+  setFirstName: (v: string) => void;
+  lastName: string;
+  setLastName: (v: string) => void;
+  address: string;
+  setAddress: (v: string) => void;
+  city: string;
+  setCity: (v: string) => void;
+  zipCode: string;
+  setZipCode: (v: string) => void;
+  loading: boolean;
+  error: string;
+  handlePlaceOrder: (e: React.FormEvent) => Promise<void>;
+  fieldErrors: FieldErrors;
+  handleBlur: (field: string) => void;
+  touched: Set<string>;
+}
 
-  if (items.length === 0) {
-    return null;
-  }
+/** Checkout form — contact info, shipping address, and mock credit-card fields with validation. */
+export function CheckoutForm({
+  email, setEmail,
+  firstName, setFirstName,
+  lastName, setLastName,
+  address, setAddress,
+  city, setCity,
+  zipCode, setZipCode,
+  loading, error,
+  handlePlaceOrder,
+  fieldErrors, handleBlur, touched,
+}: CheckoutFormProps) {
 
   return (
     <form onSubmit={handlePlaceOrder} className="space-y-8">
