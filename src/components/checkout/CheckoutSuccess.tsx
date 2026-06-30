@@ -14,7 +14,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 
 interface CheckoutSuccessProps {
   orderNumber: string;
-  maskedEmail: string;
+  email: string;
   cardNumber?: string;
   maskedCardNumber?: string;
   items: Array<{
@@ -36,7 +36,7 @@ interface CheckoutSuccessProps {
 /** Order success UI — item list, pricing totals, masked card info, and a reference number. */
 export function CheckoutSuccess({
   orderNumber,
-  maskedEmail,
+  email,
   maskedCardNumber,
   items,
   subtotal,
@@ -64,7 +64,7 @@ export function CheckoutSuccess({
 
       <p className="text-text-secondary max-w-md mx-auto text-sm md:text-base leading-relaxed">
         Thank you for your purchase. We are preparing your order. A confirmation email has been sent to:
-        <span className="block font-medium text-text-primary mt-1">{maskedEmail}</span>
+        <span className="block font-medium text-text-primary mt-1">{email}</span>
       </p>
 
       {/* Purchased Items List */}

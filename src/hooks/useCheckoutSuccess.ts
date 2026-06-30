@@ -14,6 +14,7 @@ import { useSearchParams } from "next/navigation";
 
 interface CheckoutData {
   orderNumber: string;
+  email: string;
   maskedEmail: string;
   cardNumber?: string;
   maskedCardNumber?: string;

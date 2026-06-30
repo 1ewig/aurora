@@ -135,6 +135,7 @@ export function useCheckoutForm() {
 
       const checkoutData = {
         orderNumber: "Pending Fulfillment",
+        email,
         maskedEmail: maskEmail(email),
         cardNumber: "•••• •••• •••• 4242",
         maskedCardNumber: "•••• •••• •••• 4242",

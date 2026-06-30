@@ -28,7 +28,7 @@ export function CheckoutSuccessClient() {
         </div>
         <CheckoutSuccess
           orderNumber={orderData.orderNumber}
-          maskedEmail={orderData.maskedEmail}
+          email={orderData.email}
           cardNumber={orderData.cardNumber}
           maskedCardNumber={orderData.maskedCardNumber}
           items={orderData.items}
