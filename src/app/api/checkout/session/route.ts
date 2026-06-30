@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
     const checkoutData = await createCheckout({
       variantId: body.variantId,
       userId: session?.user?.id ?? null,
-      userEmail: session?.user?.email,
+      userEmail: sanitizedAddress.email,
       userName: session?.user?.name,
       cartItems: body.cartItems,
       shippingAddress: sanitizedAddress,
