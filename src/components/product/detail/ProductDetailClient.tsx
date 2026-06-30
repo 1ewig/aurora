@@ -37,6 +37,15 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const addItem = useCartStore((s) => s.addItem);
   const cartItems = useCartStore((s) => s.items);
 
+  const relatedProducts = useMemo(() => {
+    if (!product || allProducts.length === 0) return [];
+    const sameCategory = allProducts.filter(
+      (p) => p.category === product.category && p.slug !== product.slug
+    );
+    if (sameCategory.length > 0) return sameCategory.slice(0, 4);
+    return allProducts.filter((p) => p.slug !== product.slug).slice(0, 4);
+  }, [allProducts, product]);
+
   if (isLoading) {
     return (
       <main className="pt-24 pb-16 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto animate-pulse">
@@ -102,15 +111,6 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
     }
     router.push("/checkout");
   };
-
-  const relatedProducts = useMemo(() => {
-    if (allProducts.length === 0) return [];
-    const sameCategory = allProducts.filter(
-      (p) => p.category === product.category && p.slug !== product.slug
-    );
-    if (sameCategory.length > 0) return sameCategory.slice(0, 4);
-    return allProducts.filter((p) => p.slug !== product.slug).slice(0, 4);
-  }, [allProducts, product]);
 
   return (
     <main id="main-content" tabIndex={-1} className="pt-24 pb-16 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
