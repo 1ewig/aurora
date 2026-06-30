@@ -10,43 +10,21 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
-import { getStorageUrl } from "@/utils/insforge";
-import { useLookbookQuery } from "@/hooks/queries";
 import Link from "next/link";
 
+interface LookbookSlide {
+  imageUrl: string;
+  altText: string;
+  title?: string;
+  link?: string;
+}
+
+interface LookbookSliderProps {
+  slides: LookbookSlide[];
+}
+
 /** Full-screen lookbook carousel with auto-advance and dot navigation. */
-export function LookbookSlider() {
-  const { data: dbSlides = [] } = useLookbookQuery();
-
-  const fallbackSlides = [
-    {
-      imageUrl: getStorageUrl("/images/lookbook/lookbook-1.webp"),
-      altText: "Woman in tailored cream overcoat walking through European cobblestone street at golden hour",
-      title: "Look 01 — The Overcoat",
-    },
-    {
-      imageUrl: getStorageUrl("/images/lookbook/lookbook-2.webp"),
-      altText: "Female model in all-white minimalist look in brutalist concrete architecture",
-      title: "Look 02 — The White Study",
-    },
-    {
-      imageUrl: getStorageUrl("/images/lookbook/lookbook-3.webp"),
-      altText: "Model in earth-tone outfit in a mid-century modern interior",
-      title: "Look 03 — The Interior",
-    },
-    {
-      imageUrl: getStorageUrl("/images/lookbook/lookbook-4.webp"),
-      altText: "Solitary figure in charcoal coat in a misty forest at dawn",
-      title: "Look 04 — The Drift",
-    },
-    {
-      imageUrl: getStorageUrl("/images/lookbook/lookbook-5.webp"),
-      altText: "Model in structured black blazer on rooftop at blue hour",
-      title: "Look 05 — Blue Hour",
-    },
-  ];
-
-  const slides = dbSlides.length > 0 ? dbSlides.slice(0, 5) : fallbackSlides;
+export function LookbookSlider({ slides }: LookbookSliderProps) {
 
   const autoplay = useMemo(
     () => Autoplay({ delay: 6000, stopOnInteraction: true }),

@@ -11,12 +11,15 @@ import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { Button } from "@/components/ui/Button";
-import { useFeaturedProductsQuery } from "@/hooks/queries";
 import { staggerContainer, scaleIn } from "@/animations/variants";
+import type { Product } from "@/data/products";
+
+interface FeaturedCollectionProps {
+  featured: Product[];
+}
 
 /** Featured collection grid displaying curated products with animation. */
-export function FeaturedCollection() {
-  const { data: featured = [] } = useFeaturedProductsQuery(3);
+export function FeaturedCollection({ featured }: FeaturedCollectionProps) {
   return (
     <section
       id="collection"

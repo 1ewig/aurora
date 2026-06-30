@@ -8,12 +8,18 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { useNewsletterSubmit } from "@/hooks/useNewsletterSubmit";
 import { staggerContainer, fadeInUp } from "@/animations/variants";
 
+interface NewsletterProps {
+  email: string;
+  setEmail: (v: string) => void;
+  submitted: boolean;
+  loading: boolean;
+  handleSubmit: (e: React.FormEvent) => Promise<void>;
+}
+
 /** Newsletter subscription form with email validation, loading state, and success animation. */
-export function Newsletter() {
-  const { email, setEmail, submitted, loading, handleSubmit } = useNewsletterSubmit();
+export function Newsletter({ email, setEmail, submitted, loading, handleSubmit }: NewsletterProps) {
 
   return (
     <section

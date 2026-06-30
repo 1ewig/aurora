@@ -13,20 +13,14 @@ import { CascadeCards } from "./ui/CascadeCards";
 import { Button } from "@/components/ui/Button";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { AnimatedText } from "@/components/ui/AnimatedText";
-import { useProductsQuery } from "@/hooks/queries";
+import type { Product } from "@/data/products";
+
+interface HeroProps {
+  heroProducts: Product[];
+}
 
 /** Landing page hero with animated headline, cascade cards, and call-to-action buttons. */
-export function Hero() {
-  const { data: products = [] } = useProductsQuery();
-  const heroProductsList = products.filter((p) =>
-    [
-      "ivory-wool-overcoat",
-      "camel-cashmere-turtleneck",
-      "ecru-linen-blazer",
-      "charcoal-wide-leg-trousers",
-      "champagne-silk-slip-dress",
-    ].includes(p.slug)
-  );
+export function Hero({ heroProducts }: HeroProps) {
 
   return (
     <section
@@ -90,7 +84,7 @@ export function Hero() {
 
         {/* Cascade Cards — positioned relative to create space */}
         <div className="relative w-full mt-12 md:mt-14">
-          <CascadeCards products={heroProductsList} />
+          <CascadeCards products={heroProducts} />
         </div>
 
         {/* Subheadline */}
