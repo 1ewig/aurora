@@ -5,7 +5,8 @@
  */
 
 import type { Metadata } from "next";
-import CategoryPageClient from "@/components/product/listing/CategoryPageClient";
+import { notFound } from "next/navigation";
+import { ProductListingClient } from "@/components/product/listing/ProductListingClient";
 
 const categoryMap: Record<string, string> = {
   outerwear: "Outerwear",
@@ -46,6 +47,13 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
 /** Category product listing page. */
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  return <CategoryPageClient params={params} />;
+  const { category } = await params;
+  const categoryName = categoryMap[category.toLowerCase()];
+
+  if (!categoryName) {
+    notFound();
+  }
+
+  return <ProductListingClient initialCategory={categoryName} />;
 }
 

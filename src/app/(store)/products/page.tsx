@@ -5,7 +5,7 @@
  */
 
 import type { Metadata } from "next";
-import ProductsPageClient from "@/components/product/listing/ProductsPageClient";
+import { ProductListingClient } from "@/components/product/listing/ProductListingClient";
 
 /** Metadata for the all-products listing page. */
 export const metadata: Metadata = {
@@ -26,6 +26,6 @@ export const metadata: Metadata = {
 
 /** Products listing page. */
 export default function ProductsPage() {
-  return <ProductsPageClient />;
+  return <ProductListingClient initialCategory="All" />;
 }
 
