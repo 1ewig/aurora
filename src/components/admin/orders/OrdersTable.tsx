@@ -18,9 +18,6 @@ interface OrdersTableProps {
   searchQuery: string;
   onSearchChange: (val: string) => void;
   onViewDetailsClick: (order: OrderData) => void;
-  onStatusUpdate: (orderId: string, status: string) => void;
-  updatingStatusId: string | null;
-  isAdmin: boolean;
   onRefresh: () => void;
   loading: boolean;
 }
@@ -33,9 +30,6 @@ export function OrdersTable({
   searchQuery,
   onSearchChange,
   onViewDetailsClick,
-  onStatusUpdate,
-  updatingStatusId,
-  isAdmin,
   onRefresh,
   loading,
 }: OrdersTableProps) {
@@ -154,28 +148,12 @@ export function OrdersTable({
                       <OrderStatusBadge status={o.status} />
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="inline-flex gap-2">
-                        <button
-                          onClick={() => onViewDetailsClick(o)}
-                          className="px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-text-primary hover:text-accent-primary transition-colors cursor-pointer"
-                        >
-                          View Details
-                        </button>
-                        {isAdmin && (
-                          <select
-                            disabled={updatingStatusId === o.id}
-                            value={o.status}
-                            onChange={(e) => onStatusUpdate(o.id, e.target.value)}
-                            className="px-2 py-1 bg-bg-primary border border-border-medium rounded-lg text-xs font-medium focus:outline-none focus:border-accent-primary"
-                          >
-                            <option value="pending">Pending</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
-                          </select>
-                        )}
-                      </div>
+                      <button
+                        onClick={() => onViewDetailsClick(o)}
+                        className="px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-text-primary hover:text-accent-primary transition-colors cursor-pointer border border-border-medium rounded-full bg-bg-secondary hover:border-text-primary"
+                      >
+                        View Details
+                      </button>
                     </td>
                   </tr>
                 );

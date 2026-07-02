@@ -54,9 +54,6 @@ export function OrdersClient() {
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onViewDetailsClick={setSelectedOrder}
-            onStatusUpdate={updateOrderStatus}
-            updatingStatusId={loading ? "updating" : null}
-            isAdmin={isAdmin}
             onRefresh={fetchOrders}
             loading={loading}
           />
@@ -67,7 +64,7 @@ export function OrdersClient() {
             onClose={() => setSelectedOrder(null)}
             order={selectedOrder}
             onStatusUpdate={updateOrderStatus}
-            updatingStatusId={loading ? "updating" : null}
+            updatingStatusId={loading && selectedOrder ? selectedOrder.id : null}
             isAdmin={isAdmin}
           />
         </>
