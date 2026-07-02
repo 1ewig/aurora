@@ -23,6 +23,7 @@ import { heroProducts, featuredProducts, allProducts, type Product } from '../sr
 import { lookbookSlides } from '../src/data/lookbook';
 import { editorialItems } from '../src/data/editorial';
 import { heroSlides } from '../src/data/hero';
+import { categoryDataList } from '../src/data/categories';
 
 // ════════════════════════════════════════════════════════
 //  Credential loading
@@ -94,6 +95,7 @@ const BUCKETS = {
   lookbook: 'lookbook-media',
   editorial: 'editorial-media',
   hero: 'hero-media',
+  categories: 'category-media',
 };
 
 function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: string } {
@@ -111,6 +113,11 @@ function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: st
     return {
       bucket: BUCKETS.hero,
       storageKey: localRelPath.replace(/^\/images\/hero\//, ''),
+    };
+  } else if (localRelPath.startsWith('/images/categories/')) {
+    return {
+      bucket: BUCKETS.categories,
+      storageKey: localRelPath.replace(/^\/images\/categories\//, ''),
     };
   } else {
     const key = localRelPath.replace(/^\/images\//, '');
@@ -285,6 +292,11 @@ async function seed() {
     allImagePaths.add(slide.originalImage);
   }
 
+  // Add category images
+  for (const cat of categoryDataList) {
+    allImagePaths.add(cat.image);
+  }
+
   // Add editorial images
   for (const item of editorialItems) {
     allImagePaths.add(item.originalImage);
@@ -376,10 +388,22 @@ async function seed() {
     DROP TABLE IF EXISTS public.lookbook_slides CASCADE;
     DROP TABLE IF EXISTS public.editorial_content CASCADE;
     DROP TABLE IF EXISTS public.hero_slides CASCADE;
+    DROP TABLE IF EXISTS categories CASCADE;
   `);
 
   const schemaSql = fs.readFileSync(path.resolve(process.cwd(), 'scripts', 'create-tables.sql'), 'utf-8');
   await client.query(schemaSql);
+
+  // ── Seeding Categories ──
+  console.log(`Inserting ${categoryDataList.length} categories...`);
+  for (const cat of categoryDataList) {
+    const imageUrl = urlMap.get(cat.image) || cat.image;
+    await client.query(
+      `INSERT INTO categories (slug, name, image, description)
+       VALUES ($1, $2, $3, $4)`,
+      [cat.slug, cat.name, imageUrl, cat.description]
+    );
+  }
 
   // ── Seeding Products ──
   console.log(`Inserting ${uniqueProducts.length} products...`);

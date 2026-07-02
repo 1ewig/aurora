@@ -11,6 +11,15 @@ RETURNS text
 LANGUAGE sql STABLE
 AS $$ SELECT NULLIF(auth.jwt() ->> 'sub', '')::text $$;
 
+-- Categories table
+CREATE TABLE IF NOT EXISTS categories (
+  slug VARCHAR(50) PRIMARY KEY,
+  name VARCHAR(100) UNIQUE NOT NULL,
+  image TEXT NOT NULL,
+  description TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
 -- Products base table
 CREATE TABLE IF NOT EXISTS products (
   id VARCHAR(50) PRIMARY KEY,

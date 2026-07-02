@@ -21,6 +21,7 @@ import { heroProducts, featuredProducts, allProducts, type Product } from '../sr
 import { lookbookSlides } from '../src/data/lookbook';
 import { editorialItems } from '../src/data/editorial';
 import { heroSlides } from '../src/data/hero';
+import { categoryDataList } from '../src/data/categories';
 
 // ════════════════════════════════════════════════════════
 //  Interactive Input Helpers
@@ -120,15 +121,7 @@ function saveProductsLocal(hero: Product[], featured: Product[], all: Product[])
   sizes?: string[];
 }
 
-export const categories = [
-  "Outerwear",
-  "Knitwear",
-  "Trousers",
-  "Dresses",
-  "Accessories",
-] as const;
-
-export type Category = (typeof categories)[number];
+export { categories, type Category } from "./categories";
 
 const sizeOptions = {
   apparel: ["XS", "S", "M", "L", "XL"],
@@ -161,6 +154,7 @@ const BUCKETS = {
   lookbook: 'lookbook-media',
   editorial: 'editorial-media',
   hero: 'hero-media',
+  categories: 'category-media',
 };
 
 function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: string } {
@@ -178,6 +172,11 @@ function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: st
     return {
       bucket: BUCKETS.hero,
       storageKey: localRelPath.replace(/^\/images\/hero\//, ''),
+    };
+  } else if (localRelPath.startsWith('/images/categories/')) {
+    return {
+      bucket: BUCKETS.categories,
+      storageKey: localRelPath.replace(/^\/images\/categories\//, ''),
     };
   } else {
     const key = localRelPath.replace(/^\/images\//, '');
@@ -292,6 +291,9 @@ async function uploadCatalogImages(
   }
   for (const e of editorialList) {
     if (e.originalImage) imagePaths.add(e.originalImage);
+  }
+  for (const cat of categoryDataList) {
+    if (cat.image) imagePaths.add(cat.image);
   }
   for (const slide of heroSlides) {
     if (slide.originalImage) imagePaths.add(slide.originalImage);
@@ -563,12 +565,33 @@ async function runSyncCatalog() {
   const client = new Client({ connectionString: DATABASE_URL });
   await client.connect();
 
-  console.log("\n=== Phase 3: Syncing products and details ===");
+  console.log("\n=== Phase 3: Syncing categories ===");
+  for (const cat of categoryDataList) {
+    const imageUrl = urlMap.get(cat.image) || cat.image;
+    console.log(`Syncing category: "${cat.name}"`);
+
+    const { rows } = await client.query('SELECT 1 FROM categories WHERE slug = $1', [cat.slug]);
+    if (rows.length > 0) {
+      console.log(`  -> Category "${cat.name}" exists. Running UPDATE...`);
+      await client.query(
+        `UPDATE categories SET name = $1, image = $2, description = $3 WHERE slug = $4`,
+        [cat.name, imageUrl, cat.description, cat.slug]
+      );
+    } else {
+      console.log(`  -> Category "${cat.name}" is new. Running INSERT...`);
+      await client.query(
+        `INSERT INTO categories (slug, name, image, description) VALUES ($1, $2, $3, $4)`,
+        [cat.slug, cat.name, imageUrl, cat.description]
+      );
+    }
+  }
+
+  console.log("\n=== Phase 4: Syncing products and details ===");
   for (const product of uniqueProducts) {
     await syncProductToDb(client, product, urlMap);
   }
 
-  console.log("\n=== Phase 4: Syncing lookbook slides ===");
+  console.log("\n=== Phase 5: Syncing lookbook slides ===");
   for (const slide of lookbookSlides) {
     const imageUrl = urlMap.get(slide.originalImage) || slide.originalImage;
     console.log(`Syncing lookbook slide: ${slide.slideNumber}`);
@@ -591,7 +614,7 @@ async function runSyncCatalog() {
     }
   }
 
-  console.log("\n=== Phase 5: Syncing editorial content ===");
+  console.log("\n=== Phase 6: Syncing editorial content ===");
   for (const item of editorialItems) {
     const imageUrl = urlMap.get(item.originalImage) || item.originalImage;
     console.log(`Syncing editorial item: "${item.id}"`);
@@ -614,7 +637,7 @@ async function runSyncCatalog() {
     }
   }
 
-  console.log("\n=== Phase 6: Syncing hero slides ===");
+  console.log("\n=== Phase 7: Syncing hero slides ===");
   for (const slide of heroSlides) {
     const imageUrl = urlMap.get(slide.originalImage) || slide.originalImage;
     console.log(`Syncing hero slide: ${slide.slideNumber}`);
