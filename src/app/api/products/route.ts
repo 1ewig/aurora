@@ -7,102 +7,68 @@
 
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
+import { unstable_cache } from 'next/cache';
 
-export async function GET(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const category = searchParams.get('category');
-    const pageParam = searchParams.get('page');
-    const limitParam = searchParams.get('limit');
-    const search = searchParams.get('search');
-    const sortBy = searchParams.get('sortBy');
+const fetchProductsList = async (
+  category: string | null,
+  pageParam: string | null,
+  limitParam: string | null,
+  search: string | null,
+  sortBy: string | null
+) => {
+  if (pageParam !== null) {
+    const page = Math.max(1, parseInt(pageParam, 10) || 1);
+    const limit = Math.max(1, parseInt(limitParam || '12', 10) || 12);
+    const offset = (page - 1) * limit;
 
-    // If 'page' is provided, we perform server-side pagination, filtering, and sorting
-    if (pageParam !== null) {
-      const page = Math.max(1, parseInt(pageParam, 10) || 1);
-      const limit = Math.max(1, parseInt(limitParam || '12', 10) || 12);
-      const offset = (page - 1) * limit;
-
-      const whereClauses: string[] = [];
-      const params: string[] = [];
-
-      if (category && category !== 'All') {
-        params.push(category);
-        whereClauses.push(`category = $${params.length}`);
-      }
-
-      if (search && search.trim() !== '') {
-        params.push(`%${search.trim()}%`);
-        whereClauses.push(`(
-          name ILIKE $${params.length} OR 
-          description ILIKE $${params.length} OR 
-          EXISTS (
-            SELECT 1 FROM product_keywords pk 
-            WHERE pk.product_id = products.id AND pk.keyword ILIKE $${params.length}
-          )
-        )`);
-      }
-
-      const whereSql = whereClauses.length > 0 ? ` WHERE ${whereClauses.join(' AND ')}` : '';
-
-      // 1. Fetch total count matching criteria
-      const countQuery = `SELECT COUNT(*) as count FROM products${whereSql}`;
-      const countResult = await pool.query(countQuery, params);
-      const total = parseInt(countResult.rows[0].count, 10);
-
-      // 2. Fetch paginated data
-      let dataQuery = `SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio FROM products${whereSql}`;
-
-      if (sortBy === 'price-asc') {
-        dataQuery += ' ORDER BY price ASC, name ASC';
-      } else if (sortBy === 'price-desc') {
-        dataQuery += ' ORDER BY price DESC, name ASC';
-      } else if (sortBy === 'name-asc') {
-        dataQuery += ' ORDER BY name ASC';
-      } else if (sortBy === 'name-desc') {
-        dataQuery += ' ORDER BY name DESC';
-      } else {
-        dataQuery += ' ORDER BY name ASC';
-      }
-
-      params.push(limit.toString());
-      dataQuery += ` LIMIT $${params.length}`;
-
-      params.push(offset.toString());
-      dataQuery += ` OFFSET $${params.length}`;
-
-      const dataResult = await pool.query(dataQuery, params);
-
-      const products = dataResult.rows.map((row) => ({
-        id: row.id,
-        slug: row.slug,
-        name: row.name,
-        category: row.category,
-        price: Number(row.price),
-        badge: row.badge,
-        image: row.image,
-        altText: row.alt_text,
-        span: row.span,
-        aspectRatio: row.aspect_ratio,
-      }));
-
-      return NextResponse.json({ products, total });
-    }
-
-    // Legacy unpaginated flow for backward compatibility
-    let query = 'SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio FROM products';
-    let params: string[] = [];
+    const whereClauses: string[] = [];
+    const params: string[] = [];
 
     if (category && category !== 'All') {
-      query += ' WHERE category = $1';
       params.push(category);
+      whereClauses.push(`category = $${params.length}`);
     }
 
-    query += ' ORDER BY name ASC';
+    if (search && search.trim() !== '') {
+      params.push(`%${search.trim()}%`);
+      whereClauses.push(`(
+        name ILIKE $${params.length} OR 
+        description ILIKE $${params.length} OR 
+        EXISTS (
+          SELECT 1 FROM product_keywords pk 
+          WHERE pk.product_id = products.id AND pk.keyword ILIKE $${params.length}
+        )
+      )`);
+    }
 
-    const result = await pool.query(query, params);
+    const whereSql = whereClauses.length > 0 ? ` WHERE ${whereClauses.join(' AND ')}` : '';
 
-    const products = result.rows.map((row) => ({
+    const countQuery = `SELECT COUNT(*) as count FROM products${whereSql}`;
+    const countResult = await pool.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].count, 10);
+
+    let dataQuery = `SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio FROM products${whereSql}`;
+
+    if (sortBy === 'price-asc') {
+      dataQuery += ' ORDER BY price ASC, name ASC';
+    } else if (sortBy === 'price-desc') {
+      dataQuery += ' ORDER BY price DESC, name ASC';
+    } else if (sortBy === 'name-asc') {
+      dataQuery += ' ORDER BY name ASC';
+    } else if (sortBy === 'name-desc') {
+      dataQuery += ' ORDER BY name DESC';
+    } else {
+      dataQuery += ' ORDER BY name ASC';
+    }
+
+    const limitIdx = params.length + 1;
+    const offsetIdx = params.length + 2;
+    dataQuery += ` LIMIT $${limitIdx} OFFSET $${offsetIdx}`;
+
+    const queryParams = [...params, limit.toString(), offset.toString()];
+    const dataResult = await pool.query(dataQuery, queryParams);
+
+    const products = dataResult.rows.map((row) => ({
       id: row.id,
       slug: row.slug,
       name: row.name,
@@ -115,7 +81,67 @@ export async function GET(request: Request) {
       aspectRatio: row.aspect_ratio,
     }));
 
-    return NextResponse.json(products);
+    return { products, total };
+  }
+
+  let query = 'SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio FROM products';
+  let params: string[] = [];
+
+  if (category && category !== 'All') {
+    query += ' WHERE category = $1';
+    params.push(category);
+  }
+
+  query += ' ORDER BY name ASC';
+
+  const result = await pool.query(query, params);
+
+  const products = result.rows.map((row) => ({
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    category: row.category,
+    price: Number(row.price),
+    badge: row.badge,
+    image: row.image,
+    altText: row.alt_text,
+    span: row.span,
+    aspectRatio: row.aspect_ratio,
+  }));
+
+  return { products, total: products.length };
+};
+
+const getCachedProducts = unstable_cache(
+  async (
+    category: string | null,
+    pageParam: string | null,
+    limitParam: string | null,
+    search: string | null,
+    sortBy: string | null
+  ) => {
+    return fetchProductsList(category, pageParam, limitParam, search, sortBy);
+  },
+  ['products-list'],
+  { revalidate: 300, tags: ['products'] }
+);
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get('category');
+    const pageParam = searchParams.get('page');
+    const limitParam = searchParams.get('limit');
+    const search = searchParams.get('search');
+    const sortBy = searchParams.get('sortBy');
+
+    const result = await getCachedProducts(category, pageParam, limitParam, search, sortBy);
+
+    if (pageParam !== null) {
+      return NextResponse.json(result);
+    } else {
+      return NextResponse.json(result.products);
+    }
   } catch (error) {
     console.error("Database query failed:", error);
     return NextResponse.json(

@@ -7,6 +7,51 @@
 
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
+import { unstable_cache } from 'next/cache';
+
+const fetchProductDetail = async (slug: string) => {
+  const result = await pool.query(`
+    SELECT 
+      p.id, 
+      p.slug, 
+      p.name, 
+      p.category, 
+      p.price, 
+      p.badge, 
+      p.image, 
+      p.alt_text as "altText", 
+      p.span, 
+      p.aspect_ratio as "aspectRatio", 
+      p.description,
+      (
+        SELECT COALESCE(json_agg(image_url ORDER BY id), '[]'::json)
+        FROM product_images
+        WHERE product_id = p.id
+      ) as images,
+      (
+        SELECT COALESCE(json_agg(size ORDER BY id), '[]'::json)
+        FROM product_sizes
+        WHERE product_id = p.id
+      ) as sizes,
+      (
+        SELECT COALESCE(json_agg(detail ORDER BY id), '[]'::json)
+        FROM product_details
+        WHERE product_id = p.id
+      ) as details
+    FROM products p
+    WHERE LOWER(p.slug) = LOWER($1)
+  `, [slug]);
+
+  return result.rows[0] || null;
+};
+
+const getCachedProductDetail = unstable_cache(
+  async (slug: string) => {
+    return fetchProductDetail(slug);
+  },
+  ['product-detail'],
+  { revalidate: 300, tags: ['products'] }
+);
 
 export async function GET(
   _request: Request,
@@ -14,41 +59,7 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
-
-    // Fetch base product and all nested relationships in a single query
-    const result = await pool.query(`
-      SELECT 
-        p.id, 
-        p.slug, 
-        p.name, 
-        p.category, 
-        p.price, 
-        p.badge, 
-        p.image, 
-        p.alt_text as "altText", 
-        p.span, 
-        p.aspect_ratio as "aspectRatio", 
-        p.description,
-        (
-          SELECT COALESCE(json_agg(image_url ORDER BY id), '[]'::json)
-          FROM product_images
-          WHERE product_id = p.id
-        ) as images,
-        (
-          SELECT COALESCE(json_agg(size ORDER BY id), '[]'::json)
-          FROM product_sizes
-          WHERE product_id = p.id
-        ) as sizes,
-        (
-          SELECT COALESCE(json_agg(detail ORDER BY id), '[]'::json)
-          FROM product_details
-          WHERE product_id = p.id
-        ) as details
-      FROM products p
-      WHERE LOWER(p.slug) = LOWER($1)
-    `, [slug]);
-
-    const row = result.rows[0];
+    const row = await getCachedProductDetail(slug);
 
     if (!row) {
       return NextResponse.json(

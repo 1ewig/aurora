@@ -11,6 +11,7 @@ import { pool } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
 import { createAdminClient } from '@insforge/sdk';
 import { getStorageKeyFromUrl } from '@/utils/insforge';
+import { revalidateTag } from 'next/cache';
 
 const admin = createAdminClient({
   baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL || '',
@@ -144,6 +145,7 @@ export async function PUT(
       }
 
       await client.query('COMMIT');
+      revalidateTag('products', { expire: 0 });
       return NextResponse.json({ success: true });
     } catch (dbErr) {
       await client.query('ROLLBACK');
@@ -194,6 +196,7 @@ export async function DELETE(
       await client.query('DELETE FROM products WHERE id = $1', [id]);
 
       await client.query('COMMIT');
+      revalidateTag('products', { expire: 0 });
       return NextResponse.json({ success: true });
     } catch (dbErr) {
       await client.query('ROLLBACK');

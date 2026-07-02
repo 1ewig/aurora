@@ -9,6 +9,7 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
+import { revalidateTag } from 'next/cache';
 
 export async function GET() {
   try {
@@ -128,6 +129,7 @@ export async function POST(request: Request) {
       }
 
       await client.query('COMMIT');
+      revalidateTag('products', { expire: 0 });
       return NextResponse.json({ success: true, id });
     } catch (dbErr) {
       await client.query('ROLLBACK');
