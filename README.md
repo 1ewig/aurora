@@ -147,18 +147,17 @@ WHERE p.slug = $1;
 ### 3. Edge-Gated Security Middleware
 Interceptive Edge functions block unauthenticated or non-admin requests prior to loading server bundles.
 
-In [src/middleware.ts](src/middleware.ts#L28-L48):
+In [src/proxy.ts](src/proxy.ts#L25-L45):
 ```typescript
 const sessionRes = await fetch(`${baseUrl}/api/auth/get-session`, {
   headers: { cookie: request.headers.get('cookie') || '' },
 });
-const session = sessionRes.ok ? await sessionRes.json() : null;
+const session: SessionResponse | null = sessionRes.ok ? await sessionRes.json() : null;
 
 if (!session?.user) {
-  return NextResponse.redirect(new URL("/login?redirect=" + pathname, request.url));
-}
-if (isAdminPath && !isAdmin(session.user.email)) {
-  return NextResponse.redirect(new URL("/", request.url));
+  const loginUrl = new URL("/login", request.url);
+  loginUrl.searchParams.set("redirect", pathname);
+  return NextResponse.redirect(loginUrl);
 }
 ```
 
@@ -239,7 +238,7 @@ Explore the implementation quality of the core components in this codebase:
 
 | Resource Path | Demonstration Purpose |
 | :--- | :--- |
-| **[src/middleware.ts](src/middleware.ts)** | Edge middleware, route-gating, role-checking. |
+| **[src/proxy.ts](src/proxy.ts)** | Next.js 16 Edge proxy middleware, route-gating. |
 | **[src/app/api/orders/route.ts](src/app/api/orders/route.ts)** | Concurrency transaction logic, email template compiler. |
 | **[src/hooks/queries.ts](src/hooks/queries.ts)** | Optimistic cache loading, React Query data fetching layer. |
 | **[src/app/api/products/[slug]/route.ts](src/app/api/products/%5Bslug%5D/route.ts)** | PostgreSQL query optimizations (`json_agg` data shaping). |
