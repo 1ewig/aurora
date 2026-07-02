@@ -88,6 +88,19 @@ CREATE TABLE IF NOT EXISTS processed_webhooks (
   processed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Product reservations for checkout stock holding
+CREATE TABLE IF NOT EXISTS product_reservations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  reservation_id UUID NOT NULL,
+  product_id VARCHAR(50) REFERENCES products(id) ON DELETE CASCADE,
+  size VARCHAR(50) NOT NULL,
+  quantity INT NOT NULL,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_product_reservations_lookup ON product_reservations (product_id, size, expires_at);
+
 -- Lookbook slides table
 CREATE TABLE IF NOT EXISTS public.lookbook_slides (
   id SERIAL PRIMARY KEY,

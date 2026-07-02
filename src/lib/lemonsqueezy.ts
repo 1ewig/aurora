@@ -13,6 +13,7 @@ export interface CreateCheckoutPayload {
   userId: string | null;    // Better Auth user ID, or null for guests
   userEmail?: string;       // pre-fill email
   userName?: string;        // pre-fill name
+  reservationId?: string;   // optional database-side soft reservation ID
   cartItems: Array<{
     internalProductId: string; // varchar(50)
     quantity: number;
@@ -66,6 +67,7 @@ export async function createCheckout(
             user_id: payload.userId ?? "guest",
             cart_items: JSON.stringify(payload.cartItems),
             shipping_address: JSON.stringify(payload.shippingAddress),
+            ...(payload.reservationId ? { reservation_id: payload.reservationId } : {}),
           },
         },
         product_options: {

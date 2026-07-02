@@ -9,6 +9,7 @@ import { auth } from "@/lib/auth";
 import { createCheckout } from "@/lib/lemonsqueezy";
 import { headers } from "next/headers";
 import { pool } from "@/utils/db";
+import crypto from "node:crypto";
 
 function sanitize(s: string): string {
   return s.trim().replace(/<[^>]*>/g, "").slice(0, 200);
@@ -62,39 +63,78 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 2. Calculate subtotal & generate description list
+    // 2. Calculate subtotal & generate description list, and perform database-level soft reservation
     let subtotal = 0;
     const itemsDescriptionParts: string[] = [];
-    for (const item of body.cartItems) {
-      const dbProd = productMap.get(item.internalProductId);
-      if (!dbProd) {
-        return NextResponse.json(
-          { error: `Product not found: ${item.internalProductId}` },
-          { status: 400 }
+
+    // Sort to prevent deadlocks when locking rows
+    const sortedCartItems = [...body.cartItems].sort((a, b) => {
+      if (a.internalProductId !== b.internalProductId) {
+        return a.internalProductId.localeCompare(b.internalProductId);
+      }
+      return (a.size || "").localeCompare(b.size || "");
+    });
+
+    const client = await pool.connect();
+    const reservationId = crypto.randomUUID();
+    let isReserved = false;
+
+    try {
+      await client.query("BEGIN");
+
+      for (const item of sortedCartItems) {
+        const dbProd = productMap.get(item.internalProductId);
+        if (!dbProd) {
+          throw new Error(`Product not found: ${item.internalProductId}`);
+        }
+
+        // Lock size row FOR UPDATE
+        const sizeRes = await client.query(
+          "SELECT id, stock FROM product_sizes WHERE product_id = $1 AND size = $2 FOR UPDATE",
+          [item.internalProductId, item.size || ""]
         );
+        const sizeInfo = sizeRes.rows[0];
+        if (!sizeInfo) {
+          throw new Error(`Size "${item.size}" not found for product "${dbProd.name}".`);
+        }
+
+        // Get count of active reservations (older than NOW() are ignored)
+        const activeResQuery = await client.query(
+          `SELECT COALESCE(SUM(quantity), 0) AS reserved
+           FROM product_reservations
+           WHERE product_id = $1 AND size = $2 AND expires_at > NOW()`,
+          [item.internalProductId, item.size || ""]
+        );
+        const reservedCount = parseInt(activeResQuery.rows[0].reserved, 10);
+        const availableStock = sizeInfo.stock - reservedCount;
+
+        if (availableStock < item.quantity) {
+          throw new Error(
+            `Insufficient stock for "${dbProd.name}" (Size: ${item.size}). Only ${availableStock} available.`
+          );
+        }
+
+        // Insert reservation
+        await client.query(
+          `INSERT INTO product_reservations (reservation_id, product_id, size, quantity, expires_at)
+           VALUES ($1, $2, $3, $4, NOW() + INTERVAL '35 minutes')`,
+          [reservationId, item.internalProductId, item.size || "", item.quantity]
+        );
+
+        subtotal += dbProd.price * item.quantity;
+        itemsDescriptionParts.push(`${item.quantity}x ${dbProd.name} (${item.size})`);
       }
 
-      // Validate stock availability
-      const sizeRes = await pool.query(
-        "SELECT stock FROM product_sizes WHERE product_id = $1 AND size = $2",
-        [item.internalProductId, item.size || ""]
+      await client.query("COMMIT");
+      isReserved = true;
+    } catch (err: any) {
+      await client.query("ROLLBACK");
+      return NextResponse.json(
+        { error: err.message || "Inventory verification failed." },
+        { status: 400 }
       );
-      const sizeInfo = sizeRes.rows[0];
-      if (!sizeInfo) {
-        return NextResponse.json(
-          { error: `Size "${item.size}" not found for product "${dbProd.name}".` },
-          { status: 400 }
-        );
-      }
-      if (sizeInfo.stock < item.quantity) {
-        return NextResponse.json(
-          { error: `Insufficient stock for "${dbProd.name}" (Size: ${item.size}). Only ${sizeInfo.stock} available.` },
-          { status: 400 }
-        );
-      }
-
-      subtotal += dbProd.price * item.quantity;
-      itemsDescriptionParts.push(`${item.quantity}x ${dbProd.name} (${item.size})`);
+    } finally {
+      client.release();
     }
 
     // 3. Compute shipping, tax, total and cents
@@ -107,6 +147,15 @@ export async function POST(req: NextRequest) {
 
     if (!address.email?.trim() || !address.firstName?.trim() || !address.lastName?.trim() ||
         !address.address?.trim() || !address.city?.trim() || !address.zipCode?.trim()) {
+      // Clean up reservation since request was invalid
+      if (isReserved) {
+        await pool.query(
+          "DELETE FROM product_reservations WHERE reservation_id = $1",
+          [reservationId]
+        ).catch((delErr) => {
+          console.error("Failed to clean up reservation after validation failure:", delErr);
+        });
+      }
       return NextResponse.json(
         { error: "All shipping address fields are required." },
         { status: 400 }
@@ -124,16 +173,35 @@ export async function POST(req: NextRequest) {
 
     const description = itemsDescriptionParts.join(", ");
 
-    const checkoutData = await createCheckout({
-      variantId: body.variantId,
-      userId: session?.user?.id ?? null,
-      userEmail: sanitizedAddress.email,
-      userName: session?.user?.name,
-      cartItems: body.cartItems,
-      shippingAddress: sanitizedAddress,
-      totalPriceCents: totalCents,
-      description,
-    });
+    let checkoutData;
+    try {
+      checkoutData = await createCheckout({
+        variantId: body.variantId,
+        userId: session?.user?.id ?? null,
+        userEmail: sanitizedAddress.email,
+        userName: session?.user?.name,
+        reservationId,
+        cartItems: body.cartItems,
+        shippingAddress: sanitizedAddress,
+        totalPriceCents: totalCents,
+        description,
+      });
+    } catch (err: any) {
+      console.error("[POST /api/checkout/session] Lemon Squeezy call failed:", err);
+      // Clean up reservation since checkout creation failed
+      if (isReserved) {
+        await pool.query(
+          "DELETE FROM product_reservations WHERE reservation_id = $1",
+          [reservationId]
+        ).catch((delErr) => {
+          console.error("Failed to clean up reservation after checkout failure:", delErr);
+        });
+      }
+      return NextResponse.json(
+        { error: "Failed to initialize secure checkout with payment provider." },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       checkoutUrl: checkoutData.checkoutUrl,

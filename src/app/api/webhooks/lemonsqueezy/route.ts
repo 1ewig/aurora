@@ -95,11 +95,12 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
 
   const lsOrderId: string = String(payload.data.id);
   const lsOrderNumber: number = attrs.order_number;
-  const email: string = attrs.user_email;
   const lsCustomerId: string = String(attrs.customer_id);
 
   const userId: string | null =
     customData.user_id && customData.user_id !== "guest" ? customData.user_id : null;
+
+  const reservationId: string | null = customData.reservation_id ?? null;
 
   const cartItems: Array<{
     internalProductId: string;
@@ -188,6 +189,14 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
       );
     }
 
+    // Delete reservation if exists
+    if (reservationId) {
+      await client.query(
+        "DELETE FROM product_reservations WHERE reservation_id = $1",
+        [reservationId]
+      );
+    }
+
     const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
     const tax = Math.round(subtotal * 0.08 * 100) / 100;
     const total = subtotal + shipping + tax;
@@ -227,7 +236,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
 
     // Trigger transactional order confirmation email
     await sendEmail({
-      to: email,
+      to: sanitizedAddress.email,
       subject: `Order Confirmed — AUR-LS-${lsOrderNumber}`,
       text: orderConfirmationText({
         orderNumber: `AUR-LS-${lsOrderNumber}`,
