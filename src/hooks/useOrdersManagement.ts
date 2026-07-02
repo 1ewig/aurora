@@ -35,7 +35,10 @@ export function useOrdersManagement() {
           o.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
           o.shippingAddress.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
           o.shippingAddress.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          o.shippingAddress.lastName.toLowerCase().includes(searchQuery.toLowerCase());
+          o.shippingAddress.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (o.shippingAddress.zipCode || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (o.shippingAddress.address || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (o.shippingAddress.city || "").toLowerCase().includes(searchQuery.toLowerCase());
         return matchesStatus && matchesSearch;
       }),
     [orders, filterStatus, searchQuery]

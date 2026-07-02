@@ -37,7 +37,6 @@ interface CheckoutSuccessProps {
 export function CheckoutSuccess({
   orderNumber,
   email,
-  maskedCardNumber,
   items,
   subtotal,
   shipping,
@@ -50,7 +49,7 @@ export function CheckoutSuccess({
       animate={{ opacity: 1, y: 0 }}
       className="max-w-xl mx-auto space-y-6 text-center py-12 px-6 md:px-8 bg-white rounded-2xl border border-border-subtle shadow-sm"
     >
-      <div className="w-16 h-16 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="w-16 h-16 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto mb-6 print:hidden">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">
           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
         </svg>
@@ -120,15 +119,30 @@ export function CheckoutSuccess({
         <span className="text-text-primary font-bold">{orderNumber}</span>
       </div>
 
-      {maskedCardNumber && (
-        <p className="text-xs text-text-muted">
-          Charged to: <span className="font-mono">{maskedCardNumber}</span>
-        </p>
-      )}
+      <p className="text-xs text-text-secondary flex items-center justify-center gap-1 mt-4">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="currentColor" className="w-3.5 h-3.5 text-success">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+        </svg>
+        <span>Payment Method:</span>
+        <span className="font-semibold text-text-primary">Secured by Lemon Squeezy</span>
+      </p>
 
-      <div className="pt-6">
+      <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center items-center print:hidden">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => window.print()}
+          className="flex items-center gap-1.5 cursor-pointer text-xs"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+          <span>Download Receipt</span>
+        </Button>
+
         <Link href="/products">
-          <Button variant="ghost" size="md">
+          <Button variant="ghost" size="sm" className="text-xs">
             Return to Catalog
           </Button>
         </Link>

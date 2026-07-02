@@ -48,7 +48,7 @@ export function OrdersTable({
           </svg>
           <input
             type="text"
-            placeholder="Search order #, email, customer name..."
+            placeholder="Search order #, email, name, ZIP, address..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="w-full pl-10 pr-4 py-3 bg-bg-secondary border border-border-medium rounded-full focus:border-accent-primary focus:outline-none text-sm transition-colors"

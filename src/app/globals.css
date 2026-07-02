@@ -67,3 +67,12 @@
     scroll-margin-top: 5rem;
   }
 }
+
+@media print {
+  header, footer, nav, button, .print-hide {
+    display: none !important;
+  }
+  body {
+    background-color: #FFFFFF !important;
+  }
+}
