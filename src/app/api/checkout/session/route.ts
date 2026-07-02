@@ -16,7 +16,7 @@ function sanitize(s: string): string {
 }
 
 export interface CheckoutSessionRequest {
-  variantId: string;
+  variantId?: string;
   cartItems: Array<{
     internalProductId: string; // varchar(50)
     quantity: number;
@@ -36,19 +36,72 @@ export async function POST(req: NextRequest) {
   try {
     const body: CheckoutSessionRequest = await req.json();
 
-    if (!body.variantId || !body.cartItems?.length || !body.shippingAddress) {
+    const variantId = process.env.NEXT_PUBLIC_LS_ORDER_VARIANT_ID;
+    if (!variantId) {
+      console.error("[Checkout Session] NEXT_PUBLIC_LS_ORDER_VARIANT_ID is not configured in environment.");
       return NextResponse.json(
-        { error: "variantId, cartItems, and shippingAddress parameters are required." },
+        { error: "Store checkout configuration is incomplete on the server." },
+        { status: 500 }
+      );
+    }
+
+    if (!body.cartItems?.length || !body.shippingAddress) {
+      return NextResponse.json(
+        { error: "cartItems and shippingAddress parameters are required." },
         { status: 400 }
       );
     }
+
+    // 1. Input parameter validation
+    for (const item of body.cartItems) {
+      if (
+        !item.internalProductId ||
+        typeof item.quantity !== "number" ||
+        !Number.isInteger(item.quantity) ||
+        item.quantity < 1
+      ) {
+        return NextResponse.json(
+          { error: "Invalid item quantity parameter." },
+          { status: 400 }
+        );
+      }
+      if (item.quantity > 10) {
+        return NextResponse.json(
+          { error: "Maximum purchase limit exceeded (10 items per product size)." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // 2. Merge duplicate cart items (same product + size)
+    const mergedCart = new Map<string, { internalProductId: string; quantity: number; size: string }>();
+    for (const item of body.cartItems) {
+      const key = `${item.internalProductId}-${(item.size || "").trim()}`;
+      const existing = mergedCart.get(key);
+      if (existing) {
+        existing.quantity += item.quantity;
+        if (existing.quantity > 10) {
+          return NextResponse.json(
+            { error: "Maximum purchase limit exceeded (10 items per product size)." },
+            { status: 400 }
+          );
+        }
+      } else {
+        mergedCart.set(key, {
+          internalProductId: item.internalProductId,
+          quantity: item.quantity,
+          size: (item.size || "").trim()
+        });
+      }
+    }
+    const cartItems = Array.from(mergedCart.values());
 
     const session = await auth.api.getSession({
       headers: await headers(),
     });
 
-    // 1. Fetch products from database to get authentic prices (prevent customer price tampering)
-    const itemIds = body.cartItems.map((item) => item.internalProductId);
+    // 3. Fetch products from database to get authentic prices (prevent customer price tampering)
+    const itemIds = cartItems.map((item) => item.internalProductId);
     const result = await pool.query(
       "SELECT id, price, name FROM products WHERE id = ANY($1)",
       [itemIds]
@@ -63,12 +116,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 2. Calculate subtotal & generate description list, and perform database-level soft reservation
+    // 4. Calculate subtotal & generate description list, and perform database-level soft reservation
     let subtotal = 0;
     const itemsDescriptionParts: string[] = [];
 
     // Sort to prevent deadlocks when locking rows
-    const sortedCartItems = [...body.cartItems].sort((a, b) => {
+    const sortedCartItems = [...cartItems].sort((a, b) => {
       if (a.internalProductId !== b.internalProductId) {
         return a.internalProductId.localeCompare(b.internalProductId);
       }
@@ -101,8 +154,8 @@ export async function POST(req: NextRequest) {
         // Get count of active reservations (older than NOW() are ignored)
         const activeResQuery = await client.query(
           `SELECT COALESCE(SUM(quantity), 0) AS reserved
-           FROM product_reservations
-           WHERE product_id = $1 AND size = $2 AND expires_at > NOW()`,
+            FROM product_reservations
+            WHERE product_id = $1 AND size = $2 AND expires_at > NOW()`,
           [item.internalProductId, item.size || ""]
         );
         const reservedCount = parseInt(activeResQuery.rows[0].reserved, 10);
@@ -117,7 +170,7 @@ export async function POST(req: NextRequest) {
         // Insert reservation
         await client.query(
           `INSERT INTO product_reservations (reservation_id, product_id, size, quantity, expires_at)
-           VALUES ($1, $2, $3, $4, NOW() + INTERVAL '35 minutes')`,
+            VALUES ($1, $2, $3, $4, NOW() + INTERVAL '35 minutes')`,
           [reservationId, item.internalProductId, item.size || "", item.quantity]
         );
 
@@ -137,7 +190,7 @@ export async function POST(req: NextRequest) {
       client.release();
     }
 
-    // 3. Compute shipping, tax, total and cents
+    // 5. Compute shipping, tax, total and cents
     const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
     const tax = Math.round(subtotal * 0.08 * 100) / 100;
     const total = subtotal + shipping + tax;
@@ -176,12 +229,12 @@ export async function POST(req: NextRequest) {
     let checkoutData;
     try {
       checkoutData = await createCheckout({
-        variantId: body.variantId,
+        variantId,
         userId: session?.user?.id ?? null,
         userEmail: sanitizedAddress.email,
         userName: session?.user?.name,
         reservationId,
-        cartItems: body.cartItems,
+        cartItems,
         shippingAddress: sanitizedAddress,
         totalPriceCents: totalCents,
         description,

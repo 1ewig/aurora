@@ -87,7 +87,6 @@ export function useCheckoutForm() {
 
     setLoading(true);
 
-    const variantId = process.env.NEXT_PUBLIC_LS_ORDER_VARIANT_ID || "12345";
     const cartItemsSnapshot = items.map((item) => ({ ...item }));
     const cartItemsPayload = items.map((item) => ({
       internalProductId: item.id,
@@ -100,7 +99,6 @@ export function useCheckoutForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          variantId,
           cartItems: cartItemsPayload,
           shippingAddress: {
             email,
