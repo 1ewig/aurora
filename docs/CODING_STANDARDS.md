@@ -6,10 +6,10 @@ The codebase follows a strict 4-layer separation of concerns:
 
 ```
 Pages (src/app/)
-  │  Server Components: resolve route params, export SEO metadata, render containers
+  │  Server Components: resolve route params, export SEO metadata, render client components
   │
   ▼
-Containers / Bridges (src/components/*/)
+Client Components (Clients / Containers) (src/components/*/)
   │  Read stores, call hooks, assemble props
   │
   ├──► Hooks (src/hooks/)
@@ -24,7 +24,7 @@ Presentational Components (src/components/*/)
   Pure JSX — receive everything via props, zero store/hook imports
 ```
 
-Data flows **down** from pages through containers into presentational components. Business logic lives in hooks. Global state lives in stores.
+Data flows **down** from pages through clients/containers into presentational components. Business logic lives in hooks. Global state lives in stores.
 
 ---
 
@@ -34,12 +34,12 @@ Data flows **down** from pages through containers into presentational components
 
 - Server components by default to maximize SEO indexing and performance
 - Export static metadata or use `generateMetadata()` for dynamic pages
-- Resolve route/search parameters on the server and pass them directly to containers
-- Never import Zustand stores or call client hooks directly (must delegate to a client container)
-- Never contain JSX markup beyond layout scaffolding (wrapping `<main>`, containers)
+- Resolve route/search parameters on the server and pass them directly to client components
+- Never import Zustand stores or call client hooks directly (must delegate to a page-level client wrapper)
+- Never contain JSX markup beyond layout scaffolding (wrapping `<main>`, client components)
 
 ```tsx
-// ✅ Good — Server page exporting dynamic metadata and delegating to a client container
+// ✅ Good — Server page exporting dynamic metadata and delegating to a page-level client wrapper
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const product = await getProduct(slug);
@@ -53,7 +53,7 @@ export default async function ProductPage({ params }) {
 ```
 
 ```tsx
-// ✅ Good — Server page exporting static metadata and delegating to a client container
+// ✅ Good — Server page exporting static metadata and delegating to a page-level client wrapper
 export const metadata = {
   title: "All Products | Brand",
   description: "Explore our premium collection.",
@@ -64,18 +64,18 @@ export default function ProductsPage() {
 }
 ```
 
-### Containers / Bridges
+### Client Components (Page-Level Clients & Sub-Page Containers)
 
 - `"use client"` wrappers that act as the bridge between stores/hooks and presentational components.
 - Naming conventions:
-  - **Page-level client wrappers**: Named `XxxClient.tsx` (e.g., `ProductDetailClient.tsx`, `CheckoutPageClient.tsx`) placed in their respective component folder.
-  - **Sub-page feature containers**: Named `XxxContainer.tsx` (e.g., `OrderSummaryContainer.tsx`).
+  - **Page-level client wrappers**: Named `XxxClient.tsx` (e.g., `ProductDetailClient.tsx`, `CheckoutPageClient.tsx`) placed in their respective component folder. This is the standard pattern for all main page views.
+  - **Sub-page feature containers**: Named `XxxContainer.tsx` (e.g., `OrderSummaryContainer.tsx`) for smaller nested blocks of client-side logic.
 - Read Zustand stores with individual selectors to avoid subscribing to the entire store state.
 - Call custom business logic hooks or query hooks (e.g., `useProductDetailsQuery`, `useProductFilter`).
 - Pass resolved data and event handlers down as props to children.
 
 ```tsx
-// ✅ Good — Page-level container/client wrapper fetching data and passing it to presentational items
+// ✅ Good — Page-level client wrapper fetching data and passing it to presentational items
 export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const { data: product, isLoading, error } = useProductDetailsQuery(slug);
   const isSizeGuideOpen = useProductStore((s) => s.isSizeGuideOpen);
@@ -218,7 +218,7 @@ export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSum
 | Uses a custom hook (useCarousel, etc.) | `"use client"` |
 | USES `onClick`, `onChange`, form events | `"use client"` |
 | Reads a Zustand store via selector | `"use client"` |
-| Page with `generateStaticParams` | **None** (server) — delegate interactivity to child client containers |
+| Page with `generateStaticParams` | **None** (server) — delegate interactivity to child client components |
 
 **As a rule**: start without `"use client"` and only add it when the compiler tells you it's needed. This maximizes SSG eligibility.
 
