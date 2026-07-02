@@ -80,8 +80,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (err: any) {
     console.error("[LS Webhook] Error processing event payload:", err);
-    // Always return 200 to prevent Lemon Squeezy from blocking webhooks
-    return NextResponse.json({ error: "Internal processing failed." }, { status: 200 });
+    return NextResponse.json({ error: "Internal processing failed." }, { status: 500 });
   }
 }
 
