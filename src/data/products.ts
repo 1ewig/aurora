@@ -23,15 +23,7 @@ export interface Product {
   keywords?: string[];
 }
 
-export const categories = [
-  "Outerwear",
-  "Knitwear",
-  "Trousers",
-  "Dresses",
-  "Accessories",
-] as const;
-
-export type Category = (typeof categories)[number];
+export { categories, type Category } from "./categories";
 
 export const heroProducts: Product[] = [
   {
