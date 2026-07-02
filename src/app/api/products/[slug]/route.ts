@@ -45,7 +45,7 @@ export async function GET(
           WHERE product_id = p.id
         ) as details
       FROM products p
-      WHERE p.slug = $1
+      WHERE LOWER(p.slug) = LOWER($1)
     `, [slug]);
 
     const row = result.rows[0];

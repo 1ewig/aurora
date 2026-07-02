@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps) {
   const { slug } = await params;
   try {
     const result = await pool.query(
-      "SELECT name, description, image, category FROM products WHERE slug = $1",
+      "SELECT name, description, image, category FROM products WHERE LOWER(slug) = LOWER($1)",
       [slug]
     );
     const product = result.rows[0];
@@ -64,7 +64,7 @@ export default async function ProductPage({ params }: PageProps) {
   let jsonLd = null;
   try {
     const result = await pool.query(
-      "SELECT name, description, price, image FROM products WHERE slug = $1",
+      "SELECT name, description, price, image FROM products WHERE LOWER(slug) = LOWER($1)",
       [slug]
     );
     const product = result.rows[0];

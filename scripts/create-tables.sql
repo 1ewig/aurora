@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS products (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_products_slug_lower ON products (LOWER(slug));
+
 -- Product images (one-to-many)
 CREATE TABLE IF NOT EXISTS product_images (
   id SERIAL PRIMARY KEY,
@@ -59,6 +61,11 @@ CREATE TABLE IF NOT EXISTS product_keywords (
 );
 
 CREATE INDEX IF NOT EXISTS idx_product_keywords_val ON product_keywords(keyword);
+
+-- Indexes for performance on product joins & cascade deletions
+CREATE INDEX IF NOT EXISTS idx_product_images_product_id ON product_images (product_id);
+CREATE INDEX IF NOT EXISTS idx_product_details_product_id ON product_details (product_id);
+CREATE INDEX IF NOT EXISTS idx_product_keywords_product_id ON product_keywords (product_id);
 
 -- Orders table (guest checkout allowed — user_id is nullable)
 CREATE TABLE IF NOT EXISTS orders (
