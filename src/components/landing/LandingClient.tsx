@@ -6,7 +6,7 @@
  */
 "use client";
 
-import { useProductsQuery, useFeaturedProductsQuery, useLookbookQuery } from "@/hooks/queries";
+import { useProductsQuery, useDailyCategoriesQuery, useLookbookQuery } from "@/hooks/queries";
 import { useNewsletterSubmit } from "@/hooks/useNewsletterSubmit";
 import { Hero } from "./Hero";
 import { MarqueeBar } from "./MarqueeBar";
@@ -26,7 +26,7 @@ const heroSlugs = [
 
 export default function LandingClient() {
   const { data: products = [] } = useProductsQuery();
-  const { data: featured = [] } = useFeaturedProductsQuery(3);
+  const { data: dailyCategories = [] } = useDailyCategoriesQuery();
   const { data: dbSlides = [] } = useLookbookQuery();
   const newsletter = useNewsletterSubmit();
 
@@ -37,7 +37,7 @@ export default function LandingClient() {
     <main id="main-content" tabIndex={-1}>
       <Hero heroProducts={heroProducts} />
       <MarqueeBar />
-      <FeaturedCollection featured={featured} />
+      <FeaturedCollection categories={dailyCategories} />
       {slides.length > 0 && <LookbookSlider slides={slides} />}
       <DesignerStory />
       <Testimonials />

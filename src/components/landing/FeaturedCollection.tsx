@@ -7,19 +7,19 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { ProductCard } from "@/components/ui/ProductCard";
 import { Button } from "@/components/ui/Button";
 import { staggerContainer, scaleIn } from "@/animations/variants";
-import type { Product } from "@/data/products";
+import type { CategoryMetadata } from "@/hooks/queries";
 
 interface FeaturedCollectionProps {
-  featured: Product[];
+  categories: CategoryMetadata[];
 }
 
-/** Featured collection grid displaying curated products with animation. */
-export function FeaturedCollection({ featured }: FeaturedCollectionProps) {
+/** Featured collection grid displaying dynamic daily categories with animations. */
+export function FeaturedCollection({ categories }: FeaturedCollectionProps) {
   return (
     <section
       id="collection"
@@ -32,7 +32,7 @@ export function FeaturedCollection({ featured }: FeaturedCollectionProps) {
         viewport={{ once: true }}
         transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
-        <EyebrowLabel>Featured Collection</EyebrowLabel>
+        <EyebrowLabel>Daily Collections</EyebrowLabel>
         <h2
           id="collection-heading"
           className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 mb-16 text-text-primary"
@@ -50,15 +50,65 @@ export function FeaturedCollection({ featured }: FeaturedCollectionProps) {
         whileInView="visible"
         viewport={{ once: true, margin: "-10% 0px" }}
         role="list"
-        className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6"
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
       >
-        {featured.map((product) => (
+        {categories.map((category) => (
           <motion.div
-            key={product.id}
+            key={category.slug}
             variants={scaleIn}
             role="listitem"
           >
-            <ProductCard product={product} />
+            <article aria-label={category.name}>
+              <Link href={`/products/category/${category.slug}`} className="block">
+                <div
+                  className="relative overflow-hidden rounded-[20px] bg-white cursor-pointer group transition-all duration-300 border border-transparent hover:border-accent-primary aspect-[3/4]"
+                  style={{
+                    boxShadow: "0 2px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
+                  }}
+                >
+                  {/* Category Image */}
+                  <div className="absolute inset-0 w-full h-full overflow-hidden">
+                    <motion.div
+                      className="relative w-full h-full"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    >
+                      <Image
+                        src={category.image}
+                        alt={`${category.name} cover`}
+                        fill
+                        quality={100}
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover object-center"
+                      />
+                      {/* Dark/Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 transition-opacity duration-300 group-hover:from-black/90" />
+                    </motion.div>
+                  </div>
+
+                  {/* Content Overlay */}
+                  <div className="absolute inset-0 flex flex-col justify-end p-8 text-white z-10">
+                    <span className="text-xs font-semibold tracking-[0.2em] uppercase text-accent-primary mb-2 opacity-90">
+                      Collection
+                    </span>
+                    <h3 className="font-display font-black text-2xl tracking-[0.05em] uppercase mb-3">
+                      {category.name}
+                    </h3>
+                    <p className="text-sm text-text-muted leading-relaxed opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 max-w-[280px]">
+                      {category.description}
+                    </p>
+                    <div className="mt-4 flex items-center justify-between">
+                      <span className="text-xs font-medium tracking-wide border-b border-white/50 pb-0.5 group-hover:border-accent-primary group-hover:text-accent-primary transition-all duration-300">
+                        Explore Collection
+                      </span>
+                      <span className="text-sm opacity-0 group-hover:opacity-100 group-hover:translate-x-1.5 transition-all duration-300 transform -translate-x-1 text-accent-primary font-black">
+                        →
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </article>
           </motion.div>
         ))}
       </motion.div>

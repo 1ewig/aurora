@@ -6,8 +6,8 @@
 "use client";
 
 import { type ProductData } from "@/stores/useAdminStore";
-import { categories } from "@/data/products";
 import { Button } from "@/components/ui/Button";
+import { useCategoriesQuery } from "@/hooks/queries";
 
 
 interface InventoryTableProps {
@@ -35,6 +35,9 @@ export function InventoryTable({
   onRefresh,
   loading,
 }: InventoryTableProps) {
+  const { data: dbCategories = [] } = useCategoriesQuery();
+  const fallbackCategories = ["Outerwear", "Knitwear", "Trousers", "Dresses", "Accessories"];
+  const categoriesList = dbCategories.length > 0 ? dbCategories.map((c) => c.name) : fallbackCategories;
 
   return (
     <div className="space-y-8">
@@ -68,7 +71,7 @@ export function InventoryTable({
           }}
         >
           <option value="All">All Categories</option>
-          {categories.map((cat) => (
+          {categoriesList.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
             </option>

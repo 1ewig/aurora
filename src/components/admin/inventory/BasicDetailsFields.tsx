@@ -3,7 +3,7 @@
  *
  * Form fields for product identity, pricing, and display metadata.
  */
-import { categories } from "@/data/products";
+import { useCategoriesQuery } from "@/hooks/queries";
 
 interface BasicDetailsFieldsProps {
   editingProduct: boolean;
@@ -29,6 +29,10 @@ interface BasicDetailsFieldsProps {
 
 /** Renders input fields for product ID, name, slug, category, price, badge, span, aspect ratio, and alt text. */
 export function BasicDetailsFields(props: BasicDetailsFieldsProps) {
+  const { data: dbCategories = [] } = useCategoriesQuery();
+  const fallbackCategories = ["Outerwear", "Knitwear", "Trousers", "Dresses", "Accessories"];
+  const categoriesList = dbCategories.length > 0 ? dbCategories.map((c) => c.name) : fallbackCategories;
+
   return (
     <div className="space-y-4">
       <div>
@@ -84,7 +88,7 @@ export function BasicDetailsFields(props: BasicDetailsFieldsProps) {
             onChange={(e) => props.onFormCategoryChange(e.target.value)}
             className="w-full px-4 py-2.5 bg-bg-primary border border-border-medium rounded-full text-sm focus:border-accent-primary focus:outline-none"
           >
-            {categories.map((cat) => (
+            {categoriesList.map((cat) => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>

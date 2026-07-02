@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { usePaginatedProductsQuery } from "@/hooks/queries";
-import { categories } from "@/data/products";
+import { usePaginatedProductsQuery, useCategoriesQuery } from "@/hooks/queries";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
 interface UseProductFilterOptions {
@@ -109,6 +108,8 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
     onCategoryChange?.(category);
   };
 
+  const { data: dbCategories = [] } = useCategoriesQuery();
+
   return {
     activeCategory,
     setActiveCategory,
@@ -125,7 +126,7 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
     totalPages,
     currentPage: page,
     onPageChange: handlePageChange,
-    categories: ["All", ...categories] as const,
+    categories: ["All", ...dbCategories.map((c) => c.name)],
   };
 }
 

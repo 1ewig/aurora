@@ -241,5 +241,46 @@ export function useOrders(page = 0, limit = 50) {
   });
 }
 
+export interface CategoryMetadata {
+  slug: string;
+  name: string;
+  image: string;
+  description: string;
+}
+
+async function fetchCategories(): Promise<CategoryMetadata[]> {
+  const response = await fetch('/api/categories');
+  if (!response.ok) {
+    throw new Error('Failed to fetch categories list');
+  }
+  return response.json();
+}
+
+async function fetchDailyCategories(): Promise<CategoryMetadata[]> {
+  const response = await fetch('/api/categories/daily');
+  if (!response.ok) {
+    throw new Error('Failed to fetch daily categories');
+  }
+  return response.json();
+}
+
+/** Fetches all categories with metadata dynamically from DB. */
+export function useCategoriesQuery() {
+  return useQuery<CategoryMetadata[]>({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+/** Fetches 3 daily rotating categories deterministically. */
+export function useDailyCategoriesQuery() {
+  return useQuery<CategoryMetadata[]>({
+    queryKey: ["categories", "daily"],
+    queryFn: fetchDailyCategories,
+    staleTime: 1000 * 60 * 30,
+  });
+}
+
 
 

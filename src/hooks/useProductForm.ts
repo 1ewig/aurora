@@ -8,7 +8,6 @@
 import { useState, useEffect } from "react";
 import { useInsforgeClient } from "@/lib/insforge";
 import { useAdminStore, type ProductData, type SizeStock } from "@/stores/useAdminStore";
-import { categories } from "@/data/products";
 
 /** Admin product form state and handlers for create/edit workflow. */
 export function useProductForm(onSuccess: () => void) {
@@ -18,7 +17,7 @@ export function useProductForm(onSuccess: () => void) {
   const [formId, setFormId] = useState("");
   const [formName, setFormName] = useState("");
   const [formSlug, setFormSlug] = useState("");
-  const [formCategory, setFormCategory] = useState<string>(categories[0]);
+  const [formCategory, setFormCategory] = useState<string>("Outerwear");
   const [formPrice, setFormPrice] = useState("");
   const [formBadge, setFormBadge] = useState("");
   const [formAltText, setFormAltText] = useState("");
@@ -114,7 +113,7 @@ export function useProductForm(onSuccess: () => void) {
       setFormId("");
       setFormName("");
       setFormSlug("");
-      setFormCategory(categories[0]);
+      setFormCategory("Outerwear");
       setFormPrice("");
       setFormBadge("");
       setFormAltText("");
@@ -134,7 +133,7 @@ export function useProductForm(onSuccess: () => void) {
           id: "",
           name: "",
           slug: "",
-          category: categories[0],
+          category: "Outerwear",
           price: "",
           badge: "",
           altText: "",
