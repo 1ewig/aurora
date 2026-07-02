@@ -120,6 +120,8 @@ export function InventoryClient() {
             onCategoryChange={setSelectedCategory}
             onEditClick={handleOpenModal}
             isAdmin={isAdmin}
+            onRefresh={fetchProducts}
+            loading={loading}
           />
 
 

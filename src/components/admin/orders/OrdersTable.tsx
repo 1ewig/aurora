@@ -9,6 +9,7 @@
 
 import { type OrderData } from "@/stores/useAdminStore";
 import { OrderStatusBadge } from "@/components/ui/OrderStatusBadge";
+import { Button } from "@/components/ui/Button";
 
 interface OrdersTableProps {
   orders: OrderData[];
@@ -20,6 +21,8 @@ interface OrdersTableProps {
   onStatusUpdate: (orderId: string, status: string) => void;
   updatingStatusId: string | null;
   isAdmin: boolean;
+  onRefresh: () => void;
+  loading: boolean;
 }
 
 /** Filterable, sortable orders table with inline status updates. */
@@ -33,6 +36,8 @@ export function OrdersTable({
   onStatusUpdate,
   updatingStatusId,
   isAdmin,
+  onRefresh,
+  loading,
 }: OrdersTableProps) {
   return (
     <div className="space-y-8">
@@ -73,6 +78,9 @@ export function OrdersTable({
           <option value="delivered">Delivered</option>
           <option value="cancelled">Cancelled</option>
         </select>
+        <Button variant="ghost" size="md" onClick={onRefresh} disabled={loading}>
+          {loading ? "Refreshing..." : "Refresh"}
+        </Button>
       </div>
 
       {/* Orders Table */}

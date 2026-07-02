@@ -57,5 +57,6 @@ export function useOrdersManagement() {
     setSelectedOrder,
     updateOrderStatus,
     isAdmin,
+    fetchOrders,
   };
 }

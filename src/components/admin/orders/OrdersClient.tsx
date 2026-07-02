@@ -26,6 +26,7 @@ export function OrdersClient() {
     setSelectedOrder,
     updateOrderStatus,
     isAdmin,
+    fetchOrders,
   } = useOrdersManagement();
 
   return (
@@ -56,6 +57,8 @@ export function OrdersClient() {
             onStatusUpdate={updateOrderStatus}
             updatingStatusId={loading ? "updating" : null}
             isAdmin={isAdmin}
+            onRefresh={fetchOrders}
+            loading={loading}
           />
 
           {/* Detailed order modal details */}

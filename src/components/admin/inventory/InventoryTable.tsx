@@ -7,6 +7,7 @@
 
 import { type ProductData } from "@/stores/useAdminStore";
 import { categories } from "@/data/products";
+import { Button } from "@/components/ui/Button";
 
 
 interface InventoryTableProps {
@@ -17,6 +18,8 @@ interface InventoryTableProps {
   onCategoryChange: (val: string) => void;
   onEditClick: (product: ProductData) => void;
   isAdmin: boolean;
+  onRefresh: () => void;
+  loading: boolean;
 }
 
 
@@ -29,6 +32,8 @@ export function InventoryTable({
   onCategoryChange,
   onEditClick,
   isAdmin,
+  onRefresh,
+  loading,
 }: InventoryTableProps) {
 
   return (
@@ -69,6 +74,9 @@ export function InventoryTable({
             </option>
           ))}
         </select>
+        <Button variant="ghost" size="md" onClick={onRefresh} disabled={loading}>
+          {loading ? "Refreshing..." : "Refresh"}
+        </Button>
       </div>
 
 
