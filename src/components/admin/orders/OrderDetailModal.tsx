@@ -189,49 +189,30 @@ export function OrderDetailModal({
                           <span className="text-text-secondary">Fulfillment Status:</span>
                           <OrderStatusBadge status={order.status} />
                         </div>
-                        <div className="grid grid-cols-2 gap-2 pt-2">
-                          {order.status === "pending" && (
-                            <Button
+                        <div className="pt-2 space-y-2">
+                          <label className="block text-[10px] font-bold uppercase tracking-wider text-text-secondary">
+                            Change Fulfillment Status
+                          </label>
+                          <div className="relative">
+                            <select
                               disabled={isUpdating}
-                              onClick={() => onStatusUpdate(order.id, "confirmed")}
-                              variant="gold"
-                              size="sm"
-                              className="text-[10px] py-2 px-3 cursor-pointer"
+                              value={order.status}
+                              onChange={(e) => onStatusUpdate(order.id, e.target.value)}
+                              className="block w-full px-4 py-2.5 pr-10 bg-bg-secondary border border-border-medium rounded-xl text-xs font-semibold focus:border-accent-primary focus:outline-none transition-colors cursor-pointer appearance-none"
+                              style={{
+                                backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B6B6B' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/></svg>")`,
+                                backgroundRepeat: "no-repeat",
+                                backgroundPosition: "right 1rem center",
+                                backgroundSize: "0.85rem"
+                              }}
                             >
-                              Confirm Order
-                            </Button>
-                          )}
-                          {order.status === "confirmed" && (
-                            <Button
-                              disabled={isUpdating}
-                              onClick={() => onStatusUpdate(order.id, "shipped")}
-                              variant="filled"
-                              size="sm"
-                              className="text-[10px] py-2 px-3 cursor-pointer"
-                            >
-                              Mark Shipped
-                            </Button>
-                          )}
-                          {order.status === "shipped" && (
-                            <Button
-                              disabled={isUpdating}
-                              onClick={() => onStatusUpdate(order.id, "delivered")}
-                              variant="gold"
-                              size="sm"
-                              className="text-[10px] py-2 px-3 cursor-pointer"
-                            >
-                              Mark Delivered
-                            </Button>
-                          )}
-                          {order.status !== "cancelled" && order.status !== "delivered" && (
-                            <button
-                              disabled={isUpdating}
-                              onClick={() => onStatusUpdate(order.id, "cancelled")}
-                              className="px-3 py-2 border border-error text-error text-[10px] font-semibold rounded-full hover:bg-error hover:text-white transition-colors cursor-pointer disabled:opacity-50"
-                            >
-                              Cancel Order
-                            </button>
-                          )}
+                              <option value="pending">Pending</option>
+                              <option value="confirmed">Confirmed</option>
+                              <option value="shipped">Shipped</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="cancelled">Cancelled</option>
+                            </select>
+                          </div>
                         </div>
                       </div>
                     </div>

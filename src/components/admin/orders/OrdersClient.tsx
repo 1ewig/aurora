@@ -62,7 +62,7 @@ export function OrdersClient() {
           <OrderDetailModal
             isOpen={!!selectedOrder}
             onClose={() => setSelectedOrder(null)}
-            order={selectedOrder}
+            order={selectedOrder ? (orders.find((o) => o.id === selectedOrder.id) || selectedOrder) : null}
             onStatusUpdate={updateOrderStatus}
             updatingStatusId={loading && selectedOrder ? selectedOrder.id : null}
             isAdmin={isAdmin}
