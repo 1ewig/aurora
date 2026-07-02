@@ -96,6 +96,7 @@ export async function POST(request: Request) {
         [id, slug]
       );
       if (existingProduct.rows.length > 0) {
+        await client.query('ROLLBACK');
         return NextResponse.json({ error: 'Product with this ID or slug already exists' }, { status: 400 });
       }
 
