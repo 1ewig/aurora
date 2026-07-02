@@ -215,7 +215,12 @@ async function resolveImage(
 // ════════════════════════════════════════════════════════
 
 async function seed() {
-  console.log("\n=== Mode: Setup / Fresh seed (wipe & re-create) ===\n");
+  const catalogOnly = process.argv.includes('--catalog-only');
+  if (catalogOnly) {
+    console.log("\n=== Mode: Catalog-Only Seed (preserving orders and webhooks) ===\n");
+  } else {
+    console.log("\n=== Mode: Setup / Fresh seed (wipe & re-create all) ===\n");
+  }
 
   console.log("Initializing InsForge admin client...");
   const admin = createAdminClient({ baseUrl: ossHost, apiKey });
@@ -378,20 +383,22 @@ async function seed() {
   await client.connect();
 
   console.log("Dropping tables & executing create-tables.sql schema...");
-  await client.query(`
-    DROP TABLE IF EXISTS product_images CASCADE;
-    DROP TABLE IF EXISTS product_sizes CASCADE;
-    DROP TABLE IF EXISTS product_details CASCADE;
-    DROP TABLE IF EXISTS product_keywords CASCADE;
-    DROP TABLE IF EXISTS products CASCADE;
-    DROP TABLE IF EXISTS public.orders CASCADE;
-    DROP TABLE IF EXISTS public.lookbook_slides CASCADE;
-    DROP TABLE IF EXISTS public.editorial_content CASCADE;
-    DROP TABLE IF EXISTS public.hero_slides CASCADE;
-    DROP TABLE IF EXISTS categories CASCADE;
-    DROP TABLE IF EXISTS processed_webhooks CASCADE;
-    DROP TABLE IF EXISTS product_reservations CASCADE;
-  `);
+  const tablesToDrop = [
+    'product_images',
+    'product_sizes',
+    'product_details',
+    'product_keywords',
+    'products',
+    'public.lookbook_slides',
+    'public.editorial_content',
+    'public.hero_slides',
+    'categories',
+  ];
+  if (!catalogOnly) {
+    tablesToDrop.push('public.orders', 'processed_webhooks', 'product_reservations');
+  }
+  const dropSql = tablesToDrop.map((t) => `DROP TABLE IF EXISTS ${t} CASCADE;`).join('\n');
+  await client.query(dropSql);
 
   const schemaSql = fs.readFileSync(path.resolve(process.cwd(), 'scripts', 'create-tables.sql'), 'utf-8');
   await client.query(schemaSql);
