@@ -389,6 +389,8 @@ async function seed() {
     DROP TABLE IF EXISTS public.editorial_content CASCADE;
     DROP TABLE IF EXISTS public.hero_slides CASCADE;
     DROP TABLE IF EXISTS categories CASCADE;
+    DROP TABLE IF EXISTS processed_webhooks CASCADE;
+    DROP TABLE IF EXISTS product_reservations CASCADE;
   `);
 
   const schemaSql = fs.readFileSync(path.resolve(process.cwd(), 'scripts', 'create-tables.sql'), 'utf-8');
