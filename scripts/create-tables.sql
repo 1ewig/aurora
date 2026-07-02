@@ -79,6 +79,7 @@ CREATE TABLE IF NOT EXISTS orders (
   total NUMERIC(10,2) NOT NULL,
   shipping_address JSONB NOT NULL,
   status VARCHAR(20) NOT NULL DEFAULT 'pending',
+  is_paid BOOLEAN NOT NULL DEFAULT FALSE,
   payment_provider VARCHAR(50),
   ls_order_id TEXT UNIQUE,
   ls_order_number INTEGER,

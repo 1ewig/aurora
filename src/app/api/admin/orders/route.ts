@@ -26,6 +26,7 @@ export async function GET() {
         total,
         shipping_address as "shippingAddress",
         status,
+        is_paid as "isPaid",
         created_at as "createdAt"
       FROM orders
       ORDER BY created_at DESC

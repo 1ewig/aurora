@@ -90,7 +90,8 @@ export function OrdersTable({
                 <th className="px-6 py-4">Customer</th>
                 <th className="px-6 py-4">Items count</th>
                 <th className="px-6 py-4">Total Price</th>
-                <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Payment</th>
+                <th className="px-6 py-4">Fulfillment</th>
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -131,6 +132,15 @@ export function OrdersTable({
                     </td>
                     <td className="px-6 py-4 font-semibold text-text-primary">
                       ${o.total.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                        o.isPaid 
+                          ? "bg-success/10 text-success border border-success/20" 
+                          : "bg-text-secondary/10 text-text-secondary border border-border-medium"
+                      }`}>
+                        {o.isPaid ? "Paid" : "Unpaid"}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <OrderStatusBadge status={o.status} />

@@ -59,6 +59,7 @@ export interface OrderData {
   total: number;
   shippingAddress: ShippingAddress;
   status: "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+  isPaid: boolean;
   createdAt: string;
 }
 
@@ -75,6 +76,7 @@ export interface RecentOrder {
   orderNumber: string;
   total: number;
   status: string;
+  isPaid?: boolean;
   createdAt: string;
   firstName: string;
   lastName: string;

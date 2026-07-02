@@ -45,6 +45,7 @@ export async function GET() {
           order_number as "orderNumber",
           total,
           status,
+          is_paid as "isPaid",
           created_at as "createdAt",
           shipping_address->>'firstName' as "firstName",
           shipping_address->>'lastName' as "lastName"

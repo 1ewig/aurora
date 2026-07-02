@@ -74,7 +74,7 @@ export async function GET(request: Request) {
     const total = parseInt(countRes.rows[0].count, 10);
 
     const result = await pool.query(
-      `SELECT id, user_id, order_number, items, subtotal, shipping, tax, total, shipping_address, status, created_at
+      `SELECT id, user_id, order_number, items, subtotal, shipping, tax, total, shipping_address, status, is_paid, created_at
        FROM orders
        WHERE user_id = $1
        ORDER BY created_at DESC
@@ -93,6 +93,7 @@ export async function GET(request: Request) {
       total: Number(row.total),
       shippingAddress: row.shipping_address,
       status: row.status,
+      isPaid: row.is_paid,
       createdAt: row.created_at,
     }));
 
@@ -248,8 +249,8 @@ export async function POST(request: Request) {
           const orderNumber = generateOrderNumber();
 
           const result = await client.query(
-            `INSERT INTO orders (user_id, order_number, items, subtotal, shipping, tax, total, shipping_address, status)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
+            `INSERT INTO orders (user_id, order_number, items, subtotal, shipping, tax, total, shipping_address, status, is_paid)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending', FALSE)
              RETURNING id, order_number, created_at, subtotal, shipping, tax, total`,
             [
               userId,

@@ -205,8 +205,8 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
     await client.query(
       `INSERT INTO orders (
          user_id, order_number, items, subtotal, shipping, tax, total,
-         shipping_address, status, payment_provider, ls_order_id, ls_order_number
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'paid', 'lemonsqueezy', $9, $10)
+         shipping_address, status, is_paid, payment_provider, ls_order_id, ls_order_number
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending', TRUE, 'lemonsqueezy', $9, $10)
        ON CONFLICT (ls_order_id) DO NOTHING`,
       [
         userId,

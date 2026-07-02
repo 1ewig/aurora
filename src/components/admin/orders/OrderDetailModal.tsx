@@ -164,8 +164,18 @@ export function OrderDetailModal({
                         Modify Status
                       </h3>
                       <div className="border border-border-subtle p-4 rounded-2xl space-y-3 bg-bg-primary/10">
-                        <div className="text-xs flex items-center justify-between">
-                          <span className="text-text-secondary">Current Status:</span>
+                        <div className="text-xs flex items-center justify-between border-b border-border-subtle pb-2">
+                          <span className="text-text-secondary">Payment Status:</span>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
+                            order.isPaid 
+                              ? "bg-success/10 text-success border border-success/20" 
+                              : "bg-text-secondary/10 text-text-secondary border border-border-medium"
+                          }`}>
+                            {order.isPaid ? "Paid" : "Unpaid"}
+                          </span>
+                        </div>
+                        <div className="text-xs flex items-center justify-between pt-1">
+                          <span className="text-text-secondary">Fulfillment Status:</span>
                           <OrderStatusBadge status={order.status} />
                         </div>
                         <div className="grid grid-cols-2 gap-2 pt-2">
