@@ -240,6 +240,11 @@ describe("POST /api/webhooks/lemonsqueezy", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.received).toBe(true);
+
+    // Verify order_number is a UUID format (not sequential AUR-LS-XXXXX)
+    const insertOrderCall = mockClientQuery.mock.calls[6];
+    const orderNumberArg = insertOrderCall[1][1];
+    expect(orderNumberArg).toMatch(/^AUR-[0-9A-F]{32}$/);
   });
 
   // ── Non-order events ───────────────────────────────────────────────────
