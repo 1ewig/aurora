@@ -11,6 +11,10 @@ import { RegisterClient } from "@/components/auth/RegisterClient";
 export const metadata: Metadata = {
   title: "Create Profile — Aurora",
   description: "Join Aurora for a curated wardrobe experience.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 /** Registration / sign-up page. */

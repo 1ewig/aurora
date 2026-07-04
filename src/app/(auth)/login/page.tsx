@@ -11,6 +11,10 @@ import { LoginClient } from "@/components/auth/LoginClient";
 export const metadata: Metadata = {
   title: "Access Profile — Aurora",
   description: "Sign in with your email and password to access your wardrobe.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 /** Login / sign-in page. */

@@ -10,6 +10,10 @@ import { InventoryClient } from '@/components/admin/inventory/InventoryClient';
 export const metadata = {
   title: 'Inventory | Admin | Aurora',
   description: 'Manage the product inventory.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 /** Admin inventory / products management page. */

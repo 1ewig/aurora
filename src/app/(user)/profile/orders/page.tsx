@@ -11,6 +11,10 @@ import { OrdersClient } from "@/components/profile/orders/OrdersClient";
 export const metadata: Metadata = {
   title: "Purchase History — Aurora",
   description: "View your past orders and purchase history.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 /** Orders / purchase history page. */

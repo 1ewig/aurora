@@ -11,6 +11,10 @@ import { VerifyClient } from "@/components/auth/VerifyClient";
 export const metadata: Metadata = {
   title: "Verify Account — Aurora",
   description: "Verify your email address to active your account.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 /** Email verification page. */

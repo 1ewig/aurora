@@ -11,6 +11,10 @@ import { ResetPasswordClient } from "@/components/auth/ResetPasswordClient";
 export const metadata: Metadata = {
   title: "Reset Password — Aurora",
   description: "Update your password to secure your account.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 /** Password reset page. */

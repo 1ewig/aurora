@@ -8,6 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://aurora-nu-three.vercel.app";
 
   let products: MetadataRoute.Sitemap = [];
+  let categories: MetadataRoute.Sitemap = [];
 
   try {
     const productRes = await pool.query(
@@ -19,8 +20,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 0.8,
     }));
+
+    const categoryRes = await pool.query(
+      "SELECT slug FROM categories ORDER BY name ASC"
+    );
+    categories = categoryRes.rows.map((row) => ({
+      url: `${baseUrl}/products/category/${row.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.9,
+    }));
   } catch (error) {
-    console.error("Failed to fetch products for sitemap:", error);
+    console.error("Failed to fetch products or categories for sitemap:", error);
   }
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -36,5 +47,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 1.0,
   }));
 
-  return [...staticRoutes, ...products];
+  return [...staticRoutes, ...categories, ...products];
 }
