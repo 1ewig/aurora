@@ -7,7 +7,7 @@
 
 import { create } from 'zustand';
 import { authClient } from '@/lib/auth-client';
-import { normalizeProfile } from '@/utils/auth';
+import { fetchUserRole, buildUserState, normalizeProfile } from '@/utils/auth';
 
 export interface User {
   id: string;
@@ -81,19 +81,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         return { error, needsVerification: isUnverified };
       }
 
-      const user = data?.user
-        ? { id: data.user.id, email: data.user.email, name: data.user.name, emailVerified: data.user.emailVerified, image: data.user.image }
-        : null;
-
-      if (user) {
-        const roleRes = await fetch("/api/auth/role").catch(() => null);
-        const roleData = roleRes && roleRes.ok ? await roleRes.json() : { isAdmin: false, role: 'user' };
-        const profile = normalizeProfile({ displayName: user.name || "" });
-        set({
-          user: { ...user, isAdmin: roleData.isAdmin, role: roleData.role },
-          profile,
-          loading: false,
-        });
+      if (data?.user) {
+        const role = await fetchUserRole();
+        const state = buildUserState(data.user, role);
+        set({ ...state, loading: false });
       } else {
         set({ user: null, profile: null, loading: false });
       }
@@ -116,21 +107,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       }
 
       if (data?.user && data.user.emailVerified) {
-        const roleRes = await fetch("/api/auth/role").catch(() => null);
-        const roleData = roleRes && roleRes.ok ? await roleRes.json() : { isAdmin: false, role: 'user' };
-        set({
-          user: {
-            id: data.user.id,
-            email: data.user.email,
-            name: data.user.name,
-            emailVerified: data.user.emailVerified,
-            image: data.user.image,
-            isAdmin: roleData.isAdmin,
-            role: roleData.role,
-          },
-          profile: { displayName: name || "" },
-          loading: false,
-        });
+        const role = await fetchUserRole();
+        const state = buildUserState(data.user, role);
+        set({ ...state, loading: false });
         return { error: null, needsVerification: false };
       }
 

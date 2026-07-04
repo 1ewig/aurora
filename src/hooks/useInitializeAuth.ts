@@ -10,7 +10,7 @@
 import { useEffect, useRef } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { authClient } from "@/lib/auth-client";
-import { normalizeProfile } from "@/utils/auth";
+import { fetchUserRole, buildUserState } from "@/utils/auth";
 
 /** Fetches the current session and populates the auth store on mount. */
 export function useInitializeAuth() {
@@ -27,22 +27,9 @@ export function useInitializeAuth() {
         const user = sessionData?.user || null;
 
         if (user) {
-          const roleRes = await fetch("/api/auth/role").catch(() => null);
-          const roleData = roleRes && roleRes.ok ? await roleRes.json() : { isAdmin: false, role: 'user' };
-          const profile = normalizeProfile({ displayName: user.name || "" });
-          useAuthStore.setState({
-            user: {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              emailVerified: user.emailVerified,
-              image: user.image,
-              isAdmin: roleData.isAdmin,
-              role: roleData.role,
-            },
-            profile,
-            loading: false,
-          });
+          const role = await fetchUserRole();
+          const state = buildUserState(user, role);
+          useAuthStore.setState({ ...state, loading: false });
         } else {
           useAuthStore.setState({ user: null, profile: null, loading: false });
         }
