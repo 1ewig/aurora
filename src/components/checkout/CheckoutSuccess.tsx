@@ -9,7 +9,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { toPng } from "html-to-image";
@@ -65,10 +64,8 @@ export function CheckoutSuccess({
   };
 
   return (
-    <motion.div
+    <div
       ref={receiptRef}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
       className="max-w-xl mx-auto space-y-6 text-center py-12 px-6 md:px-8 bg-white rounded-2xl border border-border-subtle shadow-sm"
     >
       <div className="w-16 h-16 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto mb-6">
@@ -167,7 +164,7 @@ export function CheckoutSuccess({
           </Button>
         </Link>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
