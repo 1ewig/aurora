@@ -77,6 +77,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
 
   const shippingAddress = customData.shipping_address ? JSON.parse(customData.shipping_address) : {};
   const sanitizedAddress = sanitizeShippingAddress(shippingAddress);
+  const orderNumber = `AUR-${crypto.randomUUID().replace(/-/g, "").toUpperCase()}`;
 
   const { verifiedItems, subtotal } = await withTransaction(async (client) => {
     const checkRes = await client.query(
@@ -157,7 +158,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
        ON CONFLICT (ls_order_id) DO NOTHING`,
       [
         userId,
-        `AUR-LS-${lsOrderNumber}`,
+        orderNumber,
         JSON.stringify(items),
         sub,
         shipping,
@@ -187,9 +188,9 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
 
   await sendEmail({
     to: sanitizedAddress.email,
-    subject: `Order Confirmed — AUR-LS-${lsOrderNumber}`,
+    subject: `Order Confirmed — ${orderNumber}`,
     text: orderConfirmationText({
-      orderNumber: `AUR-LS-${lsOrderNumber}`,
+      orderNumber,
       customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
       items: verifiedItems.map((i) => ({
         name: i.name,
@@ -210,7 +211,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
       },
     }),
     html: orderConfirmationHtml({
-      orderNumber: `AUR-LS-${lsOrderNumber}`,
+      orderNumber,
       customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
       items: verifiedItems.map((i) => ({
         name: i.name,

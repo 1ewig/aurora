@@ -1,18 +1,27 @@
-/**
- * Aurora — src/app/api/lookbook/route.ts
- *
- * GET /api/lookbook — returns lookbook slides ordered by slide number.
- */
+import { NextResponse } from "next/server";
+import { pool } from "@/utils/db";
+import { unstable_cache } from "next/cache";
 
-import { NextResponse } from 'next/server';
-import { pool } from '@/utils/db';
+const fetchLookbookSlides = async () => {
+  const result = await pool.query(
+    `SELECT id, slide_number, original_image, image_url, alt_text, tag, title, link
+     FROM lookbook_slides
+     ORDER BY slide_number ASC`
+  );
+  return result.rows;
+};
+
+const getCachedLookbookSlides = unstable_cache(
+  fetchLookbookSlides,
+  ["lookbook-slides"],
+  { revalidate: 300, tags: ["lookbook"] }
+);
 
 export async function GET() {
   try {
-    const query = 'SELECT id, slide_number, original_image, image_url, alt_text, tag, title, link FROM lookbook_slides ORDER BY slide_number ASC';
-    const result = await pool.query(query);
+    const rows = await getCachedLookbookSlides();
 
-    const slides = result.rows.map((row) => ({
+    const slides = rows.map((row) => ({
       id: row.id,
       slideNumber: row.slide_number,
       originalImage: row.original_image,
@@ -27,7 +36,7 @@ export async function GET() {
   } catch (error) {
     console.error("Database query for lookbook slides failed:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch lookbook slides. Please try again later.' },
+      { error: "Failed to fetch lookbook slides. Please try again later." },
       { status: 500 }
     );
   }
