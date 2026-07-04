@@ -49,7 +49,15 @@ export function CheckoutSuccess({
 
   const handleDownloadReceipt = async () => {
     if (!receiptRef.current) return;
-    const dataUrl = await toPng(receiptRef.current, { quality: 1 });
+    const dataUrl = await toPng(receiptRef.current, {
+      quality: 1,
+      filter: (node) => {
+        if (node instanceof HTMLElement && node.id === "receipt-actions") {
+          return false;
+        }
+        return true;
+      },
+    });
     const link = document.createElement("a");
     link.download = `Receipt-${orderNumber}.png`;
     link.href = dataUrl;
@@ -68,8 +76,6 @@ export function CheckoutSuccess({
           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
         </svg>
       </div>
-
-
 
       <h2 className="font-display font-black text-3xl tracking-tight text-text-primary">
         Order Received
@@ -141,7 +147,7 @@ export function CheckoutSuccess({
         <span className="font-semibold text-text-primary">Secured by Lemon Squeezy</span>
       </p>
 
-      <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center items-center">
+      <div id="receipt-actions" className="pt-2 flex flex-col sm:flex-row gap-3 justify-center items-center">
         <Button
           type="button"
           variant="ghost"
