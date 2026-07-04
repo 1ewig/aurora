@@ -30,8 +30,7 @@ interface BasicDetailsFieldsProps {
 /** Renders input fields for product ID, name, slug, category, price, badge, span, aspect ratio, and alt text. */
 export function BasicDetailsFields(props: BasicDetailsFieldsProps) {
   const { data: dbCategories = [] } = useCategoriesQuery();
-  const fallbackCategories = ["Outerwear", "Knitwear", "Trousers", "Dresses", "Accessories"];
-  const categoriesList = dbCategories.length > 0 ? dbCategories.map((c) => c.name) : fallbackCategories;
+  const categoriesList = dbCategories.map((c) => c.name);
 
   return (
     <div className="space-y-4">

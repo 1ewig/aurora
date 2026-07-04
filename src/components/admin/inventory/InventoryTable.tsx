@@ -36,8 +36,7 @@ export function InventoryTable({
   loading,
 }: InventoryTableProps) {
   const { data: dbCategories = [] } = useCategoriesQuery();
-  const fallbackCategories = ["Outerwear", "Knitwear", "Trousers", "Dresses", "Accessories"];
-  const categoriesList = dbCategories.length > 0 ? dbCategories.map((c) => c.name) : fallbackCategories;
+  const categoriesList = dbCategories.map((c) => c.name);
 
   return (
     <div className="space-y-8">
