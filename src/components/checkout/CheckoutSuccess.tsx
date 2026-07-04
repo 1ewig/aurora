@@ -50,6 +50,10 @@ export function CheckoutSuccess({
     if (!receiptRef.current) return;
     const dataUrl = await toPng(receiptRef.current, {
       quality: 1,
+      style: {
+        margin: "0",
+        transform: "none",
+      },
       filter: (node) => {
         if (node instanceof HTMLElement && node.id === "receipt-actions") {
           return false;
