@@ -7,8 +7,6 @@
 import { pool } from "@/utils/db";
 import { ProductDetailClient } from "@/components/product/detail/ProductDetailClient";
 
-export const dynamic = 'force-dynamic';
-
 interface PageProps {
   params: Promise<{ slug: string }>;
 }

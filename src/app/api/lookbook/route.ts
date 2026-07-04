@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/utils/db";
-import { unstable_cache } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 
 const fetchLookbookSlides = async () => {
   const result = await pool.query(
@@ -11,11 +11,12 @@ const fetchLookbookSlides = async () => {
   return result.rows;
 };
 
-const getCachedLookbookSlides = unstable_cache(
-  fetchLookbookSlides,
-  ["lookbook-slides"],
-  { revalidate: 300, tags: ["lookbook"] }
-);
+async function getCachedLookbookSlides() {
+  'use cache';
+  cacheLife({ stale: 300, revalidate: 300 });
+  cacheTag('lookbook');
+  return fetchLookbookSlides();
+}
 
 export async function GET() {
   try {

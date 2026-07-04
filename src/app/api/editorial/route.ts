@@ -5,26 +5,25 @@
  */
 
 import { NextResponse } from 'next/server';
-import { unstable_cache } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
 import { pool } from '@/utils/db';
 
-const getEditorialContent = unstable_cache(
-  async () => {
-    const query = 'SELECT id, original_image, image_url, alt_text, title, description FROM editorial_content';
-    const result = await pool.query(query);
+async function getEditorialContent() {
+  'use cache';
+  cacheLife({ stale: 600, revalidate: 600 });
+  cacheTag('editorial');
+  const query = 'SELECT id, original_image, image_url, alt_text, title, description FROM editorial_content';
+  const result = await pool.query(query);
 
-    return result.rows.map((row) => ({
-      id: row.id,
-      originalImage: row.original_image,
-      imageUrl: row.image_url,
-      altText: row.alt_text,
-      title: row.title,
-      description: row.description,
-    }));
-  },
-  ['editorial-content'],
-  { revalidate: 600, tags: ['editorial'] },
-);
+  return result.rows.map((row) => ({
+    id: row.id,
+    originalImage: row.original_image,
+    imageUrl: row.image_url,
+    altText: row.alt_text,
+    title: row.title,
+    description: row.description,
+  }));
+}
 
 export async function GET() {
   try {

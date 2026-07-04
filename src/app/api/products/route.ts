@@ -7,7 +7,7 @@
 
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
-import { unstable_cache } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
 
 const fetchProductsList = async (
   category: string | null,
@@ -112,19 +112,18 @@ const fetchProductsList = async (
   return { products, total: products.length };
 };
 
-const getCachedProducts = unstable_cache(
-  async (
-    category: string | null,
-    pageParam: string | null,
-    limitParam: string | null,
-    search: string | null,
-    sortBy: string | null
-  ) => {
-    return fetchProductsList(category, pageParam, limitParam, search, sortBy);
-  },
-  ['products-list'],
-  { revalidate: 300, tags: ['products'] }
-);
+async function getCachedProducts(
+  category: string | null,
+  pageParam: string | null,
+  limitParam: string | null,
+  search: string | null,
+  sortBy: string | null
+) {
+  'use cache';
+  cacheLife({ stale: 300, revalidate: 300 });
+  cacheTag('products');
+  return fetchProductsList(category, pageParam, limitParam, search, sortBy);
+}
 
 export async function GET(request: Request) {
   try {

@@ -18,7 +18,8 @@ vi.mock("@/utils/db", () => ({
 }));
 
 vi.mock("next/cache", () => ({
-  unstable_cache: (fn: any) => fn,
+  cacheLife: vi.fn(),
+  cacheTag: vi.fn(),
   revalidateTag: vi.fn(),
 }));
 
