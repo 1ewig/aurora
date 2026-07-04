@@ -37,7 +37,8 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
+    /* Changed to auto to prevent Next.js client-side navigation scroll glitches */
+    scroll-behavior: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
