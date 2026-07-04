@@ -52,7 +52,7 @@ aurora/
 ├── migrations/
 │   └── 20260614145429_better-auth-setup.sql  # Better Auth schema migration
 │
-├── scripts/                             # CLI tools & DB scripts (7 files)
+├── scripts/                             # CLI tools & DB scripts (6 files)
 │
 ├── __tests__/                           # Integration tests
 │   ├── api/
@@ -424,12 +424,12 @@ The codebase enforces a strict 4-layer architecture with unidirectional dependen
 
 | Endpoint | Method | Auth | Caching | Purpose |
 |---|---|---|---|---|
-| `/api/products` | GET | None | `unstable_cache` 300s, tag:`products` | List/paginate/filter/sort |
-| `/api/products/[slug]` | GET | None | `unstable_cache` 300s, tag:`products` | Single product detail (with images, sizes, details) |
-| `/api/categories` | GET | None | `unstable_cache` 300s, tags:`categories,products` | All categories with metadata |
-| `/api/categories/daily` | GET | None | `unstable_cache` 300s | 3 daily rotating categories (day-of-year modulo) |
-| `/api/lookbook` | GET | None | No server cache (client React Query 5min stale) | Lookbook slides |
-| `/api/editorial` | GET | None | No server cache (client React Query 5min stale) | Editorial content |
+| `/api/products` | GET | None | `'use cache'` 300s, tag: `products` | List/paginate/filter/sort |
+| `/api/products/[slug]` | GET | None | `'use cache'` 300s, tag: `products` | Single product detail (with images, sizes, details) |
+| `/api/categories` | GET | None | `'use cache'` 300s, tags: `categories,products` | All categories with metadata |
+| `/api/categories/daily` | GET | None | `'use cache'` 300s, tags: `categories,products` | 3 daily rotating categories (day-of-year modulo) |
+| `/api/lookbook` | GET | None | `'use cache'` 300s, tag: `lookbook` | Lookbook slides |
+| `/api/editorial` | GET | None | `'use cache'` 600s, tag: `editorial` | Editorial content |
 | `/api/orders` | GET | Better Auth session | React Query 2min | User's orders (paginated) |
 | `/api/orders` | POST | _(removed)_ | — | ~~Create order (deactivated)~~ |
 
@@ -483,7 +483,7 @@ The codebase enforces a strict 4-layer architecture with unidirectional dependen
 - With `page` param: returns `{ products: [...], total: number }` (paginated)
 - Without `page` param: returns `Product[]` (all matching)
 - Search searches `name`, `description`, and `product_keywords` via `ILIKE`
-- Cached via `unstable_cache` with 300s revalidation and `products` tag
+- Cached via Next.js 16 `'use cache'` with 300s revalidation (`cacheLife`) and `products` tag (`cacheTag`)
 
 **Response shape (paginated)**:
 ```ts
@@ -502,7 +502,7 @@ Product[]
 - Uses `json_agg` subqueries to consolidate `product_images`, `product_sizes`, `product_details` into a single row
 - Case-insensitive slug lookup via `LOWER(p.slug) = LOWER($1)`
 - Returns 404 if not found
-- Cached via `unstable_cache` 300s, tag `products`
+- Cached via Next.js 16 `'use cache'` 300s, tag `products`
 
 **Response shape**:
 ```ts
@@ -519,7 +519,7 @@ Product[]
 
 **File**: `src/app/api/categories/route.ts`
 
-**Behavior**: Returns all categories ordered by name. Cached 300s with tags `categories,products`.
+**Behavior**: Returns all categories ordered by name. Cached via Next.js 16 `'use cache'` (300s) with tags `categories,products`.
 
 **Response**: `CategoryMetadata[]`
 
@@ -527,7 +527,7 @@ Product[]
 
 **File**: `src/app/api/categories/daily/route.ts`
 
-**Behavior**: Returns 3 categories deterministically selected by day-of-year modulo. Shares the same `unstable_cache` key (`['all-categories-list']`) and tags as the regular categories route — both hit the same cached data.
+**Behavior**: Returns 3 categories deterministically selected by day-of-year modulo. Shares the same `'use cache'` properties and tags as the regular categories route — both hit the same cached data.
 
 ### 5.5 `POST /api/checkout/session`
 
@@ -776,6 +776,114 @@ CREATE TABLE hero_slides (
   title          VARCHAR(255),
   link           VARCHAR(255)
 );
+
+
+-- ========================================================
+--  Row Level Security (RLS) Policies
+-- ========================================================
+
+-- Helper for RLS (extracts sub claim from bridge JWT)
+CREATE OR REPLACE FUNCTION public.requesting_user_id()
+RETURNS text
+LANGUAGE sql STABLE
+AS $$ SELECT NULLIF(auth.jwt() ->> 'sub', '')::text $$;
+
+-- 1. Categories
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read access" ON public.categories FOR SELECT USING (true);
+CREATE POLICY "Allow admin write access" ON public.categories FOR ALL TO authenticated USING (
+  public.requesting_user_id() IN (
+    SELECT id FROM better_auth."user" WHERE role = 'admin'
+  )
+);
+
+-- 2. Products
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read access" ON public.products FOR SELECT USING (true);
+CREATE POLICY "Allow admin write access" ON public.products FOR ALL TO authenticated USING (
+  public.requesting_user_id() IN (
+    SELECT id FROM better_auth."user" WHERE role = 'admin'
+  )
+);
+
+-- 3. Product Images
+ALTER TABLE public.product_images ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read access" ON public.product_images FOR SELECT USING (true);
+CREATE POLICY "Allow admin write access" ON public.product_images FOR ALL TO authenticated USING (
+  public.requesting_user_id() IN (
+    SELECT id FROM better_auth."user" WHERE role = 'admin'
+  )
+);
+
+-- 4. Product Sizes
+ALTER TABLE public.product_sizes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read access" ON public.product_sizes FOR SELECT USING (true);
+CREATE POLICY "Allow admin write access" ON public.product_sizes FOR ALL TO authenticated USING (
+  public.requesting_user_id() IN (
+    SELECT id FROM better_auth."user" WHERE role = 'admin'
+  )
+);
+
+-- 5. Product Details
+ALTER TABLE public.product_details ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read access" ON public.product_details FOR SELECT USING (true);
+CREATE POLICY "Allow admin write access" ON public.product_details FOR ALL TO authenticated USING (
+  public.requesting_user_id() IN (
+    SELECT id FROM better_auth."user" WHERE role = 'admin'
+  )
+);
+
+-- 6. Product Keywords
+ALTER TABLE public.product_keywords ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read access" ON public.product_keywords FOR SELECT USING (true);
+CREATE POLICY "Allow admin write access" ON public.product_keywords FOR ALL TO authenticated USING (
+  public.requesting_user_id() IN (
+    SELECT id FROM better_auth."user" WHERE role = 'admin'
+  )
+);
+
+-- 7. Lookbook Slides
+ALTER TABLE public.lookbook_slides ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read access" ON public.lookbook_slides FOR SELECT USING (true);
+CREATE POLICY "Allow admin write access" ON public.lookbook_slides FOR ALL TO authenticated USING (
+  public.requesting_user_id() IN (
+    SELECT id FROM better_auth."user" WHERE role = 'admin'
+  )
+);
+
+-- 8. Editorial Content
+ALTER TABLE public.editorial_content ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read access" ON public.editorial_content FOR SELECT USING (true);
+CREATE POLICY "Allow admin write access" ON public.editorial_content FOR ALL TO authenticated USING (
+  public.requesting_user_id() IN (
+    SELECT id FROM better_auth."user" WHERE role = 'admin'
+  )
+);
+
+-- 9. Hero Slides
+ALTER TABLE public.hero_slides ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public read access" ON public.hero_slides FOR SELECT USING (true);
+CREATE POLICY "Allow admin write access" ON public.hero_slides FOR ALL TO authenticated USING (
+  public.requesting_user_id() IN (
+    SELECT id FROM better_auth."user" WHERE role = 'admin'
+  )
+);
+
+-- 10. Orders (Users read own orders, Admins read all)
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow users to view own orders" ON public.orders FOR SELECT TO authenticated USING (
+  user_id = public.requesting_user_id()
+  OR
+  public.requesting_user_id() IN (
+    SELECT id FROM better_auth."user" WHERE role = 'admin'
+  )
+);
+
+-- 11. Processed Webhooks (Bypass RLS on Service role, block client-side)
+ALTER TABLE public.processed_webhooks ENABLE ROW LEVEL SECURITY;
+
+-- 12. Product Reservations (Bypass RLS on Service role, block client-side)
+ALTER TABLE public.product_reservations ENABLE ROW LEVEL SECURITY;
 ```
 
 ### 6.2 Indexes
@@ -1569,8 +1677,8 @@ WHERE LOWER(p.slug) = LOWER($1)
 
 ### 18.5 Caching Strategy
 
-- **Public product routes**: `unstable_cache` with 300s revalidate, `products` tag
-- **Categories**: `unstable_cache` 300s, `categories`+`products` tags
+- **Public product/catalog routes**: Next.js 16 `'use cache'` with 300s revalidate (`cacheLife`) and `products` tag (`cacheTag`)
+- **Categories**: Next.js 16 `'use cache'` 300s, `categories` + `products` tags
 - **Admin**: No caching (always fresh)
 - **React Query**: 5-min stale, 10-min gc, no refetch on focus
 - **Admin cache invalidation**: Cache tags revalidated on product mutations
