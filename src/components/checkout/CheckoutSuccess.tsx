@@ -8,9 +8,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { toPng } from "html-to-image";
 
 interface CheckoutSuccessProps {
   orderNumber: string;
@@ -43,13 +45,25 @@ export function CheckoutSuccess({
   tax,
   total,
 }: CheckoutSuccessProps) {
+  const receiptRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadReceipt = async () => {
+    if (!receiptRef.current) return;
+    const dataUrl = await toPng(receiptRef.current, { quality: 1 });
+    const link = document.createElement("a");
+    link.download = `Receipt-${orderNumber}.png`;
+    link.href = dataUrl;
+    link.click();
+  };
+
   return (
     <motion.div
+      ref={receiptRef}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="max-w-xl mx-auto space-y-6 text-center py-12 px-6 md:px-8 bg-white rounded-2xl border border-border-subtle shadow-sm"
     >
-      <div className="w-16 h-16 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto mb-6 print:hidden">
+      <div className="w-16 h-16 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto mb-6">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">
           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
         </svg>
@@ -127,12 +141,12 @@ export function CheckoutSuccess({
         <span className="font-semibold text-text-primary">Secured by Lemon Squeezy</span>
       </p>
 
-      <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center items-center print:hidden">
+      <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center items-center">
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => window.print()}
+          onClick={handleDownloadReceipt}
           className="flex items-center gap-1.5 cursor-pointer text-xs"
         >
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
