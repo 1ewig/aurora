@@ -6,7 +6,7 @@
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { cache } from "react";
+import { cacheLife, cacheTag } from "next/cache";
 import { pool } from "@/utils/db";
 import { ProductListingClient } from "@/components/product/listing/ProductListingClient";
 
@@ -14,8 +14,11 @@ interface CategoryPageProps {
   params: Promise<{ category: string }>;
 }
 
-/** Dynamically resolves category name from DB with request-scoped caching. */
-const getCategoryName = cache(async (slug: string) => {
+/** Dynamically resolves category name from DB with persistent caching. */
+async function getCategoryName(slug: string) {
+  'use cache';
+  cacheLife({ stale: 300, revalidate: 300 });
+  cacheTag('categories');
   try {
     const result = await pool.query(
       "SELECT name FROM categories WHERE LOWER(slug) = LOWER($1)",
@@ -26,7 +29,7 @@ const getCategoryName = cache(async (slug: string) => {
     console.error("Failed to query category name:", error);
     return null;
   }
-});
+}
 
 /** Generate metadata based on the category slug. */
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
