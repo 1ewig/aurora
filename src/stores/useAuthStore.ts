@@ -7,7 +7,7 @@
 
 import { create } from 'zustand';
 import { authClient } from '@/lib/auth-client';
-import { fetchUserRole, buildUserState, normalizeProfile } from '@/utils/auth';
+import { fetchUserRole, buildUserState } from '@/utils/auth';
 
 export interface User {
   id: string;

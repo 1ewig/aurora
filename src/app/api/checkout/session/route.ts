@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 5. Compute shipping, tax, total and cents
-    const { shipping, tax, total } = calculateOrderPricing(subtotal);
+    const { total } = calculateOrderPricing(subtotal);
     const totalCents = Math.round(total * 100);
 
     // 6. Validate and sanitize shipping address

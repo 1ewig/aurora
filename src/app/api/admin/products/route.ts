@@ -7,7 +7,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { withTransaction } from '@/utils/db';
+import { pool, withTransaction } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
 import { revalidateTag } from 'next/cache';
 

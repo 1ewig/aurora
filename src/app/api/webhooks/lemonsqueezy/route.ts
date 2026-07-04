@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
-import { pool, withTransaction } from "@/utils/db";
+import { withTransaction } from "@/utils/db";
 import { sendEmail } from "@/lib/email";
 import { orderConfirmationHtml, orderConfirmationText } from "@/lib/email-templates";
 import { formatCurrency } from "@/utils/formatCurrency";

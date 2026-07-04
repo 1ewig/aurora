@@ -225,18 +225,14 @@ src/hooks/
 ├── useCheckoutForm.ts                  # Checkout form state + validation + LS integration
 ├── useCheckoutSuccess.ts               # Success page: clears cart, reads sessionStorage, polls for order number (up to 10x @ 1.5s)
 ├── useNewsletterSubmit.ts              # Newsletter signup (static placeholder)
-├── useOrderProcessing.ts               # Order creation logic
 ├── useOrdersManagement.ts              # Admin order management
 ├── useProductFilter.ts                 # URL-synced product listing filters
 ├── useProductForm.ts                   # Admin product form state + upload
 ├── useUserSessions.ts                  # Multi-session management
 ├── useUsersManagement.ts               # Admin user CRUD
-└── ui/                                 # Pure UI hooks (6 files)
+└── ui/                                 # Pure UI hooks (3 files)
     ├── useBodyScrollLock.ts
     ├── useCarousel.ts                   # Wraps Embla Carousel
-    ├── useInView.ts
-    ├── useMagneticHover.ts
-    ├── useMediaQuery.ts
     └── useNavbarScroll.ts              # Show/hide on scroll direction
 ```
 

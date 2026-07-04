@@ -9,7 +9,7 @@ Analysis of hooks, API routes, stores, and lib for code duplication and efficien
 | # | Finding | Files | Impact |
 |---|---------|-------|--------|
 | **1** | **Pricing logic exists as `calculateOrderPricing()` in `utils/pricing.ts` but is never imported.** The same 3 lines are copy-pasted in 4 other files. | `utils/pricing.ts` (unused), `hooks/useCheckoutForm.ts`, `api/checkout/session/route.ts`, `api/orders/route.ts`, `api/webhooks/lemonsqueezy/route.ts` | Magic numbers (`500`, `25`, `0.08`) in 5 places. Tax rate change = hunt 5 files. |
-| **2** | **`useOrderProcessing.ts` is dead code.** Never imported anywhere. Contains the same filtering logic as `useOrdersManagement.ts`. | `hooks/useOrderProcessing.ts` | 39 lines of dead code. Confusing for future agents. |
+| **2** | ~~**`useOrderProcessing.ts` is dead code.** Never imported anywhere. Contains the same filtering logic as `useOrdersManagement.ts`.~~ | ~~`hooks/useOrderProcessing.ts`~~ | ~~39 lines of dead code. Confusing for future agents.~~ ✅ Resolved in Phase 6 |
 | **3** | **Auth init logic (role fetch + user object build) duplicated 3 times.** | `stores/useAuthStore.ts` (signIn + signUp), `hooks/useInitializeAuth.ts` | Same pattern with slight variations. Adding a user field = edit 3 places. |
 | **4** | **`sanitize()` function duplicated 3 times.** Identical 1-line function. | `api/webhooks/lemonsqueezy/route.ts`, `api/orders/route.ts`, `api/checkout/session/route.ts` | 3 copies, no shared source of truth. |
 | **5** | **`sanitizeShippingAddress()` duplicated 3 times with null-safety inconsistency.** The webhook handler defensively wraps `\|\| ""`, the other two don't — meaning `null` values would crash them. | `api/webhooks/lemonsqueezy/route.ts`, `api/orders/route.ts`, `api/checkout/session/route.ts` | Bug + duplication. |
@@ -128,9 +128,7 @@ Refactor `signIn` and `signUp` to call `resolveUserRole` instead of duplicating 
 
 Simplify to delegate to the store's own initialization rather than reimplementing role-fetch + user-build.
 
-### Step 7: Delete `src/hooks/useOrderProcessing.ts`
-
-Dead code. Never imported anywhere in the codebase.
+### Step 7: ✅ Resolved in Phase 6 — `src/hooks/useOrderProcessing.ts` deleted.
 
 ### Step 8: Update files that duplicate extracted utilities
 
@@ -150,7 +148,7 @@ Dead code. Never imported anywhere in the codebase.
 |--------|------|
 | **Create** | `src/utils/sanitize.ts` |
 | **Create** | `src/utils/env.ts` |
-| **Delete** | `src/hooks/useOrderProcessing.ts` |
+| ~~**Delete**~~ | ~~`src/hooks/useOrderProcessing.ts`~~ ✅ Done |
 | **Edit** | `src/utils/db.ts` — add `withTransaction` |
 | **Edit** | `src/lib/email.ts` — add `sendOrderConfirmation` |
 | **Edit** | `src/stores/useAuthStore.ts` — add `resolveUserRole` helper |
