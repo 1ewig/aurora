@@ -6,9 +6,12 @@
 
 const aspectRatios = ["aspect-[3/4]", "aspect-[4/5]", "aspect-[2/3]", "aspect-[3/4]"];
 
+import { ScrollToTop } from "@/components/ui/ScrollToTop";
+
 export default function ProductsLoading() {
   return (
     <main className="pt-28 pb-32">
+      <ScrollToTop />
       <div className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto animate-pulse">
         {/* Header Skeleton */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
