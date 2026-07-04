@@ -5,6 +5,9 @@
  */
 
 import Link from "next/link";
+import { getCachedCategories } from "@/app/api/categories/route";
+import { categoryDataList } from "@/data/categories";
+
 
 function InstagramIcon() {
   return (
@@ -42,7 +45,16 @@ function PinterestIcon() {
   );
 }
 
-export function Footer() {
+export async function Footer() {
+  let categories = [];
+  try {
+    categories = await getCachedCategories();
+  } catch (error) {
+    console.error("Failed to load categories in footer:", error);
+  }
+
+  const displayCategories = categories.length > 0 ? categories : categoryDataList;
+
   return (
     <footer
       role="contentinfo"
@@ -108,38 +120,16 @@ export function Footer() {
                     Shop All
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    href="/products/category/outerwear"
-                    className="text-sm text-text-secondary hover:text-text-primary transition-colors"
-                  >
-                    Outerwear
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/products/category/knitwear"
-                    className="text-sm text-text-secondary hover:text-text-primary transition-colors"
-                  >
-                    Knitwear
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/products/category/trousers"
-                    className="text-sm text-text-secondary hover:text-text-primary transition-colors"
-                  >
-                    Trousers
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/products/category/accessories"
-                    className="text-sm text-text-secondary hover:text-text-primary transition-colors"
-                  >
-                    Accessories
-                  </Link>
-                </li>
+                {displayCategories.map((category) => (
+                  <li key={category.slug}>
+                    <Link
+                      href={`/products/category/${category.slug}`}
+                      className="text-sm text-text-secondary hover:text-text-primary transition-colors"
+                    >
+                      {category.name}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
 

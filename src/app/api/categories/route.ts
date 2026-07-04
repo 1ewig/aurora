@@ -18,7 +18,7 @@ const fetchCategoriesFromDb = async () => {
   return result.rows;
 };
 
-const getCachedCategories = unstable_cache(
+export const getCachedCategories = unstable_cache(
   async () => {
     return fetchCategoriesFromDb();
   },
