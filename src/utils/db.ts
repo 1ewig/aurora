@@ -5,7 +5,7 @@
  * Configures SSL conditionally and uses a short idle timeout for build compatibility.
  */
 
-import { Pool } from 'pg';
+import { Pool, type PoolClient } from 'pg';
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -20,3 +20,20 @@ export const pool = new Pool({
     : undefined,
   idleTimeoutMillis: 1000, // Close idle connections after 1 second to allow Next.js build process to exit
 });
+
+export async function withTransaction<T>(
+  fn: (client: PoolClient) => Promise<T>
+): Promise<T> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const result = await fn(client);
+    await client.query('COMMIT');
+    return result;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}
