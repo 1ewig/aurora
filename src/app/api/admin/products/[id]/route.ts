@@ -7,7 +7,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { pool } from '@/utils/db';
+import { withTransaction } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
 import { createAdminClient } from '@insforge/sdk';
 import { getStorageKeyFromUrl } from '@/utils/insforge';
@@ -72,16 +72,12 @@ export async function PUT(
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-
+    return await withTransaction(async (client) => {
       const { rows: productRows } = await client.query(
         'SELECT image FROM products WHERE id = $1',
         [id]
       );
       if (productRows.length === 0) {
-        await client.query('ROLLBACK');
         return NextResponse.json({ error: 'Product not found' }, { status: 404 });
       }
 
@@ -92,7 +88,6 @@ export async function PUT(
         [slug, id]
       );
       if (existingSlug.rows.length > 0) {
-        await client.query('ROLLBACK');
         return NextResponse.json({ error: 'Slug is already used by another product' }, { status: 400 });
       }
 
@@ -144,15 +139,9 @@ export async function PUT(
         );
       }
 
-      await client.query('COMMIT');
       revalidateTag('products', { expire: 0 });
       return NextResponse.json({ success: true });
-    } catch (dbErr) {
-      await client.query('ROLLBACK');
-      throw dbErr;
-    } finally {
-      client.release();
-    }
+    });
   } catch (err: any) {
     console.error('Failed to update product:', err);
     return NextResponse.json({ error: err.message || 'Failed to update product' }, { status: 500 });
@@ -168,16 +157,12 @@ export async function DELETE(
     const { error } = await requireAdmin();
     if (error) return error;
 
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-
+    return await withTransaction(async (client) => {
       const { rows: productRows } = await client.query(
         'SELECT image FROM products WHERE id = $1',
         [id]
       );
       if (productRows.length === 0) {
-        await client.query('ROLLBACK');
         return NextResponse.json({ error: 'Product not found' }, { status: 404 });
       }
 
@@ -195,15 +180,9 @@ export async function DELETE(
 
       await client.query('DELETE FROM products WHERE id = $1', [id]);
 
-      await client.query('COMMIT');
       revalidateTag('products', { expire: 0 });
       return NextResponse.json({ success: true });
-    } catch (dbErr) {
-      await client.query('ROLLBACK');
-      throw dbErr;
-    } finally {
-      client.release();
-    }
+    });
   } catch (err: any) {
     console.error('Failed to delete product:', err);
     return NextResponse.json({ error: err.message || 'Failed to delete product' }, { status: 500 });

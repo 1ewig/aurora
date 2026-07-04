@@ -7,7 +7,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { pool } from '@/utils/db';
+import { withTransaction } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
 import { revalidateTag } from 'next/cache';
 
@@ -87,16 +87,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-
+    return await withTransaction(async (client) => {
       const existingProduct = await client.query(
         'SELECT 1 FROM products WHERE id = $1 OR slug = $2',
         [id, slug]
       );
       if (existingProduct.rows.length > 0) {
-        await client.query('ROLLBACK');
         return NextResponse.json({ error: 'Product with this ID or slug already exists' }, { status: 400 });
       }
 
@@ -129,15 +125,9 @@ export async function POST(request: Request) {
         );
       }
 
-      await client.query('COMMIT');
       revalidateTag('products', { expire: 0 });
       return NextResponse.json({ success: true, id });
-    } catch (dbErr) {
-      await client.query('ROLLBACK');
-      throw dbErr;
-    } finally {
-      client.release();
-    }
+    });
   } catch (err: any) {
     console.error('Failed to create product:', err);
     return NextResponse.json({ error: err.message || 'Failed to create product' }, { status: 500 });
