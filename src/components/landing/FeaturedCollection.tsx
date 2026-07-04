@@ -68,42 +68,45 @@ export function FeaturedCollection({ categories }: FeaturedCollectionProps) {
                 >
                   {/* Category Image */}
                   <div className="absolute inset-0 w-full h-full overflow-hidden">
-                    <motion.div
-                      className="relative w-full h-full"
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    >
+                    <div className="relative w-full h-full">
                       <Image
                         src={category.image}
                         alt={`${category.name} cover`}
                         fill
                         quality={100}
                         sizes="(max-width: 768px) 100vw, 33vw"
-                        className="object-cover object-center"
+                        className="object-cover object-center transition-transform duration-[800ms] ease-out group-hover:scale-105"
                       />
                       {/* Dark/Gradient Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 transition-opacity duration-300 group-hover:from-black/90" />
-                    </motion.div>
+                    </div>
                   </div>
 
                   {/* Content Overlay */}
                   <div className="absolute inset-0 flex flex-col justify-end p-8 text-white z-10">
-                    <span className="text-xs font-semibold tracking-[0.2em] uppercase text-accent-primary mb-2 opacity-90">
-                      Collection
-                    </span>
-                    <h3 className="font-display font-black text-2xl tracking-[0.05em] uppercase mb-3">
-                      {category.name}
-                    </h3>
-                    <p className="text-sm text-text-muted leading-relaxed opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500 max-w-[280px]">
-                      {category.description}
-                    </p>
-                    <div className="mt-4 flex items-center justify-between">
-                      <span className="text-xs font-medium tracking-wide border-b border-white/50 pb-0.5 group-hover:border-accent-primary group-hover:text-accent-primary transition-all duration-300">
-                        Explore Collection
+                    <div className="pr-16">
+                      <span className="text-xs font-semibold tracking-[0.2em] uppercase text-accent-primary mb-2 block opacity-90">
+                        Collection
                       </span>
-                      <span className="text-sm opacity-0 group-hover:opacity-100 group-hover:translate-x-1.5 transition-all duration-300 transform -translate-x-1 text-accent-primary font-black">
-                        →
-                      </span>
+                      <h3 className="font-display font-black text-2xl tracking-[0.05em] uppercase mb-1">
+                        {category.name}
+                      </h3>
+                      <p className="text-sm text-text-muted leading-relaxed max-h-0 group-hover:max-h-24 opacity-0 group-hover:opacity-100 group-hover:mt-3 transition-all duration-500 overflow-hidden">
+                        {category.description}
+                      </p>
+                    </div>
+
+                    {/* Circular arrow button on bottom right */}
+                    <div className="absolute bottom-8 right-8 w-11 h-11 rounded-full border border-white/30 flex items-center justify-center bg-transparent transition-all duration-300 group-hover:bg-accent-primary group-hover:border-accent-primary group-hover:scale-105">
+                      <svg
+                        className="w-5 h-5 text-white transition-transform duration-300 group-hover:translate-x-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2.5"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                      </svg>
                     </div>
                   </div>
                 </div>

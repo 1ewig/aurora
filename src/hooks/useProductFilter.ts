@@ -69,8 +69,6 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
 
   // Apply both category and sorting concurrently to avoid double navigation push
   const applyFilters = (category: string, newSortBy: string) => {
-    setActiveCategory(category);
-
     const slug = category === "All" ? "" : category.toLowerCase();
     const url = slug ? `/products/category/${slug}` : "/products";
 
@@ -96,8 +94,6 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
   const totalPages = Math.ceil(total / 12);
 
   const handleCategoryChange = (category: string) => {
-    setActiveCategory(category);
-
     const slug = category === "All" ? "" : category.toLowerCase();
     const url = slug ? `/products/category/${slug}` : "/products";
 
