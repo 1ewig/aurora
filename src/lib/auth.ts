@@ -8,14 +8,8 @@
 
 import { betterAuth } from 'better-auth';
 import { Pool } from 'pg';
+import { requireEnv } from '@/utils/env';
 import { sendEmail } from './email';
-
-/** Reads a required env var or throws. */
-function requireEnv(name: string): string {
-  const v = process.env[name];
-  if (!v) throw new Error(`Missing required env var: ${name}`);
-  return v;
-}
 
 const pool = new Pool({ connectionString: requireEnv('DATABASE_URL') });
 pool.on('connect', (client) => {

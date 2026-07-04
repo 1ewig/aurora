@@ -9,14 +9,8 @@
 import { createClient } from '@insforge/sdk';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
+import { requireEnv } from '@/utils/env';
 import jwt from 'jsonwebtoken';
-
-/** Reads a required env var or throws. */
-function requireEnv(name: string): string {
-  const v = process.env[name];
-  if (!v) throw new Error(`Missing required env var: ${name}`);
-  return v;
-}
 
 /** Creates an authenticated InsForge client for the current user session. Returns null if unauthenticated. */
 export async function createInsforgeClient() {

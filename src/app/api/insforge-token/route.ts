@@ -8,13 +8,8 @@
 import { auth } from '@/lib/auth';
 import jwt from 'jsonwebtoken';
 import { headers } from 'next/headers';
+import { requireEnv } from '@/utils/env';
 import { NextResponse } from 'next/server';
-
-function requireEnv(name: string): string {
-  const v = process.env[name];
-  if (!v) throw new Error(`Missing required env var: ${name}`);
-  return v;
-}
 
 export async function GET() {
   const session = await auth.api.getSession({ headers: await headers() });
