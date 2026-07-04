@@ -14,14 +14,30 @@ const mockConnect = vi.fn();
 const mockClientQuery = vi.fn();
 const mockClientRelease = vi.fn();
 
+const mockPool = {
+  query: (...args: unknown[]) => mockQuery(...args),
+  connect: () =>
+    mockConnect().then(() => ({
+      query: mockClientQuery,
+      release: mockClientRelease,
+    })),
+};
+
 vi.mock("@/utils/db", () => ({
-  pool: {
-    query: (...args: unknown[]) => mockQuery(...args),
-    connect: () =>
-      mockConnect().then(() => ({
-        query: mockClientQuery,
-        release: mockClientRelease,
-      })),
+  pool: mockPool,
+  withTransaction: async (fn: (client: any) => Promise<any>) => {
+    const client = await mockPool.connect();
+    await client.query("BEGIN");
+    try {
+      const result = await fn(client);
+      await client.query("COMMIT");
+      return result;
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    } finally {
+      client.release();
+    }
   },
 }));
 

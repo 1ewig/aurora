@@ -1,36 +1,11 @@
-/**
- * Aurora — src/app/api/webhooks/lemonsqueezy/route.ts
- *
- * Webhook route handler for Lemon Squeezy integration:
- * - Verifies the HMAC signature timing-safely.
- * - Restricts double processing via processed_webhooks.
- * - Resolves product catalog details from database to compute pricing safely.
- * - Wraps variant stock updates and order generation inside a single PG transaction.
- * - Fires transactional order confirmation emails.
- */
-
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
-import { pool } from "@/utils/db";
+import { pool, withTransaction } from "@/utils/db";
 import { sendEmail } from "@/lib/email";
 import { orderConfirmationHtml, orderConfirmationText } from "@/lib/email-templates";
 import { formatCurrency } from "@/utils/formatCurrency";
-
-function sanitize(s: string): string {
-  return s.trim().replace(/<[^>]*>/g, "").slice(0, 200);
-}
-
-interface VerifiedItem {
-  id: string;
-  slug: string;
-  name: string;
-  size: string;
-  price: number;
-  image: string;
-  quantity: number;
-}
-
-// ─── HMAC Verification ────────────────────────────────────────────────────────
+import { calculateOrderPricing } from "@/utils/pricing";
+import { sanitizeShippingAddress, type VerifiedItem } from "@/utils/sanitize";
 
 function verifySignature(rawBody: string, signatureHeader: string): boolean {
   const secret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET;
@@ -47,15 +22,11 @@ function verifySignature(rawBody: string, signatureHeader: string): boolean {
   return crypto.timingSafeEqual(digest, signature);
 }
 
-// ─── Post Webhook Handler ────────────────────────────────────────────────────
-
 export async function POST(req: NextRequest) {
   try {
-    // 1. Read raw body before parsing
     const rawBody = await req.text();
     const signature = req.headers.get("x-signature") ?? "";
 
-    // 2. Cryptographic signature check
     if (!signature || !verifySignature(rawBody, signature)) {
       console.warn("[LS Webhook] Failed signature verification.");
       return NextResponse.json({ error: "Invalid signature." }, { status: 401 });
@@ -72,7 +43,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing event ID." }, { status: 400 });
     }
 
-    // 3. Handle event inside transaction with idempotency protection
     if (eventName === "order_created") {
       await handleOrderCreated(payload, lsEventId);
     }
@@ -83,8 +53,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Internal processing failed." }, { status: 500 });
   }
 }
-
-// ─── Order Creation Handler ──────────────────────────────────────────────────
 
 async function handleOrderCreated(payload: any, lsEventId: string) {
   const attrs = payload.data?.attributes;
@@ -108,21 +76,9 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
   }> = customData.cart_items ? JSON.parse(customData.cart_items) : [];
 
   const shippingAddress = customData.shipping_address ? JSON.parse(customData.shipping_address) : {};
+  const sanitizedAddress = sanitizeShippingAddress(shippingAddress);
 
-  const sanitizedAddress = {
-    email: (shippingAddress.email || "").trim(),
-    firstName: sanitize(shippingAddress.firstName || ""),
-    lastName: sanitize(shippingAddress.lastName || ""),
-    address: sanitize(shippingAddress.address || ""),
-    city: sanitize(shippingAddress.city || ""),
-    zipCode: (shippingAddress.zipCode || "").trim(),
-  };
-
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-
-    // Check and insert idempotency key inside the transaction
+  const { verifiedItems, subtotal } = await withTransaction(async (client) => {
     const checkRes = await client.query(
       `INSERT INTO processed_webhooks (ls_event_id) 
        VALUES ($1) 
@@ -133,15 +89,13 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
 
     if ((checkRes.rowCount ?? 0) === 0) {
       console.log(`[LS Webhook] Event ${lsEventId} was already processed. Skipping.`);
-      await client.query("COMMIT");
-      return;
+      return { verifiedItems: [] as VerifiedItem[], subtotal: 0 };
     }
 
-    const verifiedItems: VerifiedItem[] = [];
-    let subtotal = 0;
+    const items: VerifiedItem[] = [];
+    let sub = 0;
 
     for (const item of cartItems) {
-      // Get correct price and details from products
       const productRes = await client.query(
         "SELECT price, name, slug, image FROM products WHERE id = $1",
         [item.internalProductId]
@@ -152,9 +106,9 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
       }
 
       const dbPrice = Number(product.price);
-      subtotal += dbPrice * item.quantity;
+      sub += dbPrice * item.quantity;
 
-      verifiedItems.push({
+      items.push({
         id: item.internalProductId,
         slug: product.slug,
         name: product.name,
@@ -164,7 +118,6 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
         quantity: item.quantity,
       });
 
-      // Get size record and lock for update
       const sizeRes = await client.query(
         `SELECT id, stock FROM product_sizes
          WHERE product_id = $1 AND size = $2 FOR UPDATE`,
@@ -179,7 +132,6 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
         throw new Error(`Insufficient stock for product "${item.internalProductId}" (Size: ${item.size}).`);
       }
 
-      // Update stock in product_sizes
       await client.query(
         `UPDATE product_sizes
          SET stock = stock - $1
@@ -188,7 +140,6 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
       );
     }
 
-    // Delete reservation if exists
     if (reservationId) {
       await client.query(
         "DELETE FROM product_reservations WHERE reservation_id = $1",
@@ -196,11 +147,8 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
       );
     }
 
-    const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
-    const tax = Math.round(subtotal * 0.08 * 100) / 100;
-    const total = subtotal + shipping + tax;
+    const { shipping, tax, total } = calculateOrderPricing(sub);
 
-    // Insert order record mapping payments provider parameters
     await client.query(
       `INSERT INTO orders (
          user_id, order_number, items, subtotal, shipping, tax, total,
@@ -210,8 +158,8 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
       [
         userId,
         `AUR-LS-${lsOrderNumber}`,
-        JSON.stringify(verifiedItems),
-        subtotal,
+        JSON.stringify(items),
+        sub,
         shipping,
         tax,
         total,
@@ -221,7 +169,6 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
       ]
     );
 
-    // Update client customer ID if logged-in
     if (userId) {
       await client.query(
         `UPDATE better_auth."user"
@@ -231,62 +178,59 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
       );
     }
 
-    await client.query("COMMIT");
+    return { verifiedItems: items, subtotal: sub };
+  });
 
-    // Trigger transactional order confirmation email
-    await sendEmail({
-      to: sanitizedAddress.email,
-      subject: `Order Confirmed — AUR-LS-${lsOrderNumber}`,
-      text: orderConfirmationText({
-        orderNumber: `AUR-LS-${lsOrderNumber}`,
-        customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
-        items: verifiedItems.map((i) => ({
-          name: i.name,
-          size: i.size || "",
-          quantity: i.quantity,
-          price: formatCurrency(i.price),
-        })),
-        subtotal: formatCurrency(subtotal),
-        shipping: shipping === 0 ? "Complimentary" : formatCurrency(shipping),
-        tax: formatCurrency(tax),
-        total: formatCurrency(total),
-        shippingAddress: {
-          firstName: sanitizedAddress.firstName,
-          lastName: sanitizedAddress.lastName,
-          address: sanitizedAddress.address,
-          city: sanitizedAddress.city,
-          zipCode: sanitizedAddress.zipCode,
-        },
-      }),
-      html: orderConfirmationHtml({
-        orderNumber: `AUR-LS-${lsOrderNumber}`,
-        customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
-        items: verifiedItems.map((i) => ({
-          name: i.name,
-          size: i.size || "",
-          quantity: i.quantity,
-          price: formatCurrency(i.price),
-        })),
-        subtotal: formatCurrency(subtotal),
-        shipping: shipping === 0 ? "Complimentary" : formatCurrency(shipping),
-        tax: formatCurrency(tax),
-        total: formatCurrency(total),
-        shippingAddress: {
-          firstName: sanitizedAddress.firstName,
-          lastName: sanitizedAddress.lastName,
-          address: sanitizedAddress.address,
-          city: sanitizedAddress.city,
-          zipCode: sanitizedAddress.zipCode,
-        },
-      }),
-    }).catch((emailErr) => {
-      console.error("[LS Webhook] Failed to dispatch order confirmation email:", emailErr);
-    });
+  if (verifiedItems.length === 0) return;
 
-  } catch (err: any) {
-    await client.query("ROLLBACK");
-    throw err;
-  } finally {
-    client.release();
-  }
+  const { shipping, tax, total } = calculateOrderPricing(subtotal);
+
+  await sendEmail({
+    to: sanitizedAddress.email,
+    subject: `Order Confirmed — AUR-LS-${lsOrderNumber}`,
+    text: orderConfirmationText({
+      orderNumber: `AUR-LS-${lsOrderNumber}`,
+      customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
+      items: verifiedItems.map((i) => ({
+        name: i.name,
+        size: i.size || "",
+        quantity: i.quantity,
+        price: formatCurrency(i.price),
+      })),
+      subtotal: formatCurrency(subtotal),
+      shipping: shipping === 0 ? "Complimentary" : formatCurrency(shipping),
+      tax: formatCurrency(tax),
+      total: formatCurrency(total),
+      shippingAddress: {
+        firstName: sanitizedAddress.firstName,
+        lastName: sanitizedAddress.lastName,
+        address: sanitizedAddress.address,
+        city: sanitizedAddress.city,
+        zipCode: sanitizedAddress.zipCode,
+      },
+    }),
+    html: orderConfirmationHtml({
+      orderNumber: `AUR-LS-${lsOrderNumber}`,
+      customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
+      items: verifiedItems.map((i) => ({
+        name: i.name,
+        size: i.size || "",
+        quantity: i.quantity,
+        price: formatCurrency(i.price),
+      })),
+      subtotal: formatCurrency(subtotal),
+      shipping: shipping === 0 ? "Complimentary" : formatCurrency(shipping),
+      tax: formatCurrency(tax),
+      total: formatCurrency(total),
+      shippingAddress: {
+        firstName: sanitizedAddress.firstName,
+        lastName: sanitizedAddress.lastName,
+        address: sanitizedAddress.address,
+        city: sanitizedAddress.city,
+        zipCode: sanitizedAddress.zipCode,
+      },
+    }),
+  }).catch((emailErr) => {
+    console.error("[LS Webhook] Failed to dispatch order confirmation email:", emailErr);
+  });
 }
