@@ -15,6 +15,7 @@ import { LookbookSlider } from "./LookbookSlider";
 import { DesignerStory } from "./DesignerStory";
 import { Testimonials } from "./Testimonials";
 import { Newsletter } from "./Newsletter";
+import { Craftsmanship } from "./Craftsmanship";
 
 const heroSlugs = [
   "ivory-wool-overcoat",
@@ -38,6 +39,7 @@ export default function LandingClient() {
       <Hero heroProducts={heroProducts} />
       <MarqueeBar />
       <FeaturedCollection categories={dailyCategories} />
+      <Craftsmanship />
       {slides.length > 0 && <LookbookSlider slides={slides} />}
       <DesignerStory />
       <Testimonials />

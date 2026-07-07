@@ -50,7 +50,7 @@ export function Testimonials() {
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ type: "spring", stiffness: 95, damping: 18 }}
             cite={t.source}
             className="mt-12"
           >

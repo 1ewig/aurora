@@ -151,6 +151,17 @@ CREATE TABLE IF NOT EXISTS public.hero_slides (
   link VARCHAR(255)
 );
 
+-- Newsletter subscriptions table
+CREATE TABLE IF NOT EXISTS public.newsletter_subscriptions (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  status VARCHAR(20) NOT NULL DEFAULT 'active',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+ALTER TABLE public.newsletter_subscriptions ENABLE ROW LEVEL SECURITY;
+
+
+
 
 -- Realtime: allow string sender_ids for Better Auth user IDs
 DO $$

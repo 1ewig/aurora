@@ -90,6 +90,10 @@ export function Navbar() {
         animate="visible"
         className="fixed top-0 inset-x-0 z-50"
       >
+        {/* Understated Announcement Bar */}
+        <div className="bg-bg-ink text-text-inverted text-[10px] tracking-[0.18em] uppercase py-2 text-center px-4 font-medium border-b border-white/5">
+          Complimentary worldwide shipping on orders over $500.
+        </div>
         <motion.div
           style={{
             backgroundColor: navBg,
@@ -159,13 +163,16 @@ export function Navbar() {
                 </Link>
               )}
 
-              <button
+              <motion.button
                 aria-label={`Shopping bag, ${count} item${count !== 1 ? "s" : ""}`}
                 onClick={toggleCart}
-                className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary cursor-pointer"
               >
                 <BagIcon count={count} />
-              </button>
+              </motion.button>
               
               <button
                 aria-label={menuOpen ? "Close menu" : "Open menu"}

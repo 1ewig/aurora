@@ -17,7 +17,7 @@ export default function CheckoutPageClient() {
 
   if (items.length === 0) {
     return (
-      <main id="main-content" tabIndex={-1} className="pt-28 pb-32">
+      <main id="main-content" tabIndex={-1} className="pt-28 md:pt-36 pb-32">
         <div className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
           <div className="border-b border-border-subtle pb-8 mb-12">
             <h1 className="font-display font-black text-3xl md:text-4xl tracking-tight text-text-primary uppercase">
@@ -31,7 +31,7 @@ export default function CheckoutPageClient() {
   }
 
   return (
-    <main id="main-content" tabIndex={-1} className="pt-28 pb-32">
+    <main id="main-content" tabIndex={-1} className="pt-28 md:pt-36 pb-32">
       <div className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
         <div className="border-b border-border-subtle pb-8 mb-12">
           <h1 className="font-display font-black text-3xl md:text-4xl tracking-tight text-text-primary uppercase">

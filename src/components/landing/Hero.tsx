@@ -26,7 +26,7 @@ export function Hero({ heroProducts }: HeroProps) {
     <section
       id="hero"
       aria-labelledby="hero-headline"
-      className="relative flex flex-col items-center justify-center min-h-screen pt-20 pb-16 overflow-hidden bg-bg-primary"
+      className="relative flex flex-col items-center justify-center min-h-screen pt-28 md:pt-36 pb-16 overflow-hidden bg-bg-primary"
     >
       {/* Ambient background gradient blobs */}
       <div
@@ -34,19 +34,19 @@ export function Hero({ heroProducts }: HeroProps) {
         className="absolute inset-0 pointer-events-none overflow-hidden"
       >
         <div
-          className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[60vh] rounded-full opacity-30"
+          className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[60vh] rounded-full opacity-[0.25]"
           style={{
             background:
-              "radial-gradient(ellipse, rgba(200,168,130,0.35) 0%, transparent 70%)",
-            filter: "blur(60px)",
+              "radial-gradient(ellipse at center, rgba(200,168,130,0.35) 0%, rgba(200,168,130,0.05) 50%, transparent 80%)",
+            filter: "blur(120px)",
           }}
         />
         <div
-          className="absolute bottom-0 right-0 w-[40vw] h-[40vh] rounded-full opacity-20"
+          className="absolute bottom-0 right-0 w-[45vw] h-[45vh] rounded-full opacity-[0.15]"
           style={{
             background:
-              "radial-gradient(ellipse, rgba(200,168,130,0.4) 0%, transparent 70%)",
-            filter: "blur(80px)",
+              "radial-gradient(ellipse at center, rgba(200,168,130,0.4) 0%, rgba(200,168,130,0.05) 50%, transparent 80%)",
+            filter: "blur(160px)",
           }}
         />
       </div>
@@ -105,25 +105,37 @@ export function Hero({ heroProducts }: HeroProps) {
           transition={{ duration: 0.8, delay: 1.1, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="flex flex-col sm:flex-row gap-4 mt-8"
         >
-          <Link href="/products">
-            <Button
-              variant="filled"
-              size="lg"
-            >
-              Shop the Collection
-            </Button>
-          </Link>
-          <Button
-            variant="ghost"
-            size="lg"
-            onClick={() => {
-              document
-                .getElementById("story")
-                ?.scrollIntoView({ behavior: "smooth" });
-            }}
+          <motion.div
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
           >
-            Read the Story →
-          </Button>
+            <Link href="/products">
+              <Button
+                variant="filled"
+                size="lg"
+              >
+                Shop the Collection
+              </Button>
+            </Link>
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+          >
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={() => {
+                document
+                  .getElementById("story")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              Read the Story →
+            </Button>
+          </motion.div>
         </motion.div>
       </motion.div>
 
