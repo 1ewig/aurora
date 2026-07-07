@@ -250,12 +250,12 @@ src/hooks/
 
 ### 2.7 `src/stores/` (Zustand)
 
-| File | Persistence | Key |
-|---|---|---|
-| `useCartStore.ts` | localStorage | `aurora-cart` |
-| `useAuthStore.ts` | None (session) | — |
-| `useProductStore.ts` | None (transient UI) | — |
-| `useAdminStore.ts` | None (API-fetched) | — |
+| File | Persistence | Key | Notes |
+|---|---|---|---|
+| `useCartStore.ts` | localStorage | `aurora-cart` | Persisted shopping cart state |
+| `useAuthStore.ts` | None (session) | — | Authentication and user session store |
+| `useProductStore.ts` | None (transient UI) | — | UI state (size selection, active details tab) |
+| `useAdminStore.ts` | None | — | Deprecated as Zustand store (types-only now) |
 
 ### 2.8 `src/utils/`
 
@@ -1082,6 +1082,30 @@ interface PaginatedProductsResponse {
   total: number;
 }
 
+interface AdminPaginatedProductsResponse {
+  products: ProductData[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+interface PaginatedOrdersResponse {
+  orders: OrderData[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+interface PaginatedUsersResponse {
+  users: AdminUserRow[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 interface Order {
   id: string; userId: string | null; orderNumber: string;
   items: OrderItem[]; subtotal: number; shipping: number; tax: number; total: number;
@@ -1214,30 +1238,7 @@ setSizeGuideOpen(isOpen: boolean): void
 
 ### 8.4 `useAdminStore` (`src/stores/useAdminStore.ts`)
 
-**State**:
-```ts
-{
-  products: ProductData[];
-  orders: OrderData[];
-  metrics: DashboardMetrics | null;
-  recentOrders: RecentOrder[];
-  loading: boolean;
-  error: string | null;
-}
-```
-
-**Actions**:
-```ts
-fetchDashboard(): Promise<void>           // GET /api/admin/dashboard
-fetchProducts(): Promise<void>            // GET /api/admin/products
-fetchOrders(): Promise<void>              // GET /api/admin/orders
-updateOrderStatus(orderId: string, status: string): Promise<void>  // PATCH /api/admin/orders/:id
-saveProduct(product: Partial<ProductData>, id?: string): Promise<void>  // POST/PUT + refresh
-deleteProduct(id: string): Promise<void>  // DELETE + local removal
-clearError(): void
-```
-
-**Consumers**: `DashboardClient`, `InventoryClient`, `OrdersClient`, `UsersClient`, admin containers
+**Note:** This file no longer acts as a Zustand store. All data fetching, updates, and mutation actions have been migrated to TanStack Query and mutations (see `src/hooks/queries.ts`). This file serves solely as a central repository for admin TypeScript interfaces (`ProductData`, `SizeStock`, `OrderData`, `DashboardMetrics`, `RecentOrder`, etc.).
 
 ---
 
@@ -1245,6 +1246,7 @@ clearError(): void
 
 All in `src/hooks/queries.ts`. Default config: staleTime=5min, gcTime=10min, refetchOnWindowFocus=false.
 
+### Storefront Queries
 | Hook | Query Key | Fetches | Notes |
 |---|---|---|---|
 | `useProductsQuery(category?)` | `['products', categoryOr'All']` | `GET /api/products?category=...` | Returns `Product[]` (unpaginated) |
@@ -1257,6 +1259,21 @@ All in `src/hooks/queries.ts`. Default config: staleTime=5min, gcTime=10min, ref
 | `useOrders(page=0, limit=50)` | `['orders', userId, page]` | `GET /api/orders?limit=&offset=` | staleTime=2min, enabled only when `user.id` exists |
 | `useCategoriesQuery()` | `['categories']` | `GET /api/categories` | staleTime=10min |
 | `useDailyCategoriesQuery()` | `['categories', 'daily']` | `GET /api/categories/daily` | staleTime=30min |
+
+### Admin Queries & Mutations
+| Hook / Mutation | Query Key | Target Endpoint | Notes |
+|---|---|---|---|
+| `useAdminDashboardQuery()` | `['admin', 'dashboard']` | `GET /api/admin/dashboard` | Returns dashboard statistics + recent orders list |
+| `useAdminProductsQuery(params)` | `['admin', 'products', params]` | `GET /api/admin/products` | Returns paginated products list. Uses `keepPreviousData` caching. |
+| `useAdminOrdersQuery(params)` | `['admin', 'orders', params]` | `GET /api/admin/orders` | Returns paginated orders list. Uses `keepPreviousData` caching. |
+| `useAdminUsersQuery(params)` | `['admin', 'users', params]` | `GET /api/admin/users` | Returns paginated users list. Uses `keepPreviousData` caching. |
+| `useAdminUserSessionsQuery(userId)` | `['admin', 'users', userId, 'sessions']` | `GET /api/admin/users/:id?include=sessions` | Fetches user's active sessions (enabled only if `userId` is set) |
+| `useUpdateOrderStatusMutation()` | — | `PATCH /api/admin/orders/:id` | Updates order status; invalidates `orders` and `dashboard` caches |
+| `useSaveProductMutation()` | — | `POST/PUT /api/admin/products` | Creates or updates a product; invalidates `products` cache |
+| `useDeleteProductMutation()` | — | `DELETE /api/admin/products/:id` | Deletes a product; invalidates `products` cache |
+| `useToggleUserVerifyMutation()` | — | `PATCH /api/admin/users/:id` | Toggles email verification status; invalidates `users` cache |
+| `useUpdateUserRoleMutation()` | — | `PATCH /api/admin/users/:id` | Updates a user's system role; invalidates `users` cache |
+| `useDeleteUserMutation()` | — | `DELETE /api/admin/users/:id` | Deletes a user; invalidates `users` cache |
 
 ---
 
@@ -1308,14 +1325,14 @@ Called once in `Providers.tsx`. Fetches `authClient.getSession()` + `/api/auth/r
 
 ### 10.5 `useAdminDashboard()` (`src/hooks/useAdminDashboard.ts`)
 
-Simple hook: calls `useAdminStore.getState().fetchDashboard()` on mount, returns `{ metrics, recentOrders, loading, error }`.
+Simple hook: wraps `useAdminDashboardQuery()` to fetch and return dashboard metrics and recent orders.
 
 ### 10.6 Additional Admin Hooks
 
 | Hook | Purpose |
 |---|---|
-| `useOrdersManagement()` | Admin order state + update/delete actions via store |
-| `useUsersManagement()` | Admin user list + role update + delete via store |
+| `useOrdersManagement()` | Manages state filters, search parameters, status mutations, and page queries for admin orders list |
+| `useUsersManagement()` | Manages state filters, sorting, verification/role mutations, and details queries for admin users list |
 | `useCheckoutSuccess()` | Success page: clears cart on mount, reads `sessionStorage('ls_checkout_data')`, polls `/api/orders?lsOrderId=` for order number (up to 10× at 1.5s intervals). Returns `{ orderData, isLoaded, user }` |
 
 ---

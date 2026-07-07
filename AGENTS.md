@@ -20,3 +20,8 @@ Key patterns:
 - Reference users with `auth.users(id)`; use `auth.uid()` in RLS policies.
 - For storage uploads, persist both the returned `url` and `key`.
 <!-- INSFORGE:END -->
+
+## Codebase Reference
+
+For an overview of the codebase architecture, routing map, API endpoints, database schema, state management, and testing setup, see:
+- [docs/structure.md](file:///c:/Users/moshu%20moshu/Desktop/aurora/docs/structure.md)
