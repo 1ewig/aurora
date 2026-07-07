@@ -57,14 +57,14 @@ export async function GET(request: Request) {
         status,
         is_paid as "isPaid",
         created_at as "createdAt",
-        COUNT(*) OVER() AS total
+        COUNT(*) OVER() AS "totalCount"
       FROM orders
       ${whereClause}
       ORDER BY created_at DESC
       LIMIT $${paramIndex++} OFFSET $${paramIndex++}
     `, [...params, limit, offset]);
 
-    const total = result.rows.length > 0 ? Number(result.rows[0].total) : 0;
+    const total = result.rows.length > 0 ? Number(result.rows[0].totalCount) : 0;
     const orders = result.rows.map(row => ({
       ...row,
       subtotal: Number(row.subtotal),
