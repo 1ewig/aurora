@@ -5,22 +5,24 @@
  * Auth guard is enforced server-side via middleware (proxy.ts).
  */
 
-"use client";
+import type { Metadata } from "next";
+import { AdminLayoutClient } from "./AdminLayoutClient";
 
-import { AdminSidebar } from "@/components/ui/AdminSidebar";
+/** Metadata for the admin layout. Prevent search indexing. */
+export const metadata: Metadata = {
+  title: "Admin Panel — Aurora",
+  description: "Manage system dashboard metrics, inventory, orders, and user permissions.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
-/** Admin layout rendering sidebar and page content. */
+/** Server component layout that exports metadata and renders the client shell. */
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="min-h-screen bg-bg-primary flex flex-col md:flex-row">
-      <AdminSidebar />
-      <main className="flex-1 md:ml-64 p-6 md:p-12 lg:p-16 max-w-[1400px]">
-        {children}
-      </main>
-    </div>
-  );
+  return <AdminLayoutClient>{children}</AdminLayoutClient>;
 }
