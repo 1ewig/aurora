@@ -141,21 +141,24 @@ export function Navbar() {
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary cursor-pointer"
+                className="p-2 rounded-full border border-border-medium hover:bg-border-subtle/50 transition-colors text-text-primary cursor-pointer"
               >
                 <BagIcon count={count} />
               </motion.button>
 
               {user ? (
                 <div className="relative" ref={dropdownRef}>
-                  <button
+                  <motion.button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     aria-label="Toggle user menu"
                     aria-expanded={dropdownOpen}
-                    className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary flex items-center justify-center w-9 h-9 cursor-pointer"
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                    className="p-2 rounded-full border border-border-medium hover:bg-border-subtle/50 transition-colors text-text-primary flex items-center justify-center w-9 h-9 cursor-pointer"
                   >
                     <UserIcon />
-                  </button>
+                  </motion.button>
                   <NavbarProfileMenu
                     isOpen={dropdownOpen}
                     onClose={() => setDropdownOpen(false)}
