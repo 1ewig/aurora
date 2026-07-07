@@ -97,7 +97,11 @@ export function OrdersTable({
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border-subtle">
+            <tbody
+              className={`divide-y divide-border-subtle transition-opacity duration-200 ${
+                loading ? "opacity-50 pointer-events-none" : ""
+              }`}
+            >
               {orders.map((o) => {
                 const totalItems = o.items.reduce((sum, item) => sum + item.quantity, 0);
                 const orderDate = new Date(o.createdAt).toLocaleDateString("en-US", {

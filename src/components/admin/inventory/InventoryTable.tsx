@@ -101,7 +101,11 @@ export function InventoryTable({
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border-subtle">
+            <tbody
+              className={`divide-y divide-border-subtle transition-opacity duration-200 ${
+                loading ? "opacity-50 pointer-events-none" : ""
+              }`}
+            >
               {filteredProducts.map((p) => {
                 const totalStock = p.sizes.reduce((sum, s) => sum + s.stock, 0);
                 const isLowStock = p.sizes.some((s) => s.stock < 5);
