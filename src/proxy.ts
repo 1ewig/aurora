@@ -10,7 +10,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 interface SessionResponse {
-  user: { id: string; email: string; role?: string } | null;
+  user: { id: string; email: string } | null;
 }
 
 const protectedPaths = ["/profile", "/admin"];
@@ -33,8 +33,23 @@ export async function proxy(request: NextRequest) {
   }
 
   const baseUrl = process.env.BETTER_AUTH_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+  const cookie = request.headers.get('cookie') || '';
+
+  // For admin routes, check role via the dedicated endpoint
+  if (isAdminPath(pathname)) {
+    const roleRes = await fetch(`${baseUrl}/api/auth/role`, {
+      headers: { cookie },
+    });
+    const { role } = roleRes.ok ? await roleRes.json() : { role: 'user' };
+    if (role !== 'admin') {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // For profile routes, just verify the session exists
   const sessionRes = await fetch(`${baseUrl}/api/auth/get-session`, {
-    headers: { cookie: request.headers.get('cookie') || '' },
+    headers: { cookie },
   });
   const session: SessionResponse | null = sessionRes.ok ? await sessionRes.json() : null;
 
@@ -42,10 +57,6 @@ export async function proxy(request: NextRequest) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
-  }
-
-  if (isAdminPath(pathname) && session.user.role !== "admin") {
-    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
