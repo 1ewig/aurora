@@ -3,15 +3,14 @@
  *
  * Next.js middleware for route protection.
  * - Redirects unauthenticated users to /login
- * - Authenticated users can access protected routes (admin page role checks
- *   are enforced client-side; API routes enforce mutation permissions)
+ * - Redirects non-admin users away from /admin routes
  * - Uses Better Auth session cookie for auth checks
  */
 
 import { NextResponse, type NextRequest } from "next/server";
 
 interface SessionResponse {
-  user: { id: string; email: string } | null;
+  user: { id: string; email: string; role?: string } | null;
 }
 
 const protectedPaths = ["/profile", "/admin"];
@@ -20,6 +19,10 @@ function isProtectedPath(pathname: string): boolean {
   return protectedPaths.some(
     (path) => pathname === path || pathname.startsWith(path + "/")
   );
+}
+
+function isAdminPath(pathname: string): boolean {
+  return pathname === "/admin" || pathname.startsWith("/admin/");
 }
 
 export async function proxy(request: NextRequest) {
@@ -39,6 +42,10 @@ export async function proxy(request: NextRequest) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
+  }
+
+  if (isAdminPath(pathname) && session.user.role !== "admin") {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();

@@ -1,44 +1,20 @@
 /**
  * Aurora — src/app/(admin)/admin/layout.tsx
  *
- * Admin layout with auth guard and sidebar navigation.
+ * Admin layout with sidebar navigation.
+ * Auth guard is enforced server-side via middleware (proxy.ts).
  */
 
 "use client";
 
-import { useAuthStore } from "@/stores/useAuthStore";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { AdminSidebar } from "@/components/ui/AdminSidebar";
 
-/** Admin layout with authentication guard and sidebar navigation. */
+/** Admin layout rendering sidebar and page content. */
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = useAuthStore((s) => s.user);
-  const loading = useAuthStore((s) => s.loading);
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading && (!user || user.role !== 'admin')) {
-      router.push("/");
-    }
-  }, [user, loading, router]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-bg-primary flex items-center justify-center text-sm text-text-secondary">
-        Authenticating administrative session...
-      </div>
-    );
-  }
-
-  if (!user || user.role === 'user') {
-    return null;
-  }
-
   return (
     <div className="min-h-screen bg-bg-primary flex flex-col md:flex-row">
       <AdminSidebar />
