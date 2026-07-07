@@ -7,11 +7,12 @@
 
 import { useState, useEffect } from "react";
 import { useInsforgeClient } from "@/lib/insforge";
-import { useAdminStore, type ProductData, type SizeStock } from "@/stores/useAdminStore";
+import { useSaveProductMutation } from "@/hooks/queries";
+import type { ProductData, SizeStock } from "@/stores/useAdminStore";
 
 /** Admin product form state and handlers for create/edit workflow. */
 export function useProductForm(onSuccess: () => void) {
-  const saveProduct = useAdminStore((s) => s.saveProduct);
+  const saveMutation = useSaveProductMutation();
   const { client: insforge, isReady } = useInsforgeClient();
 
   const [formId, setFormId] = useState("");
@@ -218,7 +219,7 @@ export function useProductForm(onSuccess: () => void) {
     };
 
     try {
-      await saveProduct(payload, editingProduct ? editingProduct.id : undefined);
+      await saveMutation.mutateAsync({ product: payload, id: editingProduct?.id });
       onSuccess();
     } catch (err: any) {
       alert(err.message || "Failed to save product");

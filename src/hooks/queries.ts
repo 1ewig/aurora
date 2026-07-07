@@ -5,9 +5,15 @@
  * Centralized data-fetching layer with caching and optimistic initial data.
  */
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Product } from '@/data/products';
 import { useAuthStore } from '@/stores/useAuthStore';
+import type {
+  DashboardMetrics,
+  RecentOrder,
+  OrderData,
+  ProductData,
+} from '@/stores/useAdminStore';
 
 
 async function fetchProducts(category?: string): Promise<Product[]> {
@@ -282,5 +288,208 @@ export function useDailyCategoriesQuery() {
   });
 }
 
+// ── Admin queries ──────────────────────────────────────────────────────
 
+/** Fetches admin dashboard metrics and recent orders. */
+export function useAdminDashboardQuery() {
+  return useQuery<{ metrics: DashboardMetrics; recentOrders: RecentOrder[] }>({
+    queryKey: ['admin', 'dashboard'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/dashboard');
+      if (!res.ok) throw new Error('Failed to load dashboard metrics');
+      return res.json();
+    },
+  });
+}
+
+/** Fetches all products for inventory management. */
+export function useAdminProductsQuery() {
+  return useQuery<ProductData[]>({
+    queryKey: ['admin', 'products'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/products');
+      if (!res.ok) throw new Error('Failed to load products');
+      return res.json();
+    },
+  });
+}
+
+/** Fetches all orders for admin order processing. */
+export function useAdminOrdersQuery() {
+  return useQuery<OrderData[]>({
+    queryKey: ['admin', 'orders'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/orders');
+      if (!res.ok) throw new Error('Failed to load orders');
+      return res.json();
+    },
+  });
+}
+
+export interface AdminUserRow {
+  id: string;
+  name: string | null;
+  email: string;
+  emailVerified: boolean;
+  role: string;
+  image: string | null;
+  createdAt: string;
+  updatedAt: string;
+  accounts: Array<{ id: string; providerId: string; createdAt: string }>;
+  sessionCount: number;
+  lastSessionAt: string | null;
+}
+
+/** Fetches all users for admin user management. */
+export function useAdminUsersQuery() {
+  return useQuery<AdminUserRow[]>({
+    queryKey: ['admin', 'users'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/users');
+      if (!res.ok) throw new Error('Failed to load users');
+      return res.json();
+    },
+  });
+}
+
+/** Fetches sessions for a specific user (admin user detail modal). */
+export function useAdminUserSessionsQuery(userId: string | null) {
+  return useQuery({
+    queryKey: ['admin', 'users', userId, 'sessions'],
+    queryFn: async () => {
+      if (!userId) return [];
+      const res = await fetch(`/api/admin/users/${userId}?include=sessions`);
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data.sessions || [];
+    },
+    enabled: !!userId,
+  });
+}
+
+// ── Admin mutations ────────────────────────────────────────────────────
+
+/** Updates an order's status, then invalidates orders + dashboard. */
+export function useUpdateOrderStatusMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ orderId, status }: { orderId: string; status: string }) => {
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `HTTP error ${res.status}`);
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard'] });
+    },
+  });
+}
+
+/** Creates or updates a product, then invalidates the product list. */
+export function useSaveProductMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ product, id }: { product: Partial<ProductData>; id?: string }) => {
+      const url = id ? `/api/admin/products/${id}` : "/api/admin/products";
+      const method = id ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(product),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to save product");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+    },
+  });
+}
+
+/** Deletes a product, then invalidates the product list. */
+export function useDeleteProductMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to delete product");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+    },
+  });
+}
+
+/** Toggles a user's email verification status. */
+export function useToggleUserVerifyMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, emailVerified }: { userId: string; emailVerified: boolean }) => {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ emailVerified }),
+      });
+      if (!res.ok) throw new Error("Failed to update");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+    },
+  });
+}
+
+/** Updates a user's role. */
+export function useUpdateUserRoleMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to update role");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+    },
+  });
+}
+
+/** Deletes a user. */
+export function useDeleteUserMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (userId: string) => {
+      const res = await fetch(`/api/admin/users/${userId}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to delete");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+    },
+  });
+}
 

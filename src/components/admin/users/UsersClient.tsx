@@ -48,20 +48,6 @@ export function UsersClient() {
 
   return (
     <div className="space-y-8 pb-12">
-      <AdminHeaderPanel
-        title="User Management"
-        description="View and manage registered accounts, sessions, and authentication methods."
-      />
-
-      <UsersSearchFilters
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        filterVerified={filterVerified}
-        onFilterChange={setFilterVerified}
-        onRefresh={fetchUsers}
-        loading={loading}
-      />
-
       {loading && users.length === 0 ? (
         <UsersSkeleton />
       ) : error ? (
@@ -69,15 +55,31 @@ export function UsersClient() {
           {error}
         </div>
       ) : (
-        <UsersTable
-          users={users}
-          filteredUsers={filteredUsers}
-          loading={loading}
-          sortKey={sortKey}
-          sortDir={sortDir}
-          onSort={toggleSort}
-          onViewUser={setSelectedUser}
-        />
+        <>
+          <AdminHeaderPanel
+            title="User Management"
+            description="View and manage registered accounts, sessions, and authentication methods."
+          />
+
+          <UsersSearchFilters
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            filterVerified={filterVerified}
+            onFilterChange={setFilterVerified}
+            onRefresh={fetchUsers}
+            loading={loading}
+          />
+
+          <UsersTable
+            users={users}
+            filteredUsers={filteredUsers}
+            loading={loading}
+            sortKey={sortKey}
+            sortDir={sortDir}
+            onSort={toggleSort}
+            onViewUser={setSelectedUser}
+          />
+        </>
       )}
 
       {/* Detail Modal */}

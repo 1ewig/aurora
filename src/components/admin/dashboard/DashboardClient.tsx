@@ -35,11 +35,6 @@ export function DashboardClient() {
 
   return (
     <div className="space-y-10 pb-12">
-      <AdminHeaderPanel
-        title="Executive Dashboard"
-        description="Overview of sales, order cycles, and inventory state."
-      />
-
       {loading && !metrics ? (
         <DashboardSkeleton />
       ) : error ? (
@@ -47,27 +42,33 @@ export function DashboardClient() {
           {error}
         </div>
       ) : metrics ? (
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="space-y-10"
-        >
-          {/* Metrics Grid */}
-          <MetricsGrid metrics={metrics} />
+        <>
+          <AdminHeaderPanel
+            title="Executive Dashboard"
+            description="Overview of sales, order cycles, and inventory state."
+          />
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="space-y-10"
+          >
+            {/* Metrics Grid */}
+            <MetricsGrid metrics={metrics} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Recent Orders Feed */}
-            <motion.div variants={itemVariants} className="lg:col-span-2">
-              <RecentOrdersList recentOrders={recentOrders} />
-            </motion.div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Recent Orders Feed */}
+              <motion.div variants={itemVariants} className="lg:col-span-2">
+                <RecentOrdersList recentOrders={recentOrders} />
+              </motion.div>
 
-            {/* Quick Tasks Menu */}
-            <motion.div variants={itemVariants}>
-              <TaskMenu />
-            </motion.div>
-          </div>
-        </motion.div>
+              {/* Quick Tasks Menu */}
+              <motion.div variants={itemVariants}>
+                <TaskMenu />
+              </motion.div>
+            </div>
+          </motion.div>
+        </>
       ) : null}
     </div>
   );

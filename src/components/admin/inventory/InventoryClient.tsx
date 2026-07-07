@@ -1,29 +1,20 @@
-/**
- * Aurora — src/components/admin/inventory/InventoryClient.tsx
- *
- * Inventory management page with product table, add/edit modal, and delete confirmation.
- */
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { useAdminStore, type ProductData } from "@/stores/useAdminStore";
+import { useState, useMemo } from "react";
+import type { ProductData } from "@/stores/useAdminStore";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useAdminProductsQuery, useDeleteProductMutation } from "@/hooks/queries";
 import { useProductForm } from "@/hooks/useProductForm";
 import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { Button } from "@/components/ui/Button";
 import { InventoryTable } from "./InventoryTable";
 import { InventorySkeleton } from "./InventorySkeleton";
-
 import { ProductFormModal } from "./ProductFormModal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
-/** Renders the inventory management page with search, filter, table, add/edit modal, and delete dialog. */
 export function InventoryClient() {
-  const products = useAdminStore((s) => s.products);
-  const loading = useAdminStore((s) => s.loading);
-  const error = useAdminStore((s) => s.error);
-  const fetchProducts = useAdminStore((s) => s.fetchProducts);
-  const deleteProduct = useAdminStore((s) => s.deleteProduct);
+  const { data: products = [], isLoading, error, refetch } = useAdminProductsQuery();
+  const deleteMutation = useDeleteProductMutation();
   const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,18 +42,10 @@ export function InventoryClient() {
   );
 
 
-  // Setup form hook
   const form = useProductForm(() => {
     setIsModalOpen(false);
-    fetchProducts();
   });
 
-  // Load catalog on mount
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
-
-  // Open modal for adding/editing product
   function handleOpenModal(product?: ProductData) {
     if (product) {
       setEditingProduct(product);
@@ -74,12 +57,11 @@ export function InventoryClient() {
     setIsModalOpen(true);
   }
 
-  // Delete product confirmation
   async function handleDeleteConfirm() {
     if (productToDelete) {
       setDeleting(true);
       try {
-        await deleteProduct(productToDelete.id);
+        await deleteMutation.mutateAsync(productToDelete.id);
         setProductToDelete(null);
         setIsModalOpen(false);
       } catch (err: any) {
@@ -90,13 +72,15 @@ export function InventoryClient() {
     }
   }
 
+  const displayError = error ? (typeof error === 'object' && 'message' in error ? (error as Error).message : 'An error occurred') : null;
+
   return (
     <div className="space-y-8 pb-12">
-      {loading && products.length === 0 ? (
+      {isLoading && products.length === 0 ? (
         <InventorySkeleton />
-      ) : error ? (
+      ) : displayError ? (
         <div className="p-8 text-center text-error border border-border-subtle rounded-2xl bg-white">
-          {error}
+          {displayError}
         </div>
       ) : (
         <>
@@ -110,7 +94,6 @@ export function InventoryClient() {
             ) : undefined}
           />
 
-           {/* Products Table */}
           <InventoryTable
             filteredProducts={filteredProducts}
             searchQuery={searchQuery}
@@ -119,12 +102,10 @@ export function InventoryClient() {
             onCategoryChange={setSelectedCategory}
             onEditClick={handleOpenModal}
             isAdmin={isAdmin}
-            onRefresh={fetchProducts}
-            loading={loading}
+            onRefresh={refetch}
+            loading={isLoading}
           />
 
-
-          {/* Form Modal */}
           <ProductFormModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
@@ -134,7 +115,6 @@ export function InventoryClient() {
             deleting={deleting}
           />
 
-          {/* Delete Dialog */}
           <ConfirmDialog
             open={!!productToDelete}
             title="Delete Product"

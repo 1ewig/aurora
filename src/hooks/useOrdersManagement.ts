@@ -1,31 +1,21 @@
-/**
- * Aurora — src/hooks/useOrdersManagement.ts
- *
- * Consolidates fetching, state management, search query filtering,
- * and order updates for the admin order processing panel.
- */
-
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { useAdminStore, type OrderData } from "@/stores/useAdminStore";
+import { useState, useMemo } from "react";
+import type { OrderData } from "@/stores/useAdminStore";
 import { useAuthStore } from "@/stores/useAuthStore";
+import {
+  useAdminOrdersQuery,
+  useUpdateOrderStatusMutation,
+} from "@/hooks/queries";
 
 export function useOrdersManagement() {
-  const orders = useAdminStore((s) => s.orders);
-  const loading = useAdminStore((s) => s.loading);
-  const error = useAdminStore((s) => s.error);
-  const fetchOrders = useAdminStore((s) => s.fetchOrders);
-  const updateOrderStatus = useAdminStore((s) => s.updateOrderStatus);
+  const { data: orders = [], isLoading, error, refetch } = useAdminOrdersQuery();
+  const updateMutation = useUpdateOrderStatusMutation();
   const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
 
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<OrderData | null>(null);
-
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
 
   const filteredOrders = useMemo(
     () =>
@@ -44,11 +34,14 @@ export function useOrdersManagement() {
     [orders, filterStatus, searchQuery]
   );
 
+  const updateOrderStatus = (orderId: string, status: string) =>
+    updateMutation.mutateAsync({ orderId, status });
+
   return {
     orders,
     filteredOrders,
-    loading,
-    error,
+    loading: isLoading,
+    error: error?.message ?? null,
     filterStatus,
     setFilterStatus,
     searchQuery,
@@ -57,6 +50,6 @@ export function useOrdersManagement() {
     setSelectedOrder,
     updateOrderStatus,
     isAdmin,
-    fetchOrders,
+    fetchOrders: refetch,
   };
 }

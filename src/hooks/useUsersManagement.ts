@@ -1,69 +1,38 @@
-/**
- * Aurora — src/hooks/useUsersManagement.ts
- *
- * Encapsulates state and business logic for the admin user management page.
- */
-
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { useUserSessions } from "@/hooks/useUserSessions";
+import {
+  useAdminUsersQuery,
+  useAdminUserSessionsQuery,
+  useToggleUserVerifyMutation,
+  useUpdateUserRoleMutation,
+  useDeleteUserMutation,
+  type AdminUserRow,
+} from "@/hooks/queries";
 
-/** Shape of a user row returned by GET /api/admin/users. */
-export interface UserRow {
-  id: string;
-  name: string | null;
-  email: string;
-  emailVerified: boolean;
-  role: string;
-  image: string | null;
-  createdAt: string;
-  updatedAt: string;
-  accounts: Array<{ id: string; providerId: string; createdAt: string }>;
-  sessionCount: number;
-  lastSessionAt: string | null;
-}
+export type UserRow = AdminUserRow;
 
 export type SortKey = "name" | "email" | "emailVerified" | "createdAt" | "sessionCount";
 export type FilterVerified = "all" | "verified" | "unverified";
 
 export function useUsersManagement() {
   const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
-  const [users, setUsers] = useState<UserRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { data: users = [], isLoading, error, refetch } = useAdminUsersQuery();
+  const toggleVerifyMutation = useToggleUserVerifyMutation();
+  const updateRoleMutation = useUpdateUserRoleMutation();
+  const deleteMutation = useDeleteUserMutation();
+
+  const [selectedUser, setSelectedUser] = useState<UserRow | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [filterVerified, setFilterVerified] = useState<FilterVerified>("all");
-  const [selectedUser, setSelectedUser] = useState<UserRow | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<UserRow | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [updatingVerify, setUpdatingVerify] = useState<string | null>(null);
 
-  const { sessions, loading: sessionsLoading } = useUserSessions(selectedUser?.id ?? null);
-
-  const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await fetch("/api/admin/users");
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to fetch users");
-      }
-      setUsers(await res.json());
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+  const { data: sessions = [], isLoading: sessionsLoading } = useAdminUserSessionsQuery(selectedUser?.id ?? null);
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -120,17 +89,7 @@ export function useUsersManagement() {
   const handleToggleVerify = async (user: UserRow, newStatus: boolean) => {
     setUpdatingVerify(user.id);
     try {
-      const res = await fetch(`/api/admin/users/${user.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ emailVerified: newStatus }),
-      });
-      if (!res.ok) throw new Error("Failed to update");
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === user.id ? { ...u, emailVerified: newStatus } : u
-        )
-      );
+      await toggleVerifyMutation.mutateAsync({ userId: user.id, emailVerified: newStatus });
       if (selectedUser?.id === user.id) {
         setSelectedUser((prev) => (prev ? { ...prev, emailVerified: newStatus } : null));
       }
@@ -143,20 +102,7 @@ export function useUsersManagement() {
 
   const handleRoleChange = async (user: UserRow, newRole: string) => {
     try {
-      const res = await fetch(`/api/admin/users/${user.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role: newRole }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to update role");
-      }
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === user.id ? { ...u, role: newRole } : u
-        )
-      );
+      await updateRoleMutation.mutateAsync({ userId: user.id, role: newRole });
       if (selectedUser?.id === user.id) {
         setSelectedUser((prev) => (prev ? { ...prev, role: newRole } : null));
       }
@@ -169,14 +115,7 @@ export function useUsersManagement() {
     if (!confirmDelete) return;
     setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/users/${confirmDelete.id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to delete");
-      }
-      setUsers((prev) => prev.filter((u) => u.id !== confirmDelete.id));
+      await deleteMutation.mutateAsync(confirmDelete.id);
       setConfirmDelete(null);
       if (selectedUser?.id === confirmDelete.id) setSelectedUser(null);
     } catch (err: any) {
@@ -189,8 +128,8 @@ export function useUsersManagement() {
   return {
     users,
     filteredUsers,
-    loading,
-    error,
+    loading: isLoading,
+    error: error?.message ?? null,
     searchQuery,
     setSearchQuery,
     sortKey,
@@ -207,7 +146,7 @@ export function useUsersManagement() {
     sessions,
     sessionsLoading,
     isAdmin,
-    fetchUsers,
+    fetchUsers: refetch,
     handleToggleVerify,
     handleRoleChange,
     handleDelete,
