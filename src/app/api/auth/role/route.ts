@@ -16,8 +16,11 @@ export async function GET() {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) {
       return NextResponse.json(
-        { isAdmin: false, role: 'user' },
-        { headers: { "Cache-Control": "no-store" } }
+        { isAdmin: false, role: 'guest', authenticated: false },
+        { 
+          status: 401,
+          headers: { "Cache-Control": "no-store" } 
+        }
       );
     }
 

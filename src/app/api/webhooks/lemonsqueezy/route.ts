@@ -77,7 +77,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
 
   const shippingAddress = customData.shipping_address ? JSON.parse(customData.shipping_address) : {};
   const sanitizedAddress = sanitizeShippingAddress(shippingAddress);
-  const orderNumber = `AUR-${crypto.randomUUID().replace(/-/g, "").toUpperCase()}`;
+  const orderNumber = `AUR-${crypto.randomUUID().replace(/-/g, "").substring(0, 8).toUpperCase()}`;
 
   const { verifiedItems, subtotal } = await withTransaction(async (client) => {
     const checkRes = await client.query(

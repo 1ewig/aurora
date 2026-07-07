@@ -35,11 +35,27 @@ export async function proxy(request: NextRequest) {
   const baseUrl = process.env.BETTER_AUTH_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
   const cookie = request.headers.get('cookie') || '';
 
+  // Fast-path: Check if the session cookie exists before making any network calls.
+  const hasSessionCookie = cookie.includes('better-auth.session_token');
+
+  if (!hasSessionCookie) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
   // For admin routes, check role via the dedicated endpoint
   if (isAdminPath(pathname)) {
     const roleRes = await fetch(`${baseUrl}/api/auth/role`, {
       headers: { cookie },
     });
+
+    if (roleRes.status === 401) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
     const { role } = roleRes.ok ? await roleRes.json() : { role: 'user' };
     if (role !== 'admin') {
       return NextResponse.redirect(new URL("/", request.url));
