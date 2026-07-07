@@ -11,6 +11,7 @@ import { UserDetailModal } from "./UserDetailModal";
 import { UsersSearchFilters } from "./UsersSearchFilters";
 import { UsersTable } from "./UsersTable";
 import { DeleteConfirmModal } from "./DeleteConfirmModal";
+import { UsersSkeleton } from "./UsersSkeleton";
 import { useUsersManagement } from "@/hooks/useUsersManagement";
 
 // Re-export UserRow so that UserDetailModal (and others) can import it from here.
@@ -62,9 +63,7 @@ export function UsersClient() {
       />
 
       {loading && users.length === 0 ? (
-        <div className="flex items-center justify-center py-20 text-text-secondary text-sm">
-          Loading users...
-        </div>
+        <UsersSkeleton />
       ) : error ? (
         <div className="p-8 text-center text-error border border-border-subtle rounded-2xl bg-white">
           {error}

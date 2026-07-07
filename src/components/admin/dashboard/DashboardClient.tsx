@@ -11,6 +11,7 @@ import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { MetricsGrid } from "./MetricsGrid";
 import { RecentOrdersList } from "./RecentOrdersList";
 import { TaskMenu } from "./TaskMenu";
+import { DashboardSkeleton } from "./DashboardSkeleton";
 import { useAdminDashboard } from "@/hooks/useAdminDashboard";
 
 /** Renders the executive dashboard with metrics grid, recent orders feed, and quick tasks. */
@@ -40,9 +41,7 @@ export function DashboardClient() {
       />
 
       {loading && !metrics ? (
-        <div className="flex items-center justify-center py-20 text-text-secondary text-sm">
-          Loading metrics...
-        </div>
+        <DashboardSkeleton />
       ) : error ? (
         <div className="p-8 text-center text-error border border-border-subtle rounded-2xl bg-white">
           {error}

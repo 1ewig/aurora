@@ -9,6 +9,7 @@
 import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { OrdersTable } from "./OrdersTable";
 import { OrderDetailModal } from "./OrderDetailModal";
+import { OrdersSkeleton } from "./OrdersSkeleton";
 import { useOrdersManagement } from "@/hooks/useOrdersManagement";
 
 /** Orders management page — fetches, filters, and displays orders. */
@@ -32,9 +33,7 @@ export function OrdersClient() {
   return (
     <div className="space-y-8 pb-12">
       {loading && orders.length === 0 ? (
-        <div className="flex items-center justify-center py-20 text-text-secondary text-sm">
-          Loading orders database...
-        </div>
+        <OrdersSkeleton />
       ) : error ? (
         <div className="p-8 text-center text-error border border-border-subtle rounded-2xl bg-white">
           {error}

@@ -12,6 +12,7 @@ import { useProductForm } from "@/hooks/useProductForm";
 import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { Button } from "@/components/ui/Button";
 import { InventoryTable } from "./InventoryTable";
+import { InventorySkeleton } from "./InventorySkeleton";
 
 import { ProductFormModal } from "./ProductFormModal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -92,9 +93,7 @@ export function InventoryClient() {
   return (
     <div className="space-y-8 pb-12">
       {loading && products.length === 0 ? (
-        <div className="flex items-center justify-center py-20 text-text-secondary text-sm">
-          Loading catalog...
-        </div>
+        <InventorySkeleton />
       ) : error ? (
         <div className="p-8 text-center text-error border border-border-subtle rounded-2xl bg-white">
           {error}
