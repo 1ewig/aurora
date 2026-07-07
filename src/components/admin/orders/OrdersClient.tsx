@@ -1,34 +1,63 @@
-/**
- * Aurora — src/components/admin/orders/OrdersClient.tsx
- *
- * Orders management page — hosts table + detail modal, delegates logic to hook.
- */
-
 "use client";
 
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
+import { Pagination } from "@/components/ui/Pagination";
 import { OrdersTable } from "./OrdersTable";
 import { OrderDetailModal } from "./OrderDetailModal";
 import { OrdersSkeleton } from "./OrdersSkeleton";
 import { useOrdersManagement } from "@/hooks/useOrdersManagement";
 
-/** Orders management page — fetches, filters, and displays orders. */
 export function OrdersClient() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const page = Math.max(1, Number(searchParams.get('page')) || 1);
+  const search = searchParams.get('search') || '';
+  const status = searchParams.get('status') || 'all';
+
   const {
     orders,
-    filteredOrders,
+    totalPages,
     loading,
     error,
-    filterStatus,
-    setFilterStatus,
-    searchQuery,
-    setSearchQuery,
     selectedOrder,
     setSelectedOrder,
     updateOrderStatus,
     isAdmin,
     fetchOrders,
-  } = useOrdersManagement();
+  } = useOrdersManagement(page, search, status);
+
+  const [localSearch, setLocalSearch] = useState(search);
+
+  useEffect(() => {
+    setLocalSearch(search);
+  }, [search]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== search) {
+        const p = new URLSearchParams(searchParams.toString());
+        p.set('search', localSearch);
+        p.set('page', '1');
+        router.replace(`${pathname}?${p.toString()}`);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [localSearch]);
+
+  const updateParam = useCallback((key: string, value: string) => {
+    const p = new URLSearchParams(searchParams.toString());
+    if (value) {
+      p.set(key, value);
+    } else {
+      p.delete(key);
+    }
+    if (key !== 'page') p.set('page', '1');
+    router.replace(`${pathname}?${p.toString()}`);
+  }, [searchParams, pathname, router]);
 
   return (
     <div className="space-y-8 pb-12">
@@ -45,19 +74,25 @@ export function OrdersClient() {
             description="Fulfill pending purchases and process order statuses."
           />
 
-          {/* Orders list table */}
           <OrdersTable
-            orders={filteredOrders}
-            filterStatus={filterStatus}
-            onFilterStatusChange={setFilterStatus}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
+            orders={orders}
+            filterStatus={status}
+            onFilterStatusChange={(val) => updateParam('status', val)}
+            searchQuery={localSearch}
+            onSearchChange={setLocalSearch}
             onViewDetailsClick={setSelectedOrder}
             onRefresh={fetchOrders}
             loading={loading}
           />
 
-          {/* Detailed order modal details */}
+          {totalPages > 0 && (
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={(p) => updateParam('page', String(p))}
+            />
+          )}
+
           <OrderDetailModal
             isOpen={!!selectedOrder}
             onClose={() => setSelectedOrder(null)}

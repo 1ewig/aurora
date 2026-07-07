@@ -9,10 +9,39 @@ import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const { error } = await requireAdmin();
     if (error) return error;
+
+    const { searchParams } = new URL(request.url);
+    const page = Math.max(1, Number(searchParams.get('page')) || 1);
+    const limit = Math.min(100, Math.max(1, Number(searchParams.get('limit')) || 20));
+    const offset = (page - 1) * limit;
+    const search = searchParams.get('search') || '';
+    const status = searchParams.get('status') || '';
+
+    const conditions: string[] = [];
+    const params: any[] = [];
+    let paramIndex = 1;
+
+    if (search) {
+      conditions.push(`(
+        order_number ILIKE $${paramIndex} OR
+        shipping_address->>'email' ILIKE $${paramIndex} OR
+        shipping_address->>'firstName' ILIKE $${paramIndex} OR
+        shipping_address->>'lastName' ILIKE $${paramIndex}
+      )`);
+      params.push(`%${search}%`);
+      paramIndex++;
+    }
+
+    if (status && status !== 'all') {
+      conditions.push(`status = $${paramIndex++}`);
+      params.push(status);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     const result = await pool.query(`
       SELECT
@@ -27,11 +56,15 @@ export async function GET() {
         shipping_address as "shippingAddress",
         status,
         is_paid as "isPaid",
-        created_at as "createdAt"
+        created_at as "createdAt",
+        COUNT(*) OVER() AS total
       FROM orders
+      ${whereClause}
       ORDER BY created_at DESC
-    `);
+      LIMIT $${paramIndex++} OFFSET $${paramIndex++}
+    `, [...params, limit, offset]);
 
+    const total = result.rows.length > 0 ? Number(result.rows[0].total) : 0;
     const orders = result.rows.map(row => ({
       ...row,
       subtotal: Number(row.subtotal),
@@ -58,7 +91,13 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json(orders);
+    return NextResponse.json({
+      orders,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (err) {
     console.error('Failed to list orders:', err);
     return NextResponse.json({ error: 'Failed to list orders' }, { status: 500 });

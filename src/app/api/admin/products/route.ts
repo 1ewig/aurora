@@ -11,10 +11,33 @@ import { pool, withTransaction } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
 import { revalidateTag } from 'next/cache';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const { error } = await requireAdmin();
     if (error) return error;
+
+    const { searchParams } = new URL(request.url);
+    const page = Math.max(1, Number(searchParams.get('page')) || 1);
+    const limit = Math.min(100, Math.max(1, Number(searchParams.get('limit')) || 20));
+    const offset = (page - 1) * limit;
+    const search = searchParams.get('search') || '';
+    const category = searchParams.get('category') || '';
+
+    const conditions: string[] = [];
+    const params: any[] = [];
+    let paramIndex = 1;
+
+    if (search) {
+      conditions.push(`p.name ILIKE $${paramIndex++}`);
+      params.push(`%${search}%`);
+    }
+
+    if (category) {
+      conditions.push(`p.category = $${paramIndex++}`);
+      params.push(category);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     const result = await pool.query(`
       SELECT
@@ -43,17 +66,27 @@ export async function GET() {
           SELECT COALESCE(json_agg(detail ORDER BY id), '[]'::json)
           FROM product_details
           WHERE product_id = p.id
-        ) as details
+        ) as details,
+        COUNT(*) OVER() AS total
       FROM products p
+      ${whereClause}
       ORDER BY p.created_at DESC
-    `);
+      LIMIT $${paramIndex++} OFFSET $${paramIndex++}
+    `, [...params, limit, offset]);
 
+    const total = result.rows.length > 0 ? Number(result.rows[0].total) : 0;
     const products = result.rows.map(row => ({
       ...row,
       price: Number(row.price),
     }));
 
-    return NextResponse.json(products);
+    return NextResponse.json({
+      products,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (err) {
     console.error('Failed to list products:', err);
     return NextResponse.json({ error: 'Failed to list products' }, { status: 500 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
 import {
   useAdminUsersQuery,
@@ -12,79 +12,35 @@ import {
 } from "@/hooks/queries";
 
 export type UserRow = AdminUserRow;
-
 export type SortKey = "name" | "email" | "emailVerified" | "createdAt" | "sessionCount";
 export type FilterVerified = "all" | "verified" | "unverified";
 
-export function useUsersManagement() {
+export function useUsersManagement(
+  page: number,
+  search: string,
+  verified: string,
+  sortBy: string,
+  sortDir: string,
+) {
   const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
-  const { data: users = [], isLoading, isFetching, error, refetch } = useAdminUsersQuery();
+  const { data, isLoading, isFetching, error, refetch } = useAdminUsersQuery({
+    page,
+    limit: 20,
+    search,
+    verified: verified === 'all' ? undefined : verified,
+    sortBy,
+    sortDir,
+  });
   const toggleVerifyMutation = useToggleUserVerifyMutation();
   const updateRoleMutation = useUpdateUserRoleMutation();
   const deleteMutation = useDeleteUserMutation();
 
   const [selectedUser, setSelectedUser] = useState<UserRow | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("createdAt");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const [filterVerified, setFilterVerified] = useState<FilterVerified>("all");
   const [confirmDelete, setConfirmDelete] = useState<UserRow | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [updatingVerify, setUpdatingVerify] = useState<string | null>(null);
 
   const { data: sessions = [], isLoading: sessionsLoading } = useAdminUserSessionsQuery(selectedUser?.id ?? null);
-
-  const toggleSort = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setSortKey(key);
-      setSortDir("asc");
-    }
-  };
-
-  const filteredUsers = useMemo(() => {
-    let list = users;
-
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(
-        (u) =>
-          (u.name || "").toLowerCase().includes(q) ||
-          u.email.toLowerCase().includes(q)
-      );
-    }
-
-    if (filterVerified === "verified") {
-      list = list.filter((u) => u.emailVerified);
-    } else if (filterVerified === "unverified") {
-      list = list.filter((u) => !u.emailVerified);
-    }
-
-    list = [...list].sort((a, b) => {
-      let cmp = 0;
-      switch (sortKey) {
-        case "name":
-          cmp = (a.name || "").localeCompare(b.name || "");
-          break;
-        case "email":
-          cmp = a.email.localeCompare(b.email);
-          break;
-        case "emailVerified":
-          cmp = Number(a.emailVerified) - Number(b.emailVerified);
-          break;
-        case "createdAt":
-          cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-          break;
-        case "sessionCount":
-          cmp = a.sessionCount - b.sessionCount;
-          break;
-      }
-      return sortDir === "asc" ? cmp : -cmp;
-    });
-
-    return list;
-  }, [users, searchQuery, filterVerified, sortKey, sortDir]);
 
   const handleToggleVerify = async (user: UserRow, newStatus: boolean) => {
     setUpdatingVerify(user.id);
@@ -126,17 +82,11 @@ export function useUsersManagement() {
   };
 
   return {
-    users,
-    filteredUsers,
+    users: data?.users ?? [],
+    total: data?.total ?? 0,
+    totalPages: data?.totalPages ?? 0,
     loading: isLoading || isFetching,
     error: error?.message ?? null,
-    searchQuery,
-    setSearchQuery,
-    sortKey,
-    sortDir,
-    toggleSort,
-    filterVerified,
-    setFilterVerified,
     selectedUser,
     setSelectedUser,
     confirmDelete,

@@ -5,7 +5,7 @@
  * Centralized data-fetching layer with caching and optimistic initial data.
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import type { Product } from '@/data/products';
 import { useAuthStore } from '@/stores/useAuthStore';
 import type {
@@ -302,28 +302,20 @@ export function useAdminDashboardQuery() {
   });
 }
 
-/** Fetches all products for inventory management. */
-export function useAdminProductsQuery() {
-  return useQuery<ProductData[]>({
-    queryKey: ['admin', 'products'],
-    queryFn: async () => {
-      const res = await fetch('/api/admin/products');
-      if (!res.ok) throw new Error('Failed to load products');
-      return res.json();
-    },
-  });
+export interface AdminPaginatedProductsResponse {
+  products: ProductData[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
-/** Fetches all orders for admin order processing. */
-export function useAdminOrdersQuery() {
-  return useQuery<OrderData[]>({
-    queryKey: ['admin', 'orders'],
-    queryFn: async () => {
-      const res = await fetch('/api/admin/orders');
-      if (!res.ok) throw new Error('Failed to load orders');
-      return res.json();
-    },
-  });
+export interface PaginatedOrdersResponse {
+  orders: OrderData[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 export interface AdminUserRow {
@@ -340,15 +332,93 @@ export interface AdminUserRow {
   lastSessionAt: string | null;
 }
 
-/** Fetches all users for admin user management. */
-export function useAdminUsersQuery() {
-  return useQuery<AdminUserRow[]>({
-    queryKey: ['admin', 'users'],
-    queryFn: async () => {
-      const res = await fetch('/api/admin/users');
+export interface PaginatedUsersResponse {
+  users: AdminUserRow[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+interface AdminProductsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+}
+
+interface AdminOrdersParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+}
+
+interface AdminUsersParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  verified?: string;
+  sortBy?: string;
+  sortDir?: string;
+}
+
+/** Fetches paginated products for inventory management. */
+export function useAdminProductsQuery(params: AdminProductsParams = {}) {
+  return useQuery({
+    queryKey: ['admin', 'products', params],
+    queryFn: async (): Promise<AdminPaginatedProductsResponse> => {
+      const sp = new URLSearchParams();
+      if (params.page) sp.set('page', String(params.page));
+      if (params.limit) sp.set('limit', String(params.limit));
+      if (params.search) sp.set('search', params.search);
+      if (params.category) sp.set('category', params.category);
+      const qs = sp.toString();
+      const res = await fetch(`/api/admin/products${qs ? `?${qs}` : ''}`);
+      if (!res.ok) throw new Error('Failed to load products');
+      return res.json();
+    },
+    placeholderData: keepPreviousData,
+  });
+}
+
+/** Fetches paginated orders for admin order processing. */
+export function useAdminOrdersQuery(params: AdminOrdersParams = {}) {
+  return useQuery({
+    queryKey: ['admin', 'orders', params],
+    queryFn: async (): Promise<PaginatedOrdersResponse> => {
+      const sp = new URLSearchParams();
+      if (params.page) sp.set('page', String(params.page));
+      if (params.limit) sp.set('limit', String(params.limit));
+      if (params.search) sp.set('search', params.search);
+      if (params.status && params.status !== 'all') sp.set('status', params.status);
+      const qs = sp.toString();
+      const res = await fetch(`/api/admin/orders${qs ? `?${qs}` : ''}`);
+      if (!res.ok) throw new Error('Failed to load orders');
+      return res.json();
+    },
+    placeholderData: keepPreviousData,
+  });
+}
+
+/** Fetches paginated users for admin user management. */
+export function useAdminUsersQuery(params: AdminUsersParams = {}) {
+  return useQuery({
+    queryKey: ['admin', 'users', params],
+    queryFn: async (): Promise<PaginatedUsersResponse> => {
+      const sp = new URLSearchParams();
+      if (params.page) sp.set('page', String(params.page));
+      if (params.limit) sp.set('limit', String(params.limit));
+      if (params.search) sp.set('search', params.search);
+      if (params.verified) sp.set('verified', params.verified);
+      if (params.sortBy) sp.set('sortBy', params.sortBy);
+      if (params.sortDir) sp.set('sortDir', params.sortDir);
+      const qs = sp.toString();
+      const res = await fetch(`/api/admin/users${qs ? `?${qs}` : ''}`);
       if (!res.ok) throw new Error('Failed to load users');
       return res.json();
     },
+    placeholderData: keepPreviousData,
   });
 }
 

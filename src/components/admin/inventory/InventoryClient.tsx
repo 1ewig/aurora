@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { ProductData } from "@/stores/useAdminStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useAdminProductsQuery, useDeleteProductMutation } from "@/hooks/queries";
 import { useProductForm } from "@/hooks/useProductForm";
+import { Pagination } from "@/components/ui/Pagination";
 import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { Button } from "@/components/ui/Button";
 import { InventoryTable } from "./InventoryTable";
@@ -13,34 +15,59 @@ import { ProductFormModal } from "./ProductFormModal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export function InventoryClient() {
-  const { data: products = [], isLoading, isFetching, error, refetch } = useAdminProductsQuery();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const page = Math.max(1, Number(searchParams.get('page')) || 1);
+  const urlSearch = searchParams.get('search') || '';
+  const category = searchParams.get('category') || 'All';
+
+  const { data, isLoading, isFetching, error, refetch } = useAdminProductsQuery({
+    page,
+    limit: 20,
+    search: urlSearch,
+    category: category === 'All' ? undefined : category,
+  });
+
   const deleteMutation = useDeleteProductMutation();
   const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [localSearch, setLocalSearch] = useState(urlSearch);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<ProductData | null>(null);
   const [productToDelete, setProductToDelete] = useState<ProductData | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const filteredProducts = useMemo(
-    () =>
-      products.filter(
-        (p) => {
-          const matchesSearch =
-            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.category.toLowerCase().includes(searchQuery.toLowerCase());
-          const matchesCategory =
-            selectedCategory === "All" ||
-            p.category.toLowerCase() === selectedCategory.toLowerCase();
-          return matchesSearch && matchesCategory;
-        }
-      ),
-    [products, searchQuery, selectedCategory]
-  );
+  useEffect(() => {
+    setLocalSearch(urlSearch);
+  }, [urlSearch]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== urlSearch) {
+        const p = new URLSearchParams(searchParams.toString());
+        p.set('search', localSearch);
+        p.set('page', '1');
+        router.replace(`${pathname}?${p.toString()}`);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [localSearch]);
+
+  const updateParam = useCallback((key: string, value: string) => {
+    const p = new URLSearchParams(searchParams.toString());
+    if (value) {
+      p.set(key, value);
+    } else {
+      p.delete(key);
+    }
+    if (key !== 'page') p.set('page', '1');
+    router.replace(`${pathname}?${p.toString()}`);
+  }, [searchParams, pathname, router]);
+
+  const products: ProductData[] = data?.products ?? [];
+  const totalPages = data?.totalPages ?? 0;
 
   const form = useProductForm(() => {
     setIsModalOpen(false);
@@ -95,16 +122,24 @@ export function InventoryClient() {
           />
 
           <InventoryTable
-            filteredProducts={filteredProducts}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
+            filteredProducts={products}
+            searchQuery={localSearch}
+            onSearchChange={setLocalSearch}
+            selectedCategory={category}
+            onCategoryChange={(val) => updateParam('category', val)}
             onEditClick={handleOpenModal}
             isAdmin={isAdmin}
             onRefresh={refetch}
             loading={isLoading || isFetching}
           />
+
+          {data && (
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={(p) => updateParam('page', String(p))}
+            />
+          )}
 
           <ProductFormModal
             isOpen={isModalOpen}

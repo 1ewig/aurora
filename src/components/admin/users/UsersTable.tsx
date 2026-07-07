@@ -11,7 +11,7 @@ import type { UserRow, SortKey } from "@/hooks/useUsersManagement";
 
 interface UsersTableProps {
   users: UserRow[];
-  filteredUsers: UserRow[];
+  total: number;
   loading: boolean;
   sortKey: SortKey;
   sortDir: "asc" | "desc";
@@ -21,7 +21,7 @@ interface UsersTableProps {
 
 export function UsersTable({
   users,
-  filteredUsers,
+  total,
   loading,
   sortKey,
   sortDir,
@@ -74,14 +74,14 @@ export function UsersTable({
               loading ? "opacity-50 pointer-events-none" : ""
             }`}
           >
-            {filteredUsers.length === 0 ? (
+            {users.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-6 py-12 text-center text-text-secondary text-sm">
                   No users match your filters.
                 </td>
               </tr>
             ) : (
-              filteredUsers.map((user) => (
+              users.map((user) => (
                 <tr key={user.id} className="hover:bg-bg-primary/30 transition-colors">
                   <td className="px-4 py-3 text-text-primary font-medium whitespace-nowrap text-left">
                     <div className="flex items-center justify-start gap-2">
@@ -181,8 +181,7 @@ export function UsersTable({
       </div>
 
       <p className="text-xs text-text-muted text-right">
-        {filteredUsers.length} user{filteredUsers.length !== 1 ? "s" : ""}
-        {filteredUsers.length !== users.length && ` (filtered from ${users.length})`}
+        {users.length} of {total} user{total !== 1 ? "s" : ""}
       </p>
     </>
   );
