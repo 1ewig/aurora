@@ -18,7 +18,7 @@ export type FilterVerified = "all" | "verified" | "unverified";
 
 export function useUsersManagement() {
   const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
-  const { data: users = [], isLoading, error, refetch } = useAdminUsersQuery();
+  const { data: users = [], isLoading, isFetching, error, refetch } = useAdminUsersQuery();
   const toggleVerifyMutation = useToggleUserVerifyMutation();
   const updateRoleMutation = useUpdateUserRoleMutation();
   const deleteMutation = useDeleteUserMutation();
@@ -128,7 +128,7 @@ export function useUsersManagement() {
   return {
     users,
     filteredUsers,
-    loading: isLoading,
+    loading: isLoading || isFetching,
     error: error?.message ?? null,
     searchQuery,
     setSearchQuery,

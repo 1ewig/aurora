@@ -13,7 +13,7 @@ import { ProductFormModal } from "./ProductFormModal";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export function InventoryClient() {
-  const { data: products = [], isLoading, error, refetch } = useAdminProductsQuery();
+  const { data: products = [], isLoading, isFetching, error, refetch } = useAdminProductsQuery();
   const deleteMutation = useDeleteProductMutation();
   const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
 
@@ -103,7 +103,7 @@ export function InventoryClient() {
             onEditClick={handleOpenModal}
             isAdmin={isAdmin}
             onRefresh={refetch}
-            loading={isLoading}
+            loading={isLoading || isFetching}
           />
 
           <ProductFormModal

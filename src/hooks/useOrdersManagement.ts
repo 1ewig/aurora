@@ -9,7 +9,7 @@ import {
 } from "@/hooks/queries";
 
 export function useOrdersManagement() {
-  const { data: orders = [], isLoading, error, refetch } = useAdminOrdersQuery();
+  const { data: orders = [], isLoading, isFetching, error, refetch } = useAdminOrdersQuery();
   const updateMutation = useUpdateOrderStatusMutation();
   const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
 
@@ -40,7 +40,7 @@ export function useOrdersManagement() {
   return {
     orders,
     filteredOrders,
-    loading: isLoading,
+    loading: isLoading || isFetching,
     error: error?.message ?? null,
     filterStatus,
     setFilterStatus,
