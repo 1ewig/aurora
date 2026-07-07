@@ -135,6 +135,17 @@ export function Navbar() {
 
             {/* Utility Icons */}
             <div className="flex items-center gap-3">
+              <motion.button
+                aria-label={`Shopping bag, ${count} item${count !== 1 ? "s" : ""}`}
+                onClick={toggleCart}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary cursor-pointer"
+              >
+                <BagIcon count={count} />
+              </motion.button>
+
               {user ? (
                 <div className="relative" ref={dropdownRef}>
                   <button
@@ -156,23 +167,11 @@ export function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  aria-label="Sign In / Sign Up"
-                  className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary flex items-center justify-center w-9 h-9"
+                  className="px-5 py-2 rounded-full text-sm font-medium text-text-primary border border-text-primary hover:bg-text-primary hover:text-text-inverted transition-all duration-300 tracking-wide"
                 >
-                  <UserIcon />
+                  Sign In
                 </Link>
               )}
-
-              <motion.button
-                aria-label={`Shopping bag, ${count} item${count !== 1 ? "s" : ""}`}
-                onClick={toggleCart}
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className="p-2 rounded-full hover:bg-border-subtle/50 transition-colors text-text-primary cursor-pointer"
-              >
-                <BagIcon count={count} />
-              </motion.button>
               
               <button
                 aria-label={menuOpen ? "Close menu" : "Open menu"}
