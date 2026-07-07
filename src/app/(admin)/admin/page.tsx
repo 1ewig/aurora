@@ -1,22 +1,11 @@
 /**
  * Aurora — src/app/(admin)/admin/page.tsx
  *
- * Admin dashboard page.
+ * Admin page root redirecting to /admin/dashboard.
  */
 
-import { DashboardClient } from '@/components/admin/dashboard/DashboardClient';
+import { redirect } from 'next/navigation';
 
-/** Metadata for the admin dashboard page. */
-export const metadata = {
-  title: 'Dashboard | Admin | Aurora',
-  description: 'Aurora administrative panel.',
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
-
-/** Admin dashboard page. */
-export default function AdminDashboardPage() {
-  return <DashboardClient />;
+export default function AdminPage() {
+  redirect('/admin/dashboard');
 }

@@ -20,7 +20,7 @@ export function AdminLayoutClient({
   const pathname = usePathname();
   const { navBg, navBorder, navBlur } = useNavbarScroll();
 
-  const isDashboardActive = pathname === "/admin";
+  const isDashboardActive = pathname === "/admin/dashboard" || pathname === "/admin";
   const isInventoryActive = pathname.startsWith("/admin/inventory");
   const isOrdersActive = pathname.startsWith("/admin/orders");
   const isUsersActive = pathname.startsWith("/admin/users");
@@ -76,7 +76,7 @@ export function AdminLayoutClient({
       {/* Floating Navigation Capsule for Mobile */}
       <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-bg-secondary/95 text-text-primary rounded-full backdrop-blur-md px-1.5 py-1.5 flex gap-1 shadow-xl border border-border-medium/60 w-auto max-w-[95vw]">
         <Link
-          href="/admin"
+          href="/admin/dashboard"
           className={`px-3.5 py-2 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
             isDashboardActive
               ? "bg-bg-ink text-text-inverted shadow-sm"
