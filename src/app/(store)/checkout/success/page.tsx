@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function CheckoutSuccessPage() {
   return (
-    <main id="main-content" tabIndex={-1} className="pt-28 pb-32">
+    <main id="main-content" tabIndex={-1} className="pt-28 md:pt-36 pb-32">
       <div className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
         <Suspense fallback={
           <div className="max-w-xl mx-auto text-center py-12 px-6 md:px-8 bg-white rounded-2xl border border-border-subtle shadow-sm">
