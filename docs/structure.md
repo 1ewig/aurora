@@ -47,21 +47,20 @@ aurora/
 │
 ├── docs/
 │   ├── CODING_STANDARDS.md              # 4-layer architecture rules and conventions
-│   └── BACKEND_DEPLOYMENT.md            # InsForge + DB setup walkthrough
+│   ├── BACKEND_DEPLOYMENT.md            # InsForge + DB setup walkthrough
+│   └── performance-analysis.md          # Performance audit results
 │
 ├── migrations/
 │   └── 20260614145429_better-auth-setup.sql  # Better Auth schema migration
 │
 ├── scripts/                             # CLI tools & DB scripts (6 files)
 │
-├── __tests__/                           # Integration tests
-│   ├── api/
-│   │   ├── categories.test.ts
-│   │   ├── checkout.test.ts
-│   │   ├── webhook.test.ts
-│   │   └── admin-auth.test.ts
+├── __tests__/                           # Tests (19 files)
+│   ├── api/                             # 10 API integration test files
+│   ├── stores/                          # 2 store test files
+│   └── utils/                           # 6 utility test files + mocks
 │
-└── src/                                 # Application source (~196 files)
+└── src/                                 # Application source (~208 files)
     ├── proxy.ts                         # Middleware (route protection)
     ├── animations/                      # Framer Motion presets (2 files)
     ├── app/                             # Next.js App Router (~60 files)
@@ -71,7 +70,7 @@ aurora/
     ├── lib/                             # Third-party integrations (7 files)
     ├── stores/                          # Zustand state stores (4 files)
     ├── types/                           # TypeScript declarations (1 file)
-    └── utils/                           # Utility functions (9 files)
+    └── utils/                           # Utility functions (12 files)
 ```
 
 ### 2.1 `src/animations/`
@@ -92,13 +91,21 @@ src/app/
 ├── robots.ts                  # Dynamic robots.txt
 ├── sitemap.ts                 # Dynamic sitemap.xml (products + categories + static)
 │
-├── (admin)/                   # Route group: admin panel (5 files)
+├── (admin)/                   # Route group: admin panel
 │   └── admin/
 │       ├── layout.tsx         # Admin layout (Sidebar, role check)
+│       ├── loading.tsx
+│       ├── AdminLayoutClient.tsx
 │       ├── page.tsx           # Dashboard page
-│       ├── inventory/page.tsx # Inventory management
-│       ├── orders/page.tsx    # Order management
-│       └── users/page.tsx     # User management
+│       ├── inventory/
+│       │   ├── loading.tsx
+│       │   └── page.tsx       # Inventory management
+│       ├── orders/
+│       │   ├── loading.tsx
+│       │   └── page.tsx       # Order management
+│       └── users/
+│           ├── loading.tsx
+│           └── page.tsx       # User management
 │
 ├── (auth)/                    # Route group: authentication (4 directories)
 │   ├── login/page.tsx
@@ -106,11 +113,12 @@ src/app/
 │   ├── reset-password/page.tsx
 │   └── verify/page.tsx
 │
-├── (store)/                   # Route group: storefront (11 files)
+├── (store)/                   # Route group: storefront (14 files)
 │   ├── layout.tsx             # Navbar + CartDrawer + Footer
 │   ├── not-found.tsx
 │   ├── page.tsx               # Landing page
 │   ├── checkout/
+│   │   ├── loading.tsx
 │   │   ├── page.tsx           # Checkout form
 │   │   └── success/page.tsx   # Order confirmation
 │   ├── products/
@@ -123,7 +131,9 @@ src/app/
 │   │       ├── [category]/
 │   │       │   ├── page.tsx   # Category filtered listing
 │   │       │   └── loading.tsx
-│   └── story/page.tsx         # Brand story
+│   ├── story/
+│   │   ├── loading.tsx
+│   │   └── page.tsx           # Brand story
 │
 ├── (user)/                    # Route group: user account (6 files)
 │   ├── layout.tsx             # User layout with auth redirect
@@ -136,7 +146,7 @@ src/app/
 │   │       ├── page.tsx       # Order history
 │   │       └── loading.tsx
 │
-└── api/                       # API route handlers (22 endpoints)
+└── api/                       # API route handlers (23 endpoints)
     ├── admin/
     │   ├── dashboard/route.ts
     │   ├── orders/route.ts + [id]/route.ts
@@ -150,6 +160,7 @@ src/app/
     ├── editorial/route.ts
     ├── insforge-token/route.ts
     ├── lookbook/route.ts
+    ├── newsletter/route.ts
     ├── orders/route.ts
     ├── products/route.ts + [slug]/route.ts
     └── webhooks/lemonsqueezy/route.ts
@@ -159,11 +170,11 @@ src/app/
 
 ```
 src/components/
-├── admin/                         # Admin panel (18 files)
-│   ├── dashboard/                 # 4 components
-│   ├── inventory/                 # 6 components
-│   ├── orders/                    # 3 components
-│   └── users/                     # 5 components
+├── admin/                         # Admin panel (23 files)
+│   ├── dashboard/                 # 5 components (+TaskMenu)
+│   ├── inventory/                 # 8 components (+BasicDetailsFields, BulletDetailsFields)
+│   ├── orders/                    # 4 components (+OrdersSkeleton)
+│   └── users/                     # 6 components (+UsersSearchFilters)
 │
 ├── auth/                          # Auth forms (8 files)
 │   ├── LoginClient.tsx, LoginForm.tsx
@@ -173,11 +184,11 @@ src/components/
 │
 ├── checkout/                      # Checkout flow (7 files)
 │
-├── landing/                       # Home page sections (10 files)
+├── landing/                       # Home page sections (11 files)
 │   ├── LandingClient.tsx, Hero.tsx, FeaturedCollection.tsx
 │   ├── ProductGrid.tsx, LookbookSlider.tsx, MarqueeBar.tsx
-│   ├── DesignerStory.tsx, Testimonials.tsx, Newsletter.tsx
-│   └── ui/                        # Landing-specific primitives (2 files)
+│   ├── DesignerStory.tsx, Craftsmanship.tsx, Testimonials.tsx, Newsletter.tsx
+│   └── ui/                        # Landing-specific primitives (1 file)
 │
 ├── layout/                        # Shared layout (4 files)
 │   ├── Navbar.tsx, NavbarProfileMenu.tsx
@@ -219,7 +230,7 @@ src/components/
 
 ```
 src/hooks/
-├── queries.ts                          # All React Query hooks (products, categories, lookbook, editorial, orders)
+├── queries/                            # React Query hooks (5 files: index, products, orders, content, admin)
 ├── useInitializeAuth.ts                # Auth store init on mount
 ├── useAdminDashboard.ts                # Dashboard data loader
 ├── useCheckoutForm.ts                  # Checkout form state + validation + LS integration
@@ -236,7 +247,7 @@ src/hooks/
     └── useNavbarScroll.ts              # Show/hide on scroll direction
 ```
 
-### 2.6 `src/lib/` (Third-Party Integrations)
+### 2.6 `src/lib/` (7 files — Third-Party Integrations)
 
 | File | Purpose | Runtime |
 |---|---|---|
@@ -257,7 +268,7 @@ src/hooks/
 | `useProductStore.ts` | None (transient UI) | — | UI state (size selection, active details tab) |
 | `useAdminStore.ts` | None | — | Deprecated as Zustand store (types-only now) |
 
-### 2.8 `src/utils/`
+### 2.8 `src/utils/` (12 files)
 
 | File | Purpose |
 |---|---|
@@ -265,8 +276,10 @@ src/hooks/
 | `auth.ts` | `normalizeProfile()`, `isAdmin()` |
 | `cn.ts` | `cn()` — clsx + tailwind-merge |
 | `db.ts` | `pool` — PostgreSQL `Pool` singleton |
+| `env.ts` | Environment variable validation helpers |
 | `formatCurrency.ts` | Intl.NumberFormat USD formatting |
 | `pricing.ts` | `calculateOrderPricing()` — shipping/tax/total |
+| `sanitize.ts` | Input sanitization utilities |
 | `validation.ts` | `validateField()`, `validateAll()` — checkout form |
 | `insforge.ts` | `getStorageUrl()`, `getStorageKeyFromUrl()` — path↔URL mapping |
 | `insforge/client.ts` | InsForge client utility wrappers |
@@ -346,7 +359,7 @@ The codebase enforces a strict 4-layer architecture with unidirectional dependen
    → Passes data down as props
 
 3. Hooks + Stores
-   → queries.ts: useProductDetailsQuery(slug)
+   → queries/index.ts: useProductDetailsQuery(slug)
      - Query key: ['product', slug]
      - initialData from cached ['products'] query
      - Fetches GET /api/products/[slug]
@@ -389,9 +402,8 @@ The codebase enforces a strict 4-layer architecture with unidirectional dependen
 | `/story` | `(store)/story/page.tsx` | Brand story | `<StoryPageClient />` |
 | `/checkout` | `(store)/checkout/page.tsx` | Checkout | Guest OK |
 | `/checkout/success` | `(store)/checkout/success/page.tsx` | Order confirmation | Reads sessionStorage |
-| `/story` | `(store)/story/page.tsx` | Brand story | `<StoryPageClient />` |
 
-**Loading states**: `products/loading.tsx`, `products/[slug]/loading.tsx`, `products/category/[category]/loading.tsx`
+**Loading states**: `checkout/loading.tsx`, `story/loading.tsx`, `products/loading.tsx`, `products/[slug]/loading.tsx`, `products/category/[category]/loading.tsx`, `profile/orders/loading.tsx`
 
 ### 4.2 Authentication (public, noindex)
 
@@ -430,6 +442,7 @@ The codebase enforces a strict 4-layer architecture with unidirectional dependen
 | `/api/categories/daily` | GET | None | `'use cache'` 300s, tags: `categories,products` | 3 daily rotating categories (day-of-year modulo) |
 | `/api/lookbook` | GET | None | `'use cache'` 300s, tag: `lookbook` | Lookbook slides |
 | `/api/editorial` | GET | None | `'use cache'` 600s, tag: `editorial` | Editorial content |
+| `/api/newsletter` | POST | None | — | Newsletter email subscription (welcome email) |
 | `/api/orders` | GET | Better Auth session | React Query 2min | User's orders (paginated) |
 | `/api/orders` | POST | _(removed)_ | — | ~~Create order (deactivated)~~ |
 
@@ -644,7 +657,7 @@ Reads from `better_auth."user"` table, falls back to `ADMIN_EMAILS` env whitelis
 
 ## 6. Database Schema
 
-### 6.1 Full DDL (public schema, 12 tables)
+### 6.1 Full DDL (public schema, 13 tables)
 
 ```sql
 -- Helper for RLS (extracts sub claim from bridge JWT)
@@ -775,6 +788,14 @@ CREATE TABLE hero_slides (
   alt_text       TEXT NOT NULL,
   title          VARCHAR(255),
   link           VARCHAR(255)
+);
+
+-- Newsletter subscriptions
+CREATE TABLE newsletter_subscriptions (
+  id         SERIAL PRIMARY KEY,
+  email      VARCHAR(255) UNIQUE NOT NULL,
+  status     VARCHAR(20) NOT NULL DEFAULT 'active',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 
@@ -1069,7 +1090,7 @@ interface HeroSlide {
 }
 ```
 
-### 7.9 Query Types (`src/hooks/queries.ts`)
+### 7.9 Query Types (`src/hooks/queries/`)
 
 ```ts
 interface PaginatedProductsParams {
@@ -1238,13 +1259,13 @@ setSizeGuideOpen(isOpen: boolean): void
 
 ### 8.4 `useAdminStore` (`src/stores/useAdminStore.ts`)
 
-**Note:** This file no longer acts as a Zustand store. All data fetching, updates, and mutation actions have been migrated to TanStack Query and mutations (see `src/hooks/queries.ts`). This file serves solely as a central repository for admin TypeScript interfaces (`ProductData`, `SizeStock`, `OrderData`, `DashboardMetrics`, `RecentOrder`, etc.).
+**Note:** This file no longer acts as a Zustand store. All data fetching, updates, and mutation actions have been migrated to TanStack Query and mutations (see `src/hooks/queries/`). This file serves solely as a central repository for admin TypeScript interfaces (`ProductData`, `SizeStock`, `OrderData`, `DashboardMetrics`, `RecentOrder`, etc.).
 
 ---
 
 ## 9. React Query Hooks Reference
 
-All in `src/hooks/queries.ts`. Default config: staleTime=5min, gcTime=10min, refetchOnWindowFocus=false.
+All in `src/hooks/queries/`. Default config: staleTime=5min, gcTime=10min, refetchOnWindowFocus=false.
 
 ### Storefront Queries
 | Hook | Query Key | Fetches | Notes |
@@ -1770,17 +1791,16 @@ Cart items are sorted by `internalProductId` before `SELECT ... FOR UPDATE` to p
 |---|---|
 | **Runner** | Vitest 4.1.9 |
 | **Config** | `vitest.config.ts` |
-| **Location** | `__tests__/api/` |
-| **Tests** | 4 test files |
+| **Location** | `__tests__/api/`, `__tests__/stores/`, `__tests__/utils/` |
+| **Tests** | 19 test files |
 
-### Test Files
+### Test Directories
 
-| File | Tests |
+| Directory | Contents |
 |---|---|
-| `__tests__/api/categories.test.ts` | Categories endpoint (success + DB error) |
-| `__tests__/api/checkout.test.ts` | Checkout session creation |
-| `__tests__/api/webhook.test.ts` | Lemon Squeezy webhook processing |
-| `__tests__/api/admin-auth.test.ts` | Admin role authentication |
+| `__tests__/api/` | 10 files — API integration tests (categories, checkout, webhook, orders, auth, admin, stock-locking, idempotency) |
+| `__tests__/stores/` | 2 files — Zustand store tests (auth, cart) |
+| `__tests__/utils/` | 7 files — Unit tests (cn, env, formatCurrency, pricing, sanitize, validation + mocks) |
 
 ### Run Commands
 
