@@ -48,7 +48,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
 
   if (isLoading) {
     return (
-      <main className="pt-28 md:pt-36 pb-16 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto animate-pulse">
+      <main className="pt-32 md:pt-36 pb-16 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto animate-pulse">
         {/* Breadcrumb Skeleton */}
         <div className="h-4 w-48 bg-bg-secondary rounded mb-8" />
 
@@ -113,7 +113,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   };
 
   return (
-    <main id="main-content" tabIndex={-1} className="pt-28 md:pt-36 pb-16 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
+    <main id="main-content" tabIndex={-1} className="pt-32 md:pt-36 pb-16 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
       {/* Breadcrumbs */}
       <Breadcrumbs category={product.category} />
 

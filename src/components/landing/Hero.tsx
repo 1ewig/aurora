@@ -26,7 +26,7 @@ export function Hero({ heroProducts }: HeroProps) {
     <section
       id="hero"
       aria-labelledby="hero-headline"
-      className="relative flex flex-col items-center justify-center min-h-screen pt-28 md:pt-36 pb-16 overflow-hidden bg-bg-primary"
+      className="relative flex flex-col items-center justify-center min-h-screen pt-32 md:pt-36 pb-16 overflow-hidden bg-bg-primary"
     >
       {/* Ambient background gradient blobs */}
       <div
