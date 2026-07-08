@@ -17,6 +17,7 @@ export function useAdminDashboardQuery() {
       if (!res.ok) throw new Error('Failed to load dashboard metrics');
       return res.json();
     },
+    staleTime: 0,
   });
 }
 
@@ -101,6 +102,7 @@ export function useAdminProductsQuery(params: AdminProductsParams = {}) {
       return res.json();
     },
     placeholderData: keepPreviousData,
+    staleTime: 0,
   });
 }
 
@@ -120,6 +122,7 @@ export function useAdminOrdersQuery(params: AdminOrdersParams = {}) {
       return res.json();
     },
     placeholderData: keepPreviousData,
+    staleTime: 0,
   });
 }
 
@@ -141,6 +144,7 @@ export function useAdminUsersQuery(params: AdminUsersParams = {}) {
       return res.json();
     },
     placeholderData: keepPreviousData,
+    staleTime: 0,
   });
 }
 
@@ -151,11 +155,12 @@ export function useAdminUserSessionsQuery(userId: string | null) {
     queryFn: async () => {
       if (!userId) return [];
       const res = await fetch(`/api/admin/users/${userId}?include=sessions`);
-      if (!res.ok) return [];
+      if (!res.ok) throw new Error('Failed to load user sessions');
       const data = await res.json();
       return data.sessions || [];
     },
     enabled: !!userId,
+    staleTime: 0,
   });
 }
 
@@ -204,6 +209,8 @@ export function useSaveProductMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['product'] });
     },
   });
 }
@@ -222,6 +229,8 @@ export function useDeleteProductMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['product'] });
     },
   });
 }

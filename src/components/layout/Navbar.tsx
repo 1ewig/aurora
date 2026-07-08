@@ -66,6 +66,7 @@ export function Navbar() {
 
   const user = useAuthStore((s) => s.user);
   const profile = useAuthStore((s) => s.profile);
+  const loading = useAuthStore((s) => s.loading);
   const signOut = useAuthStore((s) => s.signOut);
 
   const { navBg, navBorder, navBlur } = useNavbarScroll();
@@ -146,7 +147,14 @@ export function Navbar() {
                 <BagIcon count={count} />
               </motion.button>
 
-              {user ? (
+              {loading ? (
+                <div
+                  style={{ cursor: "not-allowed" }}
+                  className="w-9 h-9 rounded-full border border-border-medium hover:bg-border-subtle/50 flex items-center justify-center"
+                >
+                  <div className="w-4 h-4 rounded-full border-2 border-text-primary/30 border-t-text-primary animate-spin" />
+                </div>
+              ) : user ? (
                 <div className="relative" ref={dropdownRef}>
                   <motion.button
                     onClick={() => setDropdownOpen(!dropdownOpen)}

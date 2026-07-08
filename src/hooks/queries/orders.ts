@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/useAuthStore';
 
 export interface OrderItem {
@@ -38,7 +38,7 @@ export function useOrders(page = 0, limit = 50) {
   const user = useAuthStore((s) => s.user);
 
   return useQuery<{ orders: Order[]; total: number }>({
-    queryKey: ["orders", user?.id, page],
+    queryKey: ["orders", user?.id, page, limit],
     queryFn: async () => {
       if (!user?.id) return { orders: [], total: 0 };
 
@@ -51,5 +51,6 @@ export function useOrders(page = 0, limit = 50) {
     },
     staleTime: 1000 * 60 * 2,
     enabled: !!user?.id,
+    placeholderData: keepPreviousData,
   });
 }

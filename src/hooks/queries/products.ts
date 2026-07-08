@@ -1,4 +1,5 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import type { Product } from '@/data/products';
 
 async function fetchProducts(category?: string): Promise<Product[]> {
@@ -60,45 +61,51 @@ export function usePaginatedProductsQuery(params: PaginatedProductsParams) {
   return useQuery<PaginatedProductsResponse>({
     queryKey: ['products', 'paginated', params],
     queryFn: () => fetchPaginatedProducts(params),
+    placeholderData: keepPreviousData,
   });
 }
 
 /** Returns a deterministic "featured" subset using the current day as a seed. */
 export function useFeaturedProductsQuery(count = 3) {
+  const selectFn = useCallback((products: Product[]) => {
+    if (!products || products.length === 0) return [];
+    const len = products.length;
+    const day = new Date().getDate();
+    const selected: Product[] = [];
+    for (let i = 0; i < Math.min(count, len); i++) {
+      const index = (day + i * 3) % len;
+      selected.push(products[index]);
+    }
+    return selected;
+  }, [count]);
+
   return useQuery({
-    queryKey: ['products', 'All'],
+    queryKey: ['products', 'featured', count],
     queryFn: () => fetchProducts(),
-    select: (products) => {
-      if (!products || products.length === 0) return [];
-      const len = products.length;
-      const day = new Date().getDate();
-      const selected: Product[] = [];
-      for (let i = 0; i < Math.min(count, len); i++) {
-        const index = (day + i * 3) % len;
-        selected.push(products[index]);
-      }
-      return selected;
-    },
+    select: selectFn,
   });
 }
 
 /** Returns up to 4 related products from the same category. */
-export function useRelatedProductsQuery(currentProduct: Product) {
+export function useRelatedProductsQuery(currentProduct?: Product) {
+  const selectFn = useCallback((dbProducts: Product[]) => {
+    if (!dbProducts || dbProducts.length === 0 || !currentProduct) return [];
+    const related = dbProducts.filter(
+      (p) => p.category === currentProduct.category && p.slug !== currentProduct.slug
+    );
+
+    if (related.length > 0) {
+      return related.slice(0, 4);
+    }
+
+    return dbProducts.filter((p) => p.slug !== currentProduct.slug).slice(0, 4);
+  }, [currentProduct]);
+
   return useQuery({
-    queryKey: ['products', 'All'],
+    queryKey: ['products', 'related', currentProduct?.category, currentProduct?.slug],
     queryFn: () => fetchProducts(),
-    select: (dbProducts) => {
-      if (!dbProducts || dbProducts.length === 0) return [];
-      const related = dbProducts.filter(
-        (p) => p.category === currentProduct.category && p.slug !== currentProduct.slug
-      );
-
-      if (related.length > 0) {
-        return related.slice(0, 4);
-      }
-
-      return dbProducts.filter((p) => p.slug !== currentProduct.slug).slice(0, 4);
-    },
+    enabled: !!currentProduct,
+    select: selectFn,
   });
 }
 

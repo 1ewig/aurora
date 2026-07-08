@@ -6,8 +6,7 @@
 "use client";
 
 import { notFound, useRouter } from "next/navigation";
-import { useMemo } from "react";
-import { useProductDetailsQuery, useProductsQuery } from "@/hooks/queries";
+import { useProductDetailsQuery, useRelatedProductsQuery } from "@/hooks/queries";
 import { useProductStore } from "@/stores/useProductStore";
 import { useCartStore } from "@/stores/useCartStore";
 import { Breadcrumbs } from "./Breadcrumbs";
@@ -26,7 +25,7 @@ interface ProductDetailClientProps {
 export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const router = useRouter();
   const { data: product, isLoading, error } = useProductDetailsQuery(slug);
-  const { data: allProducts = [] } = useProductsQuery();
+  const { data: relatedProducts = [] } = useRelatedProductsQuery(product);
 
   const isSizeGuideOpen = useProductStore((s) => s.isSizeGuideOpen);
   const setSizeGuideOpen = useProductStore((s) => s.setSizeGuideOpen);
@@ -36,15 +35,6 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   const setActiveTab = useProductStore((s) => s.setActiveTab);
   const addItem = useCartStore((s) => s.addItem);
   const cartItems = useCartStore((s) => s.items);
-
-  const relatedProducts = useMemo(() => {
-    if (!product || allProducts.length === 0) return [];
-    const sameCategory = allProducts.filter(
-      (p) => p.category === product.category && p.slug !== product.slug
-    );
-    if (sameCategory.length > 0) return sameCategory.slice(0, 4);
-    return allProducts.filter((p) => p.slug !== product.slug).slice(0, 4);
-  }, [allProducts, product]);
 
   if (isLoading) {
     return (
