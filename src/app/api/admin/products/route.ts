@@ -18,7 +18,7 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, Number(searchParams.get('page')) || 1);
-    const limit = Math.min(100, Math.max(1, Number(searchParams.get('limit')) || 10));
+    const limit = Math.min(100, Math.max(1, Number(searchParams.get('limit')) || 20));
     const offset = (page - 1) * limit;
     const search = searchParams.get('search') || '';
     const category = searchParams.get('category') || '';
