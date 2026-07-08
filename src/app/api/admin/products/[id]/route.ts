@@ -29,7 +29,7 @@ async function deleteUnusedImage(client: any, url: string, productId: string) {
     [url, productId]
   );
 
-  const count = parseInt(rows[0].count, 10);
+  const count = rows && rows[0] ? parseInt(rows[0].count, 10) : 0;
   if (count === 0) {
     const storageKey = getStorageKeyFromUrl(url);
     if (storageKey) {

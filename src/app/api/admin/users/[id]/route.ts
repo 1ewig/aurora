@@ -73,7 +73,7 @@ export async function PATCH(
       if (field in body) {
         if (field === 'emailVerified') {
           updates.push(`"emailVerified" = $${idx}`);
-          values.push(body[field] === true);
+          values.push(body[field] === true || body[field] === 'true');
         } else {
           updates.push(`"${field}" = $${idx}`);
           values.push(body[field]);
