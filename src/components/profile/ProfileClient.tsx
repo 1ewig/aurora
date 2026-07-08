@@ -52,6 +52,8 @@ export function ProfileClient() {
     }
   };
 
+  const hasChanges = displayName.trim() !== (profile?.displayName || "") && displayName.trim().length > 0;
+
   if (!user) return null;
 
   return (
@@ -64,6 +66,7 @@ export function ProfileClient() {
       statusType={statusType}
       updating={updating}
       handleUpdate={handleUpdate}
+      hasChanges={hasChanges}
     />
   );
 }

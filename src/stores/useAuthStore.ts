@@ -123,29 +123,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signOut: async () => {
-    set({ loading: true });
     try {
       await authClient.signOut();
     } catch {
       // proceed with local cleanup
     }
-    set({ user: null, profile: null, loading: false, error: null });
+    set({ user: null, profile: null, error: null });
   },
 
   updateProfile: async (updatedFields) => {
-    set({ loading: true });
     try {
       const currentProfile = get().profile;
       const displayName = updatedFields.displayName || currentProfile?.displayName || '';
       const res = await authClient.updateUser({ name: displayName });
       if (res.error) {
-        set({ loading: false });
         return { error: res.error };
       }
-      set({ profile: { displayName }, loading: false });
+      set({ profile: { displayName } });
       return { error: null };
     } catch (err: any) {
-      set({ loading: false, error: err.message });
+      set({ error: err.message });
       return { error: err };
     }
   },

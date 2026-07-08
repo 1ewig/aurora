@@ -225,6 +225,7 @@ export function Navbar() {
         }}
         onCancel={() => setShowSignOutDialog(false)}
         disabled={signingOut}
+        loading={signingOut}
       />
     </>
   );

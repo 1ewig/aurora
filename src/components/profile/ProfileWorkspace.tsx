@@ -16,6 +16,7 @@ interface ProfileWorkspaceProps {
   statusType: "success" | "error" | "";
   updating: boolean;
   handleUpdate: (e: React.FormEvent) => void;
+  hasChanges: boolean;
 }
 
 /** Renders the profile workspace with an animated heading and the ProfileForm. */
@@ -28,6 +29,7 @@ export function ProfileWorkspace({
   statusType,
   updating,
   handleUpdate,
+  hasChanges,
 }: ProfileWorkspaceProps) {
   return (
     <>
@@ -51,6 +53,7 @@ export function ProfileWorkspace({
         statusType={statusType}
         updating={updating}
         onSubmit={handleUpdate}
+        hasChanges={hasChanges}
       />
     </>
   );

@@ -17,6 +17,7 @@ interface ConfirmDialogProps {
   onConfirm: () => void;
   onCancel: () => void;
   disabled?: boolean;
+  loading?: boolean;
 }
 
 /** Confirmation modal with animated backdrop and scale entrance. */
@@ -29,6 +30,7 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
   disabled,
+  loading,
 }: ConfirmDialogProps) {
   return (
     <>
@@ -60,7 +62,7 @@ export function ConfirmDialog({
             <div className="flex flex-col sm:flex-row gap-3 justify-end">
               <Button
                 onClick={onCancel}
-                disabled={disabled}
+                disabled={disabled || loading}
                 variant="ghost"
                 size="sm"
                 fullWidth
@@ -69,13 +71,23 @@ export function ConfirmDialog({
               </Button>
               <Button
                 onClick={onConfirm}
-                disabled={disabled}
+                disabled={disabled || loading}
                 variant="ghost"
                 size="sm"
                 fullWidth
                 className="border-error text-error hover:bg-error hover:text-white hover:border-error"
               >
-                {confirmLabel}
+                {loading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>{confirmLabel}</span>
+                  </>
+                ) : (
+                  confirmLabel
+                )}
               </Button>
             </div>
           </div>
