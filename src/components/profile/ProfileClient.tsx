@@ -9,10 +9,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { ProfileWorkspace } from "./ProfileWorkspace";
+import { ProfileSkeleton } from "./ProfileSkeleton";
 
 /** Renders the profile page with auth guard, display name editing, and sign-out flow. */
 export function ProfileClient() {
-  const { user, profile, updateProfile, signOut } = useAuthStore();
+  const { user, loading, profile, updateProfile, signOut } = useAuthStore();
   const router = useRouter();
 
   const handleSignOut = async () => {
@@ -54,6 +55,7 @@ export function ProfileClient() {
 
   const hasChanges = displayName.trim() !== (profile?.displayName || "") && displayName.trim().length > 0;
 
+  if (loading) return <ProfileSkeleton />;
   if (!user) return null;
 
   return (
