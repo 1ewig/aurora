@@ -122,9 +122,17 @@ export function ProfileForm({
             variant="ghost"
             size="md"
             fullWidth
+            disabled={signingOut}
             className="hover:border-error hover:text-error hover:bg-transparent rounded-full flex-1"
           >
-            Sign Out
+            {signingOut ? (
+              <>
+                <Spinner />
+                <span>Signing Out...</span>
+              </>
+            ) : (
+              "Sign Out"
+            )}
           </Button>
         </div>
       </form>
