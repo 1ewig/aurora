@@ -10,7 +10,7 @@ import { ScrollToTop } from "@/components/ui/ScrollToTop";
 
 export default function ProductsLoading() {
   return (
-    <main className="pt-28 pb-32">
+    <main className="pt-32 md:pt-36 pb-32">
       <ScrollToTop />
       <div className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto animate-pulse">
         {/* Header Skeleton */}
