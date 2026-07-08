@@ -25,7 +25,7 @@ export function InventoryClient() {
 
   const { data, isLoading, isFetching, error, refetch } = useAdminProductsQuery({
     page,
-    limit: 20,
+    limit: 10,
     search: urlSearch,
     category: category === 'All' ? undefined : category,
   });

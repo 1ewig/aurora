@@ -11,7 +11,7 @@ import {
 export function useOrdersManagement(page: number, search: string, filterStatus: string) {
   const { data, isLoading, isFetching, error, refetch } = useAdminOrdersQuery({
     page,
-    limit: 20,
+    limit: 10,
     search,
     status: filterStatus === 'all' ? undefined : filterStatus,
   });
