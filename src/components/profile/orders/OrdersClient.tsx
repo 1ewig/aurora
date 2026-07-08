@@ -31,13 +31,11 @@ export function OrdersClient() {
 
   const handleLoadMore = () => setPage((p) => p + 1);
 
-  if (isLoading && allOrders.length === 0) {
-    return <OrderListSkeleton />;
-  }
-
   let mainContent;
 
-  if (error && allOrders.length === 0) {
+  if (isLoading && allOrders.length === 0) {
+    mainContent = <OrderListSkeleton />;
+  } else if (error && allOrders.length === 0) {
     mainContent = (
       <div className="flex flex-col items-center justify-center min-h-[40vh] text-center bg-bg-secondary border border-border-subtle p-8 rounded-[24px] shadow-sm">
         <p className="text-error text-sm font-medium mb-4">
