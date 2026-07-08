@@ -11,6 +11,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { VerifyForm } from "./VerifyForm";
+import { AuthSkeleton } from "./AuthSkeleton";
 
 const COOLDOWN_KEY = "aurora_verify_cooldown";
 const COOLDOWN_DURATION = 60;
@@ -102,7 +103,7 @@ function VerifyContent() {
 /** Wraps VerifyContent in a Suspense boundary for useSearchParams support. */
 export function VerifyClient() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-bg-primary flex items-center justify-center"><div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin"></div></div>}>
+    <Suspense fallback={<AuthSkeleton />}>
       <VerifyContent />
     </Suspense>
   );

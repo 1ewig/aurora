@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { LoginForm } from "./LoginForm";
+import { AuthSkeleton } from "./AuthSkeleton";
 
 /** Client-side login orchestrator with form state, validation, and auth-store integration. */
 export function LoginClient() {
@@ -50,6 +51,8 @@ export function LoginClient() {
       router.push("/profile");
     }
   }, [user, loading, router]);
+
+  if (loading) return <AuthSkeleton />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

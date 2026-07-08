@@ -11,6 +11,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { ResetPasswordForm } from "./ResetPasswordForm";
+import { AuthSkeleton } from "./AuthSkeleton";
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -87,7 +88,7 @@ function ResetPasswordContent() {
 /** Wraps ResetPasswordContent in a Suspense boundary for useSearchParams support. */
 export function ResetPasswordClient() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-bg-primary flex items-center justify-center"><div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin"></div></div>}>
+    <Suspense fallback={<AuthSkeleton />}>
       <ResetPasswordContent />
     </Suspense>
   );

@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { RegisterForm } from "./RegisterForm";
+import { AuthSkeleton } from "./AuthSkeleton";
 
 /** Client-side registration orchestrator with form state, validation, and auth-store integration. */
 export function RegisterClient() {
@@ -40,6 +41,8 @@ export function RegisterClient() {
       router.push("/profile");
     }
   }, [user, loading, router]);
+
+  if (loading) return <AuthSkeleton />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
