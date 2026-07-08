@@ -147,7 +147,7 @@ export function Navbar() {
                 <BagIcon count={count} />
               </motion.button>
 
-              {loading ? (
+              {loading || signingOut ? (
                 <div
                   style={{ cursor: "not-allowed" }}
                   className="w-9 h-9 rounded-full border border-border-medium hover:bg-border-subtle/50 flex items-center justify-center"
