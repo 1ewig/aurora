@@ -1,41 +1,28 @@
 /**
  * Aurora — src/app/(user)/layout.tsx
  *
- * Auth-gated layout that redirects unauthenticated users to the login page.
+ * Thin server component layout for user account pages.
+ * Auth gating is delegated to the client wrapper.
  */
 
-"use client";
+import type { Metadata } from "next";
+import { UserLayoutClient } from "./UserLayoutClient";
 
-import { useAuthStore } from "@/stores/useAuthStore";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+/** Metadata for user routes. Prevent search indexing. */
+export const metadata: Metadata = {
+  title: "My Account — Aurora",
+  description: "Manage your Aurora profile and orders.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
-/** Auth-gated layout that redirects unauthenticated users to login. */
+/** Auth-gated layout that delegates to the client wrapper. */
 export default function UserLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useAuthStore();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push("/login");
-    }
-  }, [user, loading, router]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
-
-  return <>{children}</>;
+  return <UserLayoutClient>{children}</UserLayoutClient>;
 }
