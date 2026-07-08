@@ -59,7 +59,7 @@ export function ConfirmDialog({
               {description}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-end">
+            <div className="flex flex-col gap-3 justify-end">
               <Button
                 onClick={onCancel}
                 disabled={disabled || loading}
