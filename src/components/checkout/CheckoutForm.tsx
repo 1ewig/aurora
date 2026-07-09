@@ -168,7 +168,7 @@ export function CheckoutForm({
       </div>
 
       {error && (
-        <div className="text-error text-xs font-medium px-1">{error}</div>
+        <div className="text-error text-xs font-medium px-1 whitespace-pre-line">{error}</div>
       )}
 
       {/* Checkout Submit CTA */}

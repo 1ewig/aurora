@@ -121,10 +121,12 @@ export async function POST(req: NextRequest) {
 
     try {
       await withTransaction(async (client) => {
+        const errors: string[] = [];
         for (const item of sortedCartItems) {
           const dbProd = productMap.get(item.internalProductId);
           if (!dbProd) {
-            throw new Error(`Product not found: ${item.internalProductId}`);
+            errors.push(`Product not found: ${item.internalProductId}`);
+            continue;
           }
 
           const sizeRes = await client.query(
@@ -133,7 +135,8 @@ export async function POST(req: NextRequest) {
           );
           const sizeInfo = sizeRes.rows[0];
           if (!sizeInfo) {
-            throw new Error(`Size "${item.size}" not found for product "${dbProd.name}".`);
+            errors.push(`Size "${item.size}" not found for product "${dbProd.name}".`);
+            continue;
           }
 
           const activeResQuery = await client.query(
@@ -146,9 +149,16 @@ export async function POST(req: NextRequest) {
           const availableStock = sizeInfo.stock - reservedCount;
 
           if (availableStock < item.quantity) {
-            throw new Error(
-              `Insufficient stock for "${dbProd.name}" (Size: ${item.size}). Only ${availableStock} available.`
-            );
+            if (availableStock > 0) {
+              errors.push(
+                `Insufficient stock for "${dbProd.name}" (Size: ${item.size}). Please reduce your quantity and try again.`
+              );
+            } else {
+              errors.push(
+                `Insufficient stock for "${dbProd.name}" (Size: ${item.size}).`
+              );
+            }
+            continue;
           }
 
           await client.query(
@@ -159,6 +169,10 @@ export async function POST(req: NextRequest) {
 
           subtotal += dbProd.price * item.quantity;
           itemsDescriptionParts.push(`${item.quantity}x ${dbProd.name} (${item.size})`);
+        }
+
+        if (errors.length > 0) {
+          throw new Error(errors.join("\n"));
         }
       });
     } catch (err: any) {

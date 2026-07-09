@@ -138,7 +138,7 @@ describe("Stock locking and reservation", () => {
 
   // ── Insufficient stock ─────────────────────────────────────────────────
 
-  it("rejects checkout when available stock minus reservations is insufficient", async () => {
+  it("rejects checkout with a message to reduce quantity when available stock is non-zero but insufficient", async () => {
     mockQuery.mockResolvedValue({
       rows: [{ id: "prod-1", price: 100, name: "Test Product" }],
     });
@@ -159,6 +159,36 @@ describe("Stock locking and reservation", () => {
     expect(res.status).toBe(400);
     const json = await res.json();
     expect(json.error).toContain("Insufficient stock");
+    expect(json.error).toContain("Please reduce your quantity and try again");
+
+    // Verify ROLLBACK was called
+    const rollbackCall = mockClientQuery.mock.calls.find(
+      (call) => typeof call[0] === "string" && call[0] === "ROLLBACK"
+    );
+    expect(rollbackCall).toBeDefined();
+  });
+
+  it("rejects checkout with a regular insufficient stock message when available stock is 0", async () => {
+    mockQuery.mockResolvedValue({
+      rows: [{ id: "prod-1", price: 100, name: "Test Product" }],
+    });
+
+    mockClientQuery
+      .mockResolvedValueOnce(undefined) // BEGIN
+      .mockResolvedValueOnce({ rows: [{ id: "size-1", stock: 5 }] }) // SELECT product_sizes → 5 in stock
+      .mockResolvedValueOnce({ rows: [{ reserved: "5" }] }); // 5 already reserved → 0 available
+
+    const res = await POST(
+      makeRequest({
+        cartItems: [{ internalProductId: "prod-1", quantity: 1, size: "M" }],
+        shippingAddress: validAddress,
+      })
+    );
+
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toContain("Insufficient stock");
+    expect(json.error).not.toContain("Please reduce your quantity");
 
     // Verify ROLLBACK was called
     const rollbackCall = mockClientQuery.mock.calls.find(
@@ -219,5 +249,46 @@ describe("Stock locking and reservation", () => {
     expect(res.status).toBe(400);
     // Verify client.release() was called in finally block
     expect(mockClientRelease).toHaveBeenCalled();
+  });
+
+  it("accumulates errors for multiple items that fail stock checks", async () => {
+    mockQuery.mockResolvedValue({
+      rows: [
+        { id: "prod-1", price: 100, name: "Product One" },
+        { id: "prod-2", price: 150, name: "Product Two" },
+      ],
+    });
+
+    mockClientQuery
+      .mockResolvedValueOnce(undefined) // BEGIN
+      // First product checks:
+      .mockResolvedValueOnce({ rows: [{ id: "size-1", stock: 5 }] }) // SELECT product_sizes for prod-1
+      .mockResolvedValueOnce({ rows: [{ reserved: "4" }] }) // reservations for prod-1 -> 1 available
+      // Second product checks:
+      .mockResolvedValueOnce({ rows: [{ id: "size-2", stock: 10 }] }) // SELECT product_sizes for prod-2
+      .mockResolvedValueOnce({ rows: [{ reserved: "10" }] }); // reservations for prod-2 -> 0 available
+
+    const res = await POST(
+      makeRequest({
+        cartItems: [
+          { internalProductId: "prod-1", quantity: 3, size: "M" },
+          { internalProductId: "prod-2", quantity: 2, size: "L" },
+        ],
+        shippingAddress: validAddress,
+      })
+    );
+
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    
+    expect(json.error).toContain("Insufficient stock for \"Product One\" (Size: M). Please reduce your quantity and try again.");
+    expect(json.error).toContain("Insufficient stock for \"Product Two\" (Size: L).");
+    expect(json.error.split("\n")).toHaveLength(2);
+
+    // Verify ROLLBACK was called
+    const rollbackCall = mockClientQuery.mock.calls.find(
+      (call) => typeof call[0] === "string" && call[0] === "ROLLBACK"
+    );
+    expect(rollbackCall).toBeDefined();
   });
 });
