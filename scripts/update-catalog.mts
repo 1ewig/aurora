@@ -4,7 +4,8 @@
  *
  * All-rounder catalog management script.
  * Can sync full catalog, add new products, or delete products interactively.
- * Auto-synchronizes local src/data/products.ts and updates the InsForge database/storage.
+ * Auto-synchronizes local src/data/*.ts and updates the InsForge database/storage
+ * across all five buckets (product-media, lookbook-media, editorial-media, hero-media, category-media).
  *
  * Usage:
  *   npx tsx scripts/update-catalog.mts
@@ -192,9 +193,9 @@ function buildStorageUrl(bucketName: string, bucketKey: string): string {
   return `${ossHost}/api/storage/buckets/${bucketName}/objects/${encodedKey}`;
 }
 
-function getStorageKeyFromUrl(url: string): string | null {
+function getStorageKeyFromUrl(url: string, bucketName: string = 'product-media'): string | null {
   if (!url) return null;
-  const prefix = '/api/storage/buckets/product-media/objects/';
+  const prefix = `/api/storage/buckets/${bucketName}/objects/`;
   const index = url.indexOf(prefix);
   if (index !== -1) {
     const encodedKey = url.substring(index + prefix.length).split('?')[0];
@@ -208,6 +209,25 @@ function getStorageKeyFromUrl(url: string): string | null {
     return url.replace(/^\/images\//, '');
   }
   return null;
+}
+
+async function ensureBucketsExist(admin: ReturnType<typeof createAdminClient>): Promise<void> {
+  const bucketsList = execSync(`npx @insforge/cli storage buckets`, { encoding: 'utf-8' });
+
+  for (const bucketName of Object.values(BUCKETS)) {
+    if (bucketsList.includes(bucketName)) {
+      console.log(`  Bucket "${bucketName}" exists.`);
+    } else {
+      console.log(`  Bucket "${bucketName}" not found. Creating...`);
+      try {
+        const createOut = execSync(`npx @insforge/cli storage create-bucket ${bucketName}`, { encoding: 'utf-8' });
+        console.log(`  ${createOut.trim()}`);
+      } catch (err: any) {
+        console.error(`  Failed to create bucket "${bucketName}":`, err.message || err);
+        process.exit(1);
+      }
+    }
+  }
 }
 
 // ════════════════════════════════════════════════════════
@@ -271,7 +291,9 @@ async function uploadCatalogImages(
   admin: ReturnType<typeof createAdminClient>,
   productsList: Product[],
   lookbookList: typeof lookbookSlides = [],
-  editorialList: typeof editorialItems = []
+  editorialList: typeof editorialItems = [],
+  heroList: typeof heroSlides = [],
+  categoryList: typeof categoryDataList = [],
 ) {
   const existingKeys = await getExistingKeys(admin);
   const urlMap = new Map<string, string>();
@@ -292,10 +314,10 @@ async function uploadCatalogImages(
   for (const e of editorialList) {
     if (e.originalImage) imagePaths.add(e.originalImage);
   }
-  for (const cat of categoryDataList) {
+  for (const cat of categoryList) {
     if (cat.image) imagePaths.add(cat.image);
   }
-  for (const slide of heroSlides) {
+  for (const slide of heroList) {
     if (slide.originalImage) imagePaths.add(slide.originalImage);
   }
 
@@ -432,9 +454,12 @@ async function addProductInteractively() {
     return;
   }
 
-  console.log("\nInitializing InsForge client and uploading images...");
+  console.log("\nInitializing InsForge client and verifying storage buckets...");
   const admin = createAdminClient({ baseUrl: ossHost, apiKey });
-  const urlMap = await uploadCatalogImages(admin, newProducts);
+  await ensureBucketsExist(admin);
+
+  console.log("Uploading images...");
+  const urlMap = await uploadCatalogImages(admin, newProducts, [], [], [], []);
 
   console.log("Inserting products into the database...");
   for (const product of newProducts) {
@@ -515,10 +540,11 @@ async function deleteProductInteractively() {
     );
     const count = parseInt(usageRows[0].count, 10);
     if (count === 0) {
-      const storageKey = getStorageKeyFromUrl(url);
+      const bucketName = Object.values(BUCKETS).find((b) => url.includes(`/api/storage/buckets/${b}/`)) || BUCKET;
+      const storageKey = getStorageKeyFromUrl(url, bucketName);
       if (storageKey) {
-        console.log(`  Deleting unused storage key: "${storageKey}"...`);
-        const { error } = await admin.storage.from(BUCKET).remove(storageKey);
+        console.log(`  Deleting unused storage key: "${storageKey}" from "${bucketName}"...`);
+        const { error } = await admin.storage.from(bucketName).remove(storageKey);
         if (error) {
           console.warn(`  Warning: failed to delete "${storageKey}" from storage:`, error.message);
         } else {
@@ -540,6 +566,10 @@ async function runSyncCatalog() {
   console.log("\n=== Operation: Full Catalog Sync ===");
   const admin = createAdminClient({ baseUrl: ossHost, apiKey });
 
+  // Verify all storage buckets exist before proceeding
+  console.log("\n=== Phase 1: Verifying storage buckets ===");
+  await ensureBucketsExist(admin);
+
   // Gather unique products
   const productMap = new Map<string, Product>();
   function addProducts(products: Product[]) {
@@ -559,13 +589,14 @@ async function runSyncCatalog() {
   addProducts(allProducts);
   const uniqueProducts = Array.from(productMap.values());
 
-  const urlMap = await uploadCatalogImages(admin, uniqueProducts, lookbookSlides, editorialItems);
+  console.log("\n=== Phase 2: Uploading and syncing media assets ===");
+  const urlMap = await uploadCatalogImages(admin, uniqueProducts, lookbookSlides, editorialItems, heroSlides, categoryDataList);
 
-  console.log("\n=== Phase 2: Connecting to database ===");
+  console.log("\n=== Phase 3: Connecting to database ===");
   const client = new Client({ connectionString: DATABASE_URL });
   await client.connect();
 
-  console.log("\n=== Phase 3: Syncing categories ===");
+  console.log("\n=== Phase 4: Syncing categories ===");
   for (const cat of categoryDataList) {
     const imageUrl = urlMap.get(cat.image) || cat.image;
     console.log(`Syncing category: "${cat.name}"`);
@@ -586,12 +617,12 @@ async function runSyncCatalog() {
     }
   }
 
-  console.log("\n=== Phase 4: Syncing products and details ===");
+  console.log("\n=== Phase 5: Syncing products and details ===");
   for (const product of uniqueProducts) {
     await syncProductToDb(client, product, urlMap);
   }
 
-  console.log("\n=== Phase 5: Syncing lookbook slides ===");
+  console.log("\n=== Phase 6: Syncing lookbook slides ===");
   for (const slide of lookbookSlides) {
     const imageUrl = urlMap.get(slide.originalImage) || slide.originalImage;
     console.log(`Syncing lookbook slide: ${slide.slideNumber}`);
@@ -614,7 +645,7 @@ async function runSyncCatalog() {
     }
   }
 
-  console.log("\n=== Phase 6: Syncing editorial content ===");
+  console.log("\n=== Phase 7: Syncing editorial content ===");
   for (const item of editorialItems) {
     const imageUrl = urlMap.get(item.originalImage) || item.originalImage;
     console.log(`Syncing editorial item: "${item.id}"`);
@@ -637,7 +668,7 @@ async function runSyncCatalog() {
     }
   }
 
-  console.log("\n=== Phase 7: Syncing hero slides ===");
+  console.log("\n=== Phase 8: Syncing hero slides ===");
   for (const slide of heroSlides) {
     const imageUrl = urlMap.get(slide.originalImage) || slide.originalImage;
     console.log(`Syncing hero slide: ${slide.slideNumber}`);
