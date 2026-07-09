@@ -3,10 +3,10 @@
  * ===================
  *
  * First-time setup / Wiping & Seeding script:
- * - Verifies and wipes/recreates the three storage buckets (product-media, lookbook-media, editorial-media)
- * - Drops and rebuilds all database tables (products, product_images, product_sizes, product_details, orders, lookbook_slides, editorial_content)
+ * - Verifies and wipes/recreates the five storage buckets (product-media, lookbook-media, editorial-media, hero-media, category-media)
+ * - Drops and rebuilds all database tables (products, product_images, product_sizes, product_details, product_keywords, orders, processed_webhooks, product_reservations, lookbook_slides, editorial_content, hero_slides, categories)
  * - Recursively scans and uploads all local assets to storage
- * - Seeds all catalog, lookbook slides, and editorial content into the database
+ * - Seeds all catalog, lookbook slides, editorial content, hero slides, and categories into the database
  *
  * Usage:
  *   npx tsx scripts/upload-and-seed.mts
@@ -225,7 +225,7 @@ async function seed() {
   console.log("Initializing InsForge admin client...");
   const admin = createAdminClient({ baseUrl: ossHost, apiKey });
 
-  // Verify and prepare all three storage buckets
+  // Verify and prepare all five storage buckets
   const bucketsList = execSync(`npx @insforge/cli storage buckets`, { encoding: 'utf-8' });
   const existingKeys: Record<string, Set<string>> = {};
 
