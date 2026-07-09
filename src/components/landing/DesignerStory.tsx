@@ -9,7 +9,6 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { Button } from "@/components/ui/Button";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { staggerContainer, fadeInUp } from "@/animations/variants";
 import { getStorageUrl } from "@/utils/insforge";
@@ -83,17 +82,11 @@ export function DesignerStory() {
             Founder & Creative Director, Aurora
           </p>
         </motion.div>
-
-        <motion.div variants={fadeInUp} className="mt-8">
-          <Link href="/story">
-            <Button variant="ghost">Read The Full Story →</Button>
-          </Link>
-        </motion.div>
       </motion.div>
 
       {/* Image Column */}
-      <div className="relative overflow-hidden aspect-square lg:aspect-auto lg:h-auto lg:order-last">
-        <div className="absolute inset-0 w-full h-full">
+      <div className="relative overflow-hidden aspect-square lg:aspect-auto lg:h-auto lg:order-last min-h-[400px] lg:min-h-0">
+        <div className="absolute inset-0 w-full h-full overflow-hidden">
           <OptimizedImage
             src={getStorageUrl("/images/editorial/designer.webp")}
             alt="Aurora's creative director photographed in her design studio, examining fabric swatches"
@@ -111,6 +104,14 @@ export function DesignerStory() {
             mixBlendMode: "multiply",
           }}
         />
+        {/* Read The Full Story button overlay on bottom right */}
+        <div className="absolute bottom-8 right-8 z-20">
+          <Link href="/story">
+            <button className="px-5 py-2 rounded-full border border-white/50 text-white text-sm font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors cursor-pointer">
+              Read The Full Story →
+            </button>
+          </Link>
+        </div>
       </div>
     </section>
   );
