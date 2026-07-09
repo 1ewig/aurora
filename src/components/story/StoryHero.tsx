@@ -13,7 +13,7 @@ import { fadeInUp, staggerContainer } from "@/animations/variants";
 /** Story page hero section introducing the brand narrative with a title and pull quote. */
 export function StoryHero() {
   return (
-    <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto pt-24 pb-12 md:pt-40 md:pb-20 text-center space-y-6">
+    <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto pt-36 pb-12 md:pt-40 md:pb-20 text-center space-y-6">
       <motion.div
         variants={staggerContainer}
         initial="hidden"
