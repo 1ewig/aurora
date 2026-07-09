@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS product_reservations (
 );
 
 CREATE INDEX IF NOT EXISTS idx_product_reservations_lookup ON product_reservations (product_id, size, expires_at);
+CREATE INDEX IF NOT EXISTS idx_product_reservations_reservation_id ON product_reservations (reservation_id);
 
 -- Lookbook slides table
 CREATE TABLE IF NOT EXISTS public.lookbook_slides (
