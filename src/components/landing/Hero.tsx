@@ -13,14 +13,14 @@ import { CascadeCards } from "./ui/CascadeCards";
 import { Button } from "@/components/ui/Button";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { AnimatedText } from "@/components/ui/AnimatedText";
-import type { Product } from "@/data/products";
+import type { HeroSlide } from "@/data/hero";
 
 interface HeroProps {
-  heroProducts: Product[];
+  heroSlides: HeroSlide[];
 }
 
 /** Landing page hero with animated headline, cascade cards, and call-to-action buttons. */
-export function Hero({ heroProducts }: HeroProps) {
+export function Hero({ heroSlides }: HeroProps) {
 
   return (
     <section
@@ -84,7 +84,7 @@ export function Hero({ heroProducts }: HeroProps) {
 
         {/* Cascade Cards — positioned relative to create space */}
         <div className="relative w-full mt-12 md:mt-14">
-          <CascadeCards products={heroProducts} />
+          <CascadeCards slides={heroSlides} />
         </div>
 
         {/* Subheadline */}

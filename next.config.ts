@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   allowedDevOrigins: ['harmonics-paternity-blighted.ngrok-free.dev'],
   images: {
-    qualities: [100],
+    qualities: [100, 85],
     remotePatterns: [
       {
         protocol: 'https',

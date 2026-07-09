@@ -11,10 +11,13 @@ import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { staggerContainer, fadeInUp } from "@/animations/variants";
-import { getStorageUrl } from "@/utils/insforge";
+
+interface DesignerStoryProps {
+  imageUrl?: string;
+}
 
 /** Designer story section showcasing the founder and brand philosophy with parallax scrolling imagery. */
-export function DesignerStory() {
+export function DesignerStory({ imageUrl }: DesignerStoryProps) {
   return (
     <section
       id="story"
@@ -87,13 +90,15 @@ export function DesignerStory() {
       {/* Image Column */}
       <div className="relative overflow-hidden aspect-square lg:aspect-auto lg:h-auto lg:order-last min-h-[400px] lg:min-h-0">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <OptimizedImage
-            src={getStorageUrl("/images/editorial/designer.webp")}
-            alt="Aurora's creative director photographed in her design studio, examining fabric swatches"
-            className="w-full h-full object-cover object-top"
-            loading="eager"
-            sizes="(max-width: 1023px) 100vw, 50vw"
-          />
+          {imageUrl && (
+            <OptimizedImage
+              src={imageUrl}
+              alt="Aurora's creative director photographed in her design studio, examining fabric swatches"
+              className="w-full h-full object-cover object-top"
+              loading="lazy"
+              sizes="(max-width: 1023px) 100vw, 50vw"
+            />
+          )}
         </div>
         {/* Warm color overlay */}
         <div

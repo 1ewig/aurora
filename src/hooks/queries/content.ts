@@ -23,6 +23,23 @@ export function useLookbookQuery() {
   });
 }
 
+async function fetchHeroSlides(): Promise<any[]> {
+  const response = await fetch('/api/hero');
+  if (!response.ok) {
+    throw new Error('Failed to fetch hero slides');
+  }
+  return response.json();
+}
+
+/** Fetches hero slides for the landing page cascade cards. */
+export function useHeroQuery() {
+  return useQuery({
+    queryKey: ['hero'],
+    queryFn: fetchHeroSlides,
+    staleTime: 1000 * 60 * 30,
+  });
+}
+
 async function fetchEditorialContent(): Promise<any[]> {
   const response = await fetch('/api/editorial');
   if (!response.ok) {

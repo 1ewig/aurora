@@ -6,7 +6,7 @@
  */
 "use client";
 
-import { useProductsQuery, useDailyCategoriesQuery, useLookbookQuery } from "@/hooks/queries";
+import { useHeroQuery, useEditorialQuery, useDailyCategoriesQuery, useLookbookQuery } from "@/hooks/queries";
 import { useNewsletterSubmit } from "@/hooks/useNewsletterSubmit";
 import { Hero } from "./Hero";
 import { MarqueeBar } from "./MarqueeBar";
@@ -17,31 +17,24 @@ import { Testimonials } from "./Testimonials";
 import { Newsletter } from "./Newsletter";
 import { Craftsmanship } from "./Craftsmanship";
 
-const heroSlugs = [
-  "ivory-wool-overcoat",
-  "camel-cashmere-turtleneck",
-  "ecru-linen-blazer",
-  "charcoal-wide-leg-trousers",
-  "champagne-silk-slip-dress",
-];
-
 export default function LandingClient() {
-  const { data: products = [] } = useProductsQuery();
+  const { data: heroSlides = [] } = useHeroQuery();
   const { data: dailyCategories = [] } = useDailyCategoriesQuery();
   const { data: dbSlides = [] } = useLookbookQuery();
+  const { data: editorialItems = [] } = useEditorialQuery();
   const newsletter = useNewsletterSubmit();
 
-  const heroProducts = products.filter((p) => heroSlugs.includes(p.slug));
   const slides = dbSlides.slice(0, 5);
+  const designerImage = editorialItems.find((item) => item.id === "designer")?.imageUrl;
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <Hero heroProducts={heroProducts} />
+      <Hero heroSlides={heroSlides} />
       <MarqueeBar />
       <FeaturedCollection categories={dailyCategories} />
       <Craftsmanship />
       {slides.length > 0 && <LookbookSlider slides={slides} />}
-      <DesignerStory />
+      <DesignerStory imageUrl={designerImage} />
       <Testimonials />
       <Newsletter {...newsletter} />
     </main>

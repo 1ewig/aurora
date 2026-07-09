@@ -10,7 +10,6 @@ import { motion } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { OptimizedImage } from "@/components/ui/OptimizedImage";
 import { fadeInUp, staggerContainer } from "@/animations/variants";
-import { getStorageUrl } from "@/utils/insforge";
 import type { EditorialItem } from "@/data/editorial";
 
 interface AtelierSectionProps {
@@ -20,13 +19,12 @@ interface AtelierSectionProps {
 
 /** Atelier section detailing the brand's partnerships with historic family-owned mills. */
 export function AtelierSection({ loomContent, foldingContent }: AtelierSectionProps) {
-  const loomImg = loomContent?.imageUrl || getStorageUrl("/images/editorial/loom.webp");
-  const loomAlt = loomContent?.altText || "Wool loom detail";
-  const loomTitle = loomContent?.title || "The Historic Mills";
-  const loomDesc = loomContent?.description || "A garment is only as good as the fibers it's made from. We work exclusively with generational family-owned mills in Biella, Italy for our virgin wool blends, and heritage spinning ateliers in Scotland for Mongolian cashmere.";
-
-  const foldingImg = foldingContent?.imageUrl || getStorageUrl("/images/editorial/folding.webp");
-  const foldingAlt = foldingContent?.altText || "Cashmere folding";
+  const loomImg = loomContent?.imageUrl;
+  const loomAlt = loomContent?.altText;
+  const loomTitle = loomContent?.title;
+  const loomDesc = loomContent?.description;
+  const foldingImg = foldingContent?.imageUrl;
+  const foldingAlt = foldingContent?.altText;
 
   return (
     <section className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto py-16">
@@ -59,20 +57,24 @@ export function AtelierSection({ loomContent, foldingContent }: AtelierSectionPr
           className="lg:col-span-7 grid grid-cols-2 gap-4 md:gap-6 w-full"
         >
           <div className="relative aspect-[3/4] bg-border-subtle rounded-xl overflow-hidden">
-            <OptimizedImage
-              src={loomImg}
-              alt={loomAlt}
-              className="w-full h-full object-cover"
-              sizes="(max-width: 1024px) 50vw, 30vw"
-            />
+            {loomImg && (
+              <OptimizedImage
+                src={loomImg}
+                alt={loomAlt ?? ""}
+                className="w-full h-full object-cover"
+                sizes="(max-width: 1024px) 50vw, 30vw"
+              />
+            )}
           </div>
           <div className="relative aspect-[3/4] bg-border-subtle rounded-xl overflow-hidden mt-8">
-            <OptimizedImage
-              src={foldingImg}
-              alt={foldingAlt}
-              className="w-full h-full object-cover"
-              sizes="(max-width: 1024px) 50vw, 30vw"
-            />
+            {foldingImg && (
+              <OptimizedImage
+                src={foldingImg}
+                alt={foldingAlt ?? ""}
+                className="w-full h-full object-cover"
+                sizes="(max-width: 1024px) 50vw, 30vw"
+              />
+            )}
           </div>
         </motion.div>
       </div>

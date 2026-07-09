@@ -9,10 +9,10 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { cardCascade, getCardRotation } from "@/animations/variants";
-import type { Product } from "@/data/products";
+import type { HeroSlide } from "@/data/hero";
 
 interface CascadeCardsProps {
-  products: Product[];
+  slides: HeroSlide[];
 }
 
 const desktopPositions = [
@@ -29,19 +29,20 @@ const mobilePositions = [
   { left: "45%", top: "0px",   zIndex: 20 },
 ];
 
-/** Cascading product card fan showing products with staggered entry and hover animations. */
-export function CascadeCards({ products }: CascadeCardsProps) {
+/** Cascading card fan using hero slides with staggered entry and hover animations. */
+export function CascadeCards({ slides }: CascadeCardsProps) {
   return (
     <>
       {/* Desktop: Full fan layout */}
       <div className="relative w-full max-w-[700px] mx-auto h-[360px] md:h-[440px] hidden md:block">
-        {products.slice(0, 5).map((product, index) => {
+        {slides.slice(0, 5).map((slide, index) => {
           const pos = desktopPositions[index];
           const rotation = getCardRotation(index);
+          const isPriority = index >= 1 && index <= 3;
 
           return (
             <motion.div
-              key={product.id}
+              key={slide.id}
               variants={cardCascade(index)}
               initial="hidden"
               animate="visible"
@@ -64,10 +65,11 @@ export function CascadeCards({ products }: CascadeCardsProps) {
               }}
             >
               <Image
-                src={product.image}
-                alt={product.altText}
+                src={slide.imageUrl}
+                alt={slide.altText}
                 fill
-                quality={100}
+                priority={isPriority}
+                quality={85}
                 sizes="(min-width: 768px) 18vw, 140px"
                 className="object-cover object-top"
               />
@@ -84,14 +86,14 @@ export function CascadeCards({ products }: CascadeCardsProps) {
 
       {/* Mobile: 3-card simplified stack */}
       <div className="relative w-full max-w-[340px] mx-auto h-[260px] md:hidden">
-        {products.slice(0, 3).map((product, index) => {
+        {slides.slice(0, 3).map((slide, index) => {
           const pos = mobilePositions[index];
           const rotations = [-8, -2, 6];
           const rotation = rotations[index];
 
           return (
             <motion.div
-              key={product.id}
+              key={slide.id}
               initial={{ opacity: 0, y: 50, rotate: rotation - 4 }}
               animate={{ opacity: 1, y: 0, rotate: rotation }}
               transition={{
@@ -110,10 +112,10 @@ export function CascadeCards({ products }: CascadeCardsProps) {
               }}
             >
               <Image
-                src={product.image}
-                alt={product.altText}
+                src={slide.imageUrl}
+                alt={slide.altText}
                 fill
-                quality={100}
+                quality={85}
                 sizes="(min-width: 768px) 18vw, 140px"
                 className="object-cover object-top"
               />

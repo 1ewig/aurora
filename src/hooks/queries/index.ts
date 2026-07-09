@@ -12,6 +12,7 @@ export type {
 
 export {
   useLookbookQuery,
+  useHeroQuery,
   useEditorialQuery,
   useCategoriesQuery,
   useDailyCategoriesQuery,
