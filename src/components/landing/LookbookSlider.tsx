@@ -100,13 +100,8 @@ export function LookbookSlider({ slides }: LookbookSliderProps) {
                 {/* Gradient scrim */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
-                {/* Caption */}
-                <figcaption className="absolute bottom-4 right-4 text-white/70 text-xs tracking-[0.15em] uppercase font-mono">
-                  {slide.title ?? `Look 0${i + 1}`} / {i + 1} of {slides.length}
-                </figcaption>
-
-                {/* Watch/shop button overlay */}
-                <div className="absolute bottom-12 right-4">
+                {/* Caption + button group (bottom-right) */}
+                <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2">
                   {slide.link ? (
                     <Link href={slide.link} className="inline-block">
                       <button className="px-5 py-2 rounded-full border border-white/50 text-white text-sm font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors cursor-pointer">
@@ -118,6 +113,9 @@ export function LookbookSlider({ slides }: LookbookSliderProps) {
                       Watch
                     </button>
                   )}
+                  <figcaption className="text-white/70 text-xs tracking-[0.15em] uppercase font-mono">
+                    {slide.title ?? `Look 0${i + 1}`} / {i + 1} of {slides.length}
+                  </figcaption>
                 </div>
               </figure>
             ))}
