@@ -81,7 +81,7 @@ export function LookbookSlider({ slides }: LookbookSliderProps) {
         Lookbook — Aurora SS 2026
       </h2>
 
-      <div className="relative aspect-[4/5] md:aspect-[16/9]">
+      <div className="relative aspect-square md:aspect-[16/9]">
         {/* Embla viewport */}
         <div ref={emblaRef} className="overflow-hidden h-full">
           <div className="flex h-full">
@@ -101,12 +101,12 @@ export function LookbookSlider({ slides }: LookbookSliderProps) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
 
                 {/* Caption */}
-                <figcaption className="absolute bottom-8 right-8 text-white/70 text-xs tracking-[0.15em] uppercase font-mono">
+                <figcaption className="absolute bottom-4 right-4 text-white/70 text-xs tracking-[0.15em] uppercase font-mono">
                   {slide.title ?? `Look 0${i + 1}`} / {i + 1} of {slides.length}
                 </figcaption>
 
                 {/* Watch/shop button overlay */}
-                <div className="absolute bottom-16 right-8">
+                <div className="absolute bottom-12 right-4">
                   {slide.link ? (
                     <Link href={slide.link} className="inline-block">
                       <button className="px-5 py-2 rounded-full border border-white/50 text-white text-sm font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors cursor-pointer">
@@ -130,7 +130,7 @@ export function LookbookSlider({ slides }: LookbookSliderProps) {
       <div
         role="tablist"
         aria-label="Lookbook slides"
-        className="flex justify-center gap-2 py-5"
+        className="flex justify-center gap-2 py-2"
       >
         {slides.map((_, i) => (
           <button
