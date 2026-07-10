@@ -28,7 +28,7 @@ export default function LandingClient() {
   const { data: editorialItems = [] } = useEditorialQuery();
   const newsletter = useNewsletterSubmit();
 
-  const slides = dbSlides.slice(0, 5);
+  const slides = dbSlides.slice(0, 6);
   const designerImage = editorialItems.find((item) => item.id === "designer")?.imageUrl;
 
   return (
