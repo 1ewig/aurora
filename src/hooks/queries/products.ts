@@ -61,6 +61,8 @@ export function usePaginatedProductsQuery(params: PaginatedProductsParams) {
   return useQuery<PaginatedProductsResponse>({
     queryKey: ['products', 'paginated', params],
     queryFn: () => fetchPaginatedProducts(params),
+    staleTime: 300_000,
+    gcTime: 300_000,
     placeholderData: keepPreviousData,
   });
 }
