@@ -33,7 +33,8 @@ CREATE TABLE IF NOT EXISTS products (
   span VARCHAR(50),
   aspect_ratio VARCHAR(50),
   description TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_products_slug_lower ON products (LOWER(slug));
@@ -93,7 +94,8 @@ CREATE TABLE IF NOT EXISTS orders (
   payment_provider VARCHAR(50),
   ls_order_id TEXT UNIQUE,
   ls_order_number INTEGER,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
@@ -110,11 +112,12 @@ CREATE TABLE IF NOT EXISTS processed_webhooks (
 CREATE TABLE IF NOT EXISTS product_reservations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   reservation_id UUID NOT NULL,
-  product_id VARCHAR(50) REFERENCES products(id) ON DELETE CASCADE,
+  product_id VARCHAR(50) NOT NULL,
   size VARCHAR(50) NOT NULL,
   quantity INT NOT NULL,
   expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  FOREIGN KEY (product_id, size) REFERENCES product_sizes(product_id, size) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_product_reservations_lookup ON product_reservations (product_id, size, expires_at);
@@ -180,6 +183,18 @@ BEGIN
   END IF;
 END $$;
 
+
+-- Trigger function to auto-update updated_at on row modification
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$ BEGIN NEW.updated_at = NOW(); RETURN NEW; END; $$;
+
+-- Attach updated_at triggers to products and orders
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON products
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON orders
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ========================================================
 --  Row Level Security (RLS) Policies
