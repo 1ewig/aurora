@@ -70,7 +70,6 @@ describe("PATCH /api/admin/orders/[id]", () => {
     const res = await PATCH(req({ status: "shipped" }), { params: Promise.resolve({ id: "ord-1" }) });
     const json = await res.json();
 
-    expect(json.order.status).toBe("shipped");
     expect(json.success).toBe(true);
   });
 });

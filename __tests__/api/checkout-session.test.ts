@@ -92,7 +92,7 @@ describe("POST /api/checkout/session", () => {
 
   beforeEach(async () => {
     vi.resetModules();
-    mockQuery.mockReset();
+    mockQuery.mockReset().mockResolvedValue({ rows: [{ request_count: 1 }] });
     mockConnect.mockReset().mockResolvedValue(undefined);
     mockClientQuery.mockReset();
     mockClientRelease.mockReset();
@@ -223,9 +223,11 @@ describe("POST /api/checkout/session", () => {
 
   it("ignores client-provided variantId and uses server env", async () => {
     // Set up mocks for a complete successful flow
-    mockQuery.mockResolvedValue({
-      rows: [{ id: "prod-1", price: 100, name: "Test Product" }],
-    });
+    mockQuery
+      .mockResolvedValueOnce({ rows: [{ request_count: 1 }] })
+      .mockResolvedValue({
+        rows: [{ id: "prod-1", price: 100, name: "Test Product" }],
+      });
     mockClientQuery
       .mockResolvedValueOnce(undefined) // BEGIN
       .mockResolvedValueOnce({ rows: [{ id: "size-1", stock: 50 }] }) // SELECT product_sizes FOR UPDATE

@@ -86,7 +86,7 @@ describe("Stock locking and reservation", () => {
 
   beforeEach(async () => {
     vi.resetModules();
-    mockQuery.mockReset();
+    mockQuery.mockReset().mockResolvedValue({ rows: [{ request_count: 1 }] });
     mockConnect.mockReset().mockResolvedValue(undefined);
     mockClientQuery.mockReset();
     mockClientRelease.mockReset();
@@ -102,9 +102,11 @@ describe("Stock locking and reservation", () => {
 
   it("inserts a product reservation row inside the transaction", async () => {
     // Mock the product lookup (pool.query for SELECT products)
-    mockQuery.mockResolvedValue({
-      rows: [{ id: "prod-1", price: 100, name: "Test Product" }],
-    });
+    mockQuery
+      .mockResolvedValueOnce({ rows: [{ request_count: 1 }] })
+      .mockResolvedValue({
+        rows: [{ id: "prod-1", price: 100, name: "Test Product" }],
+      });
 
     // Mock transaction sequence
     mockClientQuery
@@ -139,9 +141,11 @@ describe("Stock locking and reservation", () => {
   // ── Insufficient stock ─────────────────────────────────────────────────
 
   it("rejects checkout with a message to reduce quantity when available stock is non-zero but insufficient", async () => {
-    mockQuery.mockResolvedValue({
-      rows: [{ id: "prod-1", price: 100, name: "Test Product" }],
-    });
+    mockQuery
+      .mockResolvedValueOnce({ rows: [{ request_count: 1 }] })
+      .mockResolvedValue({
+        rows: [{ id: "prod-1", price: 100, name: "Test Product" }],
+      });
 
     mockClientQuery
       .mockResolvedValueOnce(undefined) // BEGIN
@@ -169,9 +173,11 @@ describe("Stock locking and reservation", () => {
   });
 
   it("rejects checkout with a regular insufficient stock message when available stock is 0", async () => {
-    mockQuery.mockResolvedValue({
-      rows: [{ id: "prod-1", price: 100, name: "Test Product" }],
-    });
+    mockQuery
+      .mockResolvedValueOnce({ rows: [{ request_count: 1 }] })
+      .mockResolvedValue({
+        rows: [{ id: "prod-1", price: 100, name: "Test Product" }],
+      });
 
     mockClientQuery
       .mockResolvedValueOnce(undefined) // BEGIN
@@ -200,9 +206,11 @@ describe("Stock locking and reservation", () => {
   // ── FOR UPDATE locking ─────────────────────────────────────────────────
 
   it("uses FOR UPDATE to lock size rows during reservation", async () => {
-    mockQuery.mockResolvedValue({
-      rows: [{ id: "prod-1", price: 50, name: "Locked Product" }],
-    });
+    mockQuery
+      .mockResolvedValueOnce({ rows: [{ request_count: 1 }] })
+      .mockResolvedValue({
+        rows: [{ id: "prod-1", price: 50, name: "Locked Product" }],
+      });
 
     mockClientQuery
       .mockResolvedValueOnce(undefined) // BEGIN
@@ -231,9 +239,11 @@ describe("Stock locking and reservation", () => {
   // ── Client release on error ────────────────────────────────────────────
 
   it("releases client connection back to pool even on error", async () => {
-    mockQuery.mockResolvedValue({
-      rows: [{ id: "prod-1", price: 100, name: "Error Product" }],
-    });
+    mockQuery
+      .mockResolvedValueOnce({ rows: [{ request_count: 1 }] })
+      .mockResolvedValue({
+        rows: [{ id: "prod-1", price: 100, name: "Error Product" }],
+      });
 
     mockClientQuery
       .mockResolvedValueOnce(undefined) // BEGIN
@@ -252,12 +262,14 @@ describe("Stock locking and reservation", () => {
   });
 
   it("accumulates errors for multiple items that fail stock checks", async () => {
-    mockQuery.mockResolvedValue({
-      rows: [
-        { id: "prod-1", price: 100, name: "Product One" },
-        { id: "prod-2", price: 150, name: "Product Two" },
-      ],
-    });
+    mockQuery
+      .mockResolvedValueOnce({ rows: [{ request_count: 1 }] })
+      .mockResolvedValue({
+        rows: [
+          { id: "prod-1", price: 100, name: "Product One" },
+          { id: "prod-2", price: 150, name: "Product Two" },
+        ],
+      });
 
     mockClientQuery
       .mockResolvedValueOnce(undefined) // BEGIN

@@ -93,7 +93,7 @@ describe("PATCH /api/admin/users/[id]", () => {
     const { PATCH } = await import("@/app/api/admin/users/[id]/route");
     await PATCH(req("http://localhost:3000", { method: "PATCH", body: { emailVerified: "true" } }), { params: Promise.resolve({ id: "u1" }) });
 
-    const values = db.mockQuery.mock.calls[0][1] as any[];
+    const values = db.mockQuery.mock.calls[1][1] as any[];
     expect(values[0]).toBe(true);
   });
 
