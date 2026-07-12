@@ -90,7 +90,7 @@ export function MaterialIndex() {
           <motion.article
             key={material.name}
             variants={scaleIn}
-            className="group flex flex-col h-full bg-white rounded-[24px] overflow-hidden border border-border-subtle hover:shadow-lg transition-all duration-300"
+            className="group flex flex-col h-full bg-white rounded-[24px] overflow-hidden border border-border-subtle hover:shadow-lg transition-[box-shadow,border-color] duration-300"
           >
             {/* Macro Image Wrapper */}
             <div className="relative aspect-square overflow-hidden bg-bg-secondary">
