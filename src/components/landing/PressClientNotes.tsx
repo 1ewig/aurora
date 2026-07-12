@@ -10,7 +10,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { fadeInUp, staggerContainer } from "@/animations/variants";
+import { fadeInUp, scaleIn, staggerContainer } from "@/animations/variants";
 
 interface PressMention {
   publication: string;
@@ -104,7 +104,7 @@ export function PressClientNotes() {
           {pressMentions.map((press, idx) => (
             <motion.div
               key={idx}
-              variants={fadeInUp}
+              variants={scaleIn}
               className="text-center lg:text-left px-4 lg:px-0 flex flex-col justify-between"
             >
               <p className="font-display italic text-lg md:text-xl text-text-secondary leading-relaxed mb-6">
@@ -133,7 +133,7 @@ export function PressClientNotes() {
             {clientNotes.map((note, idx) => (
               <motion.article
                 key={idx}
-                variants={fadeInUp}
+                variants={scaleIn}
                 className="flex flex-col h-full bg-bg-secondary p-8 rounded-[24px] border border-border-subtle"
               >
                 <blockquote className="flex-grow flex flex-col">

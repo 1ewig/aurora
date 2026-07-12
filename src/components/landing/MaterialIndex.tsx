@@ -9,7 +9,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { fadeInUp, staggerContainer } from "@/animations/variants";
+import { scaleIn, staggerContainer } from "@/animations/variants";
 
 interface MaterialItem {
   name: string;
@@ -89,7 +89,7 @@ export function MaterialIndex() {
         {materials.map((material, idx) => (
           <motion.article
             key={material.name}
-            variants={fadeInUp}
+            variants={scaleIn}
             className="group flex flex-col h-full bg-white rounded-[24px] overflow-hidden border border-border-subtle hover:shadow-lg transition-all duration-300"
           >
             {/* Macro Image Wrapper */}

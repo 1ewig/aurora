@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { fadeInUp, staggerContainer } from "@/animations/variants";
+import { scaleIn, staggerContainer } from "@/animations/variants";
 import { formatCurrency } from "@/utils/formatCurrency";
 
 interface SignatureProduct {
@@ -98,7 +98,7 @@ export function SignaturePieces() {
         {signatureProducts.map((product) => (
           <motion.article
             key={product.slug}
-            variants={fadeInUp}
+            variants={scaleIn}
             className="group flex flex-col h-full bg-white rounded-[24px] overflow-hidden border border-border-subtle transition-[box-shadow,border-color] duration-500 hover:shadow-xl hover:border-accent-primary/30"
           >
             <Link href={`/products/${product.slug}`} className="block relative aspect-[3/4] overflow-hidden bg-bg-secondary">
