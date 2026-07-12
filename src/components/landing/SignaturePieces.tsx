@@ -16,8 +16,6 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { cardEnter, fadeInUp, staggerContainer } from "@/animations/variants";
 import { heroProducts } from "@/data/products";
 
-const aspectRatios = ["aspect-[3/4]", "aspect-[4/5]", "aspect-[2/3]", "aspect-[3/4]"];
-
 // Curated signature products
 const signatureProducts = [
   heroProducts[0], // Ivory Wool Overcoat

@@ -79,7 +79,7 @@ export function MaterialIndex() {
         viewport={{ once: true, margin: "-10% 0px" }}
         className="grid grid-cols-1 md:grid-cols-3 gap-8"
       >
-        {materials.map((material, idx) => (
+        {materials.map((material) => (
           <motion.article
             key={material.name}
             variants={scaleIn}
