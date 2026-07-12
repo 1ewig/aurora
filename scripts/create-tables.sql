@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS products (
   id VARCHAR(50) PRIMARY KEY,
   slug VARCHAR(100) UNIQUE NOT NULL,
   name VARCHAR(255) NOT NULL,
-  category VARCHAR(100) NOT NULL REFERENCES categories(name),
+  category VARCHAR(100) NOT NULL REFERENCES categories(name) ON UPDATE CASCADE,
   price NUMERIC(10, 2) NOT NULL CHECK (price >= 0),
   badge VARCHAR(50),
   image TEXT NOT NULL,
