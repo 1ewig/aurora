@@ -99,7 +99,7 @@ export function SignaturePieces() {
           <motion.article
             key={product.slug}
             variants={fadeInUp}
-            className="group flex flex-col h-full bg-white rounded-[24px] overflow-hidden border border-border-subtle transition-all duration-500 hover:shadow-xl hover:border-accent-primary/30"
+            className="group flex flex-col h-full bg-white rounded-[24px] overflow-hidden border border-border-subtle transition-[box-shadow,border-color] duration-500 hover:shadow-xl hover:border-accent-primary/30"
           >
             <Link href={`/products/${product.slug}`} className="block relative aspect-[3/4] overflow-hidden bg-bg-secondary">
               <Image
