@@ -6,7 +6,7 @@
 
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { CartDrawer } from "@/components/ui/CartDrawer";
+import { CartDrawerWrapper } from "@/components/ui/CartDrawerWrapper";
 
 /** Store layout providing navbar, cart drawer, and footer to all store pages. */
 export default function StoreLayout({
@@ -15,7 +15,7 @@ export default function StoreLayout({
   return (
     <>
       <Navbar />
-      <CartDrawer />
+      <CartDrawerWrapper />
       {children}
       <Footer />
     </>

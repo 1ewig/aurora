@@ -6,14 +6,16 @@
 
 "use client";
 
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { CascadeCards } from "./ui/CascadeCards";
 
 import { Button } from "@/components/ui/Button";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { AnimatedText } from "@/components/ui/AnimatedText";
 import type { HeroSlide } from "@/data/hero";
+
+const CascadeCards = dynamic(() => import("./ui/CascadeCards").then((m) => m.CascadeCards), { ssr: false });
 
 interface HeroProps {
   heroSlides: HeroSlide[];
