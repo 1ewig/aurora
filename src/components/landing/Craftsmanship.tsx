@@ -41,10 +41,10 @@ export function Craftsmanship() {
         {/* Left Column: Title + 3 Cards */}
         <div className="lg:col-span-7">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
             <EyebrowLabel>Proven Quality</EyebrowLabel>
             <h2

@@ -75,10 +75,10 @@ export function PressClientNotes() {
         
         {/* Section Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          variants={fadeInUp}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
           className="text-center mb-20"
         >
           <EyebrowLabel>Credibility &amp; Proof</EyebrowLabel>

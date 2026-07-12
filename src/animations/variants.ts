@@ -10,8 +10,8 @@ import type { Variants } from "framer-motion";
 /** Spring config for card entrance animations. */
 export const springCardEnter = {
   type: "spring" as const,
-  stiffness: 260,
-  damping: 26,
+  stiffness: 150,
+  damping: 24,
 };
 
 /** Easing for card exit animations. */
@@ -22,11 +22,11 @@ export const springCardExit = {
 
 /** Fades in while sliding upward. Used for section reveals. */
 export const fadeInUp: Variants = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
   },
 };
 
@@ -66,11 +66,11 @@ export const slideInRight: Variants = {
 
 /** Scales in from 88% with an overshoot ease. */
 export const scaleIn: Variants = {
-  hidden: { opacity: 0, scale: 0.88 },
+  hidden: { opacity: 0, scale: 0.95 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.7, ease: [0.34, 1.56, 0.64, 1] },
+    transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
   },
 };
 
@@ -161,9 +161,9 @@ export function cardEnter(index: number): Variants {
   return {
     hidden: {
       opacity: 0,
-      y: isEven ? 60 : 30,
-      x: isEven ? 0 : 20,
-      scale: 0.92,
+      y: isEven ? 20 : 10,
+      x: isEven ? 0 : 5,
+      scale: 0.97,
     },
     visible: {
       opacity: 1,

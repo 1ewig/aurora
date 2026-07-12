@@ -9,7 +9,7 @@
 import { motion } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { ProductCard } from "@/components/ui/ProductCard";
-import { cardEnter, staggerContainer } from "@/animations/variants";
+import { cardEnter, fadeInUp, staggerContainer } from "@/animations/variants";
 import { heroProducts } from "@/data/products";
 
 const aspectRatios = ["aspect-[3/4]", "aspect-[4/5]", "aspect-[2/3]", "aspect-[3/4]"];
@@ -30,10 +30,10 @@ export function SignaturePieces() {
       className="py-32 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto bg-bg-primary border-t border-border-subtle"
     >
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        variants={fadeInUp}
+        initial="hidden"
+        whileInView="visible"
         viewport={{ once: true }}
-        transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="mb-16 text-center md:text-left md:flex md:items-end md:justify-between"
       >
         <div>
