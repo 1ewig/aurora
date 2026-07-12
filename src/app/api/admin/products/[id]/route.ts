@@ -9,6 +9,7 @@
 import { NextResponse } from 'next/server';
 import { withTransaction } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
+import { logAudit } from '@/utils/audit';
 import { createAdminClient } from '@insforge/sdk';
 import { getStorageKeyFromUrl } from '@/utils/insforge';
 import { revalidateTag } from 'next/cache';
@@ -74,14 +75,15 @@ export async function PUT(
 
     return await withTransaction(async (client) => {
       const { rows: productRows } = await client.query(
-        'SELECT image FROM products WHERE id = $1',
+        'SELECT slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description FROM products WHERE id = $1',
         [id]
       );
       if (productRows.length === 0) {
         return NextResponse.json({ error: 'Product not found' }, { status: 404 });
       }
 
-      const oldMainImage = productRows[0].image;
+      const oldProduct = productRows[0];
+      const oldMainImage = oldProduct.image;
 
       const existingSlug = await client.query(
         'SELECT 1 FROM products WHERE slug = $1 AND id <> $2',
@@ -140,6 +142,28 @@ export async function PUT(
       }
 
       revalidateTag('products', { expire: 0 });
+
+      const { user } = await requireAdmin();
+      const changes: Record<string, { from: any; to: any }> = {};
+      const fields = ['slug', 'name', 'category', 'price', 'badge', 'image', 'alt_text', 'span', 'aspect_ratio', 'description'] as const;
+      const newVals = { slug, name, category, price, badge, image, altText, span, aspectRatio, description };
+      const fieldMap: Record<string, string> = { altText: 'alt_text', span: 'span', aspectRatio: 'aspect_ratio' };
+      for (const f of fields) {
+        const oldVal = oldProduct[f];
+        const newVal = f in fieldMap ? newVals[fieldMap[f] as keyof typeof newVals] : newVals[f as keyof typeof newVals];
+        if (String(oldVal) !== String(newVal)) {
+          changes[f] = { from: oldVal, to: newVal };
+        }
+      }
+      await logAudit({
+        adminId: user.id,
+        adminEmail: user.email,
+        action: 'product.update',
+        targetType: 'product',
+        targetId: id,
+        metadata: { slug, name, changes },
+      });
+
       return NextResponse.json({ success: true });
     });
   } catch (err: any) {
@@ -159,14 +183,14 @@ export async function DELETE(
 
     return await withTransaction(async (client) => {
       const { rows: productRows } = await client.query(
-        'SELECT image FROM products WHERE id = $1',
+        'SELECT image, name, slug FROM products WHERE id = $1',
         [id]
       );
       if (productRows.length === 0) {
         return NextResponse.json({ error: 'Product not found' }, { status: 404 });
       }
 
-      const mainImage = productRows[0].image;
+      const { image: mainImage, name: productName, slug: productSlug } = productRows[0];
       const { rows: galleryRows } = await client.query(
         'SELECT image_url FROM product_images WHERE product_id = $1',
         [id]
@@ -181,6 +205,17 @@ export async function DELETE(
       await client.query('DELETE FROM products WHERE id = $1', [id]);
 
       revalidateTag('products', { expire: 0 });
+
+      const { user } = await requireAdmin();
+      await logAudit({
+        adminId: user.id,
+        adminEmail: user.email,
+        action: 'product.delete',
+        targetType: 'product',
+        targetId: id,
+        metadata: { slug: productSlug, name: productName },
+      });
+
       return NextResponse.json({ success: true });
     });
   } catch (err: any) {

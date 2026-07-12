@@ -9,6 +9,7 @@
 import { NextResponse } from 'next/server';
 import { pool, withTransaction } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
+import { logAudit } from '@/utils/audit';
 import { revalidateTag } from 'next/cache';
 
 export async function GET(request: Request) {
@@ -159,6 +160,17 @@ export async function POST(request: Request) {
       }
 
       revalidateTag('products', { expire: 0 });
+
+      const { user } = await requireAdmin();
+      await logAudit({
+        adminId: user.id,
+        adminEmail: user.email,
+        action: 'product.create',
+        targetType: 'product',
+        targetId: id,
+        metadata: { slug, name },
+      });
+
       return NextResponse.json({ success: true, id });
     });
   } catch (err: any) {

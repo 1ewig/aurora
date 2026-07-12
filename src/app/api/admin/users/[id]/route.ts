@@ -10,6 +10,7 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
+import { logAudit } from '@/utils/audit';
 
 export async function GET(
   request: Request,
@@ -86,6 +87,16 @@ export async function PATCH(
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
     }
 
+    const changedFields = Object.keys(body).filter(k => allowedFields.includes(k as any));
+    const oldResult = await pool.query(
+      `SELECT name, email, "emailVerified", role FROM better_auth."user" WHERE id = $1`,
+      [id]
+    );
+    if (oldResult.rows.length === 0) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+    const oldUser = oldResult.rows[0];
+
     updates.push(`"updatedAt" = timezone('utc'::text, now())`);
 
     const result = await pool.query(
@@ -93,9 +104,25 @@ export async function PATCH(
       [...values, id]
     );
 
-    if (result.rows.length === 0) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    const changes: Record<string, { from: any; to: any }> = {};
+    for (const field of changedFields) {
+      const dbField = field === 'emailVerified' ? 'emailVerified' : field;
+      const oldVal = oldUser[dbField];
+      const newVal = field === 'emailVerified' ? (body[field] === true || body[field] === 'true') : body[field];
+      if (String(oldVal) !== String(newVal)) {
+        changes[field] = { from: oldVal, to: newVal };
+      }
     }
+
+    const { user } = await requireAdmin();
+    await logAudit({
+      adminId: user.id,
+      adminEmail: user.email,
+      action: 'user.update',
+      targetType: 'user',
+      targetId: id,
+      metadata: { fields: changedFields, changes },
+    });
 
     return NextResponse.json(result.rows[0]);
   } catch (err) {
@@ -125,6 +152,16 @@ export async function DELETE(
     if (result.rows.length === 0) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const { email: deletedEmail, name: deletedName } = result.rows[0];
+    await logAudit({
+      adminId: user.id,
+      adminEmail: user.email,
+      action: 'user.delete',
+      targetType: 'user',
+      targetId: id,
+      metadata: { email: deletedEmail, name: deletedName },
+    });
 
     return NextResponse.json({ deleted: result.rows[0] });
   } catch (err) {

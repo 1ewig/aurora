@@ -276,6 +276,53 @@ export function useUpdateUserRoleMutation() {
   });
 }
 
+export interface AuditLogEntry {
+  id: string;
+  admin_id: string;
+  admin_email: string;
+  action: string;
+  target_type: string;
+  target_id: string;
+  metadata: Record<string, any> | null;
+  created_at: string;
+}
+
+export interface PaginatedAuditLogsResponse {
+  logs: AuditLogEntry[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+interface AdminAuditLogsParams {
+  page?: number;
+  limit?: number;
+  targetType?: string;
+  action?: string;
+  search?: string;
+}
+
+export function useAdminAuditLogsQuery(params: AdminAuditLogsParams = {}) {
+  return useQuery({
+    queryKey: ['admin', 'audit', params],
+    queryFn: async (): Promise<PaginatedAuditLogsResponse> => {
+      const sp = new URLSearchParams();
+      if (params.page) sp.set('page', String(params.page));
+      if (params.limit) sp.set('limit', String(params.limit));
+      if (params.targetType) sp.set('targetType', params.targetType);
+      if (params.action) sp.set('action', params.action);
+      if (params.search) sp.set('search', params.search);
+      const qs = sp.toString();
+      const res = await fetch(`/api/admin/audit${qs ? `?${qs}` : ''}`);
+      if (!res.ok) throw new Error('Failed to load audit logs');
+      return res.json();
+    },
+    placeholderData: keepPreviousData,
+    staleTime: 0,
+  });
+}
+
 /** Deletes a user. */
 export function useDeleteUserMutation() {
   const queryClient = useQueryClient();

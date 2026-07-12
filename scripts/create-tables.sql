@@ -187,6 +187,19 @@ SELECT cron.schedule('cleanup-expired-reservations', '*/5 * * * *',
 SELECT cron.schedule('cleanup-rate-limits', '0 * * * *',
   $$DELETE FROM public.rate_limits WHERE window_start < now() - interval '1 hour'$$);
 
+-- Audit logs for tracking admin actions
+CREATE TABLE IF NOT EXISTS public.audit_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  admin_id TEXT NOT NULL,
+  admin_email TEXT NOT NULL,
+  action VARCHAR(50) NOT NULL,
+  target_type VARCHAR(50) NOT NULL,
+  target_id TEXT NOT NULL,
+  metadata JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON public.audit_logs (created_at DESC);
 
 
 -- Realtime: allow string sender_ids for Better Auth user IDs
