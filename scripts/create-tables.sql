@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS orders (
   total NUMERIC(10,2) NOT NULL,
   shipping_address JSONB NOT NULL,
   status VARCHAR(20) NOT NULL DEFAULT 'pending',
+  CONSTRAINT orders_status_check CHECK (status IN ('pending', 'confirmed', 'shipped', 'delivered', 'cancelled')),
   is_paid BOOLEAN NOT NULL DEFAULT FALSE,
   payment_provider VARCHAR(50),
   ls_order_id TEXT UNIQUE,
@@ -157,6 +158,7 @@ CREATE TABLE IF NOT EXISTS public.newsletter_subscriptions (
   id SERIAL PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL,
   status VARCHAR(20) NOT NULL DEFAULT 'active',
+  CONSTRAINT newsletter_status_check CHECK (status IN ('active')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 ALTER TABLE public.newsletter_subscriptions ENABLE ROW LEVEL SECURITY;
