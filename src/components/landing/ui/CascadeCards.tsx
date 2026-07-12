@@ -83,13 +83,20 @@ export function CascadeCards({ slides }: CascadeCardsProps) {
                   sizes="(min-width: 768px) 18vw, 140px"
                   className="object-cover object-top animate-fade-in"
                 />
-                {/* Subtle bottom gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                {/* Subtle bottom gradient (default state) */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
                 
-                {/* Hover overlay with Product Name & Price */}
-                <div className="absolute bottom-3 left-3 right-3 bg-black/60 backdrop-blur-md border border-white/10 p-2.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                  <p className="text-white text-[10px] font-bold uppercase tracking-wider line-clamp-1">{slide.title}</p>
-                  <p className="text-accent-primary text-[10px] font-mono mt-0.5">{slide.title ? productPrices[slide.title] || "" : ""}</p>
+                {/* Full-card hover gradient overlay with Product Name & Price */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-350 flex flex-col justify-end p-4 text-left">
+                  <span className="text-[9px] font-mono text-accent-primary uppercase tracking-[0.2em] mb-1 block">
+                    Signature
+                  </span>
+                  <h4 className="text-white text-xs font-black uppercase tracking-wider line-clamp-1">
+                    {slide.title}
+                  </h4>
+                  <p className="text-white/85 text-[10px] font-mono mt-0.5">
+                    {slide.title ? productPrices[slide.title] || "" : ""}
+                  </p>
                 </div>
 
                 {/* Subtle shimmer on front card */}
@@ -138,13 +145,20 @@ export function CascadeCards({ slides }: CascadeCardsProps) {
                   sizes="(max-width: 768px) 18vw, 140px"
                   className="object-cover object-top"
                 />
-                {/* Subtle bottom gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                {/* Subtle bottom gradient (default state) */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
                 
-                {/* Mobile Hover overlay with Product Name & Price */}
-                <div className="absolute bottom-2 left-2 right-2 bg-black/70 backdrop-blur-md border border-white/10 p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                  <p className="text-white text-[8px] font-bold uppercase tracking-wider line-clamp-1">{slide.title}</p>
-                  <p className="text-accent-primary text-[8px] font-mono mt-0.5">{slide.title ? productPrices[slide.title] || "" : ""}</p>
+                {/* Mobile Full-card hover gradient overlay with Product Name & Price */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-350 flex flex-col justify-end p-3 text-left">
+                  <span className="text-[8px] font-mono text-accent-primary uppercase tracking-[0.15em] mb-0.5 block">
+                    Signature
+                  </span>
+                  <h4 className="text-white text-[10px] font-black uppercase tracking-wide line-clamp-1">
+                    {slide.title}
+                  </h4>
+                  <p className="text-white/85 text-[9px] font-mono mt-0.5">
+                    {slide.title ? productPrices[slide.title] || "" : ""}
+                  </p>
                 </div>
               </Link>
             </motion.div>
