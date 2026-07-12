@@ -13,13 +13,15 @@ import { useHeroQuery, useEditorialQuery, useDailyCategoriesQuery, useLookbookQu
 import { useNewsletterSubmit } from "@/hooks/useNewsletterSubmit";
 import { Hero } from "./Hero";
 
-const MarqueeBar = dynamic(() => import("./MarqueeBar").then((m) => m.MarqueeBar), { loading: () => <div className="h-16" /> });
+const SignaturePieces = dynamic(() => import("./SignaturePieces").then((m) => m.SignaturePieces), { loading: () => <div className="h-96" /> });
 const FeaturedCollection = dynamic(() => import("./FeaturedCollection").then((m) => m.FeaturedCollection), { loading: () => <div className="h-96" /> });
-const Craftsmanship = dynamic(() => import("./Craftsmanship").then((m) => m.Craftsmanship), { loading: () => <div className="h-80" /> });
+const MaterialIndex = dynamic(() => import("./MaterialIndex").then((m) => m.MaterialIndex), { loading: () => <div className="h-[50vh]" /> });
 const LookbookSlider = dynamic(() => import("./LookbookSlider").then((m) => m.LookbookSlider), { loading: () => <div className="h-[60vh]" /> });
+const Craftsmanship = dynamic(() => import("./Craftsmanship").then((m) => m.Craftsmanship), { loading: () => <div className="h-80" /> });
 const DesignerStory = dynamic(() => import("./DesignerStory").then((m) => m.DesignerStory), { loading: () => <div className="h-[50vh]" /> });
-const Testimonials = dynamic(() => import("./Testimonials").then((m) => m.Testimonials), { loading: () => <div className="h-80" /> });
+const PressClientNotes = dynamic(() => import("./PressClientNotes").then((m) => m.PressClientNotes), { loading: () => <div className="h-80" /> });
 const Newsletter = dynamic(() => import("./Newsletter").then((m) => m.Newsletter), { loading: () => <div className="h-96" /> });
+const ServicePromise = dynamic(() => import("./ServicePromise").then((m) => m.ServicePromise), { loading: () => <div className="h-32" /> });
 
 export default function LandingClient() {
   const { data: heroSlides = [] } = useHeroQuery();
@@ -34,13 +36,15 @@ export default function LandingClient() {
   return (
     <main id="main-content" tabIndex={-1}>
       <Hero heroSlides={heroSlides} />
-      <MarqueeBar />
+      <SignaturePieces />
       <FeaturedCollection categories={dailyCategories} />
-      <Craftsmanship />
+      <MaterialIndex />
       {slides.length > 0 && <LookbookSlider slides={slides} />}
+      <Craftsmanship />
       <DesignerStory imageUrl={designerImage} />
-      <Testimonials />
+      <PressClientNotes />
       <Newsletter {...newsletter} />
+      <ServicePromise />
     </main>
   );
 }

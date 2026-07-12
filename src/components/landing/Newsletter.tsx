@@ -36,7 +36,7 @@ export function Newsletter({ email, setEmail, submitted, loading, error, handleS
           viewport={{ once: true, margin: "-10% 0px" }}
         >
           <motion.div variants={fadeInUp}>
-            <EyebrowLabel color="gold">Join The Inner Circle</EyebrowLabel>
+            <EyebrowLabel color="gold">Private Preview Access</EyebrowLabel>
           </motion.div>
 
           <motion.h2
@@ -45,17 +45,16 @@ export function Newsletter({ email, setEmail, submitted, loading, error, handleS
             className="font-sans font-black leading-tight tracking-[-0.02em] text-text-inverted mt-4"
             style={{ fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}
           >
-            First to Know.
+            Atelier Notes &amp;
             <br />
-            Last to Forget.
+            Access.
           </motion.h2>
 
           <motion.p
             variants={fadeInUp}
             className="text-text-muted mt-6 leading-relaxed max-w-md mx-auto"
           >
-            Early collection access, private sale invitations, and unfiltered
-            notes from the studio.
+            Receive private notifications of limited-run releases, custom atelier swatches, and priority entry before public drops.
           </motion.p>
 
           <motion.div variants={fadeInUp} className="mt-12">
@@ -111,7 +110,7 @@ export function Newsletter({ email, setEmail, submitted, loading, error, handleS
                     }}
                     className="text-text-inverted font-display text-xl tracking-wide uppercase font-light mt-2"
                   >
-                    Welcome to the Inner Circle.
+                    Access Granted.
                   </motion.p>
                   
                   <motion.p
@@ -121,7 +120,7 @@ export function Newsletter({ email, setEmail, submitted, loading, error, handleS
                     }}
                     className="text-text-muted text-sm font-light max-w-sm"
                   >
-                    Your address has been registered. A private entry confirmation will arrive in your inbox.
+                    Your address has been registered. Private preview entry confirmation will arrive in your inbox.
                   </motion.p>
                 </motion.div>
               ) : (

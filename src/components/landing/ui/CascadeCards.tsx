@@ -7,6 +7,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { cardCascade, getCardRotation } from "@/animations/variants";
 import type { HeroSlide } from "@/data/hero";
@@ -14,6 +15,14 @@ import type { HeroSlide } from "@/data/hero";
 interface CascadeCardsProps {
   slides: HeroSlide[];
 }
+
+const productPrices: Record<string, string> = {
+  "Ivory Wool Overcoat": "$1,290",
+  "Camel Cashmere Turtleneck": "$485",
+  "Ecru Linen Blazer": "$890",
+  "Charcoal Wide-Leg Trousers": "$395",
+  "Champagne Silk Slip Dress": "$720",
+};
 
 const desktopPositions = [
   { left: "2%",  top: "70px",  zIndex: 10 },
@@ -53,7 +62,7 @@ export function CascadeCards({ slides }: CascadeCardsProps) {
                 y: -12,
                 transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] },
               }}
-              className="absolute rounded-[22px] overflow-hidden cursor-pointer"
+              className="absolute rounded-[22px] overflow-hidden cursor-pointer group"
               style={{
                 left: pos.left,
                 top: pos.top,
@@ -64,21 +73,30 @@ export function CascadeCards({ slides }: CascadeCardsProps) {
                 boxShadow: "0 20px 60px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.10)",
               }}
             >
-              <Image
-                src={slide.imageUrl}
-                alt={slide.altText}
-                fill
-                priority={isPriority}
-                quality={85}
-                sizes="(min-width: 768px) 18vw, 140px"
-                className="object-cover object-top"
-              />
-              {/* Subtle bottom gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-              {/* Subtle shimmer on front card */}
-              {index === 2 && (
-                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500" />
-              )}
+              <Link href={slide.link || "/products"} className="block w-full h-full relative">
+                <Image
+                  src={slide.imageUrl}
+                  alt={slide.altText}
+                  fill
+                  priority={isPriority}
+                  quality={85}
+                  sizes="(min-width: 768px) 18vw, 140px"
+                  className="object-cover object-top animate-fade-in"
+                />
+                {/* Subtle bottom gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                
+                {/* Hover overlay with Product Name & Price */}
+                <div className="absolute bottom-3 left-3 right-3 bg-black/60 backdrop-blur-md border border-white/10 p-2.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                  <p className="text-white text-[10px] font-bold uppercase tracking-wider line-clamp-1">{slide.title}</p>
+                  <p className="text-accent-primary text-[10px] font-mono mt-0.5">{slide.title ? productPrices[slide.title] || "" : ""}</p>
+                </div>
+
+                {/* Subtle shimmer on front card */}
+                {index === 2 && (
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-500" />
+                )}
+              </Link>
             </motion.div>
           );
         })}
@@ -101,7 +119,7 @@ export function CascadeCards({ slides }: CascadeCardsProps) {
                 delay: index * 0.12,
                 ease: [0.25, 0.46, 0.45, 0.94],
               }}
-              className="absolute rounded-[18px] overflow-hidden"
+              className="absolute rounded-[18px] overflow-hidden group"
               style={{
                 left: pos.left,
                 top: pos.top,
@@ -111,14 +129,24 @@ export function CascadeCards({ slides }: CascadeCardsProps) {
                 boxShadow: "0 16px 40px rgba(0,0,0,0.16)",
               }}
             >
-              <Image
-                src={slide.imageUrl}
-                alt={slide.altText}
-                fill
-                quality={85}
-                sizes="(min-width: 768px) 18vw, 140px"
-                className="object-cover object-top"
-              />
+              <Link href={slide.link || "/products"} className="block w-full h-full relative">
+                <Image
+                  src={slide.imageUrl}
+                  alt={slide.altText}
+                  fill
+                  quality={85}
+                  sizes="(max-width: 768px) 18vw, 140px"
+                  className="object-cover object-top"
+                />
+                {/* Subtle bottom gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                
+                {/* Mobile Hover overlay with Product Name & Price */}
+                <div className="absolute bottom-2 left-2 right-2 bg-black/70 backdrop-blur-md border border-white/10 p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                  <p className="text-white text-[8px] font-bold uppercase tracking-wider line-clamp-1">{slide.title}</p>
+                  <p className="text-accent-primary text-[8px] font-mono mt-0.5">{slide.title ? productPrices[slide.title] || "" : ""}</p>
+                </div>
+              </Link>
             </motion.div>
           );
         })}

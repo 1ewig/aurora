@@ -32,15 +32,15 @@ export function FeaturedCollection({ categories }: FeaturedCollectionProps) {
         viewport={{ once: true }}
         transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
-        <EyebrowLabel>Daily Collections</EyebrowLabel>
+        <EyebrowLabel>Curated Edits</EyebrowLabel>
         <h2
           id="collection-heading"
           className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 mb-16 text-text-primary"
           style={{ fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}
         >
-          Curated For
+          The Seasonal
           <br />
-          <span className="text-accent-primary">The Rare Few.</span>
+          <span className="text-accent-primary">Edit.</span>
         </h2>
       </motion.div>
 

@@ -36,18 +36,18 @@ export function Hero({ heroSlides }: HeroProps) {
         className="absolute inset-0 pointer-events-none overflow-hidden"
       >
         <div
-          className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[60vh] rounded-full opacity-[0.25]"
+          className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[60vh] rounded-full opacity-[0.08]"
           style={{
             background:
-              "radial-gradient(ellipse at center, rgba(200,168,130,0.35) 0%, rgba(200,168,130,0.05) 50%, transparent 80%)",
+              "radial-gradient(ellipse at center, rgba(200,168,130,0.2) 0%, rgba(200,168,130,0.02) 50%, transparent 80%)",
             filter: "blur(120px)",
           }}
         />
         <div
-          className="absolute bottom-0 right-0 w-[45vw] h-[45vh] rounded-full opacity-[0.15]"
+          className="absolute bottom-0 right-0 w-[45vw] h-[45vh] rounded-full opacity-[0.05]"
           style={{
             background:
-              "radial-gradient(ellipse at center, rgba(200,168,130,0.4) 0%, rgba(200,168,130,0.05) 50%, transparent 80%)",
+              "radial-gradient(ellipse at center, rgba(200,168,130,0.2) 0%, rgba(200,168,130,0.02) 50%, transparent 80%)",
             filter: "blur(160px)",
           }}
         />
