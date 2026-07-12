@@ -1,61 +1,25 @@
 /**
  * Aurora — src/components/landing/SignaturePieces.tsx
  *
- * Displays a curated grid of the brand's signature pieces, bridging editorial
- * design and immediate shoppability.
+ * Displays a curated grid of the brand's signature pieces, matched with the main product grid styling.
  */
 
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
-import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { scaleIn, staggerContainer } from "@/animations/variants";
-import { formatCurrency } from "@/utils/formatCurrency";
+import { ProductCard } from "@/components/ui/ProductCard";
+import { cardEnter, staggerContainer } from "@/animations/variants";
+import { heroProducts } from "@/data/products";
 
-interface SignatureProduct {
-  slug: string;
-  name: string;
-  price: number;
-  image: string;
-  fabric: string;
-  limitText: string;
-}
+const aspectRatios = ["aspect-[3/4]", "aspect-[4/5]", "aspect-[2/3]", "aspect-[3/4]"];
 
-const signatureProducts: SignatureProduct[] = [
-  {
-    slug: "ivory-wool-overcoat",
-    name: "Ivory Wool Overcoat",
-    price: 1290,
-    image: "/images/products/ivory-wool-overcoat.webp",
-    fabric: "100% Fine Italian Virgin Wool",
-    limitText: "Limited run of 50 units",
-  },
-  {
-    slug: "camel-cashmere-turtleneck",
-    name: "Camel Cashmere Turtleneck",
-    price: 485,
-    image: "/images/products/camel-cashmere-turtleneck.webp",
-    fabric: "100% Grade-A Mongolian Cashmere",
-    limitText: "Atelier exclusive — no restocks",
-  },
-  {
-    slug: "ecru-linen-blazer",
-    name: "Ecru Linen Blazer",
-    price: 890,
-    image: "/images/products/ecru-linen-blazer.webp",
-    fabric: "100% Premium French Flax Linen",
-    limitText: "Limited run of 75 units",
-  },
-  {
-    slug: "champagne-silk-slip-dress",
-    name: "Champagne Silk Slip Dress",
-    price: 720,
-    image: "/images/products/champagne-silk-slip-dress.webp",
-    fabric: "19mm Heavyweight Mulberry Silk",
-    limitText: "Few remaining",
-  },
+// Select 4 signature products from the hero products catalog
+const signatureProducts = [
+  heroProducts[0], // Ivory Wool Overcoat
+  heroProducts[1], // Camel Cashmere Turtleneck
+  heroProducts[2], // Ecru Linen Blazer
+  heroProducts[4], // Champagne Silk Slip Dress
 ];
 
 export function SignaturePieces() {
@@ -93,58 +57,19 @@ export function SignaturePieces() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-10% 0px" }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-6 lg:gap-8"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
       >
-        {signatureProducts.map((product) => (
-          <motion.article
-            key={product.slug}
-            variants={scaleIn}
-            className="group flex flex-col h-full bg-white rounded-[24px] overflow-hidden border border-border-subtle transition-[box-shadow,border-color] duration-500 hover:shadow-xl hover:border-accent-primary/30"
+        {signatureProducts.map((product, i) => (
+          <motion.div
+            key={product.id}
+            variants={cardEnter(i)}
+            className={i % 4 === 1 || i % 4 === 2 ? "md:mt-8" : ""}
           >
-            <Link href={`/products/${product.slug}`} className="block relative aspect-[3/4] overflow-hidden bg-bg-secondary">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-cover object-center transition-transform duration-[1000ms] ease-out group-hover:scale-105"
-                quality={90}
-              />
-              <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-              
-              {/* Batch Limit Badge */}
-              <div className="absolute top-4 left-4 bg-white/80 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/40">
-                <span className="text-[10px] font-semibold tracking-wider text-text-primary uppercase font-mono">
-                  {product.limitText}
-                </span>
-              </div>
-            </Link>
-
-            <div className="p-6 flex flex-col flex-grow">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="font-sans font-black text-lg text-text-primary tracking-tight">
-                  <Link href={`/products/${product.slug}`} className="hover:text-accent-primary transition-colors">
-                    {product.name}
-                  </Link>
-                </h3>
-                <span className="font-mono text-sm text-text-primary font-medium ml-2">
-                  {formatCurrency(product.price)}
-                </span>
-              </div>
-              
-              <p className="text-text-muted text-xs font-mono uppercase tracking-wider mb-6">
-                {product.fabric}
-              </p>
-
-              <div className="mt-auto">
-                <Link href={`/products/${product.slug}`}>
-                  <button className="w-full py-3.5 rounded-full bg-bg-ink hover:bg-accent-primary text-white text-xs font-semibold uppercase tracking-widest transition-all duration-300 active:scale-[0.98] cursor-pointer">
-                    Shop Piece →
-                  </button>
-                </Link>
-              </div>
-            </div>
-          </motion.article>
+            <ProductCard
+              product={product}
+              aspectRatio={aspectRatios[i % aspectRatios.length]}
+            />
+          </motion.div>
         ))}
       </motion.div>
     </section>
