@@ -41,13 +41,6 @@ const materials: MaterialItem[] = [
     image: "/images/materials/silk-macro.png",
     properties: ["100% Mulberry Silk", "19 Momme Weight", "Bias-cut Fluidity"],
   },
-  {
-    name: "Flax Linen",
-    source: "Normandy, France / Portugal Ateliers",
-    description: "Organic French flax woven in Portuguese mills, creating a textured, highly breathable tailoring fabric that gains character with age.",
-    image: "/images/materials/linen-macro.png",
-    properties: ["100% French Flax", "Unstructured Drape", "Breathable Weave"],
-  },
 ];
 
 export function MaterialIndex() {
@@ -84,7 +77,7 @@ export function MaterialIndex() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-10% 0px" }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+        className="grid grid-cols-1 md:grid-cols-3 gap-8"
       >
         {materials.map((material, idx) => (
           <motion.article
@@ -98,7 +91,7 @@ export function MaterialIndex() {
                 src={material.image}
                 alt={`Macro texture close-up of ${material.name}`}
                 fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
                 quality={90}
               />

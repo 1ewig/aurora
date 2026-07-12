@@ -14,12 +14,11 @@ import { heroProducts } from "@/data/products";
 
 const aspectRatios = ["aspect-[3/4]", "aspect-[4/5]", "aspect-[2/3]", "aspect-[3/4]"];
 
-// Select 4 signature products from the hero products catalog
+// Select 3 signature products from the hero products catalog
 const signatureProducts = [
   heroProducts[0], // Ivory Wool Overcoat
   heroProducts[1], // Camel Cashmere Turtleneck
   heroProducts[2], // Ecru Linen Blazer
-  heroProducts[4], // Champagne Silk Slip Dress
 ];
 
 export function SignaturePieces() {
@@ -57,13 +56,13 @@ export function SignaturePieces() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-10% 0px" }}
-        className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
+        className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8"
       >
         {signatureProducts.map((product, i) => (
           <motion.div
             key={product.id}
             variants={cardEnter(i)}
-            className={i % 4 === 1 || i % 4 === 2 ? "md:mt-8" : ""}
+            className={i % 3 === 1 ? "md:mt-8" : ""}
           >
             <ProductCard
               product={product}
