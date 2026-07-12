@@ -8,9 +8,15 @@
 import { NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
 import { pool } from "@/utils/db";
+import { rateLimit } from "@/utils/rateLimit";
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (!await rateLimit(ip, 'newsletter', 5)) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const { email } = await request.json();
 
     if (!email || typeof email !== "string" || !email.includes("@")) {

@@ -9,6 +9,7 @@ import {
   validateShippingAddress,
   type ShippingAddress,
 } from "@/utils/sanitize";
+import { rateLimit } from "@/utils/rateLimit";
 import crypto from "node:crypto";
 
 export interface CheckoutSessionRequest {
@@ -23,6 +24,11 @@ export interface CheckoutSessionRequest {
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    if (!await rateLimit(ip, 'checkout', 10)) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
+
     const body: CheckoutSessionRequest = await req.json();
 
     const variantId = process.env.NEXT_PUBLIC_LS_ORDER_VARIANT_ID;

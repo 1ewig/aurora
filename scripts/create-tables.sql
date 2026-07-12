@@ -166,6 +166,26 @@ CREATE TABLE IF NOT EXISTS public.newsletter_subscriptions (
 );
 ALTER TABLE public.newsletter_subscriptions ENABLE ROW LEVEL SECURITY;
 
+-- Rate limits table for in-flight usage spike protection (DB-backed sliding window)
+CREATE TABLE IF NOT EXISTS public.rate_limits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ip VARCHAR(45) NOT NULL,
+  route VARCHAR(100) NOT NULL,
+  window_start TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT date_trunc('minute', now()),
+  request_count INT NOT NULL DEFAULT 1,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  CONSTRAINT unique_rate_limit_window UNIQUE (ip, route, window_start)
+);
+
+CREATE INDEX IF NOT EXISTS idx_rate_limits_created_at ON public.rate_limits (created_at);
+
+-- Cleanup expired product reservations (runs every 5 minutes)
+SELECT cron.schedule('cleanup-expired-reservations', '*/5 * * * *',
+  $$DELETE FROM public.product_reservations WHERE expires_at < now()$$);
+
+-- Rate limit cleanup job (runs hourly, purges windows older than 1 hour)
+SELECT cron.schedule('cleanup-rate-limits', '0 * * * *',
+  $$DELETE FROM public.rate_limits WHERE window_start < now() - interval '1 hour'$$);
 
 
 
