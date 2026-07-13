@@ -3,7 +3,7 @@
  * ===================
  *
  * First-time setup / Wiping & Seeding script:
- * - Verifies and wipes/recreates the five storage buckets (product-media, lookbook-media, editorial-media, hero-media, category-media)
+ * - Verifies and wipes/recreates the four storage buckets (product-media, lookbook-media, editorial-media, category-media)
  * - Drops and rebuilds all database tables (products, product_images, product_sizes, product_details, product_keywords, orders, processed_webhooks, product_reservations, lookbook_slides, editorial_content, hero_slides, categories)
  * - Recursively scans and uploads all local assets to storage
  * - Seeds all catalog, lookbook slides, editorial content, hero slides, and categories into the database
@@ -22,7 +22,6 @@ import { execSync } from 'child_process';
 import { heroProducts, featuredProducts, allProducts, type Product } from '../src/data/products';
 import { lookbookSlides } from '../src/data/lookbook';
 import { editorialItems } from '../src/data/editorial';
-import { heroSlides } from '../src/data/hero';
 import { categoryDataList } from '../src/data/categories';
 
 // ════════════════════════════════════════════════════════
@@ -94,7 +93,6 @@ const BUCKETS = {
   products: 'product-media',
   lookbook: 'lookbook-media',
   editorial: 'editorial-media',
-  hero: 'hero-media',
   categories: 'category-media',
 };
 
@@ -108,11 +106,6 @@ function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: st
     return {
       bucket: BUCKETS.editorial,
       storageKey: localRelPath.replace(/^\/images\/editorial\//, ''),
-    };
-  } else if (localRelPath.startsWith('/images/hero/')) {
-    return {
-      bucket: BUCKETS.hero,
-      storageKey: localRelPath.replace(/^\/images\/hero\//, ''),
     };
   } else if (localRelPath.startsWith('/images/categories/')) {
     return {
@@ -307,11 +300,6 @@ async function seed() {
     allImagePaths.add(item.originalImage);
   }
 
-  // Add hero images
-  for (const slide of heroSlides) {
-    allImagePaths.add(slide.originalImage);
-  }
-
   // Scan directories for other public images
   const publicDir = path.resolve(process.cwd(), 'public');
   const imagesDir = path.resolve(publicDir, 'images');
@@ -391,7 +379,6 @@ async function seed() {
     'products',
     'public.lookbook_slides',
     'public.editorial_content',
-    'public.hero_slides',
     'categories',
   ];
   if (!catalogOnly) {
@@ -536,16 +523,6 @@ async function seed() {
     );
   }
 
-  // ── Seeding Hero Slides ──
-  console.log("Seeding hero slides...");
-  for (const slide of heroSlides) {
-    const imageUrl = urlMap.get(slide.originalImage) || slide.originalImage;
-    await client.query(
-      `INSERT INTO hero_slides (slide_number, original_image, image_url, alt_text, title, link)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [slide.slideNumber, slide.originalImage, imageUrl, slide.altText, slide.title || null, slide.link || null]
-    );
-  }
 
   await client.end();
   console.log("\n=== Seeding completed successfully. ===");

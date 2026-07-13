@@ -145,17 +145,6 @@ CREATE TABLE IF NOT EXISTS public.editorial_content (
   description TEXT
 );
 
--- Hero images table
-CREATE TABLE IF NOT EXISTS public.hero_slides (
-  id SERIAL PRIMARY KEY,
-  slide_number INT UNIQUE NOT NULL,
-  original_image TEXT NOT NULL,
-  image_url TEXT NOT NULL,
-  alt_text TEXT NOT NULL,
-  title VARCHAR(255),
-  link VARCHAR(255)
-);
-
 -- Newsletter subscriptions table
 CREATE TABLE IF NOT EXISTS public.newsletter_subscriptions (
   id SERIAL PRIMARY KEY,
@@ -321,18 +310,7 @@ CREATE POLICY "Allow admin write access" ON public.editorial_content FOR ALL TO 
   )
 );
 
--- 9. Hero Slides
-ALTER TABLE public.hero_slides ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Allow public read access" ON public.hero_slides;
-CREATE POLICY "Allow public read access" ON public.hero_slides FOR SELECT USING (true);
-DROP POLICY IF EXISTS "Allow admin write access" ON public.hero_slides;
-CREATE POLICY "Allow admin write access" ON public.hero_slides FOR ALL TO authenticated USING (
-  public.requesting_user_id() IN (
-    SELECT id FROM better_auth."user" WHERE role = 'admin'
-  )
-);
-
--- 10. Orders (Users read own orders, Admins read all)
+-- 9. Orders (Users read own orders, Admins read all)
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow users to view own orders" ON public.orders;
 CREATE POLICY "Allow users to view own orders" ON public.orders FOR SELECT TO authenticated USING (
