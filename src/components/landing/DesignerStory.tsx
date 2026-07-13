@@ -26,7 +26,7 @@ export function DesignerStory({ imageUrl }: DesignerStoryProps) {
     >
       {/* Text Column */}
       <motion.div
-        className="flex flex-col justify-center px-8 md:px-12 xl:px-20 py-20 bg-bg-primary lg:order-first"
+        className="flex flex-col justify-center items-center lg:items-start text-center lg:text-left px-8 md:px-12 xl:px-20 py-20 bg-bg-primary lg:order-first"
         variants={staggerContainer}
         initial="hidden"
         whileInView="visible"
@@ -68,7 +68,7 @@ export function DesignerStory({ imageUrl }: DesignerStoryProps) {
 
         <motion.div
           variants={fadeInUp}
-          className="mt-10 border-t border-border-subtle pt-8"
+          className="mt-10 border-t border-border-subtle pt-8 w-full"
         >
           <p className="font-display text-lg text-text-primary italic">
             — Elena Voss
