@@ -7,7 +7,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import Image from "next/image";
 import { fadeInUp, staggerContainer } from "@/animations/variants";
 import type { EditorialItem } from "@/data/editorial";
 
@@ -32,12 +32,14 @@ export function PhilosophySection({ content }: PhilosophySectionProps) {
         className="lg:col-span-6 relative aspect-[4/5] bg-border-subtle rounded-2xl overflow-hidden shadow-sm"
       >
         {imageUrl && (
-          <OptimizedImage
+          <Image
             src={imageUrl}
             alt={altText ?? ""}
+            fill
+            quality={85}
+            sizes="(max-width: 1023px) 100vw, 45vw"
             className="w-full h-full object-cover object-top"
             loading="lazy"
-            sizes="(max-width: 1023px) 100vw, 45vw"
           />
         )}
       </motion.div>

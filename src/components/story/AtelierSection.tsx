@@ -8,7 +8,7 @@
 
 import { motion } from "framer-motion";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import Image from "next/image";
 import { fadeInUp, staggerContainer } from "@/animations/variants";
 import type { EditorialItem } from "@/data/editorial";
 
@@ -58,21 +58,25 @@ export function AtelierSection({ loomContent, foldingContent }: AtelierSectionPr
         >
           <div className="relative aspect-[3/4] bg-border-subtle rounded-xl overflow-hidden">
             {loomImg && (
-              <OptimizedImage
+              <Image
                 src={loomImg}
                 alt={loomAlt ?? ""}
-                className="w-full h-full object-cover"
+                fill
+                quality={85}
                 sizes="(max-width: 1024px) 50vw, 30vw"
+                className="w-full h-full object-cover"
               />
             )}
           </div>
           <div className="relative aspect-[3/4] bg-border-subtle rounded-xl overflow-hidden mt-8">
             {foldingImg && (
-              <OptimizedImage
+              <Image
                 src={foldingImg}
                 alt={foldingAlt ?? ""}
-                className="w-full h-full object-cover"
+                fill
+                quality={85}
                 sizes="(max-width: 1024px) 50vw, 30vw"
+                className="w-full h-full object-cover"
               />
             )}
           </div>

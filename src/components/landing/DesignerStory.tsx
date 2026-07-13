@@ -9,7 +9,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import Image from "next/image";
 import { staggerContainer, fadeInUp } from "@/animations/variants";
 
 interface DesignerStoryProps {
@@ -83,12 +83,14 @@ export function DesignerStory({ imageUrl }: DesignerStoryProps) {
       <div className="relative overflow-hidden aspect-square lg:aspect-auto lg:h-auto lg:order-last min-h-[400px] lg:min-h-0">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           {imageUrl && (
-            <OptimizedImage
+            <Image
               src={imageUrl}
               alt="Aurora's creative director photographed in her design studio, examining fabric swatches"
+              fill
+              quality={85}
+              sizes="(max-width: 1023px) 100vw, 50vw"
               className="w-full h-full object-cover object-top"
               loading="lazy"
-              sizes="(max-width: 1023px) 100vw, 50vw"
             />
           )}
         </div>

@@ -7,7 +7,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import Image from "next/image";
 import { getStorageUrl } from "@/utils/insforge";
 import { cn } from "@/utils/cn";
 
@@ -36,12 +36,14 @@ export function ImageGallery({ images, altText }: ImageGalleryProps) {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="absolute inset-0 w-full h-full"
           >
-            <OptimizedImage
+            <Image
               src={galleryImages[activeIndex]}
               alt={`${altText} - view ${activeIndex + 1}`}
+              fill
+              quality={100}
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover w-full h-full"
               loading="eager"
-              sizes="(max-width: 1024px) 100vw, 50vw"
             />
           </motion.div>
         </AnimatePresence>
@@ -67,11 +69,13 @@ export function ImageGallery({ images, altText }: ImageGalleryProps) {
                 )}
                 aria-label={`View image ${idx + 1}`}
               >
-                <OptimizedImage
+                <Image
                   src={img}
                   alt={`${altText} - thumbnail ${idx + 1}`}
-                  className="object-cover w-full h-full"
+                  fill
+                  quality={50}
                   sizes="64px"
+                  className="object-cover w-full h-full"
                 />
               </button>
             );

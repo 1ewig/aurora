@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import Image from "next/image";
 import Link from "next/link";
 
 interface LookbookSlide {
@@ -91,9 +91,12 @@ export function LookbookSlider({ slides }: LookbookSliderProps) {
                 className="relative flex-[0_0_100%] min-w-0 h-full"
                 aria-label={`Look ${i + 1} of ${slides.length}`}
               >
-                <OptimizedImage
+                <Image
                   src={slide.imageUrl}
                   alt={slide.altText}
+                  fill
+                  quality={100}
+                  sizes="100vw"
                   className="w-full h-full object-cover object-center"
                 />
 

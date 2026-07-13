@@ -73,7 +73,7 @@ export function FeaturedCollection({ categories }: FeaturedCollectionProps) {
                         src={category.image}
                         alt={`${category.name} cover`}
                         fill
-                        quality={80}
+                        quality={85}
                         sizes="(max-width: 768px) 100vw, 33vw"
                         className="object-cover object-center transition-transform duration-[800ms] ease-out group-hover:scale-105"
                       />

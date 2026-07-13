@@ -93,7 +93,7 @@ export function MaterialIndex() {
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                quality={90}
+                quality={85}
               />
               <div className="absolute inset-0 bg-black/5 group-hover:opacity-0 transition-opacity duration-300" />
             </div>

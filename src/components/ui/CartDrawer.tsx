@@ -10,7 +10,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/stores/useCartStore";
 import { useBodyScrollLock } from "@/hooks/ui/useBodyScrollLock";
-import { OptimizedImage } from "@/components/ui/OptimizedImage";
+import Image from "next/image";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { drawerSlide } from "@/animations/variants";
 
@@ -97,11 +97,13 @@ export function CartDrawer() {
                         onClick={closeCart}
                         className="w-20 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-bg-primary relative"
                       >
-                        <OptimizedImage
+                        <Image
                           src={item.image}
                           alt={item.name}
-                          className="w-full h-full object-cover"
+                          fill
+                          quality={50}
                           sizes="80px"
+                          className="w-full h-full object-cover"
                         />
                       </Link>
                       <div className="flex-1 min-w-0">

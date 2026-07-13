@@ -91,7 +91,7 @@ export function SignaturePieces({ products }: SignaturePiecesProps) {
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover object-top transition-transform duration-[1000ms] ease-out group-hover:scale-105"
-                    quality={90}
+                    quality={85}
                   />
                   {/* Subtle hover overlay */}
                   <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
