@@ -18,22 +18,6 @@ interface SignaturePiecesProps {
   products: Product[];
 }
 
-// Luxury textile origins and batch runs
-const signatureDetails: Record<string, { fabric: string; run: string }> = {
-  "ivory-wool-overcoat": {
-    fabric: "100% Fine Italian Virgin Wool",
-    run: "Batch of 50"
-  },
-  "camel-cashmere-turtleneck": {
-    fabric: "100% Grade-A Mongolian Cashmere",
-    run: "Batch of 40"
-  },
-  "ecru-linen-blazer": {
-    fabric: "100% Premium French Flax Linen",
-    run: "Batch of 75"
-  }
-};
-
 export function SignaturePieces({ products }: SignaturePiecesProps) {
   return (
     <section
@@ -72,7 +56,6 @@ export function SignaturePieces({ products }: SignaturePiecesProps) {
         className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8"
       >
         {products.map((product, i) => {
-          const details = signatureDetails[product.slug] || { fabric: "Noble Fiber Blend", run: "Limited Batch" };
           return (
             <motion.div
               key={product.id}
@@ -111,7 +94,7 @@ export function SignaturePieces({ products }: SignaturePiecesProps) {
                           {product.name}
                         </h3>
                         <p className="text-sm text-text-muted leading-relaxed max-h-0 group-hover:max-h-24 opacity-0 group-hover:opacity-100 group-hover:mt-3 transition-all duration-500 overflow-hidden">
-                          {details.fabric} — {details.run}
+                          {product.description}
                         </p>
                         <div className="mt-2">
                           <span className="font-mono text-sm text-white">

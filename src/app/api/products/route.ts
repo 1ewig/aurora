@@ -47,7 +47,7 @@ const fetchProductsList = async (
     const countResult = await pool.query(countQuery, params);
     const total = parseInt(countResult.rows[0].count, 10);
 
-    let dataQuery = `SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio FROM products${whereSql}`;
+    let dataQuery = `SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description FROM products${whereSql}`;
 
     if (sortBy === 'price-asc') {
       dataQuery += ' ORDER BY price ASC, name ASC';
@@ -79,12 +79,13 @@ const fetchProductsList = async (
       altText: row.alt_text,
       span: row.span,
       aspectRatio: row.aspect_ratio,
+      description: row.description,
     }));
 
     return { products, total };
   }
 
-  let query = 'SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio FROM products';
+  let query = 'SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description FROM products';
   let params: string[] = [];
 
   if (category && category !== 'All') {
@@ -104,10 +105,12 @@ const fetchProductsList = async (
     price: Number(row.price),
     badge: row.badge,
     image: row.image,
-    altText: row.alt_text,
-    span: row.span,
-    aspectRatio: row.aspect_ratio,
+      altText: row.alt_text,
+      span: row.span,
+      aspectRatio: row.aspect_ratio,
+      description: row.description,
   }));
+
 
   return { products, total: products.length };
 };
