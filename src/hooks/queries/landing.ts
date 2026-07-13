@@ -43,6 +43,6 @@ export function useLandingQuery() {
   return useQuery<LandingData>({
     queryKey: ['landing'],
     queryFn: fetchLanding,
-    staleTime: 1000 * 60 * 2,
+    staleTime: 1000 * 60 * 5,
   });
 }

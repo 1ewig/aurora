@@ -20,6 +20,7 @@ export function useEditorialQuery() {
   return useQuery({
     queryKey: ['editorial'],
     queryFn: fetchEditorialContent,
+    staleTime: 1000 * 60 * 5,
   });
 }
 
@@ -36,6 +37,6 @@ export function useCategoriesQuery() {
   return useQuery<CategoryMetadata[]>({
     queryKey: ["categories"],
     queryFn: fetchCategories,
-    staleTime: 1000 * 60 * 10,
+    staleTime: 1000 * 60 * 5,
   });
 }
