@@ -19,6 +19,7 @@ export function useProductsQuery(category?: string) {
   return useQuery({
     queryKey: ['products', category || 'All'],
     queryFn: () => fetchProducts(category),
+    staleTime: 1000 * 60 * 5,
   });
 }
 
@@ -85,6 +86,7 @@ export function useFeaturedProductsQuery(count = 3) {
     queryKey: ['products', 'featured', count],
     queryFn: () => fetchProducts(),
     select: selectFn,
+    staleTime: 1000 * 60 * 5,
   });
 }
 
@@ -108,6 +110,7 @@ export function useRelatedProductsQuery(currentProduct?: Product) {
     queryFn: () => fetchProducts(),
     enabled: !!currentProduct,
     select: selectFn,
+    staleTime: 1000 * 60 * 5,
   });
 }
 
