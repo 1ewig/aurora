@@ -4,7 +4,7 @@
  *
  * First-time setup / Wiping & Seeding script:
  * - Verifies and wipes/recreates the five storage buckets (product-media, lookbook-media, editorial-media, material-media, category-media)
- * - Drops and rebuilds all database tables (products, product_images, product_sizes, product_details, product_keywords, orders, processed_webhooks, product_reservations, lookbook_slides, editorial_content, hero_slides, categories)
+ * - Drops and rebuilds all database tables (products, product_images, product_sizes, product_details, product_keywords, orders, processed_webhooks, product_reservations, lookbook_slides, editorial_content, materials, categories)
  * - Recursively scans and uploads all local assets to storage
  * - Seeds all catalog, lookbook slides, editorial content, hero slides, and categories into the database
  *

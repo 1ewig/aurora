@@ -65,7 +65,7 @@ aurora/
     ├── animations/                      # Framer Motion presets (2 files)
     ├── app/                             # Next.js App Router (~60 files)
     ├── components/                      # React components (~92 files)
-    ├── data/                            # Static content definitions (7 files)
+    ├── data/                            # Static content definitions (6 files)
     ├── hooks/                           # Custom React hooks (13 files)
     ├── lib/                             # Third-party integrations (7 files)
     ├── stores/                          # Zustand state stores (4 files)
@@ -220,7 +220,6 @@ src/components/
 |---|---|
 | `products.ts` | `Product` type + `heroProducts`, `featuredProducts`, `allProducts` arrays |
 | `categories.ts` | `Category` type (union), `CategoryData` interface, `categoryDataList` |
-| `hero.ts` | `HeroSlide` type + `heroSlides` array for homepage |
 | `editorial.ts` | Editorial content for story page |
 | `lookbook.ts` | Lookbook slide data |
 | `navigation.ts` | Navigation link definitions |
@@ -289,7 +288,7 @@ src/hooks/
 
 | Script | Language | Purpose |
 |---|---|---|
-| `create-tables.sql` | SQL | Full DDL (categories, products, product_*, orders, reservations, lookbook, editorial, hero) |
+| `create-tables.sql` | SQL | Full DDL (categories, products, product_*, orders, reservations, lookbook, editorial, materials) |
 | `setup-db.js` | JS | Better Auth schema initializer |
 | `upload-and-seed.mts` | TS | Deploy schema + upload media + seed DB (full reset) |
 | `update-catalog.mts` | TS | Upsert products without wiping orders/users (`--catalog-only`) |
@@ -779,17 +778,6 @@ CREATE TABLE editorial_content (
   description    TEXT
 );
 
--- Hero slides
-CREATE TABLE hero_slides (
-  id             SERIAL PRIMARY KEY,
-  slide_number   INT UNIQUE NOT NULL,
-  original_image TEXT NOT NULL,
-  image_url      TEXT NOT NULL,
-  alt_text       TEXT NOT NULL,
-  title          VARCHAR(255),
-  link           VARCHAR(255)
-);
-
 -- Newsletter subscriptions
 CREATE TABLE newsletter_subscriptions (
   id         SERIAL PRIMARY KEY,
@@ -881,16 +869,7 @@ CREATE POLICY "Allow admin write access" ON public.editorial_content FOR ALL TO 
   )
 );
 
--- 9. Hero Slides
-ALTER TABLE public.hero_slides ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read access" ON public.hero_slides FOR SELECT USING (true);
-CREATE POLICY "Allow admin write access" ON public.hero_slides FOR ALL TO authenticated USING (
-  public.requesting_user_id() IN (
-    SELECT id FROM better_auth."user" WHERE role = 'admin'
-  )
-);
-
--- 10. Orders (Users read own orders, Admins read all)
+-- 9. Orders (Users read own orders, Admins read all)
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow users to view own orders" ON public.orders FOR SELECT TO authenticated USING (
   user_id = public.requesting_user_id()
@@ -900,10 +879,10 @@ CREATE POLICY "Allow users to view own orders" ON public.orders FOR SELECT TO au
   )
 );
 
--- 11. Processed Webhooks (Bypass RLS on Service role, block client-side)
+-- 10. Processed Webhooks (Bypass RLS on Service role, block client-side)
 ALTER TABLE public.processed_webhooks ENABLE ROW LEVEL SECURITY;
 
--- 12. Product Reservations (Bypass RLS on Service role, block client-side)
+-- 11. Product Reservations (Bypass RLS on Service role, block client-side)
 ALTER TABLE public.product_reservations ENABLE ROW LEVEL SECURITY;
 ```
 
@@ -1076,21 +1055,7 @@ interface FieldErrors {
 }
 ```
 
-### 7.8 Hero / Landing Types (`src/data/hero.ts`)
-
-```ts
-interface HeroSlide {
-  id?: number;
-  slideNumber: number;
-  originalImage: string;
-  imageUrl: string;
-  altText: string;
-  title?: string;
-  link?: string;
-}
-```
-
-### 7.9 Query Types (`src/hooks/queries/`)
+### 7.8 Query Types (`src/hooks/queries/`)
 
 ```ts
 interface PaginatedProductsParams {
@@ -1139,7 +1104,7 @@ interface CategoryMetadata {
 }
 ```
 
-### 7.10 Email Types (`src/lib/email-templates.ts`)
+### 7.9 Email Types (`src/lib/email-templates.ts`)
 
 ```ts
 interface OrderConfirmationData {
@@ -1150,7 +1115,7 @@ interface OrderConfirmationData {
 }
 ```
 
-### 7.11 Lemon Squeezy Types (`src/lib/lemonsqueezy.ts`)
+### 7.10 Lemon Squeezy Types (`src/lib/lemonsqueezy.ts`)
 
 ```ts
 interface CreateCheckoutPayload {
@@ -1169,7 +1134,7 @@ interface LemonSqueezyCheckoutResponse {
 }
 ```
 
-### 7.12 Webhook Verified Item Type (`src/app/api/webhooks/lemonsqueezy/route.ts`)
+### 7.11 Webhook Verified Item Type (`src/app/api/webhooks/lemonsqueezy/route.ts`)
 
 ```ts
 interface VerifiedItem {
@@ -1483,7 +1448,8 @@ LS sends webhook POST → /api/webhooks/lemonsqueezy
 | `product-media` | `/images/products/` | Product images/gallery, seed scripts |
 | `lookbook-media` | `/images/lookbook/` | Lookbook slider |
 | `editorial-media` | `/images/editorial/` | Brand story page |
-| `hero-media` | `/images/hero/` | Homepage hero slides |
+
+| `material-media` | `/images/materials/` | Fabric Index section |
 | `category-media` | `/images/categories/` | Category listing images |
 
 ### 13.2 Dual Client Architecture
@@ -1606,7 +1572,7 @@ getStorageKeyFromUrl(url: string): string | null
 
 | Script | Language | Purpose | When to Run |
 |---|---|---|---|
-| `scripts/create-tables.sql` | SQL | Full DDL (categories, products, product_*, orders, reservations, lookbook, editorial, hero, indexes, RLS helper) | Auto by upload-and-seed |
+| `scripts/create-tables.sql` | SQL | Full DDL (categories, products, product_*, orders, reservations, lookbook, editorial, materials, indexes, RLS helper) | Auto by upload-and-seed |
 | `scripts/setup-db.js` | JS | Initialize Better Auth schema (`npx @better-auth/cli` equivalent) | First-time setup |
 | `scripts/upload-and-seed.mts` | TS | Deploy schema + upload media to InsForge Storage + seed all DB tables | First-time setup or full reset |
 | `scripts/update-catalog.mts` | TS | Upsert products/media from `src/data/products.ts` | Adding/updating products (safe for production — uses `--catalog-only` flag) |
@@ -1616,8 +1582,8 @@ getStorageKeyFromUrl(url: string): string | null
 ### Update-Catalog Details
 
 The `update-catalog.mts` script:
-- Handles 5 InsForge Storage buckets (product, lookbook, editorial, hero, category)
-- Upserts lookbook slides, editorial content, hero slides, categories, and products
+- Handles 5 InsForge Storage buckets (product, lookbook, editorial, material, category)
+- Upserts lookbook slides, editorial content, materials, categories, and products
 - `--catalog-only` flag skips transactional tables (orders, processed_webhooks, product_reservations) and only updates catalog
 
 ---
