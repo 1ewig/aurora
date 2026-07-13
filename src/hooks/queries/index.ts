@@ -10,12 +10,12 @@ export type {
   PaginatedProductsResponse,
 } from './products';
 
+export { useLandingQuery } from './landing';
+export type { LandingData, LookbookSlide, EditorialItem } from './landing';
+
 export {
-  useLookbookQuery,
   useEditorialQuery,
   useCategoriesQuery,
-  useDailyCategoriesQuery,
-  useMaterialsQuery,
 } from './content';
 export type { CategoryMetadata } from './content';
 

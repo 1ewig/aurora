@@ -160,6 +160,7 @@ export async function POST(request: Request) {
       }
 
       revalidateTag('products', { expire: 0 });
+      revalidateTag('landing', { expire: 0 });
 
       const { user } = await requireAdmin();
       await logAudit({

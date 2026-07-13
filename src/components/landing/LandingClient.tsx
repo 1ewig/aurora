@@ -10,7 +10,7 @@
 
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
-import { useProductsQuery, useEditorialQuery, useDailyCategoriesQuery, useLookbookQuery, useMaterialsQuery } from "@/hooks/queries";
+import { useLandingQuery } from "@/hooks/queries/landing";
 import { useNewsletterSubmit } from "@/hooks/useNewsletterSubmit";
 import type { Product } from "@/data/products";
 import { Hero } from "./Hero";
@@ -24,12 +24,14 @@ const PressClientNotes = dynamic(() => import("./PressClientNotes").then((m) => 
 const Newsletter = dynamic(() => import("./Newsletter").then((m) => m.Newsletter), { loading: () => <div className="h-96" /> });
 
 export default function LandingClient() {
-  const { data: allProducts = [] } = useProductsQuery();
-  const { data: dailyCategories = [] } = useDailyCategoriesQuery();
-  const { data: dbSlides = [] } = useLookbookQuery();
-  const { data: editorialItems = [] } = useEditorialQuery();
-  const { data: materials = [] } = useMaterialsQuery();
+  const { data: landing } = useLandingQuery();
   const newsletter = useNewsletterSubmit();
+
+  const allProducts = landing?.products ?? [];
+  const allCategories = landing?.categories ?? [];
+  const dbSlides = landing?.lookbook ?? [];
+  const editorialItems = landing?.editorial ?? [];
+  const materials = landing?.materials ?? [];
 
   const heroProducts = useMemo(() => {
     if (!allProducts.length) return [];
@@ -54,6 +56,14 @@ export default function LandingClient() {
     }
     return selected;
   }, [allProducts]);
+
+  const dailyCategories = useMemo(() => {
+    if (!allCategories.length) return [];
+    const day = new Date().getDate();
+    return Array.from({ length: Math.min(3, allCategories.length) }, (_, i) =>
+      allCategories[(day + i) % allCategories.length]
+    );
+  }, [allCategories]);
 
   const slides = dbSlides.slice(0, 6);
   const designerImage = editorialItems.find((item) => item.id === "designer")?.imageUrl;

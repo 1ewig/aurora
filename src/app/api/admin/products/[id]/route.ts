@@ -142,6 +142,7 @@ export async function PUT(
       }
 
       revalidateTag('products', { expire: 0 });
+      revalidateTag('landing', { expire: 0 });
 
       const { user } = await requireAdmin();
       const changes: Record<string, { from: any; to: any }> = {};
@@ -205,6 +206,7 @@ export async function DELETE(
       await client.query('DELETE FROM products WHERE id = $1', [id]);
 
       revalidateTag('products', { expire: 0 });
+      revalidateTag('landing', { expire: 0 });
 
       const { user } = await requireAdmin();
       await logAudit({
