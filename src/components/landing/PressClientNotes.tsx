@@ -8,21 +8,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { fadeInUp, scaleIn, staggerContainer } from "@/animations/variants";
 
 interface PressMention {
   publication: string;
   quote: string;
-}
-
-interface ClientNote {
-  quote: string;
-  client: string;
-  location: string;
-  productName: string;
-  productSlug: string;
 }
 
 const pressMentions: PressMention[] = [
@@ -37,30 +28,6 @@ const pressMentions: PressMention[] = [
   {
     publication: "The Wardrobe Index",
     quote: "In a world of excessive noise, Aurora represents a welcome silence.",
-  },
-];
-
-const clientNotes: ClientNote[] = [
-  {
-    quote: "The Ivory Wool Overcoat has a drape that is unmatched. It feels substantial yet incredibly soft. A lifetime piece.",
-    client: "Sarah K.",
-    location: "New York",
-    productName: "Ivory Wool Overcoat",
-    productSlug: "ivory-wool-overcoat",
-  },
-  {
-    quote: "Deliberate scarcity makes each purchase feel personal. The linen blazer has become my summer second skin.",
-    client: "Julian M.",
-    location: "London",
-    productName: "Ecru Linen Blazer",
-    productSlug: "ecru-linen-blazer",
-  },
-  {
-    quote: "Spun in Scotland and knitted to perfection. The camel cashmere turtleneck is exceptionally warm and cloud-soft.",
-    client: "Sofia R.",
-    location: "Milan",
-    productName: "Camel Cashmere Turtleneck",
-    productSlug: "camel-cashmere-turtleneck",
   },
 ];
 
@@ -99,7 +66,7 @@ export function PressClientNotes() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-10% 0px" }}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-12 pb-20 border-b border-border-subtle"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-12"
         >
           {pressMentions.map((press, idx) => (
             <motion.div
@@ -117,57 +84,6 @@ export function PressClientNotes() {
           ))}
         </motion.div>
 
-        {/* Client Notes Section */}
-        <div className="mt-20">
-          <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-text-muted text-center mb-12">
-            Verified Client Observations
-          </h3>
-
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-10% 0px" }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16"
-          >
-            {clientNotes.map((note, idx) => (
-              <motion.article
-                key={idx}
-                variants={scaleIn}
-                className="flex flex-col h-full bg-bg-secondary p-8 rounded-[24px] border border-border-subtle"
-              >
-                <blockquote className="flex-grow flex flex-col">
-                  <p className="text-text-primary text-sm md:text-base font-light leading-relaxed mb-8 italic flex-grow">
-                    “ {note.quote} ”
-                  </p>
-                  
-                  <footer className="mt-auto pt-6 border-t border-border-subtle/50 flex flex-col gap-2">
-                    <div className="flex justify-between items-baseline">
-                      <cite className="font-semibold text-text-primary not-italic text-sm">
-                        {note.client}
-                      </cite>
-                      <span className="text-text-muted text-xs font-light">
-                        {note.location}
-                      </span>
-                    </div>
-
-                    <div className="mt-2 flex items-center justify-between">
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-text-muted">
-                        Verified Purchase
-                      </span>
-                      <Link 
-                        href={`/products/${note.productSlug}`}
-                        className="text-[10px] font-mono uppercase tracking-wider text-accent-primary hover:underline"
-                      >
-                        {note.productName} →
-                      </Link>
-                    </div>
-                  </footer>
-                </blockquote>
-              </motion.article>
-            ))}
-          </motion.div>
-        </div>
       </div>
     </section>
   );
