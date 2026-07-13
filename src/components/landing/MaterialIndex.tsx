@@ -37,7 +37,7 @@ export function MaterialIndex({ materials }: MaterialIndexProps) {
             className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 text-text-primary"
             style={{ fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}
           >
-            The Fabric Index.
+            Material <span className="text-accent-primary">Archive.</span>
           </h2>
         </div>
         <p className="text-text-secondary font-light text-sm md:text-base max-w-sm mt-4 md:mt-0 leading-relaxed text-center md:text-left">

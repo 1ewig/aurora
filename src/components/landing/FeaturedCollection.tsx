@@ -31,17 +31,21 @@ export function FeaturedCollection({ categories }: FeaturedCollectionProps) {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
+        className="mb-16 text-center md:text-left md:flex md:items-center md:justify-between"
       >
-        <EyebrowLabel>Curated Edits</EyebrowLabel>
-        <h2
-          id="collection-heading"
-          className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 mb-16 text-text-primary"
-          style={{ fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}
-        >
-          The Seasonal
-          <br />
-          <span className="text-accent-primary">Edit.</span>
-        </h2>
+        <div>
+          <EyebrowLabel>Curated Edits</EyebrowLabel>
+          <h2
+            id="collection-heading"
+            className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 text-text-primary"
+            style={{ fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}
+          >
+            Seasonal <span className="text-accent-primary">Edit.</span>
+          </h2>
+        </div>
+        <p className="text-text-secondary font-light text-sm md:text-base max-w-sm mt-4 md:mt-0 leading-relaxed text-center md:text-left">
+          A highly curated capsule of seasonal essentials, designed for versatility, comfort, and uncompromising aesthetic longevity.
+        </p>
       </motion.div>
 
       <motion.div

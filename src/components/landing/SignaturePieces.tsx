@@ -40,7 +40,7 @@ export function SignaturePieces({ products }: SignaturePiecesProps) {
             className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 text-text-primary"
             style={{ fontSize: "clamp(2.5rem, 5vw, 5.5rem)" }}
           >
-            Signature Pieces.
+            Signature <span className="text-accent-primary">Pieces.</span>
           </h2>
         </div>
         <p className="text-text-secondary font-light text-sm md:text-base max-w-sm mt-4 md:mt-0 leading-relaxed text-center md:text-left">
