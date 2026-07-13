@@ -6,6 +6,7 @@
 
 import type { Metadata } from "next";
 import CheckoutPageClient from "@/components/checkout/CheckoutPageClient";
+import Script from "next/script";
 
 /** Metadata for the checkout page. */
 export const metadata: Metadata = {
@@ -19,6 +20,14 @@ export const metadata: Metadata = {
 
 /** Secure checkout page. */
 export default function CheckoutPage() {
-  return <CheckoutPageClient />;
+  return (
+    <>
+      <CheckoutPageClient />
+      <Script
+        src="https://app.lemonsqueezy.com/js/lemon.js"
+        strategy="afterInteractive"
+      />
+    </>
+  );
 }
 
