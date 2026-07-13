@@ -262,7 +262,7 @@ Explore the implementation quality of the core components in this codebase:
 | :--- | :--- |
 | **[src/proxy.ts](src/proxy.ts)** | Next.js 16 Edge proxy middleware, route-gating. |
 | **[src/app/api/orders/route.ts](src/app/api/orders/route.ts)** | Concurrency transaction logic, email template compiler. |
-| **[src/hooks/queries.ts](src/hooks/queries.ts)** | Optimistic cache loading, React Query data fetching layer. |
+| **[src/hooks/queries/index.ts](src/hooks/queries/index.ts)** | Optimistic cache loading, React Query data fetching layer. |
 | **[src/app/api/products/[slug]/route.ts](src/app/api/products/%5Bslug%5D/route.ts)** | PostgreSQL query optimizations (`json_agg` data shaping). |
 | **[src/hooks/useUsersManagement.ts](src/hooks/useUsersManagement.ts)** | Custom React hook separating business/state logic from admin user panel. |
 | **[src/stores/useAuthStore.ts](src/stores/useAuthStore.ts)** | Zustand client wrapper for session tracking. |
