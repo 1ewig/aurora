@@ -80,51 +80,49 @@ export function MaterialIndex() {
         className="grid grid-cols-1 md:grid-cols-3 gap-8"
       >
         {materials.map((material) => (
-          <motion.article
+          <motion.div
             key={material.name}
             variants={scaleIn}
-            className="group flex flex-col h-full bg-white rounded-[24px] overflow-hidden border border-border-subtle hover:shadow-lg transition-[box-shadow,border-color] duration-300"
           >
-            {/* Macro Image Wrapper */}
-            <div className="relative aspect-square overflow-hidden bg-bg-secondary">
-              <Image
-                src={material.image}
-                alt={`Macro texture close-up of ${material.name}`}
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                quality={85}
-              />
-              <div className="absolute inset-0 bg-black/5 group-hover:opacity-0 transition-opacity duration-300" />
-            </div>
+            <article aria-label={material.name}>
+              <div
+                className="relative overflow-hidden rounded-[20px] bg-white cursor-pointer group transition-all duration-300 border border-transparent hover:border-accent-primary aspect-[3/4]"
+                style={{
+                  boxShadow: "0 2px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
+                }}
+              >
+                {/* Material Image */}
+                <div className="absolute inset-0 w-full h-full overflow-hidden">
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={material.image}
+                      alt={`Macro texture close-up of ${material.name}`}
+                      fill
+                      quality={85}
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover object-center transition-transform duration-[800ms] ease-out group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 transition-opacity duration-300 group-hover:from-black/90" />
+                  </div>
+                </div>
 
-            {/* Description Card */}
-            <div className="p-6 flex flex-col flex-grow">
-              <div className="mb-3">
-                <span className="text-[10px] font-mono text-accent-primary uppercase tracking-widest block mb-1">
-                  {material.source}
-                </span>
-                <h3 className="font-sans font-black text-xl text-text-primary tracking-tight">
-                  {material.name}
-                </h3>
+                {/* Content Overlay */}
+                <div className="absolute inset-0 flex flex-col justify-end p-8 text-white z-10">
+                  <div className="pr-16">
+                    <span className="text-xs font-semibold tracking-[0.2em] uppercase text-accent-primary mb-2 block opacity-90">
+                      {material.source}
+                    </span>
+                    <h3 className="font-display font-black text-2xl tracking-[0.05em] uppercase mb-1">
+                      {material.name}
+                    </h3>
+                    <p className="text-sm text-text-muted leading-relaxed max-h-0 group-hover:max-h-24 opacity-0 group-hover:opacity-100 group-hover:mt-3 transition-all duration-500 overflow-hidden">
+                      {material.description}
+                    </p>
+                  </div>
+                </div>
               </div>
-              <p className="text-text-secondary text-sm font-light leading-relaxed mb-6">
-                {material.description}
-              </p>
-              <div className="mt-auto pt-4 border-t border-border-subtle">
-                <ul className="flex flex-wrap gap-2">
-                  {material.properties.map((prop) => (
-                    <li
-                      key={prop}
-                      className="text-[10px] font-mono bg-bg-secondary text-text-muted px-2.5 py-1 rounded-full"
-                    >
-                      {prop}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </motion.article>
+            </article>
+          </motion.div>
         ))}
       </motion.div>
     </section>
