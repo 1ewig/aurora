@@ -5,7 +5,7 @@
  * All-rounder catalog management script.
  * Can sync full catalog, add new products, or delete products interactively.
  * Auto-synchronizes local src/data/*.ts and updates the InsForge database/storage
- * across all four buckets (product-media, lookbook-media, editorial-media, category-media).
+ * across all five buckets (product-media, lookbook-media, editorial-media, material-media, category-media).
  *
  * Usage:
  *   npx tsx scripts/update-catalog.mts
@@ -16,11 +16,13 @@ import { Client } from 'pg';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
+import { execSync } from 'child_process';
 
 // Reads definitions
 import { heroProducts, featuredProducts, allProducts, type Product } from '../src/data/products';
 import { lookbookSlides } from '../src/data/lookbook';
 import { editorialItems } from '../src/data/editorial';
+import { materials } from '../src/data/materials';
 import { categoryDataList } from '../src/data/categories';
 
 // ════════════════════════════════════════════════════════
@@ -153,6 +155,7 @@ const BUCKETS = {
   products: 'product-media',
   lookbook: 'lookbook-media',
   editorial: 'editorial-media',
+  materials: 'material-media',
   categories: 'category-media',
 };
 
@@ -166,6 +169,11 @@ function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: st
     return {
       bucket: BUCKETS.editorial,
       storageKey: localRelPath.replace(/^\/images\/editorial\//, ''),
+    };
+  } else if (localRelPath.startsWith('/images/materials/')) {
+    return {
+      bucket: BUCKETS.materials,
+      storageKey: localRelPath.replace(/^\/images\/materials\//, ''),
     };
   } else if (localRelPath.startsWith('/images/categories/')) {
     return {
@@ -285,6 +293,7 @@ async function uploadCatalogImages(
   productsList: Product[],
   lookbookList: typeof lookbookSlides = [],
   editorialList: typeof editorialItems = [],
+  materialsList: typeof materials = [],
   categoryList: typeof categoryDataList = [],
 ) {
   const existingKeys = await getExistingKeys(admin);
@@ -308,6 +317,9 @@ async function uploadCatalogImages(
   }
   for (const cat of categoryList) {
     if (cat.image) imagePaths.add(cat.image);
+  }
+  for (const mat of materialsList) {
+    if (mat.image) imagePaths.add(mat.image);
   }
 
   console.log(`Syncing ${imagePaths.size} media assets in parallel...`);
@@ -448,7 +460,7 @@ async function addProductInteractively() {
   await ensureBucketsExist(admin);
 
   console.log("Uploading images...");
-  const urlMap = await uploadCatalogImages(admin, newProducts, [], [], []);
+  const urlMap = await uploadCatalogImages(admin, newProducts, [], [], [], []);
 
   console.log("Inserting products into the database...");
   for (const product of newProducts) {
@@ -579,7 +591,7 @@ async function runSyncCatalog() {
   const uniqueProducts = Array.from(productMap.values());
 
   console.log("\n=== Phase 2: Uploading and syncing media assets ===");
-  const urlMap = await uploadCatalogImages(admin, uniqueProducts, lookbookSlides, editorialItems, categoryDataList);
+  const urlMap = await uploadCatalogImages(admin, uniqueProducts, lookbookSlides, editorialItems, materials, categoryDataList);
 
   console.log("\n=== Phase 3: Connecting to database ===");
   const client = new Client({ connectionString: DATABASE_URL });
@@ -657,6 +669,28 @@ async function runSyncCatalog() {
     }
   }
 
+  console.log("\n=== Phase 8: Syncing materials ===");
+  for (const mat of materials) {
+    const imageUrl = urlMap.get(mat.image) || mat.image;
+    console.log(`Syncing material: "${mat.name}"`);
+
+    const { rows } = await client.query('SELECT 1 FROM materials WHERE name = $1', [mat.name]);
+    if (rows.length > 0) {
+      console.log(`  -> Material "${mat.name}" exists. Running UPDATE...`);
+      await client.query(
+        `UPDATE materials SET source = $1, original_image = $2, image_url = $3, description = $4, properties = $5
+         WHERE name = $6`,
+        [mat.source, mat.image, imageUrl, mat.description, mat.properties, mat.name]
+      );
+    } else {
+      console.log(`  -> Material "${mat.name}" is new. Running INSERT...`);
+      await client.query(
+        `INSERT INTO materials (name, source, original_image, image_url, description, properties)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [mat.name, mat.source, mat.image, imageUrl, mat.description, mat.properties]
+      );
+    }
+  }
 
   await client.end();
   console.log("\n=== Success! Full Catalog update complete. ===");

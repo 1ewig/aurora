@@ -15,6 +15,7 @@ export {
   useEditorialQuery,
   useCategoriesQuery,
   useDailyCategoriesQuery,
+  useMaterialsQuery,
 } from './content';
 export type { CategoryMetadata } from './content';
 

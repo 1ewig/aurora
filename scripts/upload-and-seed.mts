@@ -3,7 +3,7 @@
  * ===================
  *
  * First-time setup / Wiping & Seeding script:
- * - Verifies and wipes/recreates the four storage buckets (product-media, lookbook-media, editorial-media, category-media)
+ * - Verifies and wipes/recreates the five storage buckets (product-media, lookbook-media, editorial-media, material-media, category-media)
  * - Drops and rebuilds all database tables (products, product_images, product_sizes, product_details, product_keywords, orders, processed_webhooks, product_reservations, lookbook_slides, editorial_content, hero_slides, categories)
  * - Recursively scans and uploads all local assets to storage
  * - Seeds all catalog, lookbook slides, editorial content, hero slides, and categories into the database
@@ -22,6 +22,7 @@ import { execSync } from 'child_process';
 import { heroProducts, featuredProducts, allProducts, type Product } from '../src/data/products';
 import { lookbookSlides } from '../src/data/lookbook';
 import { editorialItems } from '../src/data/editorial';
+import { materials } from '../src/data/materials';
 import { categoryDataList } from '../src/data/categories';
 
 // ════════════════════════════════════════════════════════
@@ -93,6 +94,7 @@ const BUCKETS = {
   products: 'product-media',
   lookbook: 'lookbook-media',
   editorial: 'editorial-media',
+  materials: 'material-media',
   categories: 'category-media',
 };
 
@@ -106,6 +108,11 @@ function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: st
     return {
       bucket: BUCKETS.editorial,
       storageKey: localRelPath.replace(/^\/images\/editorial\//, ''),
+    };
+  } else if (localRelPath.startsWith('/images/materials/')) {
+    return {
+      bucket: BUCKETS.materials,
+      storageKey: localRelPath.replace(/^\/images\/materials\//, ''),
     };
   } else if (localRelPath.startsWith('/images/categories/')) {
     return {
@@ -219,6 +226,7 @@ async function seed() {
   const admin = createAdminClient({ baseUrl: ossHost, apiKey });
 
   // Verify and prepare all five storage buckets
+
   const bucketsList = execSync(`npx @insforge/cli storage buckets`, { encoding: 'utf-8' });
   const existingKeys: Record<string, Set<string>> = {};
 
@@ -293,6 +301,11 @@ async function seed() {
   // Add category images
   for (const cat of categoryDataList) {
     allImagePaths.add(cat.image);
+  }
+
+  // Add material images
+  for (const mat of materials) {
+    allImagePaths.add(mat.image);
   }
 
   // Add editorial images
@@ -382,7 +395,7 @@ async function seed() {
     'categories',
   ];
   if (!catalogOnly) {
-    tablesToDrop.push('public.orders', 'processed_webhooks', 'product_reservations');
+    tablesToDrop.push('public.materials', 'public.orders', 'processed_webhooks', 'product_reservations');
   }
   const dropSql = tablesToDrop.map((t) => `DROP TABLE IF EXISTS ${t} CASCADE;`).join('\n');
   await client.query(dropSql);
@@ -523,6 +536,16 @@ async function seed() {
     );
   }
 
+  // ── Seeding Materials ──
+  console.log("Seeding materials...");
+  for (const mat of materials) {
+    const imageUrl = urlMap.get(mat.image) || mat.image;
+    await client.query(
+      `INSERT INTO materials (name, source, original_image, image_url, description, properties)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [mat.name, mat.source, mat.image, imageUrl, mat.description, mat.properties]
+    );
+  }
 
   await client.end();
   console.log("\n=== Seeding completed successfully. ===");

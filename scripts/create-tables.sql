@@ -145,6 +145,17 @@ CREATE TABLE IF NOT EXISTS public.editorial_content (
   description TEXT
 );
 
+-- Materials table
+CREATE TABLE IF NOT EXISTS public.materials (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) UNIQUE NOT NULL,
+  source VARCHAR(255) NOT NULL,
+  original_image TEXT NOT NULL,
+  image_url TEXT NOT NULL,
+  description TEXT NOT NULL,
+  properties TEXT[] DEFAULT '{}'
+);
+
 -- Newsletter subscriptions table
 CREATE TABLE IF NOT EXISTS public.newsletter_subscriptions (
   id SERIAL PRIMARY KEY,
@@ -310,7 +321,18 @@ CREATE POLICY "Allow admin write access" ON public.editorial_content FOR ALL TO 
   )
 );
 
--- 9. Orders (Users read own orders, Admins read all)
+-- 9. Materials
+ALTER TABLE public.materials ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read access" ON public.materials;
+CREATE POLICY "Allow public read access" ON public.materials FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Allow admin write access" ON public.materials;
+CREATE POLICY "Allow admin write access" ON public.materials FOR ALL TO authenticated USING (
+  public.requesting_user_id() IN (
+    SELECT id FROM better_auth."user" WHERE role = 'admin'
+  )
+);
+
+-- 10. Orders (Users read own orders, Admins read all)
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow users to view own orders" ON public.orders;
 CREATE POLICY "Allow users to view own orders" ON public.orders FOR SELECT TO authenticated USING (
@@ -321,9 +343,9 @@ CREATE POLICY "Allow users to view own orders" ON public.orders FOR SELECT TO au
   )
 );
 
--- 11. Processed Webhooks (Bypass RLS on Service role, block client-side)
+-- 12. Processed Webhooks (Bypass RLS on Service role, block client-side)
 ALTER TABLE public.processed_webhooks ENABLE ROW LEVEL SECURITY;
 
--- 12. Product Reservations (Bypass RLS on Service role, block client-side)
+-- 13. Product Reservations (Bypass RLS on Service role, block client-side)
 ALTER TABLE public.product_reservations ENABLE ROW LEVEL SECURITY;
 

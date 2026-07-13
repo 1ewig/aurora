@@ -10,10 +10,13 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { fadeInUp, scaleIn, staggerContainer } from "@/animations/variants";
-import { materials } from "@/data/materials";
+import type { MaterialItem } from "@/data/materials";
 
+interface MaterialIndexProps {
+  materials: MaterialItem[];
+}
 
-export function MaterialIndex() {
+export function MaterialIndex({ materials }: MaterialIndexProps) {
   return (
     <section
       id="materials-index"

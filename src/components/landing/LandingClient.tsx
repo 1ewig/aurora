@@ -10,7 +10,7 @@
 
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
-import { useProductsQuery, useEditorialQuery, useDailyCategoriesQuery, useLookbookQuery } from "@/hooks/queries";
+import { useProductsQuery, useEditorialQuery, useDailyCategoriesQuery, useLookbookQuery, useMaterialsQuery } from "@/hooks/queries";
 import { useNewsletterSubmit } from "@/hooks/useNewsletterSubmit";
 import type { Product } from "@/data/products";
 import { Hero } from "./Hero";
@@ -28,6 +28,7 @@ export default function LandingClient() {
   const { data: dailyCategories = [] } = useDailyCategoriesQuery();
   const { data: dbSlides = [] } = useLookbookQuery();
   const { data: editorialItems = [] } = useEditorialQuery();
+  const { data: materials = [] } = useMaterialsQuery();
   const newsletter = useNewsletterSubmit();
 
   const heroProducts = useMemo(() => {
@@ -62,7 +63,7 @@ export default function LandingClient() {
       <Hero products={heroProducts} />
       <SignaturePieces products={signatureProducts} />
       <FeaturedCollection categories={dailyCategories} />
-      <MaterialIndex />
+      <MaterialIndex materials={materials} />
       {slides.length > 0 && <LookbookSlider slides={slides} />}
       <DesignerStory imageUrl={designerImage} />
       <PressClientNotes />

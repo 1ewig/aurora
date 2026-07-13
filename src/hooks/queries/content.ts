@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import type { MaterialItem } from '@/data/materials';
 
 export interface CategoryMetadata {
   slug: string;
@@ -61,6 +62,22 @@ export function useCategoriesQuery() {
     queryKey: ["categories"],
     queryFn: fetchCategories,
     staleTime: 1000 * 60 * 10,
+  });
+}
+
+async function fetchMaterials(): Promise<MaterialItem[]> {
+  const response = await fetch('/api/materials');
+  if (!response.ok) {
+    throw new Error('Failed to fetch materials');
+  }
+  return response.json();
+}
+
+/** Fetches materials for the Fabric Index section. */
+export function useMaterialsQuery() {
+  return useQuery<MaterialItem[]>({
+    queryKey: ['materials'],
+    queryFn: fetchMaterials,
   });
 }
 
