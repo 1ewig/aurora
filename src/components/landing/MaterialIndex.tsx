@@ -48,7 +48,7 @@ export function MaterialIndex() {
     <section
       id="materials-index"
       aria-labelledby="materials-heading"
-      className="py-32 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto border-t border-border-subtle bg-bg-primary"
+      className="py-20 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto bg-bg-primary"
     >
       <motion.div
         variants={fadeInUp}

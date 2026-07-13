@@ -36,7 +36,7 @@ export function PressClientNotes() {
     <section
       id="press-notes"
       aria-labelledby="press-notes-heading"
-      className="py-32 bg-white overflow-hidden border-t border-border-subtle"
+      className="py-20 bg-white overflow-hidden border-t border-border-subtle"
     >
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20">
         

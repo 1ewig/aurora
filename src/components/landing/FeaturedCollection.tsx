@@ -24,7 +24,7 @@ export function FeaturedCollection({ categories }: FeaturedCollectionProps) {
     <section
       id="collection"
       aria-labelledby="collection-heading"
-      className="py-32 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto"
+      className="py-20 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto"
     >
       <motion.div
         variants={fadeInUp}
