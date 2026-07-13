@@ -9,8 +9,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useHeroQuery, useEditorialQuery, useDailyCategoriesQuery, useLookbookQuery } from "@/hooks/queries";
+import { useMemo } from "react";
+import { useProductsQuery, useEditorialQuery, useDailyCategoriesQuery, useLookbookQuery } from "@/hooks/queries";
 import { useNewsletterSubmit } from "@/hooks/useNewsletterSubmit";
+import type { Product } from "@/data/products";
 import { Hero } from "./Hero";
 
 const SignaturePieces = dynamic(() => import("./SignaturePieces").then((m) => m.SignaturePieces), { loading: () => <div className="h-96" /> });
@@ -22,19 +24,43 @@ const PressClientNotes = dynamic(() => import("./PressClientNotes").then((m) => 
 const Newsletter = dynamic(() => import("./Newsletter").then((m) => m.Newsletter), { loading: () => <div className="h-96" /> });
 
 export default function LandingClient() {
-  const { data: heroSlides = [] } = useHeroQuery();
+  const { data: allProducts = [] } = useProductsQuery();
   const { data: dailyCategories = [] } = useDailyCategoriesQuery();
   const { data: dbSlides = [] } = useLookbookQuery();
   const { data: editorialItems = [] } = useEditorialQuery();
   const newsletter = useNewsletterSubmit();
+
+  const heroProducts = useMemo(() => {
+    if (!allProducts.length) return [];
+    const len = allProducts.length;
+    const day = new Date().getDate();
+    const selected: Product[] = [];
+    for (let i = 0; i < Math.min(5, len); i++) {
+      const index = (day + i * 3) % len;
+      selected.push(allProducts[index]);
+    }
+    return selected;
+  }, [allProducts]);
+
+  const signatureProducts = useMemo(() => {
+    if (!allProducts.length) return [];
+    const len = allProducts.length;
+    const day = new Date().getDate();
+    const selected: Product[] = [];
+    for (let i = 0; i < Math.min(3, len); i++) {
+      const index = (day + 7 + i * 5) % len;
+      selected.push(allProducts[index]);
+    }
+    return selected;
+  }, [allProducts]);
 
   const slides = dbSlides.slice(0, 6);
   const designerImage = editorialItems.find((item) => item.id === "designer")?.imageUrl;
 
   return (
     <main id="main-content" tabIndex={-1}>
-      <Hero heroSlides={heroSlides} />
-      <SignaturePieces />
+      <Hero products={heroProducts} />
+      <SignaturePieces products={signatureProducts} />
       <FeaturedCollection categories={dailyCategories} />
       <MaterialIndex />
       {slides.length > 0 && <LookbookSlider slides={slides} />}

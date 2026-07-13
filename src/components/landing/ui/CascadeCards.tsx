@@ -10,19 +10,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { cardCascade, getCardRotation } from "@/animations/variants";
-import type { HeroSlide } from "@/data/hero";
+import { formatCurrency } from "@/utils/formatCurrency";
+import type { Product } from "@/data/products";
 
 interface CascadeCardsProps {
-  slides: HeroSlide[];
+  products: Product[];
 }
-
-const productPrices: Record<string, string> = {
-  "Ivory Wool Overcoat": "$1,290",
-  "Camel Cashmere Turtleneck": "$485",
-  "Ecru Linen Blazer": "$890",
-  "Charcoal Wide-Leg Trousers": "$395",
-  "Champagne Silk Slip Dress": "$720",
-};
 
 const desktopPositions = [
   { left: "2%",  top: "70px",  zIndex: 10 },
@@ -38,20 +31,20 @@ const mobilePositions = [
   { left: "45%", top: "0px",   zIndex: 20 },
 ];
 
-/** Cascading card fan using hero slides with staggered entry and hover animations. */
-export function CascadeCards({ slides }: CascadeCardsProps) {
+/** Cascading card fan using products with staggered entry and hover animations. */
+export function CascadeCards({ products }: CascadeCardsProps) {
   return (
     <>
       {/* Desktop: Full fan layout */}
       <div className="relative w-full max-w-[700px] mx-auto h-[360px] md:h-[440px] hidden md:block">
-        {slides.slice(0, 5).map((slide, index) => {
+        {products.slice(0, 5).map((product, index) => {
           const pos = desktopPositions[index];
           const rotation = getCardRotation(index);
           const isPriority = index >= 1 && index <= 3;
 
           return (
             <motion.div
-              key={slide.id}
+              key={product.id}
               variants={cardCascade(index)}
               initial="hidden"
               animate="visible"
@@ -73,10 +66,10 @@ export function CascadeCards({ slides }: CascadeCardsProps) {
                 boxShadow: "0 20px 60px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.10)",
               }}
             >
-              <Link href={slide.link || "/products"} className="block w-full h-full relative">
+              <Link href={`/products/${product.slug}`} className="block w-full h-full relative">
                 <Image
-                  src={slide.imageUrl}
-                  alt={slide.altText}
+                  src={product.image}
+                  alt={product.altText}
                   fill
                   priority={isPriority}
                   quality={85}
@@ -92,10 +85,10 @@ export function CascadeCards({ slides }: CascadeCardsProps) {
                     Signature
                   </span>
                   <h4 className="text-white text-xs font-black uppercase tracking-wider line-clamp-1">
-                    {slide.title}
+                    {product.name}
                   </h4>
                   <p className="text-white/85 text-[10px] font-mono mt-0.5">
-                    {slide.title ? productPrices[slide.title] || "" : ""}
+                    {formatCurrency(product.price)}
                   </p>
                 </div>
 
@@ -111,14 +104,14 @@ export function CascadeCards({ slides }: CascadeCardsProps) {
 
       {/* Mobile: 3-card simplified stack */}
       <div className="relative w-full max-w-[340px] mx-auto h-[260px] md:hidden">
-        {slides.slice(0, 3).map((slide, index) => {
+        {products.slice(0, 3).map((product, index) => {
           const pos = mobilePositions[index];
           const rotations = [-8, -2, 6];
           const rotation = rotations[index];
 
           return (
             <motion.div
-              key={slide.id}
+              key={product.id}
               initial={{ opacity: 0, y: 50, rotate: rotation - 4 }}
               animate={{ opacity: 1, y: 0, rotate: rotation }}
               transition={{
@@ -136,10 +129,10 @@ export function CascadeCards({ slides }: CascadeCardsProps) {
                 boxShadow: "0 16px 40px rgba(0,0,0,0.16)",
               }}
             >
-              <Link href={slide.link || "/products"} className="block w-full h-full relative">
+              <Link href={`/products/${product.slug}`} className="block w-full h-full relative">
                 <Image
-                  src={slide.imageUrl}
-                  alt={slide.altText}
+                  src={product.image}
+                  alt={product.altText}
                   fill
                   quality={85}
                   sizes="(max-width: 768px) 18vw, 140px"
@@ -154,10 +147,10 @@ export function CascadeCards({ slides }: CascadeCardsProps) {
                     Signature
                   </span>
                   <h4 className="text-white text-[10px] font-black uppercase tracking-wide line-clamp-1">
-                    {slide.title}
+                    {product.name}
                   </h4>
                   <p className="text-white/85 text-[9px] font-mono mt-0.5">
-                    {slide.title ? productPrices[slide.title] || "" : ""}
+                    {formatCurrency(product.price)}
                   </p>
                 </div>
               </Link>

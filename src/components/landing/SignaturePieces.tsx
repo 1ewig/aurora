@@ -11,17 +11,13 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
-import { useCartStore } from "@/stores/useCartStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { cardEnter, fadeInUp, staggerContainer } from "@/animations/variants";
-import { heroProducts } from "@/data/products";
+import type { Product } from "@/data/products";
 
-// Curated signature products
-const signatureProducts = [
-  heroProducts[0], // Ivory Wool Overcoat
-  heroProducts[1], // Camel Cashmere Turtleneck
-  heroProducts[2], // Ecru Linen Blazer
-];
+interface SignaturePiecesProps {
+  products: Product[];
+}
 
 // Luxury textile origins and batch runs
 const signatureDetails: Record<string, { fabric: string; run: string }> = {
@@ -39,23 +35,7 @@ const signatureDetails: Record<string, { fabric: string; run: string }> = {
   }
 };
 
-export function SignaturePieces() {
-  const addItem = useCartStore((state) => state.addItem);
-  const openCart = useCartStore((state) => state.openCart);
-
-  const handleBuyNow = (product: typeof heroProducts[0]) => {
-    addItem({
-      id: product.id,
-      slug: product.slug,
-      name: product.name,
-      price: product.price,
-      size: "M", // default size for immediate buy
-      image: product.image,
-      category: product.category,
-    });
-    openCart();
-  };
-
+export function SignaturePieces({ products }: SignaturePiecesProps) {
   return (
     <section
       id="signature-pieces"
@@ -92,7 +72,7 @@ export function SignaturePieces() {
         viewport={{ once: true, margin: "-10% 0px" }}
         className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8"
       >
-        {signatureProducts.map((product, i) => {
+        {products.map((product, i) => {
           const details = signatureDetails[product.slug] || { fabric: "Noble Fiber Blend", run: "Limited Batch" };
           return (
             <motion.div
@@ -150,12 +130,12 @@ export function SignaturePieces() {
                     </span>
                   </div>
                   
-                  <button
-                    onClick={() => handleBuyNow(product)}
-                    className="px-6 py-3 rounded-full bg-bg-ink hover:bg-accent-primary text-white text-xs font-semibold uppercase tracking-widest transition-all duration-300 active:scale-[0.96] hover:shadow-md cursor-pointer"
+                  <Link
+                    href={`/products/${product.slug}`}
+                    className="inline-block px-6 py-3 rounded-full bg-bg-ink hover:bg-accent-primary text-white text-xs font-semibold uppercase tracking-widest transition-all duration-300 active:scale-[0.96] hover:shadow-md"
                   >
-                    Buy Now
-                  </button>
+                    View →
+                  </Link>
                 </div>
               </div>
             </motion.div>
