@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
+import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { cardEnter, fadeInUp, staggerContainer } from "@/animations/variants";
 import type { Product } from "@/data/products";
@@ -122,6 +123,14 @@ export function SignaturePieces({ products }: SignaturePiecesProps) {
           );
         })}
       </motion.div>
+
+      <div className="flex justify-center mt-16">
+        <Link href="/products">
+          <Button variant="ghost" size="lg">
+            View All Products →
+          </Button>
+        </Link>
+      </div>
     </section>
   );
 }
