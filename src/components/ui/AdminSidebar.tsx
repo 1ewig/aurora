@@ -10,7 +10,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
-const navItems = [
+export const navItems = [
   {
     label: "Dashboard",
     href: "/admin/dashboard",

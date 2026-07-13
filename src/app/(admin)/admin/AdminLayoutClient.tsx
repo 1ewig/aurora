@@ -10,7 +10,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { useNavbarScroll } from "@/hooks/ui/useNavbarScroll";
-import { AdminSidebar } from "@/components/ui/AdminSidebar";
+import { AdminSidebar, navItems } from "@/components/ui/AdminSidebar";
 
 export function AdminLayoutClient({
   children,
@@ -19,11 +19,6 @@ export function AdminLayoutClient({
 }) {
   const pathname = usePathname();
   const { navBg, navBorder, navBlur } = useNavbarScroll();
-
-  const isDashboardActive = pathname === "/admin/dashboard" || pathname === "/admin";
-  const isInventoryActive = pathname.startsWith("/admin/inventory");
-  const isOrdersActive = pathname.startsWith("/admin/orders");
-  const isUsersActive = pathname.startsWith("/admin/users");
 
   return (
     <div className="min-h-screen bg-bg-primary flex flex-col md:flex-row">
@@ -73,48 +68,28 @@ export function AdminLayoutClient({
         {children}
       </main>
 
-      {/* Floating Navigation Capsule for Mobile */}
+      {/* Floating Navigation Capsule for Mobile — icon-only pills */}
       <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-bg-secondary/95 text-text-primary rounded-full backdrop-blur-md px-1.5 py-1.5 flex gap-1 shadow-xl border border-border-medium/60 w-auto max-w-[95vw]">
-        <Link
-          href="/admin/dashboard"
-          className={`px-3.5 py-2 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
-            isDashboardActive
-              ? "bg-bg-ink text-text-inverted shadow-sm"
-              : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
-          }`}
-        >
-          Dashboard
-        </Link>
-        <Link
-          href="/admin/inventory"
-          className={`px-3.5 py-2 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
-            isInventoryActive
-              ? "bg-bg-ink text-text-inverted shadow-sm"
-              : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
-          }`}
-        >
-          Inventory
-        </Link>
-        <Link
-          href="/admin/orders"
-          className={`px-3.5 py-2 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
-            isOrdersActive
-              ? "bg-bg-ink text-text-inverted shadow-sm"
-              : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
-          }`}
-        >
-          Orders
-        </Link>
-        <Link
-          href="/admin/users"
-          className={`px-3.5 py-2 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all duration-300 ${
-            isUsersActive
-              ? "bg-bg-ink text-text-inverted shadow-sm"
-              : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
-          }`}
-        >
-          Users
-        </Link>
+        {navItems.map((item) => {
+          const isActive = item.matchExact
+            ? pathname === item.href
+            : pathname.startsWith(item.href);
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-label={item.label}
+              className={`w-10 h-10 flex items-center justify-center rounded-full transition-all duration-300 ${
+                isActive
+                  ? "bg-bg-ink text-text-inverted shadow-sm"
+                  : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/50"
+              }`}
+            >
+              {item.icon}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

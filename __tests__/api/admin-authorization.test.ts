@@ -129,7 +129,7 @@ describe("Admin authorization", () => {
       mockGetSession.mockResolvedValue(null);
 
       const { GET } = await import("@/app/api/admin/products/route");
-      const res = await GET();
+      const res = await GET(new Request("http://localhost:3000/api/admin/products"));
 
       expect(res.status).toBe(401);
     });
@@ -141,7 +141,7 @@ describe("Admin authorization", () => {
       mockPoolQuery.mockResolvedValue({ rows: [{ role: "user" }] });
 
       const { GET } = await import("@/app/api/admin/products/route");
-      const res = await GET();
+      const res = await GET(new Request("http://localhost:3000/api/admin/products"));
 
       expect(res.status).toBe(403);
     });

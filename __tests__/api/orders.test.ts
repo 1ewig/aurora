@@ -77,7 +77,6 @@ describe("GET /api/orders", () => {
 
     const { GET } = await import("@/app/api/orders/route");
     const res = await GET(makeRequest("http://localhost:3000/api/orders?limit=999"));
-    const json = await res.json();
 
     expect(res.status).toBe(200);
     const queryArgs = mockPoolQuery.mock.calls[1];
@@ -91,8 +90,7 @@ describe("GET /api/orders", () => {
       const { GET } = await import("@/app/api/orders/route");
       const res = await GET(makeRequest("http://localhost:3000/api/orders?lsOrderId=ls-1"));
       const json = await res.json();
-
-      expect(res.status).toBe(200);
+    expect(res.status).toBe(200);
       expect(json.orderNumber).toBe("AUR-001");
     });
 
