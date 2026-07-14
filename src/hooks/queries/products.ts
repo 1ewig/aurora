@@ -131,7 +131,7 @@ export function useProductDetailsQuery(slug: string) {
     queryFn: () => fetchProductDetails(slug),
     enabled: !!slug,
     staleTime: 1000 * 60 * 5,
-    initialData: () => {
+    placeholderData: () => {
       const cachedQueries = queryClient.getQueriesData<any>({ queryKey: ['products'] });
       for (const [, data] of cachedQueries) {
         if (data) {
