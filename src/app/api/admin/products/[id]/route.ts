@@ -13,6 +13,7 @@ import { logAudit } from '@/utils/audit';
 import { createAdminClient } from '@insforge/sdk';
 import { getStorageKeyFromUrl } from '@/utils/insforge';
 import { revalidateTag } from 'next/cache';
+import { rethrowIfDynamicServerError } from '@/utils/errors';
 
 const admin = createAdminClient({
   baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL || '',
@@ -168,6 +169,7 @@ export async function PUT(
       return NextResponse.json({ success: true });
     });
   } catch (err: any) {
+    rethrowIfDynamicServerError(err);
     console.error('Failed to update product:', err);
     return NextResponse.json({ error: err.message || 'Failed to update product' }, { status: 500 });
   }
@@ -221,6 +223,7 @@ export async function DELETE(
       return NextResponse.json({ success: true });
     });
   } catch (err: any) {
+    rethrowIfDynamicServerError(err);
     console.error('Failed to delete product:', err);
     return NextResponse.json({ error: err.message || 'Failed to delete product' }, { status: 500 });
   }

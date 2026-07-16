@@ -11,6 +11,7 @@ import { pool, withTransaction } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
 import { logAudit } from '@/utils/audit';
 import { revalidateTag } from 'next/cache';
+import { rethrowIfDynamicServerError } from '@/utils/errors';
 
 export async function GET(request: Request) {
   try {
@@ -89,6 +90,7 @@ export async function GET(request: Request) {
       totalPages: Math.ceil(total / limit),
     });
   } catch (err) {
+    rethrowIfDynamicServerError(err);
     console.error('Failed to list products:', err);
     return NextResponse.json({ error: 'Failed to list products' }, { status: 500 });
   }
@@ -175,6 +177,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, id });
     });
   } catch (err: any) {
+    rethrowIfDynamicServerError(err);
     console.error('Failed to create product:', err);
     return NextResponse.json({ error: err.message || 'Failed to create product' }, { status: 500 });
   }

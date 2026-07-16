@@ -6,6 +6,7 @@ import { orderConfirmationHtml, orderConfirmationText } from "@/lib/email-templa
 import { formatCurrency } from "@/utils/formatCurrency";
 import { calculateOrderPricing } from "@/utils/pricing";
 import { sanitizeShippingAddress, type VerifiedItem } from "@/utils/sanitize";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
 
 function verifySignature(rawBody: string, signatureHeader: string): boolean {
   const secret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET;
@@ -49,6 +50,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (err: any) {
+    rethrowIfDynamicServerError(err);
     console.error("[LS Webhook] Error processing event payload:", err);
     return NextResponse.json({ error: "Internal processing failed." }, { status: 500 });
   }

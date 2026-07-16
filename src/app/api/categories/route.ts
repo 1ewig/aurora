@@ -8,6 +8,7 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { cacheLife, cacheTag } from 'next/cache';
+import { rethrowIfDynamicServerError } from '@/utils/errors';
 
 const fetchCategoriesFromDb = async () => {
   const result = await pool.query(`
@@ -30,6 +31,7 @@ export async function GET() {
     const categories = await getCachedCategories();
     return NextResponse.json(categories);
   } catch (error) {
+    rethrowIfDynamicServerError(error);
     console.error("Failed to fetch categories list:", error);
     return NextResponse.json(
       { error: 'Failed to fetch categories' },

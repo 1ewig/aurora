@@ -9,6 +9,7 @@ import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
 import { logAudit } from '@/utils/audit';
+import { rethrowIfDynamicServerError } from '@/utils/errors';
 
 const VALID_STATUSES = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
 
@@ -49,6 +50,7 @@ export async function PATCH(
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
+    rethrowIfDynamicServerError(err);
     console.error('Failed to update order status:', err);
     return NextResponse.json({ error: err.message || 'Failed to update order status' }, { status: 500 });
   }

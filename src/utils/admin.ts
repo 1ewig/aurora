@@ -21,6 +21,7 @@ import type { User } from '@/stores/useAuthStore';
 
 export const ROLE_LEVELS: Record<string, number> = {
   user: 0,
+  explorer: 1,
   admin: 10,
 };
 
@@ -79,30 +80,38 @@ export async function requireAdmin(): Promise<{ user: any; error?: NextResponse 
  * Returns a client-safe User object or null if unauthenticated.
  */
 export const getServerAuthUser = cache(async (): Promise<User | null> => {
+  let session;
   try {
-    const session = await auth.api.getSession({ headers: await headers() });
-    if (!session?.user) {
-      return null;
-    }
+    session = await auth.api.getSession({ headers: await headers() });
+  } catch (err: unknown) {
+    rethrowIfDynamicServerError(err);
+    console.error('getServerAuthUser: session fetch failed:', err);
+    return null;
+  }
 
+  if (!session?.user) {
+    return null;
+  }
+
+  let role = 'user';
+  try {
     const userResult = await pool.query(
       `SELECT role FROM better_auth."user" WHERE id = $1`,
       [session.user.id]
     );
-    const role = userResult.rows[0]?.role || 'user';
-
-    return {
-      id: session.user.id,
-      email: session.user.email,
-      name: session.user.name ?? "",
-      emailVerified: session.user.emailVerified ?? false,
-      image: session.user.image ?? "",
-      role,
-      isAdmin: isAdmin(session.user.email, role),
-    };
+    role = userResult.rows[0]?.role || 'user';
   } catch (err: unknown) {
     rethrowIfDynamicServerError(err);
-    console.error('getServerAuthUser error:', err);
-    return null;
+    console.error('getServerAuthUser: role query failed, defaulting to user:', err);
   }
+
+  return {
+    id: session.user.id,
+    email: session.user.email,
+    name: session.user.name ?? "",
+    emailVerified: session.user.emailVerified ?? false,
+    image: session.user.image ?? "",
+    role,
+    isAdmin: isAdmin(session.user.email, role),
+  };
 });

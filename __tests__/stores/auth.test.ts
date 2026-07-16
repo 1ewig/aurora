@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { createAuthStore } from "@/stores/useAuthStore";
 
 const { mockSignInEmail, mockSignUpEmail, mockSignOut, mockUpdateUser, mockVerifyEmail, mockSendVerificationEmail, mockRequestPasswordReset, mockResetPassword, mockChangePassword } = vi.hoisted(() => ({
   mockSignInEmail: vi.fn(),
@@ -37,8 +37,10 @@ vi.mock("@/utils/auth", () => ({
   buildUserState: mockBuildUserState,
 }));
 
+let store: ReturnType<typeof createAuthStore>;
+
 beforeEach(() => {
-  useAuthStore.setState({ user: null, profile: null, loading: true, error: null });
+  store = createAuthStore(null);
   vi.clearAllMocks();
 });
 
@@ -51,46 +53,46 @@ describe("signIn", () => {
       profile: { displayName: "" },
     });
 
-    const result = await useAuthStore.getState().signIn("a@b.com", "pass");
+    const result = await store.getState().signIn("a@b.com", "pass");
 
     expect(result.error).toBeNull();
-    expect(useAuthStore.getState().user?.id).toBe("u1");
-    expect(useAuthStore.getState().loading).toBe(false);
+    expect(store.getState().user?.id).toBe("u1");
+    expect(store.getState().loading).toBe(false);
     expect(mockFetchUserRole).toHaveBeenCalled();
   });
 
   it("maps invalid_password error", async () => {
     mockSignInEmail.mockResolvedValue({ data: null, error: { code: "invalid_password", message: "Invalid password" } });
 
-    const result = await useAuthStore.getState().signIn("a@b.com", "wrong");
+    const result = await store.getState().signIn("a@b.com", "wrong");
 
-    expect(useAuthStore.getState().error).toContain("Incorrect password");
+    expect(store.getState().error).toContain("Incorrect password");
     expect(result.needsVerification).toBe(false);
   });
 
   it("detects unverified email via 403 status", async () => {
     mockSignInEmail.mockResolvedValue({ data: null, error: { status: 403, message: "Email not verified" } });
 
-    const result = await useAuthStore.getState().signIn("a@b.com", "pass");
+    const result = await store.getState().signIn("a@b.com", "pass");
 
-    expect(useAuthStore.getState().error).toContain("verify your email");
+    expect(store.getState().error).toContain("verify your email");
     expect(result.needsVerification).toBe(true);
   });
 
   it("maps rate_limit error", async () => {
     mockSignInEmail.mockResolvedValue({ data: null, error: { code: "rate_limit", message: "Too many requests" } });
 
-    await useAuthStore.getState().signIn("a@b.com", "pass");
+    await store.getState().signIn("a@b.com", "pass");
 
-    expect(useAuthStore.getState().error).toContain("Too many attempts");
+    expect(store.getState().error).toContain("Too many attempts");
   });
 
   it("maps weak_password error", async () => {
     mockSignInEmail.mockResolvedValue({ data: null, error: { code: "weak_password", message: "Password is too short" } });
 
-    await useAuthStore.getState().signIn("a@b.com", "short");
+    await store.getState().signIn("a@b.com", "short");
 
-    expect(useAuthStore.getState().error).toContain("at least 8 characters");
+    expect(store.getState().error).toContain("at least 8 characters");
   });
 });
 
@@ -98,10 +100,10 @@ describe("signUp", () => {
   it("returns needsVerification when email not verified", async () => {
     mockSignUpEmail.mockResolvedValue({ data: { user: { id: "u2", email: "a@b.com", emailVerified: false } }, error: null });
 
-    const result = await useAuthStore.getState().signUp("a@b.com", "password123", "Test");
+    const result = await store.getState().signUp("a@b.com", "password123", "Test");
 
     expect(result.needsVerification).toBe(true);
-    expect(useAuthStore.getState().user).toBeNull();
+    expect(store.getState().user).toBeNull();
   });
 
   it("sets user when email is verified after sign-up", async () => {
@@ -112,71 +114,71 @@ describe("signUp", () => {
       profile: { displayName: "Test" },
     });
 
-    const result = await useAuthStore.getState().signUp("a@b.com", "password123", "Test");
+    const result = await store.getState().signUp("a@b.com", "password123", "Test");
 
     expect(result.error).toBeNull();
-    expect(useAuthStore.getState().user?.id).toBe("u2");
+    expect(store.getState().user?.id).toBe("u2");
   });
 
   it("maps existing account error", async () => {
     mockSignUpEmail.mockResolvedValue({ data: null, error: { message: "An account with this email already exists" } });
 
-    await useAuthStore.getState().signUp("existing@b.com", "password123", "Test");
+    await store.getState().signUp("existing@b.com", "password123", "Test");
 
-    expect(useAuthStore.getState().error).toContain("already exists");
+    expect(store.getState().error).toContain("already exists");
   });
 });
 
 describe("signOut", () => {
   it("clears user and profile", async () => {
-    useAuthStore.setState({ user: { id: "u1", email: "a@b.com" } as any, profile: { displayName: "A" } });
+    store.setState({ user: { id: "u1", email: "a@b.com" } as any, profile: { displayName: "A" } });
     mockSignOut.mockResolvedValue({ data: null, error: null });
 
-    await useAuthStore.getState().signOut();
+    await store.getState().signOut();
 
-    expect(useAuthStore.getState().user).toBeNull();
-    expect(useAuthStore.getState().profile).toBeNull();
-    expect(useAuthStore.getState().error).toBeNull();
+    expect(store.getState().user).toBeNull();
+    expect(store.getState().profile).toBeNull();
+    expect(store.getState().error).toBeNull();
   });
 });
 
 describe("clearError", () => {
   it("resets error to null", () => {
-    useAuthStore.setState({ error: "Some error" });
-    useAuthStore.getState().clearError();
-    expect(useAuthStore.getState().error).toBeNull();
+    store.setState({ error: "Some error" });
+    store.getState().clearError();
+    expect(store.getState().error).toBeNull();
   });
 });
 
 describe("updateProfile", () => {
   it("updates displayName on success", async () => {
     mockUpdateUser.mockResolvedValue({ data: null, error: null });
-    useAuthStore.setState({ profile: { displayName: "Old" }, loading: false });
+    store.setState({ profile: { displayName: "Old" }, loading: false });
 
-    await useAuthStore.getState().updateProfile({ displayName: "New Name" });
+    await store.getState().updateProfile({ displayName: "New Name" });
 
-    expect(useAuthStore.getState().profile?.displayName).toBe("New Name");
-    expect(useAuthStore.getState().loading).toBe(false);
+    expect(store.getState().profile?.displayName).toBe("New Name");
+    expect(store.getState().loading).toBe(false);
   });
 });
 
 describe("verifyEmail", () => {
   it("rejects missing token", async () => {
-    const result = await useAuthStore.getState().verifyEmail("a@b.com", "");
+    const result = await store.getState().verifyEmail("a@b.com", "");
     expect(result.error).toBeTruthy();
   });
 
   it("maps invalid_token error", async () => {
     mockVerifyEmail.mockResolvedValue({ error: { code: "invalid_token", message: "Invalid token" } });
-    await useAuthStore.getState().verifyEmail("a@b.com", "bad-token");
-    expect(useAuthStore.getState().error).toContain("expired");
+    await store.getState().verifyEmail("a@b.com", "bad-token");
+    expect(store.getState().error).toContain("expired");
   });
 });
 
 describe("resetPassword", () => {
   it("returns error on failure", async () => {
     mockResetPassword.mockResolvedValue({ error: { code: "invalid_token", message: "Invalid or expired token" } });
-    const result = await useAuthStore.getState().resetPassword("newpass", "bad-token");
+    const result = await store.getState().resetPassword("newpass", "bad-token");
     expect(result.error).toBeTruthy();
   });
 });
@@ -184,7 +186,7 @@ describe("resetPassword", () => {
 describe("changePassword", () => {
   it("returns error on wrong current password", async () => {
     mockChangePassword.mockResolvedValue({ error: { code: "invalid_password", message: "Invalid password" } });
-    await useAuthStore.getState().changePassword("wrong", "newpass");
-    expect(useAuthStore.getState().error).toContain("Incorrect password");
+    await store.getState().changePassword("wrong", "newpass");
+    expect(store.getState().error).toContain("Incorrect password");
   });
 });

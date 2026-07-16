@@ -9,6 +9,7 @@ import { NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
 import { pool } from "@/utils/db";
 import { rateLimit } from "@/utils/rateLimit";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
 
 export async function POST(request: Request) {
   try {
@@ -66,6 +67,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    rethrowIfDynamicServerError(error);
     console.error("[newsletter-api] Failed to process subscription:", error);
     return NextResponse.json(
       { error: "Failed to process subscription" },

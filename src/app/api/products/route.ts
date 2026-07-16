@@ -8,6 +8,7 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { cacheLife, cacheTag } from 'next/cache';
+import { rethrowIfDynamicServerError } from '@/utils/errors';
 
 const fetchProductsList = async (
   category: string | null,
@@ -145,6 +146,7 @@ export async function GET(request: Request) {
       return NextResponse.json(result.products);
     }
   } catch (error) {
+    rethrowIfDynamicServerError(error);
     console.error("Database query failed:", error);
     return NextResponse.json(
       { error: 'Failed to fetch products. Please try again later.' },

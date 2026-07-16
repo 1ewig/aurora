@@ -8,6 +8,7 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { cacheLife, cacheTag } from 'next/cache';
+import { rethrowIfDynamicServerError } from '@/utils/errors';
 
 const fetchProductDetail = async (slug: string) => {
   const result = await pool.query(`
@@ -86,6 +87,7 @@ export async function GET(
 
     return NextResponse.json(product);
   } catch (error) {
+    rethrowIfDynamicServerError(error);
     console.error("Failed to fetch product details:", error);
     return NextResponse.json(
       { error: 'Failed to fetch product details' },

@@ -10,21 +10,17 @@
  * dynamic rendering without being caught and logged as application errors.
  */
 export function rethrowIfDynamicServerError(err: unknown): void {
-  if (
-    err instanceof Error &&
-    (err.message.includes('prerendering') ||
-      err.name === 'DynamicServerError' ||
-      err.message.includes('DynamicServerError') ||
-      err.message.includes('dynamic-server'))
-  ) {
+  if (err instanceof Error && err.name === 'DynamicServerError') {
     throw err;
   }
   if (
-    err &&
     typeof err === 'object' &&
+    err !== null &&
     'digest' in err &&
     typeof (err as { digest: unknown }).digest === 'string' &&
-    ['DYNAMIC_SERVER_USAGE', 'HANGING_PROMISE_REJECTION'].includes((err as { digest: string }).digest)
+    ['DYNAMIC_SERVER_USAGE', 'HANGING_PROMISE_REJECTION', 'NEXT_PRERENDER_INTERRUPTED'].includes(
+      (err as { digest: string }).digest
+    )
   ) {
     throw err;
   }

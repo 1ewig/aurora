@@ -8,7 +8,7 @@
 "use client";
 
 import { createStore, useStore } from 'zustand';
-import { createContext, useContext, useRef } from 'react';
+import { createContext, useContext, useEffect, useRef } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { fetchUserRole, buildUserState } from '@/utils/auth';
 
@@ -258,6 +258,26 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
   if (!storeRef.current) {
     storeRef.current = createAuthStore(initialUser);
   }
+
+  useEffect(() => {
+    if (initialUser) return;
+
+    async function recoverSession() {
+      try {
+        const { data: sessionData } = await authClient.getSession();
+        if (!sessionData?.user) return;
+
+        const role = await fetchUserRole();
+        const state = buildUserState(sessionData.user, role);
+        storeRef.current?.setState({ ...state });
+      } catch {
+        // silent — server-side role query may have failed transiently
+      }
+    }
+
+    recoverSession();
+  }, [initialUser]);
+
   return (
     <AuthStoreContext.Provider value={storeRef.current}>
       {children}
@@ -292,7 +312,4 @@ export function useAuthStore<T>(selector?: (state: AuthState) => T): T | AuthSta
   return useStore(store);
 }
 
-// Attach store methods for backwards compatibility in tests and utilities
-useAuthStore.getState = fallbackStore.getState;
-useAuthStore.setState = fallbackStore.setState;
-useAuthStore.subscribe = fallbackStore.subscribe;
+

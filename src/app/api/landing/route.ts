@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { pool } from "@/utils/db";
 import { cacheLife, cacheTag } from "next/cache";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
 
 export async function getLandingData() {
   'use cache';
@@ -79,6 +80,7 @@ export async function GET() {
   try {
     return NextResponse.json(await getLandingData());
   } catch (error) {
+    rethrowIfDynamicServerError(error);
     console.error("Failed to fetch landing data:", error);
     return NextResponse.json(
       { error: "Failed to fetch landing data." },

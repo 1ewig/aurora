@@ -128,6 +128,7 @@ export async function PATCH(
 
     return NextResponse.json(result.rows[0]);
   } catch (err) {
+    rethrowIfDynamicServerError(err);
     console.error('Failed to update user:', err);
     return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
   }
@@ -167,6 +168,7 @@ export async function DELETE(
 
     return NextResponse.json({ deleted: result.rows[0] });
   } catch (err) {
+    rethrowIfDynamicServerError(err);
     console.error('Failed to delete user:', err);
     return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
   }

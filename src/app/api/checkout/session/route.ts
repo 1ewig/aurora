@@ -10,6 +10,7 @@ import {
   type ShippingAddress,
 } from "@/utils/sanitize";
 import { rateLimit } from "@/utils/rateLimit";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
 import crypto from "node:crypto";
 
 export interface CheckoutSessionRequest {
@@ -182,6 +183,7 @@ export async function POST(req: NextRequest) {
         }
       });
     } catch (err: any) {
+      rethrowIfDynamicServerError(err);
       return NextResponse.json(
         { error: err.message || "Inventory verification failed." },
         { status: 400 }
@@ -225,6 +227,7 @@ export async function POST(req: NextRequest) {
         description,
       });
     } catch (err: any) {
+      rethrowIfDynamicServerError(err);
       console.error("[POST /api/checkout/session] Lemon Squeezy call failed:", err);
       await pool.query(
         "DELETE FROM product_reservations WHERE reservation_id = $1",
@@ -243,6 +246,7 @@ export async function POST(req: NextRequest) {
       checkoutId: checkoutData.checkoutId,
     });
   } catch (err: any) {
+    rethrowIfDynamicServerError(err);
     console.error("[POST /api/checkout/session] Error creating session:", err);
     return NextResponse.json(
       { error: err.message || "Failed to create checkout session." },

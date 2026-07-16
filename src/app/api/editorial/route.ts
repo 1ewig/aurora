@@ -7,6 +7,7 @@
 import { NextResponse } from 'next/server';
 import { cacheLife, cacheTag } from 'next/cache';
 import { pool } from '@/utils/db';
+import { rethrowIfDynamicServerError } from '@/utils/errors';
 
 async function getEditorialContent() {
   'use cache';
@@ -30,6 +31,7 @@ export async function GET() {
     const items = await getEditorialContent();
     return NextResponse.json(items);
   } catch (error) {
+    rethrowIfDynamicServerError(error);
     console.error('Failed to fetch editorial content:', error);
     return NextResponse.json(
       { error: 'Failed to fetch editorial content. Please try again later.' },
