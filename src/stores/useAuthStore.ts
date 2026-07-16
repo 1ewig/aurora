@@ -5,7 +5,10 @@
  * Wraps Better Auth client methods with error mapping and profile normalization.
  */
 
-import { create } from 'zustand';
+"use client";
+
+import { createStore, useStore } from 'zustand';
+import { createContext, useContext, useRef, createElement } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { fetchUserRole, buildUserState } from '@/utils/auth';
 
@@ -61,11 +64,12 @@ interface AuthState {
   clearError: () => void;
 }
 
-/** Global auth store wrapping Better Auth with error handling and profile management. */
-export const useAuthStore = create<AuthState>((set, get) => ({
-  user: null,
-  profile: null,
-  loading: true,
+/** Create vanilla auth store instance. */
+export const createAuthStore = (initialUser: User | null = null) => {
+  return createStore<AuthState>((set, get) => ({
+    user: initialUser,
+    profile: initialUser ? { displayName: initialUser.name || "" } : null,
+    loading: false,
   error: null,
 
   clearError: () => set({ error: null }),
@@ -238,4 +242,41 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return { error: err };
     }
   },
-}));
+  }));
+};
+
+// React Context for request-scoped store instances
+export const AuthStoreContext = createContext<ReturnType<typeof createAuthStore> | null>(null);
+
+interface AuthProviderProps {
+  children: React.ReactNode;
+  initialUser: User | null;
+}
+
+export function AuthProvider({ children, initialUser }: AuthProviderProps) {
+  const storeRef = useRef<ReturnType<typeof createAuthStore> | undefined>(undefined);
+  if (!storeRef.current) {
+    storeRef.current = createAuthStore(initialUser);
+  }
+  return createElement(AuthStoreContext.Provider, { value: storeRef.current }, children);
+}
+
+// Default global store for fallback and testing environments
+const defaultAuthStore = createAuthStore(null);
+
+// Custom hook matching the original hook signature to minimize code churn
+export function useAuthStore(): AuthState;
+export function useAuthStore<T>(selector: (state: AuthState) => T): T;
+export function useAuthStore<T>(selector?: (state: AuthState) => T): T | AuthState {
+  const store = useContext(AuthStoreContext);
+  const activeStore = store || defaultAuthStore;
+  if (selector) {
+    return useStore(activeStore, selector);
+  }
+  return useStore(activeStore);
+}
+
+// Attach store methods to the hook for backwards compatibility in tests and utilities
+useAuthStore.getState = defaultAuthStore.getState;
+useAuthStore.setState = defaultAuthStore.setState;
+useAuthStore.subscribe = defaultAuthStore.subscribe;

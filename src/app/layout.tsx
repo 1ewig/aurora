@@ -9,6 +9,8 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Providers from "@/app/providers";
 import { Analytics } from "@vercel/analytics/next";
+import { AuthInitializer } from "@/components/auth/AuthInitializer";
+import { Suspense } from "react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -63,7 +65,11 @@ export default function RootLayout({
     >
       <body className="bg-bg-primary min-h-screen antialiased">
         <Providers>
-          {children}
+          <Suspense fallback={null}>
+            <AuthInitializer>
+              {children}
+            </AuthInitializer>
+          </Suspense>
           <Analytics />
         </Providers>
       </body>

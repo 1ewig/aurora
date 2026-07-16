@@ -45,7 +45,19 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
     return NextResponse.json(userResult.rows[0]);
-  } catch (err) {
+  } catch (err: any) {
+    if (
+      (err instanceof Error &&
+       (err.message.includes('prerendering') ||
+        err.name === 'DynamicServerError' ||
+        err.message.includes('DynamicServerError') ||
+        err.message.includes('dynamic-server'))) ||
+      (err &&
+       ((err as any).digest === 'DYNAMIC_SERVER_USAGE' ||
+        (err as any).digest === 'HANGING_PROMISE_REJECTION'))
+    ) {
+      throw err;
+    }
     console.error('Failed to get user:', err);
     return NextResponse.json({ error: 'Failed to get user' }, { status: 500 });
   }

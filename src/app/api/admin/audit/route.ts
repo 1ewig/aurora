@@ -56,7 +56,19 @@ export async function GET(req: NextRequest) {
       limit,
       totalPages: Math.ceil(total / limit),
     });
-  } catch (err) {
+  } catch (err: any) {
+    if (
+      (err instanceof Error &&
+       (err.message.includes('prerendering') ||
+        err.name === 'DynamicServerError' ||
+        err.message.includes('DynamicServerError') ||
+        err.message.includes('dynamic-server'))) ||
+      (err &&
+       ((err as any).digest === 'DYNAMIC_SERVER_USAGE' ||
+        (err as any).digest === 'HANGING_PROMISE_REJECTION'))
+    ) {
+      throw err;
+    }
     console.error('Failed to fetch audit logs:', err);
     return NextResponse.json({ error: 'Failed to fetch audit logs' }, { status: 500 });
   }

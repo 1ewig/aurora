@@ -34,7 +34,19 @@ export async function GET() {
       { isAdmin: isAdmin(session.user.email, role), role },
       { headers: { "Cache-Control": "no-store" } }
     );
-  } catch (error) {
+  } catch (error: any) {
+    if (
+      (error instanceof Error &&
+       (error.message.includes('prerendering') ||
+        error.name === 'DynamicServerError' ||
+        error.message.includes('DynamicServerError') ||
+        error.message.includes('dynamic-server'))) ||
+      (error &&
+       ((error as any).digest === 'DYNAMIC_SERVER_USAGE' ||
+        (error as any).digest === 'HANGING_PROMISE_REJECTION'))
+    ) {
+      throw error;
+    }
     console.error("Failed to check user role:", error);
     return NextResponse.json(
       { error: "Failed to resolve role" },
