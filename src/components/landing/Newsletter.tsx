@@ -47,7 +47,7 @@ export function Newsletter({ email, setEmail, submitted, loading, error, handleS
           >
             Atelier Notes &amp;
             <br />
-            Access.
+            <span className="text-accent-primary">Access.</span>
           </motion.h2>
 
           <motion.p

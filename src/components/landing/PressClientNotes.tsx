@@ -56,7 +56,7 @@ export function PressClientNotes() {
             className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 text-text-primary text-center"
             style={{ fontSize: "clamp(2rem, 4.5vw, 4.5rem)" }}
           >
-            Seen In &amp; Client Notes.
+            Seen In &amp; Client <span className="text-accent-primary">Notes.</span>
           </p>
         </motion.div>
 
