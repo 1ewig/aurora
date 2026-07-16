@@ -6,6 +6,7 @@
 
 import type { Metadata } from "next";
 import LandingClient from "@/components/landing/LandingClient";
+import { getLandingData } from "@/app/api/landing/route";
 
 export const metadata: Metadata = {
   title: "SS 2026 Collection",
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
 };
 
 /** Home/landing page composing all landing sections. */
-export default function HomePage() {
-  return <LandingClient />;
+export default async function HomePage() {
+  const landingData = await getLandingData();
+  return <LandingClient initialData={landingData} />;
 }

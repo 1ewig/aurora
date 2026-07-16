@@ -10,7 +10,7 @@
 
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
-import { useLandingQuery } from "@/hooks/queries/landing";
+import { useLandingQuery, type LandingData } from "@/hooks/queries/landing";
 import { useNewsletterSubmit } from "@/hooks/useNewsletterSubmit";
 import type { Product } from "@/data/products";
 import { Hero } from "./Hero";
@@ -23,8 +23,12 @@ const DesignerStory = dynamic(() => import("./DesignerStory").then((m) => m.Desi
 const PressClientNotes = dynamic(() => import("./PressClientNotes").then((m) => m.PressClientNotes), { loading: () => <div className="h-80" /> });
 const Newsletter = dynamic(() => import("./Newsletter").then((m) => m.Newsletter), { loading: () => <div className="h-96" /> });
 
-export default function LandingClient() {
-  const { data: landing } = useLandingQuery();
+interface LandingClientProps {
+  initialData?: LandingData;
+}
+
+export default function LandingClient({ initialData }: LandingClientProps) {
+  const { data: landing } = useLandingQuery(initialData);
   const newsletter = useNewsletterSubmit();
 
   const allProducts = landing?.products ?? [];

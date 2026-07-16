@@ -39,10 +39,11 @@ async function fetchLanding(): Promise<LandingData> {
   return response.json();
 }
 
-export function useLandingQuery() {
+export function useLandingQuery(initialData?: LandingData) {
   return useQuery<LandingData>({
     queryKey: ['landing'],
     queryFn: fetchLanding,
+    initialData,
     staleTime: 1000 * 60 * 5,
   });
 }

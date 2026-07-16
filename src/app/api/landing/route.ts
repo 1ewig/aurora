@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { pool } from "@/utils/db";
 import { cacheLife, cacheTag } from "next/cache";
 
-async function getLandingData() {
+export async function getLandingData() {
   'use cache';
   cacheLife({ stale: 60, revalidate: 60 });
   cacheTag('landing');
