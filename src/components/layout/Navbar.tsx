@@ -11,14 +11,16 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
 import { navLinks } from "@/data/navigation";
 import { useCartStore } from "@/stores/useCartStore";
 import { useNavbarScroll } from "@/hooks/ui/useNavbarScroll";
 import { navbarReveal } from "@/animations/variants";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { NavbarProfileMenu } from "./NavbarProfileMenu";
-import { MobileMenu } from "./MobileMenu";
+
+const ConfirmDialog = dynamic(() => import("@/components/ui/ConfirmDialog").then((m) => m.ConfirmDialog), { ssr: false });
+const NavbarProfileMenu = dynamic(() => import("./NavbarProfileMenu").then((m) => m.NavbarProfileMenu), { ssr: false });
+const MobileMenu = dynamic(() => import("./MobileMenu").then((m) => m.MobileMenu), { ssr: false });
 
 function UserIcon() {
   return (
