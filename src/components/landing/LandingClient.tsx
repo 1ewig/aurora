@@ -31,6 +31,7 @@ export default function LandingClient({ initialData }: LandingClientProps) {
   const { data: landing } = useLandingQuery(initialData);
   const newsletter = useNewsletterSubmit();
 
+  const serverDay = landing?.serverDay ?? new Date().getDate();
   const allProducts = landing?.products ?? [];
   const allCategories = landing?.categories ?? [];
   const dbSlides = landing?.lookbook ?? [];
@@ -40,34 +41,31 @@ export default function LandingClient({ initialData }: LandingClientProps) {
   const heroProducts = useMemo(() => {
     if (!allProducts.length) return [];
     const len = allProducts.length;
-    const day = new Date().getDate();
     const selected: Product[] = [];
     for (let i = 0; i < Math.min(5, len); i++) {
-      const index = (day + i * 3) % len;
+      const index = (serverDay + i * 3) % len;
       selected.push(allProducts[index]);
     }
     return selected;
-  }, [allProducts]);
+  }, [allProducts, serverDay]);
 
   const signatureProducts = useMemo(() => {
     if (!allProducts.length) return [];
     const len = allProducts.length;
-    const day = new Date().getDate();
     const selected: Product[] = [];
     for (let i = 0; i < Math.min(3, len); i++) {
-      const index = (day + 7 + i * 5) % len;
+      const index = (serverDay + 7 + i * 5) % len;
       selected.push(allProducts[index]);
     }
     return selected;
-  }, [allProducts]);
+  }, [allProducts, serverDay]);
 
   const dailyCategories = useMemo(() => {
     if (!allCategories.length) return [];
-    const day = new Date().getDate();
     return Array.from({ length: Math.min(3, allCategories.length) }, (_, i) =>
-      allCategories[(day + i) % allCategories.length]
+      allCategories[(serverDay + i) % allCategories.length]
     );
-  }, [allCategories]);
+  }, [allCategories, serverDay]);
 
   const slides = dbSlides.slice(0, 6);
   const designerImage = editorialItems.find((item) => item.id === "designer")?.imageUrl;

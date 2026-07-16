@@ -71,6 +71,7 @@ export async function getLandingData() {
       description: row.description,
       properties: row.properties ?? [],
     })),
+    serverDay: new Date().getDate(),
   };
 }
 

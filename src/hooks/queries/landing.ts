@@ -29,6 +29,7 @@ export interface LandingData {
   lookbook: LookbookSlide[];
   editorial: EditorialItem[];
   materials: MaterialItem[];
+  serverDay: number;
 }
 
 async function fetchLanding(): Promise<LandingData> {
