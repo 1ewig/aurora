@@ -85,7 +85,7 @@ export function Hero({ products }: HeroProps) {
         </h1>
 
         {/* Cascade Cards — positioned relative to create space */}
-        <div className="relative w-full mt-12 md:mt-14">
+        <div className="relative w-full mt-12 md:mt-14 min-h-[260px] md:min-h-[440px]">
           <CascadeCards products={products} />
         </div>
 
