@@ -1,9 +1,6 @@
 /**
  * Aurora — src/app/api/orders/route.ts
  *
-/**
- * Aurora — src/app/api/orders/route.ts
- *
  * Order API — GET returns the current user's orders.
  */
 
@@ -11,6 +8,7 @@ import { NextResponse } from "next/server";
 import { pool } from "@/utils/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
 
 export async function GET(request: Request) {
   try {
@@ -75,19 +73,8 @@ export async function GET(request: Request) {
     }));
 
     return NextResponse.json({ orders, total });
-  } catch (error: any) {
-    if (
-      (error instanceof Error &&
-       (error.message.includes('prerendering') ||
-        error.name === 'DynamicServerError' ||
-        error.message.includes('DynamicServerError') ||
-        error.message.includes('dynamic-server'))) ||
-      (error &&
-       ((error as any).digest === 'DYNAMIC_SERVER_USAGE' ||
-        (error as any).digest === 'HANGING_PROMISE_REJECTION'))
-    ) {
-      throw error;
-    }
+  } catch (error: unknown) {
+    rethrowIfDynamicServerError(error);
     console.error("Failed to fetch orders:", error);
     return NextResponse.json(
       { error: "Failed to fetch orders" },

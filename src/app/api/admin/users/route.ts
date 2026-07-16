@@ -8,6 +8,7 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
+import { rethrowIfDynamicServerError } from '@/utils/errors';
 
 const SORT_MAP: Record<string, string> = {
   name: 'u.name',
@@ -87,19 +88,8 @@ export async function GET(request: Request) {
       limit,
       totalPages: Math.ceil(total / limit),
     });
-  } catch (err: any) {
-    if (
-      (err instanceof Error &&
-       (err.message.includes('prerendering') ||
-        err.name === 'DynamicServerError' ||
-        err.message.includes('DynamicServerError') ||
-        err.message.includes('dynamic-server'))) ||
-      (err &&
-       ((err as any).digest === 'DYNAMIC_SERVER_USAGE' ||
-        (err as any).digest === 'HANGING_PROMISE_REJECTION'))
-    ) {
-      throw err;
-    }
+  } catch (err: unknown) {
+    rethrowIfDynamicServerError(err);
     console.error('Failed to list users:', err);
     return NextResponse.json({ error: 'Failed to list users' }, { status: 500 });
   }

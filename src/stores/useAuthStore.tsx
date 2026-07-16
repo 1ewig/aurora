@@ -8,7 +8,7 @@
 "use client";
 
 import { createStore, useStore } from 'zustand';
-import { createContext, useContext, useRef, createElement } from 'react';
+import { createContext, useContext, useRef } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { fetchUserRole, buildUserState } from '@/utils/auth';
 
@@ -67,9 +67,9 @@ interface AuthState {
 /** Create vanilla auth store instance. */
 export const createAuthStore = (initialUser: User | null = null) => {
   return createStore<AuthState>((set, get) => ({
-    user: initialUser,
-    profile: initialUser ? { displayName: initialUser.name || "" } : null,
-    loading: false,
+  user: initialUser,
+  profile: initialUser ? { displayName: initialUser.name || "" } : null,
+  loading: false,
   error: null,
 
   clearError: () => set({ error: null }),
@@ -176,7 +176,7 @@ export const createAuthStore = (initialUser: User | null = null) => {
   resendVerification: async (email) => {
     set({ loading: true, error: null });
     try {
-      const callbackURL = `${window.location.origin}/profile`;
+      const callbackURL = `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/profile`;
       const { error } = await authClient.sendVerificationEmail({ email, callbackURL });
       if (error) {
         const message = mapBetterAuthError(error);
@@ -194,7 +194,7 @@ export const createAuthStore = (initialUser: User | null = null) => {
   sendResetPasswordEmail: async (email) => {
     set({ loading: true, error: null });
     try {
-      const redirectTo = `${window.location.origin}/reset-password`;
+      const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/reset-password`;
       const { error } = await authClient.requestPasswordReset({ email, redirectTo });
       if (error) {
         const message = mapBetterAuthError(error);
@@ -258,25 +258,41 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
   if (!storeRef.current) {
     storeRef.current = createAuthStore(initialUser);
   }
-  return createElement(AuthStoreContext.Provider, { value: storeRef.current }, children);
+  return (
+    <AuthStoreContext.Provider value={storeRef.current}>
+      {children}
+    </AuthStoreContext.Provider>
+  );
 }
 
-// Default global store for fallback and testing environments
-const defaultAuthStore = createAuthStore(null);
+// Fallback store instance for static method access (tests, utilities)
+const fallbackStore = createAuthStore(null);
 
-// Custom hook matching the original hook signature to minimize code churn
+// Custom hook with throw guard for missing AuthProvider context
 export function useAuthStore(): AuthState;
 export function useAuthStore<T>(selector: (state: AuthState) => T): T;
 export function useAuthStore<T>(selector?: (state: AuthState) => T): T | AuthState {
   const store = useContext(AuthStoreContext);
-  const activeStore = store || defaultAuthStore;
-  if (selector) {
-    return useStore(activeStore, selector);
+  if (!store) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        'useAuthStore called outside of AuthProvider. ' +
+        'Wrap your component tree with <AuthInitializer> or <AuthProvider>. ' +
+        'Falling back to default store.'
+      );
+    }
+    if (selector) {
+      return useStore(fallbackStore, selector);
+    }
+    return useStore(fallbackStore);
   }
-  return useStore(activeStore);
+  if (selector) {
+    return useStore(store, selector);
+  }
+  return useStore(store);
 }
 
-// Attach store methods to the hook for backwards compatibility in tests and utilities
-useAuthStore.getState = defaultAuthStore.getState;
-useAuthStore.setState = defaultAuthStore.setState;
-useAuthStore.subscribe = defaultAuthStore.subscribe;
+// Attach store methods for backwards compatibility in tests and utilities
+useAuthStore.getState = fallbackStore.getState;
+useAuthStore.setState = fallbackStore.setState;
+useAuthStore.subscribe = fallbackStore.subscribe;

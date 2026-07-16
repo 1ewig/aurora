@@ -34,6 +34,8 @@ vi.mock("next/cache", () => ({
   revalidateTag: vi.fn(),
 }));
 
+vi.mock("server-only", () => ({}));
+
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
 describe("Admin authorization", () => {

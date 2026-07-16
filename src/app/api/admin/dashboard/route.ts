@@ -8,6 +8,7 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
+import { rethrowIfDynamicServerError } from '@/utils/errors';
 
 export async function GET() {
   try {
@@ -80,19 +81,8 @@ export async function GET() {
       },
       recentOrders,
     });
-  } catch (err: any) {
-    if (
-      (err instanceof Error &&
-       (err.message.includes('prerendering') ||
-        err.name === 'DynamicServerError' ||
-        err.message.includes('DynamicServerError') ||
-        err.message.includes('dynamic-server'))) ||
-      (err &&
-       ((err as any).digest === 'DYNAMIC_SERVER_USAGE' ||
-        (err as any).digest === 'HANGING_PROMISE_REJECTION'))
-    ) {
-      throw err;
-    }
+  } catch (err: unknown) {
+    rethrowIfDynamicServerError(err);
     console.error('Failed to load dashboard metrics:', err);
     return NextResponse.json({ error: 'Failed to load dashboard metrics' }, { status: 500 });
   }

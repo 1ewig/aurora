@@ -8,11 +8,16 @@
  * Level hierarchy:  user=0, explorer=1, admin=10
  */
 
+import 'server-only';
+
+import { cache } from 'react';
 import { auth } from '@/lib/auth';
 import { pool } from '@/utils/db';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { isAdmin } from '@/utils/auth';
+import { rethrowIfDynamicServerError } from '@/utils/errors';
+import type { User } from '@/stores/useAuthStore';
 
 export const ROLE_LEVELS: Record<string, number> = {
   user: 0,
@@ -49,19 +54,8 @@ export async function requireRole(
     }
 
     return { user: session.user, role };
-  } catch (err: any) {
-    if (
-      (err instanceof Error &&
-       (err.message.includes('prerendering') ||
-        err.name === 'DynamicServerError' ||
-        err.message.includes('DynamicServerError') ||
-        err.message.includes('dynamic-server'))) ||
-      (err &&
-       ((err as any).digest === 'DYNAMIC_SERVER_USAGE' ||
-        (err as any).digest === 'HANGING_PROMISE_REJECTION'))
-    ) {
-      throw err;
-    }
+  } catch (err: unknown) {
+    rethrowIfDynamicServerError(err);
     console.error('requireRole error:', err);
     return {
       user: null,
@@ -81,9 +75,10 @@ export async function requireAdmin(): Promise<{ user: any; error?: NextResponse 
 
 /**
  * Fetches the current session and role server-side.
+ * Memoized per-request via React.cache().
  * Returns a client-safe User object or null if unauthenticated.
  */
-export async function getServerAuthUser(): Promise<any> {
+export const getServerAuthUser = cache(async (): Promise<User | null> => {
   try {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) {
@@ -105,20 +100,9 @@ export async function getServerAuthUser(): Promise<any> {
       role,
       isAdmin: isAdmin(session.user.email, role),
     };
-  } catch (err: any) {
-    if (
-      (err instanceof Error &&
-       (err.message.includes('prerendering') ||
-        err.name === 'DynamicServerError' ||
-        err.message.includes('DynamicServerError') ||
-        err.message.includes('dynamic-server'))) ||
-      (err &&
-       ((err as any).digest === 'DYNAMIC_SERVER_USAGE' ||
-        (err as any).digest === 'HANGING_PROMISE_REJECTION'))
-    ) {
-      throw err;
-    }
+  } catch (err: unknown) {
+    rethrowIfDynamicServerError(err);
     console.error('getServerAuthUser error:', err);
     return null;
   }
-}
+});
