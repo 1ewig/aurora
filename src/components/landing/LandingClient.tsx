@@ -14,6 +14,7 @@ import { useLandingQuery, type LandingData } from "@/hooks/queries/landing";
 import { useNewsletterSubmit } from "@/hooks/useNewsletterSubmit";
 import type { Product } from "@/data/products";
 import { Hero } from "./Hero";
+import { LazySection } from "@/components/ui/LazySection";
 
 const SignaturePieces = dynamic(() => import("./SignaturePieces").then((m) => m.SignaturePieces), { loading: () => <div className="h-96" /> });
 const FeaturedCollection = dynamic(() => import("./FeaturedCollection").then((m) => m.FeaturedCollection), { loading: () => <div className="h-96" /> });
@@ -73,13 +74,29 @@ export default function LandingClient({ initialData }: LandingClientProps) {
   return (
     <main id="main-content" tabIndex={-1}>
       <Hero products={heroProducts} />
-      <SignaturePieces products={signatureProducts} />
-      <FeaturedCollection categories={dailyCategories} />
-      <MaterialIndex materials={materials} />
-      {slides.length > 0 && <LookbookSlider slides={slides} />}
-      <DesignerStory imageUrl={designerImage} />
-      <PressClientNotes />
-      <Newsletter {...newsletter} />
+      <LazySection height="min-h-[600px]">
+        <SignaturePieces products={signatureProducts} />
+      </LazySection>
+      <LazySection height="min-h-[600px]">
+        <FeaturedCollection categories={dailyCategories} />
+      </LazySection>
+      <LazySection height="min-h-[50vh]">
+        <MaterialIndex materials={materials} />
+      </LazySection>
+      {slides.length > 0 && (
+        <LazySection height="min-h-[60vh]">
+          <LookbookSlider slides={slides} />
+        </LazySection>
+      )}
+      <LazySection height="min-h-[50vh]">
+        <DesignerStory imageUrl={designerImage} />
+      </LazySection>
+      <LazySection height="min-h-[320px]">
+        <PressClientNotes />
+      </LazySection>
+      <LazySection height="min-h-[400px]">
+        <Newsletter {...newsletter} />
+      </LazySection>
     </main>
   );
 }

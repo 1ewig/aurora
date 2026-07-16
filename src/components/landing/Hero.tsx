@@ -6,7 +6,6 @@
 
 "use client";
 
-import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
@@ -14,8 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { EyebrowLabel } from "@/components/ui/EyebrowLabel";
 import { AnimatedText } from "@/components/ui/AnimatedText";
 import type { Product } from "@/data/products";
-
-const CascadeCards = dynamic(() => import("./ui/CascadeCards").then((m) => m.CascadeCards), { ssr: false });
+import { CascadeCards } from "./ui/CascadeCards";
 
 interface HeroProps {
   products: Product[];
@@ -112,7 +110,7 @@ export function Hero({ products }: HeroProps) {
             whileTap={{ scale: 0.98 }}
             transition={{ type: "spring", stiffness: 400, damping: 20 }}
           >
-            <Link href="/products">
+            <Link href="/products" prefetch={false}>
               <Button
                 variant="filled"
                 size="lg"

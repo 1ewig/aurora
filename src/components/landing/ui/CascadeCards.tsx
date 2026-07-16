@@ -71,7 +71,7 @@ export function CascadeCards({ products }: CascadeCardsProps) {
                   src={product.image}
                   alt={product.altText}
                   fill
-                  preload={isPriority}
+                  priority={isPriority}
                   quality={75}
                   sizes="(min-width: 768px) 18vw, 140px"
                   className="object-cover object-top animate-fade-in"
@@ -134,6 +134,7 @@ export function CascadeCards({ products }: CascadeCardsProps) {
                   src={product.image}
                   alt={product.altText}
                   fill
+                  priority={index >= 1}
                   quality={75}
                   sizes="(max-width: 768px) 18vw, 140px"
                   className="object-cover object-top"

@@ -23,7 +23,7 @@ interface ProductCardProps {
 export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCardProps) {
   return (
     <article aria-label={`${product.name} — ${formatCurrency(product.price)}`}>
-      <Link href={`/products/${product.slug}`} className="block">
+      <Link href={`/products/${product.slug}`} prefetch={false} className="block">
         <div
           className="relative overflow-hidden rounded-[20px] bg-white cursor-pointer group transition-all duration-300 border border-transparent hover:border-accent-primary"
           style={{
@@ -45,7 +45,7 @@ export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCa
                 src={product.image}
                 alt={product.altText}
                 fill
-                quality={100}
+                quality={85}
                 sizes="(max-width: 768px) 50vw, 25vw"
                 className="object-cover object-top"
               />

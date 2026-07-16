@@ -95,7 +95,7 @@ export function LookbookSlider({ slides }: LookbookSliderProps) {
                   src={slide.imageUrl}
                   alt={slide.altText}
                   fill
-                  quality={100}
+                  quality={80}
                   sizes="100vw"
                   className="w-full h-full object-cover object-center"
                 />

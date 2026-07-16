@@ -111,6 +111,7 @@ export function Navbar() {
             {/* Logo */}
             <Link
               href="/"
+              prefetch={false}
               aria-label="Aurora — return to homepage"
               className="font-display font-black text-xl tracking-[0.15em] uppercase text-text-primary hover:text-accent-primary transition-colors"
             >
@@ -126,6 +127,7 @@ export function Navbar() {
                 <li key={link.href + link.label}>
                   <Link
                     href={link.href}
+                    prefetch={false}
                     className="text-sm font-medium text-text-primary hover:text-accent-primary transition-colors tracking-wide"
                   >
                     {link.label}
@@ -178,6 +180,7 @@ export function Navbar() {
               ) : (
                 <Link
                   href="/login"
+                  prefetch={false}
                   className="px-5 py-2 rounded-full text-sm font-medium text-text-primary border border-text-primary hover:bg-text-primary hover:text-text-inverted transition-all duration-300 tracking-wide"
                 >
                   Sign In
