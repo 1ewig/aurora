@@ -71,13 +71,13 @@ export function Hero({ products }: HeroProps) {
           className="font-sans font-black leading-none tracking-[-0.04em] mt-6 text-text-primary w-full"
           style={{ fontSize: "clamp(3rem, 9vw, 9rem)" }}
         >
-          <AnimatedText delay={0.2}>
+          <AnimatedText delay={0.2} immediate>
             <span className="block">Wear What</span>
           </AnimatedText>
-          <AnimatedText delay={0.35}>
+          <AnimatedText delay={0.35} immediate>
             <span className="block">The World</span>
           </AnimatedText>
-          <AnimatedText delay={0.5}>
+          <AnimatedText delay={0.5} immediate>
             <span className="block text-accent-primary">
               Whispers.
             </span>
