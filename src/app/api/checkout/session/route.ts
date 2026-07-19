@@ -25,7 +25,7 @@ export interface CheckoutSessionRequest {
 
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+    const ip = (req as any).ip || req.headers.get('x-real-ip') || '127.0.0.1';
     if (!await rateLimit(ip, 'checkout', 10)) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }

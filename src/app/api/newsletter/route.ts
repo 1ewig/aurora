@@ -5,17 +5,17 @@
  * Sends a welcome email upon subscription.
  */
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
 import { pool } from "@/utils/db";
 import { rateLimit } from "@/utils/rateLimit";
 import { rethrowIfDynamicServerError } from "@/utils/errors";
 import { isValidEmail } from "@/utils/validation";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-    if (!await rateLimit(ip, 'newsletter', 5)) {
+    const ip = (request as any).ip || request.headers.get('x-real-ip') || '127.0.0.1';
+    if (!await rateLimit(ip, 'newsletter', 3)) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
