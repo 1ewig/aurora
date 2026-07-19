@@ -81,6 +81,27 @@ function parseCustomField<T>(val: any, fallback: T): T {
   throw new Error(`Invalid custom field type: ${typeof val}`);
 }
 
+function validateCartItems(items: any): Array<{ internalProductId: string; quantity: number; size: string }> {
+  if (!Array.isArray(items)) {
+    throw new Error("cart_items must be an array.");
+  }
+  for (const item of items) {
+    if (!item || typeof item !== "object") {
+      throw new Error("cart_item must be an object.");
+    }
+    if (typeof item.internalProductId !== "string" || !item.internalProductId.trim()) {
+      throw new Error("cart_item.internalProductId must be a non-empty string.");
+    }
+    if (typeof item.quantity !== "number" || !Number.isInteger(item.quantity) || item.quantity < 1) {
+      throw new Error("cart_item.quantity must be a positive integer.");
+    }
+    if (typeof item.size !== "string") {
+      throw new Error("cart_item.size must be a string.");
+    }
+  }
+  return items;
+}
+
 async function handleOrderCreated(payload: any, lsEventId: string) {
   const attrs = payload.data?.attributes;
   const customData = payload.meta?.custom_data ?? {};
@@ -96,13 +117,12 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
 
   const reservationId: string | null = customData.reservation_id ?? null;
 
-  const cartItems: Array<{
-    internalProductId: string;
-    quantity: number;
-    size: string;
-  }> = parseCustomField(customData.cart_items, []);
+  const cartItems = validateCartItems(parseCustomField(customData.cart_items, []));
 
   const shippingAddress = parseCustomField(customData.shipping_address, {});
+  if (!shippingAddress || typeof shippingAddress !== "object" || Array.isArray(shippingAddress)) {
+    throw new Error("shipping_address must be a valid object.");
+  }
   const sanitizedAddress = sanitizeShippingAddress(shippingAddress);
   const orderNumber = `AUR-${crypto.randomUUID().replace(/-/g, "").substring(0, 8).toUpperCase()}`;
 

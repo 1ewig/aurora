@@ -323,4 +323,60 @@ describe("POST /api/webhooks/lemonsqueezy", () => {
     const json = await res.json();
     expect(json.received).toBe(true);
   });
+
+  it("returns 500 when custom field cart_items is not an array", async () => {
+    const payload = makeWebhookPayload("order_created", "evt-invalid-cart-array");
+    payload.meta.custom_data.cart_items = JSON.stringify("not-an-array");
+    const rawBody = JSON.stringify(payload);
+    const signature = signPayload(rawBody);
+
+    const res = await POST(makeWebhookRequest(rawBody, signature));
+
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json.error).toBe("Internal processing failed.");
+  });
+
+  it("returns 500 when cart_item contains negative quantity", async () => {
+    const payload = makeWebhookPayload("order_created", "evt-negative-qty");
+    payload.meta.custom_data.cart_items = JSON.stringify([
+      { internalProductId: "prod-1", quantity: -5, size: "M" },
+    ]);
+    const rawBody = JSON.stringify(payload);
+    const signature = signPayload(rawBody);
+
+    const res = await POST(makeWebhookRequest(rawBody, signature));
+
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json.error).toBe("Internal processing failed.");
+  });
+
+  it("returns 500 when cart_item contains missing internalProductId", async () => {
+    const payload = makeWebhookPayload("order_created", "evt-missing-prod");
+    payload.meta.custom_data.cart_items = JSON.stringify([
+      { quantity: 1, size: "M" } as any,
+    ]);
+    const rawBody = JSON.stringify(payload);
+    const signature = signPayload(rawBody);
+
+    const res = await POST(makeWebhookRequest(rawBody, signature));
+
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json.error).toBe("Internal processing failed.");
+  });
+
+  it("returns 500 when shipping_address custom field is not a valid object", async () => {
+    const payload = makeWebhookPayload("order_created", "evt-invalid-address");
+    payload.meta.custom_data.shipping_address = JSON.stringify("invalid-address-string");
+    const rawBody = JSON.stringify(payload);
+    const signature = signPayload(rawBody);
+
+    const res = await POST(makeWebhookRequest(rawBody, signature));
+
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json.error).toBe("Internal processing failed.");
+  });
 });
