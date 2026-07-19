@@ -10,6 +10,7 @@ import { sendEmail } from "@/lib/email";
 import { pool } from "@/utils/db";
 import { rateLimit } from "@/utils/rateLimit";
 import { rethrowIfDynamicServerError } from "@/utils/errors";
+import { isValidEmail } from "@/utils/validation";
 
 export async function POST(request: Request) {
   try {
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
 
     const { email } = await request.json();
 
-    if (!email || typeof email !== "string" || !email.includes("@")) {
+    if (!email || typeof email !== "string" || !isValidEmail(email)) {
       return NextResponse.json(
         { error: "A valid email address is required" },
         { status: 400 }

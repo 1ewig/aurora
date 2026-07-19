@@ -17,6 +17,10 @@ export interface FieldErrors {
   cardCVC?: string;
 }
 
+export function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
+
 /** Validates a single form field and returns an error message or undefined. */
 export function validateField(field: string, value: string): string | undefined {
   const trimmed = value.trim();
@@ -24,7 +28,7 @@ export function validateField(field: string, value: string): string | undefined 
   switch (field) {
     case "email": {
       if (!trimmed) return "Email is required.";
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return "Enter a valid email address.";
+      if (!isValidEmail(trimmed)) return "Enter a valid email address.";
       return undefined;
     }
     case "firstName": {

@@ -1,3 +1,5 @@
+import { isValidEmail } from "./validation";
+
 export interface ShippingAddress {
   email: string;
   firstName: string;
@@ -46,5 +48,10 @@ export function validateShippingAddress(address: Record<string, any>): string | 
       return `${label} is required`;
     }
   }
+
+  if (!isValidEmail(address.email?.toString() || "")) {
+    return "Enter a valid email address";
+  }
+
   return null;
 }
