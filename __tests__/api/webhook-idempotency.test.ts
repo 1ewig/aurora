@@ -260,4 +260,67 @@ describe("POST /api/webhooks/lemonsqueezy", () => {
     // Should not have connected to DB for order processing
     expect(mockConnect).not.toHaveBeenCalled();
   });
+
+  // ── JSON parsing robustness ───────────────────────────────────────────
+
+  it("returns 400 for malformed JSON request body payload", async () => {
+    const rawBody = "{ invalid-json }";
+    const signature = signPayload(rawBody);
+    const res = await POST(makeWebhookRequest(rawBody, signature));
+
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toBe("Invalid JSON payload.");
+  });
+
+  it("returns 400 when payload is null", async () => {
+    const rawBody = "null";
+    const signature = signPayload(rawBody);
+    const res = await POST(makeWebhookRequest(rawBody, signature));
+
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toBe("Invalid payload format.");
+  });
+
+  it("returns 500 when custom field cart_items has malformed JSON", async () => {
+    const payload = makeWebhookPayload("order_created", "evt-malformed-custom");
+    // Inject invalid JSON string into custom field
+    payload.meta.custom_data.cart_items = "{ invalid-cart-items-json }";
+    const rawBody = JSON.stringify(payload);
+    const signature = signPayload(rawBody);
+
+    const res = await POST(makeWebhookRequest(rawBody, signature));
+
+    expect(res.status).toBe(500);
+    const json = await res.json();
+    expect(json.error).toBe("Internal processing failed.");
+  });
+
+  it("returns 200 and processes correctly when custom field cart_items is already a parsed array", async () => {
+    const payload = makeWebhookPayload("order_created", "evt-pre-parsed");
+    // Inject actual parsed array instead of stringified JSON
+    (payload.meta.custom_data as any).cart_items = [
+      { internalProductId: "prod-1", quantity: 1, size: "M" },
+    ];
+    const rawBody = JSON.stringify(payload);
+    const signature = signPayload(rawBody);
+
+    mockClientQuery
+      .mockResolvedValueOnce(undefined) // BEGIN
+      .mockResolvedValueOnce({ rowCount: 1 }) // INSERT processed_webhooks
+      .mockResolvedValueOnce({ rows: [{ price: 100, name: "Product", slug: "product", image: "/img.jpg" }] }) // SELECT product
+      .mockResolvedValueOnce({ rows: [{ id: "size-1", stock: 50 }] }) // SELECT product_sizes FOR UPDATE
+      .mockResolvedValueOnce(undefined) // UPDATE product_sizes stock
+      .mockResolvedValueOnce(undefined) // DELETE reservation
+      .mockResolvedValueOnce(undefined) // INSERT order
+      .mockResolvedValueOnce(undefined) // UPDATE user ls_customer_id
+      .mockResolvedValueOnce(undefined); // COMMIT
+
+    const res = await POST(makeWebhookRequest(rawBody, signature));
+
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.received).toBe(true);
+  });
 });

@@ -33,7 +33,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid signature." }, { status: 401 });
     }
 
-    const payload = JSON.parse(rawBody);
+    let payload: any;
+    try {
+      payload = JSON.parse(rawBody);
+    } catch (parseErr) {
+      console.warn("[LS Webhook] Failed to parse request body JSON:", parseErr);
+      return NextResponse.json({ error: "Invalid JSON payload." }, { status: 400 });
+    }
+
+    if (!payload || typeof payload !== "object") {
+      console.warn("[LS Webhook] Payload is null or not an object.");
+      return NextResponse.json({ error: "Invalid payload format." }, { status: 400 });
+    }
+
     const eventName = payload.meta?.event_name;
     const lsEventId = payload.data?.id;
 
@@ -56,6 +68,19 @@ export async function POST(req: NextRequest) {
   }
 }
 
+function parseCustomField<T>(val: any, fallback: T): T {
+  if (val === undefined || val === null) return fallback;
+  if (typeof val === "object") return val as T;
+  if (typeof val === "string") {
+    try {
+      return JSON.parse(val) as T;
+    } catch (err: any) {
+      throw new Error(`Failed to parse custom field JSON: ${err.message || err}`);
+    }
+  }
+  throw new Error(`Invalid custom field type: ${typeof val}`);
+}
+
 async function handleOrderCreated(payload: any, lsEventId: string) {
   const attrs = payload.data?.attributes;
   const customData = payload.meta?.custom_data ?? {};
@@ -75,9 +100,9 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
     internalProductId: string;
     quantity: number;
     size: string;
-  }> = customData.cart_items ? JSON.parse(customData.cart_items) : [];
+  }> = parseCustomField(customData.cart_items, []);
 
-  const shippingAddress = customData.shipping_address ? JSON.parse(customData.shipping_address) : {};
+  const shippingAddress = parseCustomField(customData.shipping_address, {});
   const sanitizedAddress = sanitizeShippingAddress(shippingAddress);
   const orderNumber = `AUR-${crypto.randomUUID().replace(/-/g, "").substring(0, 8).toUpperCase()}`;
 
