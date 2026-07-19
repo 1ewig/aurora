@@ -11,7 +11,7 @@ import { useOrders, type Order } from "@/hooks/queries";
 
 import { Button } from "@/components/ui/Button";
 import { OrderCard } from "./OrderCard";
-import { OrderListSkeleton } from "./OrderListSkeleton";
+import { OrderListLoader } from "./OrderListLoader";
 
 /** Renders the purchase history page with order cards, handling loading, empty, and error states. */
 export function OrdersClient() {
@@ -34,7 +34,7 @@ export function OrdersClient() {
   let mainContent;
 
   if (isLoading && allOrders.length === 0) {
-    mainContent = <OrderListSkeleton />;
+    mainContent = <OrderListLoader />;
   } else if (error && allOrders.length === 0) {
     mainContent = (
       <div className="flex flex-col items-center justify-center min-h-[40vh] text-center bg-bg-secondary border border-border-subtle p-8 rounded-[24px] shadow-sm">
