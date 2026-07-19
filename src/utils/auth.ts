@@ -1,7 +1,8 @@
 /**
  * Aurora — src/utils/auth.ts
  *
- * Auth utility helpers: profile normalization and admin email checks.
+ * Client-safe auth utility helpers: profile normalization, role fetching,
+ * and admin email checks. Used by both stores and server-side code.
  */
 
 import type { Profile, User } from "@/stores/useAuthStore";
@@ -44,11 +45,15 @@ export function buildUserState(
   };
 }
 
-/** Checks whether a user is an admin.
+/**
+ * Checks whether a user is an admin.
  *
- *  Priority order:
- *  1. DB-backed `role` column (from `better_auth."user"`) when provided
- *  2. Legacy `ADMIN_EMAILS` env-var whitelist (backward compat during migration)
+ * Priority order:
+ *  1. DB-backed `role` column (from `better_auth."user"`) — authoritative.
+ *  2. Legacy `ADMIN_EMAILS` env-var whitelist — back-compat during migration.
+ *
+ * The env-var fallback ensures existing admin users defined via
+ * ADMIN_EMAILS continue to work even before they have a DB role set.
  */
 export function isAdmin(email?: string, role?: string): boolean {
   if (role) return role === 'admin';

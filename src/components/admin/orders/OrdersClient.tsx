@@ -1,3 +1,11 @@
+/**
+ * Aurora — src/components/admin/orders/OrdersClient.tsx
+ *
+ * Client-side orchestrator component for order management panel.
+ * Connects order queries, state variables, and callbacks to the interactive
+ * table view and detail slide-over modal.
+ */
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";

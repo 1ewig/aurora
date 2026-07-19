@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/hooks/queries/index.ts
+ *
+ * Barrel file re-exporting all TanStack Query hooks and their associated types.
+ * Single import point for consumers across the app.
+ */
+
 export {
   useProductsQuery,
   usePaginatedProductsQuery,

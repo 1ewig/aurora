@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/admin/dashboard/DashboardSkeleton.tsx
+ *
+ * Loading skeleton representation of the main admin dashboard page, mirroring
+ * the metrics grid, recent orders log, and quick tasks panel.
+ */
+
 export function DashboardSkeleton() {
   return (
     <div className="space-y-10 pb-12 animate-pulse">

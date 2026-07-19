@@ -1,8 +1,14 @@
 /**
  * Aurora — src/hooks/useProductForm.ts
  *
- * Admin product form state — fields, image upload, size/detail management,
- * change detection, and save logic.
+ * Admin product create/edit form hook. Manages ~15 form fields,
+ * InsForge storage image upload, size/stock variant management,
+ * detail bullet editing, auto-slug generation, and snapshot-based
+ * change detection (dirty flag).
+ *
+ * On save, calls useSaveProductMutation (POST or PUT depending on
+ * whether editingProduct is passed). On success, calls onSuccess()
+ * which typically refreshes the product list and closes the form.
  */
 
 import { useState, useEffect } from "react";
@@ -40,7 +46,11 @@ export function useProductForm(onSuccess: () => void) {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Snapshot for change detection
+  /*
+   * JSON-serialized snapshot of the initial form state.
+   * Compared against currentSnapshot() to determine if the user
+   * has made changes (enables/disables the save button).
+   */
   const [initialSnapshot, setInitialSnapshot] = useState<string>("");
 
   function currentSnapshot() {
@@ -64,7 +74,11 @@ export function useProductForm(onSuccess: () => void) {
 
   const hasChanges = currentSnapshot() !== initialSnapshot;
 
-  // Sync auto slug
+  /*
+   * Auto-generate slug from name when creating a new product.
+   * Only fires when formId is empty (no existing product loaded).
+   * Prevents overriding a manually-set slug during edits.
+   */
   useEffect(() => {
     if (!formId && formName) {
       const slugified = formName
@@ -75,7 +89,7 @@ export function useProductForm(onSuccess: () => void) {
     }
   }, [formName, formId]);
 
-  // Load editing product properties
+  /** Populates the form for editing or resets to defaults for creation. */
   function resetForm(product?: ProductData | null) {
     if (product) {
       setFormId(product.id);
@@ -111,6 +125,7 @@ export function useProductForm(onSuccess: () => void) {
         })
       );
     } else {
+      // Reset to default blank form for new product creation
       setFormId("");
       setFormName("");
       setFormSlug("");
@@ -154,7 +169,12 @@ export function useProductForm(onSuccess: () => void) {
     }
   }
 
-  // Upload to bucket
+  /*
+   * Uploads file(s) to the InsForge 'product-media' storage bucket.
+   * Generates a safe filename key: {productId}/{sanitized-original-name}.
+   * For main image uploads, the uploaded URL is also prepended to the
+   * gallery list to ensure it's the first gallery entry.
+   */
   async function handleUpload(files: FileList | null, isGallery = false) {
     if (!files || files.length === 0) return;
 
@@ -228,7 +248,6 @@ export function useProductForm(onSuccess: () => void) {
     }
   }
 
-  // Add detail bullet
   function handleAddDetail() {
     if (formDetailInput.trim()) {
       setFormDetails((prev) => [...prev, formDetailInput.trim()]);
@@ -236,7 +255,11 @@ export function useProductForm(onSuccess: () => void) {
     }
   }
 
-  // Add size / stock
+  /*
+   * Adds a new size variant with case-insensitive dedup.
+   * If a size with the same name (case-insensitive) already exists
+   * in the list, it is replaced rather than duplicated.
+   */
   function handleAddSize() {
     if (newSizeName.trim()) {
       const stock = parseInt(newSizeStock, 10);
@@ -245,7 +268,6 @@ export function useProductForm(onSuccess: () => void) {
         return;
       }
       setFormSizes((prev) => {
-        // Prevent duplicate sizes in list
         const filtered = prev.filter((s) => s.size.toUpperCase() !== newSizeName.trim().toUpperCase());
         return [...filtered, { size: newSizeName.trim().toUpperCase(), stock }];
       });

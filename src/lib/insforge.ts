@@ -1,8 +1,17 @@
 /**
  * Aurora — src/lib/insforge.ts
  *
- * React hook that provides an authenticated InsForge browser client.
- * Automatically fetches and refreshes a JWT bridge token on auth state changes.
+ * React hook (useInsforgeClient) that provides an authenticated InsForge
+ * browser client. The JWT bridge token is fetched from the server endpoint
+ * (/api/insforge-token) on mount and refreshed every 50 minutes.
+ *
+ * The bridge JWT is signed server-side with the user's Better Auth session
+ * and allows the client SDK to authenticate with InsForge Storage and
+ * edge functions.
+ *
+ * SDK API variance: newer versions use setAccessToken(), older versions
+ * need setAuthToken() on the HTTP client + realtime token manager.
+ * Both paths are handled here.
  */
 
 'use client';
@@ -13,7 +22,12 @@ import { useEffect, useMemo, useState } from 'react';
 
 const REFRESH_INTERVAL_MS = 50 * 60 * 1000;
 
-/** Sets the auth token on the InsForge client (handles SDK API variance). */
+/**
+ * Sets the auth token on the InsForge client.
+ * Handles SDK version differences:
+ * - V2+: setAccessToken() directly on the client.
+ * - V1: getHttpClient().setAuthToken() + realtime token manager.
+ */
 function setBridgeToken(client: InsForgeClient, token: string | null) {
   if (typeof (client as unknown as { setAccessToken?: unknown }).setAccessToken === 'function') {
     (client as unknown as { setAccessToken: (t: string | null) => void }).setAccessToken(token);
@@ -38,6 +52,12 @@ export function useInsforgeClient(): { client: InsForgeClient; isReady: boolean 
     [],
   );
 
+  /*
+   * When the user session changes, fetch a fresh JWT bridge token.
+   * Token is refreshed every 50 minutes via setInterval to prevent
+   * expiry during long sessions. The cancelled flag prevents setting
+   * state after unmount.
+   */
   useEffect(() => {
     if (!session.data?.user) {
       setBridgeToken(client, null);

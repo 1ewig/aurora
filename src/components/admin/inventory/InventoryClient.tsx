@@ -1,3 +1,11 @@
+/**
+ * Aurora — src/components/admin/inventory/InventoryClient.tsx
+ *
+ * Client component managing product catalog inventory operations.
+ * Handles product search, category filtering, delete confirmations, and
+ * launches the form modal for adding or editing items.
+ */
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";

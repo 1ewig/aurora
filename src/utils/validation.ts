@@ -2,7 +2,13 @@
  * Aurora — src/utils/validation.ts
  *
  * Checkout form field validation with per-field error messages.
- * Supports email, name, address, ZIP, card number, expiry, and CVC.
+ * Supports email, name, address, ZIP (US 5-digit or 5+4), card number
+ * (Luhn-length check: 13-19 digits), card expiry (MM/YY with date
+ * comparison against current month), and CVC (3-4 digits).
+ *
+ * validateField validates a single field, validateAll runs all fields.
+ * The FieldErrors interface mirrors the checkout form's six address
+ * fields plus three card fields (for future card-on-file support).
  */
 
 export interface FieldErrors {
@@ -65,9 +71,10 @@ export function validateField(field: string, value: string): string | undefined 
       if (!/^\d{2}\/\d{2}$/.test(trimmed)) return "Use MM/YY format (e.g. 12/28).";
       const [mm, yy] = trimmed.split("/").map(Number);
       if (mm < 1 || mm > 12) return "Month must be 01–12.";
+      // Compare against current date to reject expired cards
       const now = new Date();
       const expYear = 2000 + yy;
-      const expMonth = mm - 1;
+      const expMonth = mm - 1; // JS months are 0-indexed
       if (expYear < now.getFullYear() || (expYear === now.getFullYear() && expMonth < now.getMonth())) {
         return "Card is expired.";
       }

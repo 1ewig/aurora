@@ -1,6 +1,11 @@
+/**
+ * Aurora — src/hooks/useNewsletterSubmit.ts
+ *
+ * Newsletter sign-up form state and submission handler.
+ */
+
 import { useState } from "react";
 
-/** Newsletter sign-up form state and submission handler. */
 export function useNewsletterSubmit() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);

@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/admin/orders/OrdersSkeleton.tsx
+ *
+ * Loading skeleton representation of the admin order history and status tables.
+ */
+
 export function OrdersSkeleton() {
   return (
     <div className="space-y-8 pb-12 animate-pulse">

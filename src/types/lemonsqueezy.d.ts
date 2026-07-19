@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/types/lemonsqueezy.d.ts
+ *
+ * Global type declarations for the LemonSqueezy overlay widget (checkout popup).
+ * Augments the Window interface with LemonSqueezy SDK entry points.
+ */
+
 interface LemonSqueezyUrlObject {
   Open: (url: string) => void;
   Close: () => void;

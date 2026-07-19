@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/utils/audit.ts
+ *
+ * Admin action audit logger. Inserts a row into the audit_logs table
+ * tracking who performed what action on which target resource.
+ */
+
 import { pool } from '@/utils/db';
 
 export async function logAudit(opts: {

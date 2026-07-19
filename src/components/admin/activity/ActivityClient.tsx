@@ -1,3 +1,11 @@
+/**
+ * Aurora — src/components/admin/activity/ActivityClient.tsx
+ *
+ * Client-side component for rendering the admin activity audit log.
+ * Handles server-side pagination, search queries, filter states, and renders
+ * a paginated audit trail table of admin events.
+ */
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";

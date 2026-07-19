@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/admin/users/UsersClient.tsx
+ *
+ * Client-side component for administering user accounts, role definitions,
+ * email verification toggles, and account deletions.
+ */
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";

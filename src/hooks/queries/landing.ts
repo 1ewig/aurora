@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/hooks/queries/landing.ts
+ *
+ * React Query hooks for aggregated homepage data: hero products, lookbook slides,
+ * material features, testimonials, and category metadata.
+ */
+
 import { useQuery } from '@tanstack/react-query';
 import type { Product } from '@/data/products';
 import type { MaterialItem } from '@/data/materials';

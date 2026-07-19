@@ -1,7 +1,14 @@
 /**
  * Aurora — src/lib/lemonsqueezy.ts
  *
- * Server-side client wrapper for Lemon Squeezy REST API v1/checkouts.
+ * Server-side client wrapper for the Lemon Squeezy REST API v1.
+ * Currently only exposes createCheckout() which creates a checkout
+ * session with custom pricing, cart data, and shipping info.
+ *
+ * The API returns JSON:API format (vnd.api+json). Custom data fields
+ * (cart_items, shipping_address, reservation_id) are serialized as
+ * JSON strings inside the checkout_data.custom object so they survive
+ * the round-trip through LS and back in the webhook.
  */
 
 const LS_API_BASE = "https://api.lemonsqueezy.com/v1";
@@ -49,6 +56,17 @@ export async function createCheckout(
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "http://localhost:3000";
 
+  /*
+   * Build the JSON:API payload for Lemon Squeezy v1/checkouts.
+   * Key details:
+   *  - custom_price: overrides the variant's default price.
+   *  - embed: true enables the overlay modal (vs. redirect).
+   *  - checkout_data.custom: passes-through data that comes back
+   *    in the webhook as meta.custom_data.
+   *  - redirect_url: uses [order_id] placeholder that LS replaces
+   *    with the actual LS order ID after payment.
+   *  - expires_at: checkout link expires in 30 minutes.
+   */
   const body = {
     data: {
       type: "checkouts",
@@ -65,6 +83,7 @@ export async function createCheckout(
           ...(payload.userName?.trim() ? { name: payload.userName.trim() } : {}),
           custom: {
             user_id: payload.userId ?? "guest",
+            // Serialize complex objects as JSON strings for LS storage
             cart_items: JSON.stringify(payload.cartItems),
             shipping_address: JSON.stringify(payload.shippingAddress),
             ...(payload.reservationId ? { reservation_id: payload.reservationId } : {}),

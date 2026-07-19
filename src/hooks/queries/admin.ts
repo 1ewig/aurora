@@ -1,3 +1,20 @@
+/**
+ * Aurora — src/hooks/queries/admin.ts
+ *
+ * Admin dashboard, paginated queries, and mutation hooks.
+ *
+ * Paginated queries (useAdminProductsQuery, useAdminOrdersQuery,
+ * useAdminUsersQuery, useAdminAuditLogsQuery) all share the same
+ * pattern: they accept params with page/limit/search/filter fields,
+ * build a URLSearchParams string, fetch from the admin API, and
+ * return a paginated response type.
+ *
+ * Mutations (useUpdateOrderStatusMutation, useSaveProductMutation,
+ * useDeleteProductMutation, etc.) perform an API call then
+ * invalidate specific React Query cache prefixes to refresh data
+ * without a manual refetch.
+ */
+
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import type {
   DashboardMetrics,
@@ -86,6 +103,13 @@ interface AdminUsersParams {
 
 // ── Paginated queries ───────────────────────────────────────────────────
 
+/**
+ * Generic pattern for all admin paginated queries:
+ * - Params are serialized to URLSearchParams.
+ * - keepPreviousData provides smooth pagination transitions.
+ * - staleTime=0 ensures fresh data on every mount.
+ */
+
 /** Fetches paginated products for inventory management. */
 export function useAdminProductsQuery(params: AdminProductsParams = {}) {
   return useQuery({
@@ -166,6 +190,12 @@ export function useAdminUserSessionsQuery(userId: string | null) {
 
 // ── Admin mutations ─────────────────────────────────────────────────────
 
+/**
+ * Mutation pattern: each mutation performs a fetch call on mutateFn,
+ * then invalidates relevant query cache(s) on success so the UI
+ * reflects the new data without manual refetch.
+ */
+
 /** Updates an order's status, then invalidates orders + dashboard. */
 export function useUpdateOrderStatusMutation() {
   const queryClient = useQueryClient();
@@ -189,7 +219,12 @@ export function useUpdateOrderStatusMutation() {
   });
 }
 
-/** Creates or updates a product, then invalidates the product list. */
+/**
+ * Creates or updates a product.
+ * If `id` is provided, uses PUT (update); otherwise POST (create).
+ * Invalidates all product-related cache prefixes so the storefront
+ * and admin list both refresh.
+ */
 export function useSaveProductMutation() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -208,6 +243,7 @@ export function useSaveProductMutation() {
       return res.json();
     },
     onSuccess: () => {
+      // Invalidate both admin and public product caches
       queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['product'] });
@@ -254,7 +290,7 @@ export function useToggleUserVerifyMutation() {
   });
 }
 
-/** Updates a user's role. */
+/** Updates a user's role (user | admin). */
 export function useUpdateUserRoleMutation() {
   const queryClient = useQueryClient();
   return useMutation({

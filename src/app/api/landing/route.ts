@@ -1,3 +1,11 @@
+/**
+ * Aurora — src/app/api/landing/route.ts
+ *
+ * GET /api/landing — returns aggregated homepage data:
+ * featured products, lookbook slides, material highlights, testimonials,
+ * and category metadata. Uses Next.js `use cache` for ISR with 60s stale TTL.
+ */
+
 import { NextResponse } from "next/server";
 import { pool } from "@/utils/db";
 import { cacheLife, cacheTag } from "next/cache";

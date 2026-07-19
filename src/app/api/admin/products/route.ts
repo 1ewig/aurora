@@ -1,9 +1,13 @@
 /**
  * Aurora — src/app/api/admin/products/route.ts
  *
- * GET /api/admin/products — returns all products with images, sizes, and details.
- * POST /api/admin/products — creates a new product with full nested data.
- * Admin-only endpoints.
+ * GET  /api/admin/products — paginated admin product listing with nested
+ *       images, sizes, and details (uses json_agg subqueries).
+ * POST /api/admin/products — creates a new product in a transaction:
+ *       inserts base row + related images/sizes/details, checks for
+ *       duplicate ID/slug, invalidates cache tags, and logs an audit entry.
+ *
+ * Both endpoints require admin role (requireAdmin).
  */
 
 import { NextResponse } from 'next/server';
@@ -25,6 +29,11 @@ export async function GET(request: Request) {
     const search = searchParams.get('search') || '';
     const category = searchParams.get('category') || '';
 
+    /*
+     * Build dynamic WHERE clause with parameterized queries.
+     * paramIndex tracks the $N position for pg parameter binding,
+     * incremented per condition to avoid collisions.
+     */
     const conditions: string[] = [];
     const params: any[] = [];
     let paramIndex = 1;
@@ -41,6 +50,11 @@ export async function GET(request: Request) {
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
+    /*
+     * Single-roundtrip query using json_agg subqueries to consolidate
+     * related rows (images, sizes, details) into JSON arrays.
+     * COUNT(*) OVER() provides total count without a separate query.
+     */
     const result = await pool.query(`
       SELECT
         p.id,
@@ -124,6 +138,7 @@ export async function POST(request: Request) {
     }
 
     return await withTransaction(async (client) => {
+      // Check for duplicate ID or slug before attempting insert
       const existingProduct = await client.query(
         'SELECT 1 FROM products WHERE id = $1 OR slug = $2',
         [id, slug]
@@ -132,6 +147,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Product with this ID or slug already exists' }, { status: 400 });
       }
 
+      // Insert the base product row
       await client.query(
         `INSERT INTO products (
           id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description
@@ -139,6 +155,7 @@ export async function POST(request: Request) {
         [id, slug, name, category, price, badge || null, image, altText, span || null, aspectRatio || null, description]
       );
 
+      // Insert related gallery images
       for (const imgUrl of images) {
         await client.query(
           'INSERT INTO product_images (product_id, image_url) VALUES ($1, $2)',
@@ -146,6 +163,7 @@ export async function POST(request: Request) {
         );
       }
 
+      // Insert size/stock variants
       for (const sizeObj of sizes) {
         const stock = typeof sizeObj.stock === 'number' ? sizeObj.stock : 0;
         await client.query(
@@ -154,6 +172,7 @@ export async function POST(request: Request) {
         );
       }
 
+      // Insert detail bullets
       for (const detailText of details) {
         await client.query(
           'INSERT INTO product_details (product_id, detail) VALUES ($1, $2)',
@@ -161,6 +180,10 @@ export async function POST(request: Request) {
         );
       }
 
+      /*
+       * Invalidate cached product and landing data so the storefront
+       * picks up the new product on next request.
+       */
       revalidateTag('products', { expire: 0 });
       revalidateTag('landing', { expire: 0 });
 

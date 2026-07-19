@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/hooks/useAdminDashboard.ts
+ *
+ * Admin dashboard data hook: aggregates metrics, recent orders, and summary stats.
+ */
+
 "use client";
 
 import { useAdminDashboardQuery } from "@/hooks/queries";

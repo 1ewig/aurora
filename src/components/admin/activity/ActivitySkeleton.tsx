@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/admin/activity/ActivitySkeleton.tsx
+ *
+ * Loading skeleton representation of the admin activity page, mimicking
+ * the grid size, search inputs, and table logs structure.
+ */
+
 export function ActivitySkeleton() {
   return (
     <div className="space-y-8 pb-12 animate-pulse">

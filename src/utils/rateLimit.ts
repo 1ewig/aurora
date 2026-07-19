@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/utils/rateLimit.ts
+ *
+ * Database-backed IP rate limiter using a minute-granularity sliding window.
+ * Returns false when the caller exceeds the configured max requests per minute.
+ */
+
 import { pool } from '@/utils/db';
 
 export async function rateLimit(ip: string, route: string, maxRequests: number): Promise<boolean> {

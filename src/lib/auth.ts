@@ -3,7 +3,16 @@
  *
  * Better Auth server configuration with email/password authentication,
  * email verification, password reset, and DB-backed rate limiting.
- * Uses a dedicated PostgreSQL pool scoped to the `better_auth` schema.
+ * Uses a dedicated PostgreSQL pool scoped to the `better_auth` schema
+ * via SET search_path on each new connection.
+ *
+ * Security-relevant config:
+ *  - Rate limiting: custom rules per endpoint (5/min for sign-in/sign-up,
+ *    3/min for reset/verification emails, unlimited for session reads).
+ *  - CSRF protection enabled.
+ *  - Secure cookies in production only.
+ *  - trustedOrigins locked to NEXT_PUBLIC_APP_URL.
+ *  - Session: 7-day expiry, 1-day sliding window, cookie cache 5min.
  */
 
 import { betterAuth } from 'better-auth';
@@ -11,6 +20,7 @@ import { Pool } from 'pg';
 import { requireEnv } from '@/utils/env';
 import { sendEmail } from './email';
 
+// Dedicated pool scoped to better_auth schema — never use the public pool for auth
 const pool = new Pool({ connectionString: requireEnv('DATABASE_URL') });
 pool.on('connect', (client) => {
   client.query('SET search_path TO better_auth, public').catch(() => {});
@@ -40,6 +50,11 @@ export const auth = betterAuth({
 
   csrf: { enabled: true },
 
+  /*
+   * Rate limiting: stricter limits on auth endpoints vs. session reads.
+   * /get-session is intentionally unlimited (false) to avoid false
+   * rate-limit hits on frequent session checks.
+   */
   rateLimit: {
     enabled: true,
     storage: 'database',
@@ -57,6 +72,10 @@ export const auth = betterAuth({
     },
   },
 
+  /*
+   * Session: 7-day expiry, 1-day sliding window (session is refreshed
+   * if active within this window). Cookie cache reduces DB reads.
+   */
   session: {
     expiresIn: 60 * 60 * 24 * 7,
     updateAge: 60 * 60 * 24,
@@ -73,6 +92,7 @@ export const auth = betterAuth({
     requireEmailVerification: true,
     autoSignIn: false,
     resetPasswordTokenExpiresIn: 3600,
+    // Email callbacks throw on failure — Better Auth expects them to succeed
     sendResetPassword: async ({ user, url }) => {
       const { sent, error } = await sendEmail({
         to: user.email,
@@ -82,6 +102,7 @@ export const auth = betterAuth({
       });
       if (!sent) throw new Error(error || 'Failed to send password reset email');
     },
+    // Alert existing users if someone tries to sign up with their email
     onExistingUserSignUp: async ({ user }) => {
       const { sent } = await sendEmail({
         to: user.email,

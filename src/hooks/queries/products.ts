@@ -1,3 +1,16 @@
+/**
+ * Aurora — src/hooks/queries/products.ts
+ *
+ * Storefront product query hooks. Covers:
+ *  - useProductsQuery: fetches all products (optionally by category).
+ *  - usePaginatedProductsQuery: paginated, sorted, searchable product list.
+ *  - useFeaturedProductsQuery: deterministic daily subset via day-of-month seed.
+ *  - useRelatedProductsQuery: up to 4 same-category products.
+ *  - useProductDetailsQuery: single product by slug with cache-aware
+ *    placeholderData that hydrates from the cached product list for
+ *    instant page rendering while the detail query refetches in background.
+ */
+
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import type { Product } from '@/data/products';
@@ -67,7 +80,12 @@ export function usePaginatedProductsQuery(params: PaginatedProductsParams) {
   });
 }
 
-/** Returns a deterministic "featured" subset using the current day as a seed. */
+/**
+ * Deterministically selects `count` products using the current day-of-month
+ * as a seed index. This ensures the featured products change daily without
+ * any server-side logic or content management.
+ * The formula: index = (dayOfMonth + i * 3) % total, for i = 0..count.
+ */
 export function useFeaturedProductsQuery(count = 3) {
   const selectFn = useCallback((products: Product[]) => {
     if (!products || products.length === 0) return [];
@@ -89,7 +107,11 @@ export function useFeaturedProductsQuery(count = 3) {
   });
 }
 
-/** Returns up to 4 related products from the same category. */
+/**
+ * Returns up to 4 products from the same category as the current product.
+ * If no same-category products exist (e.g. only 1 product in category),
+ * falls back to any other products as a related suggestion.
+ */
 export function useRelatedProductsQuery(currentProduct?: Product) {
   const selectFn = useCallback((dbProducts: Product[]) => {
     if (!dbProducts || dbProducts.length === 0 || !currentProduct) return [];
@@ -101,6 +123,7 @@ export function useRelatedProductsQuery(currentProduct?: Product) {
       return related.slice(0, 4);
     }
 
+    // Fallback: return any products except the current one
     return dbProducts.filter((p) => p.slug !== currentProduct.slug).slice(0, 4);
   }, [currentProduct]);
 
@@ -121,7 +144,13 @@ async function fetchProductDetails(slug: string): Promise<Product> {
   return response.json();
 }
 
-/** Fetches a single product by slug with initial data from cached product list. */
+/**
+ * Fetches a single product by slug for the detail page.
+ * Uses placeholderData to scan the cached ['products'] query data and
+ * return a partial product immediately, enabling instant page rendering
+ * while the detail endpoint fetches fresh data in the background.
+ * Handles both array and { products: [] } response shapes from the cache.
+ */
 export function useProductDetailsQuery(slug: string) {
   const queryClient = useQueryClient();
 
@@ -131,6 +160,7 @@ export function useProductDetailsQuery(slug: string) {
     enabled: !!slug,
     staleTime: 1000 * 60 * 5,
     placeholderData: () => {
+      // Scan cached product lists for a matching slug to use as placeholder
       const cachedQueries = queryClient.getQueriesData<any>({ queryKey: ['products'] });
       for (const [, data] of cachedQueries) {
         if (data) {

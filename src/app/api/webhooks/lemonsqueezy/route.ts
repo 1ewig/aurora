@@ -1,3 +1,21 @@
+/**
+ * Aurora — src/app/api/webhooks/lemonsqueezy/route.ts
+ *
+ * POST /api/webhooks/lemonsqueezy — processes Lemon Squeezy order_created events.
+ *
+ * Security-critical endpoint:
+ *  1. Reads raw body as text (required for HMAC verification, req.json() would
+ *     consume it before we can compute the signature).
+ *  2. Verifies HMAC-SHA256 signature via crypto.timingSafeEqual (timing-attack
+ *     resistant).
+ *  3. Parses custom_data (cart, shipping, reservation) submitted during checkout
+ *     session creation.
+ *  4. Opens DB transaction: idempotent dedup (processed_webhooks), verifies
+ *     product existence and stock, debits inventory, deletes reservation.
+ *  5. Inserts order with is_paid=true and generates order number.
+ *  6. Sends order confirmation email (fire-and-forget, non-blocking).
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { withTransaction } from "@/utils/db";
@@ -8,6 +26,11 @@ import { calculateOrderPricing } from "@/utils/pricing";
 import { sanitizeShippingAddress, type VerifiedItem } from "@/utils/sanitize";
 import { rethrowIfDynamicServerError } from "@/utils/errors";
 
+/**
+ * HMAC-SHA256 signature verification using timing-safe comparison.
+ * The raw body must be verified BEFORE JSON.parse to prevent signature
+ * ambiguity (any JSON re-serialization could change the payload).
+ */
 function verifySignature(rawBody: string, signatureHeader: string): boolean {
   const secret = process.env.LEMON_SQUEEZY_WEBHOOK_SECRET;
   if (!secret) {
@@ -19,12 +42,17 @@ function verifySignature(rawBody: string, signatureHeader: string): boolean {
   const digest = Buffer.from(hmac.update(rawBody).digest("hex"), "utf8");
   const signature = Buffer.from(signatureHeader, "utf8");
 
+  /*
+   * Length check before timingSafeEqual prevents the function from
+   * throwing on mismatched-length buffers and acts as an early rejection.
+   */
   if (digest.length !== signature.length) return false;
   return crypto.timingSafeEqual(digest, signature);
 }
 
 export async function POST(req: NextRequest) {
   try {
+    // Read raw body as text first — req.json() would consume the stream
     const rawBody = await req.text();
     const signature = req.headers.get("x-signature") ?? "";
 
@@ -56,6 +84,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing event ID." }, { status: 400 });
     }
 
+    // Currently only processes order_created; other events are acknowledged but ignored
     if (eventName === "order_created") {
       await handleOrderCreated(payload, lsEventId);
     }
@@ -68,6 +97,10 @@ export async function POST(req: NextRequest) {
   }
 }
 
+/**
+ * Parses a custom_data field that may arrive as a pre-deserialized object
+ * or as a JSON string (Lemon Squeezy's API behavior varies).
+ */
 function parseCustomField<T>(val: any, fallback: T): T {
   if (val === undefined || val === null) return fallback;
   if (typeof val === "object") return val as T;
@@ -81,6 +114,7 @@ function parseCustomField<T>(val: any, fallback: T): T {
   throw new Error(`Invalid custom field type: ${typeof val}`);
 }
 
+/** Validates the structure of cart items extracted from custom_data. */
 function validateCartItems(items: any): Array<{ internalProductId: string; quantity: number; size: string }> {
   if (!Array.isArray(items)) {
     throw new Error("cart_items must be an array.");
@@ -102,6 +136,7 @@ function validateCartItems(items: any): Array<{ internalProductId: string; quant
   return items;
 }
 
+/** Core order processing: idempotent dedup, inventory debit, order insert, email. */
 async function handleOrderCreated(payload: any, lsEventId: string) {
   const attrs = payload.data?.attributes;
   const customData = payload.meta?.custom_data ?? {};
@@ -112,6 +147,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
   const lsOrderNumber: number = attrs.order_number;
   const lsCustomerId: string = String(attrs.customer_id);
 
+  // Guest checkouts have no userId; authenticated users with sessions have one
   const userId: string | null =
     customData.user_id && customData.user_id !== "guest" ? customData.user_id : null;
 
@@ -127,6 +163,11 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
   const orderNumber = `AUR-${crypto.randomUUID().replace(/-/g, "").substring(0, 8).toUpperCase()}`;
 
   const { verifiedItems, subtotal } = await withTransaction(async (client) => {
+    /*
+     * Idempotency check: INSERT with ON CONFLICT DO NOTHING.
+     * If this lsEventId was already processed, rowCount will be 0
+     * and we skip the entire transaction.
+     */
     const checkRes = await client.query(
       `INSERT INTO processed_webhooks (ls_event_id) 
        VALUES ($1) 
@@ -143,6 +184,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
     const items: VerifiedItem[] = [];
     let sub = 0;
 
+    // Verify each product exists, lock its size row, and debit stock
     for (const item of cartItems) {
       const productRes = await client.query(
         "SELECT price, name, slug, image FROM products WHERE id = $1",
@@ -166,6 +208,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
         quantity: item.quantity,
       });
 
+      // Lock the size row to prevent concurrent stock updates
       const sizeRes = await client.query(
         `SELECT id, stock FROM product_sizes
          WHERE product_id = $1 AND size = $2 FOR UPDATE`,
@@ -180,6 +223,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
         throw new Error(`Insufficient stock for product "${item.internalProductId}" (Size: ${item.size}).`);
       }
 
+      // Decrement inventory permanently
       await client.query(
         `UPDATE product_sizes
          SET stock = stock - $1
@@ -188,6 +232,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
       );
     }
 
+    // Remove the soft reservation (it's now a confirmed order)
     if (reservationId) {
       await client.query(
         "DELETE FROM product_reservations WHERE reservation_id = $1",
@@ -197,6 +242,11 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
 
     const { shipping, tax, total } = calculateOrderPricing(sub);
 
+    /*
+     * Insert the order with is_paid=true and status='pending'.
+     * The ON CONFLICT DO NOTHING on ls_order_id is a secondary
+     * idempotency guard (should never trigger if webhook dedup works).
+     */
     await client.query(
       `INSERT INTO orders (
          user_id, order_number, items, subtotal, shipping, tax, total,
@@ -217,6 +267,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
       ]
     );
 
+    // Link the LS customer ID to the user account for future purchases
     if (userId) {
       await client.query(
         `UPDATE better_auth."user"
@@ -229,10 +280,12 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
     return { verifiedItems: items, subtotal: sub };
   });
 
+  // If the event was already processed, skip email
   if (verifiedItems.length === 0) return;
 
   const { shipping, tax, total } = calculateOrderPricing(subtotal);
 
+  // Fire-and-forget email — failures are logged but don't block the webhook response
   await sendEmail({
     to: sanitizedAddress.email,
     subject: `Order Confirmed — ${orderNumber}`,
@@ -279,6 +332,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
       },
     }),
   }).catch((emailErr) => {
+    // Email failures are non-fatal — the order is already saved
     console.error("[LS Webhook] Failed to dispatch order confirmation email:", emailErr);
   });
 }

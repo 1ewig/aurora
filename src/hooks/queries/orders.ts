@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/hooks/queries/orders.ts
+ *
+ * React Query hook for fetching the current authenticated user's orders.
+ * Returns order history with itemized product details, paginated.
+ */
+
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/useAuthStore';
 

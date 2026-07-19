@@ -1,9 +1,15 @@
 /**
  * Aurora — src/app/api/admin/products/[id]/route.ts
  *
- * PUT /api/admin/products/:id — updates a product with its images, sizes, and details.
- * DELETE /api/admin/products/:id — deletes a product and cleans up unused storage assets.
- * Admin-only endpoints with transactional DB operations.
+ * PUT    /api/admin/products/:id — updates a product with its images, sizes,
+ *        and details. Runs in a transaction: checks slug uniqueness, cleans
+ *        up orphaned storage objects, deletes and re-inserts related rows,
+ *        logs diff-based audit entry.
+ * DELETE /api/admin/products/:id — removes a product (cascading delete on
+ *        related tables) and cleans up orphaned storage objects.
+ *
+ * Both endpoints require admin role.
+ * Cache tags ('products', 'landing') are revalidated on success.
  */
 
 import { NextResponse } from 'next/server';
@@ -20,7 +26,11 @@ const admin = createAdminClient({
   apiKey: process.env.INSFORGE_API_KEY || ''
 });
 
-/** Deletes a storage object if no other product references it. */
+/**
+ * Deletes a storage object from InsForge if no other product references it.
+ * Checks both the main product image column AND product_images gallery rows
+ * to avoid removing images shared by multiple products.
+ */
 async function deleteUnusedImage(client: any, url: string, productId: string) {
   const { rows } = await client.query(
     `SELECT COUNT(*) as count FROM (
@@ -75,6 +85,7 @@ export async function PUT(
     }
 
     return await withTransaction(async (client) => {
+      // Fetch the existing product to compare fields for audit diff
       const { rows: productRows } = await client.query(
         'SELECT slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description FROM products WHERE id = $1',
         [id]
@@ -86,6 +97,7 @@ export async function PUT(
       const oldProduct = productRows[0];
       const oldMainImage = oldProduct.image;
 
+      // Ensure the new slug doesn't conflict with another product
       const existingSlug = await client.query(
         'SELECT 1 FROM products WHERE slug = $1 AND id <> $2',
         [slug, id]
@@ -94,21 +106,25 @@ export async function PUT(
         return NextResponse.json({ error: 'Slug is already used by another product' }, { status: 400 });
       }
 
+      // Fetch old gallery images for cleanup comparison
       const { rows: galleryRows } = await client.query(
         'SELECT image_url FROM product_images WHERE product_id = $1',
         [id]
       );
       const oldGalleryImages = galleryRows.map(r => r.image_url);
 
+      // Clean up old main image if it changed
       if (image !== oldMainImage) {
         await deleteUnusedImage(client, oldMainImage, id);
       }
+      // Clean up old gallery images that are no longer in the new set
       for (const oldImg of oldGalleryImages) {
         if (!images.includes(oldImg)) {
           await deleteUnusedImage(client, oldImg, id);
         }
       }
 
+      // Update the base product row
       await client.query(
         `UPDATE products
          SET slug = $1, name = $2, category = $3, price = $4, badge = $5, image = $6, alt_text = $7, span = $8, aspect_ratio = $9, description = $10
@@ -116,6 +132,10 @@ export async function PUT(
         [slug, name, category, price, badge || null, image, altText, span || null, aspectRatio || null, description, id]
       );
 
+      /*
+       * Replace gallery images: delete all, then re-insert.
+       * The main image is prepended to ensure it's always the first gallery entry.
+       */
       await client.query('DELETE FROM product_images WHERE product_id = $1', [id]);
       const allImageUrls = [image, ...images.filter((img: string) => img !== image)];
       for (const imgUrl of allImageUrls) {
@@ -125,6 +145,7 @@ export async function PUT(
         );
       }
 
+      // Replace sizes (delete all, re-insert)
       await client.query('DELETE FROM product_sizes WHERE product_id = $1', [id]);
       for (const sizeObj of sizes) {
         const stock = typeof sizeObj.stock === 'number' ? sizeObj.stock : 0;
@@ -134,6 +155,7 @@ export async function PUT(
         );
       }
 
+      // Replace detail bullets (delete all, re-insert)
       await client.query('DELETE FROM product_details WHERE product_id = $1', [id]);
       for (const detailText of details) {
         await client.query(
@@ -145,6 +167,7 @@ export async function PUT(
       revalidateTag('products', { expire: 0 });
       revalidateTag('landing', { expire: 0 });
 
+      // Build a diff of changed fields for the audit log
       const { user } = await requireAdmin();
       const changes: Record<string, { from: any; to: any }> = {};
       const fields = ['slug', 'name', 'category', 'price', 'badge', 'image', 'alt_text', 'span', 'aspect_ratio', 'description'] as const;
@@ -185,6 +208,7 @@ export async function DELETE(
     if (error) return error;
 
     return await withTransaction(async (client) => {
+      // Fetch product info before deletion for audit trail and storage cleanup
       const { rows: productRows } = await client.query(
         'SELECT image, name, slug FROM products WHERE id = $1',
         [id]
@@ -200,11 +224,13 @@ export async function DELETE(
       );
       const galleryImages = galleryRows.map(r => r.image_url);
 
+      // Clean up main and gallery images before deleting (cascade handles DB rows)
       await deleteUnusedImage(client, mainImage, id);
       for (const img of galleryImages) {
         await deleteUnusedImage(client, img, id);
       }
 
+      // CASCADE deletes handle related rows (images, sizes, details, keywords)
       await client.query('DELETE FROM products WHERE id = $1', [id]);
 
       revalidateTag('products', { expire: 0 });

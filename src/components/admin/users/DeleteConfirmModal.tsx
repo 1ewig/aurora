@@ -16,6 +16,7 @@ interface DeleteConfirmModalProps {
   onConfirm: () => void;
 }
 
+/** Renders the delete user confirmation dialog modal. */
 export function DeleteConfirmModal({
   user,
   deleting,

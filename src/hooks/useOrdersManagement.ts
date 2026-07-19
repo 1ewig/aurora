@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/hooks/useOrdersManagement.ts
+ *
+ * Admin order management hook: list, filter, paginate, and update order status.
+ * Wraps TanStack Query mutations with local UI state for tracking in-flight updates.
+ */
+
 "use client";
 
 import { useState } from "react";

@@ -1,11 +1,16 @@
 /**
  * Aurora — src/utils/admin.ts
  *
- * Server-only authorization helpers with role-based access control.
- * Each role has a numeric level — guards check that the user's level
- * meets the minimum required for the operation.
+ * Server-only authorization helpers with role-based access control (RBAC).
+ * Each role maps to a numeric level (user=0, explorer=1, admin=10).
+ * Guards query the DB-backed `role` column in better_auth."user" and
+ * compare the user's level against the required minimum.
  *
- * Level hierarchy:  user=0, explorer=1, admin=10
+ * Exports:
+ *  - requireRole(minLevel): returns user + role, or an error NextResponse.
+ *  - requireAdmin(): convenience wrapper around requireRole(10).
+ *  - getServerAuthUser(): memoized per-request (React.cache) user fetch
+ *    for server components that need the current user.
  */
 
 import 'server-only';
@@ -43,6 +48,7 @@ export async function requireRole(
       return { user: null, role: 'user', error: UNAUTHORIZED };
     }
 
+    // Query the user's role directly from the database
     const userResult = await pool.query(
       `SELECT role FROM better_auth."user" WHERE id = $1`,
       [session.user.id]
@@ -67,7 +73,7 @@ export async function requireRole(
 }
 
 /**
- * Convenience wrapper — requires admin level (default, used in mutation endpoints).
+ * Convenience wrapper — requires admin level (10).
  */
 export async function requireAdmin(): Promise<{ user: any; error?: NextResponse }> {
   const result = await requireRole(10);
@@ -76,7 +82,8 @@ export async function requireAdmin(): Promise<{ user: any; error?: NextResponse 
 
 /**
  * Fetches the current session and role server-side.
- * Memoized per-request via React.cache().
+ * Memoized per-request via React.cache() so multiple calls within
+ * the same request reuse the result without additional DB queries.
  * Returns a client-safe User object or null if unauthenticated.
  */
 export const getServerAuthUser = cache(async (): Promise<User | null> => {
@@ -93,6 +100,7 @@ export const getServerAuthUser = cache(async (): Promise<User | null> => {
     return null;
   }
 
+  // Default to 'user' role if the DB query fails
   let role = 'user';
   try {
     const userResult = await pool.query(

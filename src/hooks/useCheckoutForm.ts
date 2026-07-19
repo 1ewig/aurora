@@ -1,10 +1,17 @@
 /**
  * Aurora — src/hooks/useCheckoutForm.ts
  *
- * Checkout form state management for Lemon Squeezy sandbox payments:
- * - Collects and validates shipping address.
- * - Programmatically initiates checkout sessions.
- * - Integrates with LemonSqueezy client overlay modal.
+ * Checkout form state management for Lemon Squeezy payments.
+ * Handles:
+ *  - 6 form fields (email, first/last name, address, city, zip)
+ *    with per-field validation on change + batch validation on submit.
+ *  - Prefilling email and name from the auth store (if logged in).
+ *  - POST to /api/checkout/session to create a checkout session.
+ *  - Storing order data snapshot in sessionStorage (for receipt display
+ *    on the success page, even if the user is redirected).
+ *  - Initializing the Lemon Squeezy overlay modal and wiring the
+ *    Checkout.Success event handler to clear the cart.
+ *  - Fallback redirect to LS checkout if the overlay fails.
  */
 
 import { useState, useCallback, useEffect } from "react";
@@ -28,7 +35,7 @@ export function useCheckoutForm() {
   const [city, setCity] = useState("");
   const [zipCode, setZipCode] = useState("");
 
-  // Prefill email and name if user is logged in
+  // Prefill email and split name from auth profile when available
   useEffect(() => {
     if (user?.email && !email) {
       setEmail(user.email);
@@ -54,6 +61,7 @@ export function useCheckoutForm() {
     markTouched(field);
   }, [markTouched]);
 
+  // Validates the field immediately on every change for real-time feedback
   const setAndValidate = useCallback((field: string, value: string, setter: (v: string) => void) => {
     setter(value);
     setFieldErrors((prev) => {
@@ -66,6 +74,8 @@ export function useCheckoutForm() {
     email, firstName, lastName, address, city, zipCode,
   };
 
+  /* Masks an email for display on the confirmation screen:
+   * j***n@domain.com */
   const maskEmail = (rawEmail: string) => {
     const [name, domain] = rawEmail.split("@");
     if (!domain) return rawEmail;
@@ -77,6 +87,7 @@ export function useCheckoutForm() {
     e.preventDefault();
     setError("");
 
+    // Mark all fields as touched to show all validation errors on submit
     const allTouched = new Set(Object.keys(fields));
     setTouched(allTouched);
 
@@ -87,6 +98,10 @@ export function useCheckoutForm() {
 
     setLoading(true);
 
+    /*
+     * Snapshot the cart before the async call so we can derive pricing
+     * locally for the confirmation screen without another API call.
+     */
     const cartItemsSnapshot = items.map((item) => ({ ...item }));
     const cartItemsPayload = items.map((item) => ({
       internalProductId: item.id,
@@ -125,7 +140,11 @@ export function useCheckoutForm() {
 
       setLoading(false);
 
-      // Store the checkout data in sessionStorage in case they get redirected
+      /*
+       * Compute pricing locally for the receipt in sessionStorage.
+       * This mirrors calculateOrderPricing so the success page can
+       * display pricing immediately without a server round-trip.
+       */
       const subtotal = cartItemsSnapshot.reduce((sum, item) => sum + item.price * item.quantity, 0);
       const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
       const tax = Math.round(subtotal * 0.08 * 100) / 100;
@@ -145,12 +164,17 @@ export function useCheckoutForm() {
       };
       sessionStorage.setItem("ls_checkout_data", JSON.stringify(checkoutData));
 
-      // Re-initialize overlay script manually
+      /*
+       * Lemon Squeezy overlay integration:
+       * 1. Re-initialize the overlay if it was already loaded on the page.
+       * 2. Set up event handler for Checkout.Success → clear cart + invalidate orders.
+       * 3. Open the checkout URL in the overlay modal.
+       * 4. Fallback to redirect if the overlay JS didn't load.
+       */
       if (window.createLemonSqueezy) {
         window.createLemonSqueezy();
       }
 
-      // Configure the event handler to capture success events from the iframe
       if (window.LemonSqueezy) {
         window.LemonSqueezy.Setup({
           eventHandler: (event) => {
@@ -161,10 +185,9 @@ export function useCheckoutForm() {
           }
         });
 
-        // Open the Lemon Squeezy overlay modal directly
         window.LemonSqueezy.Url.Open(data.checkoutUrl);
       } else {
-        // Fallback redirect if Overlay fails to initialize
+        // Fallback: redirect the user to the LS hosted checkout page
         window.location.href = data.checkoutUrl;
       }
     } catch (err: any) {

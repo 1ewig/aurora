@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/app/api/admin/audit/route.ts
+ *
+ * GET /api/admin/audit — returns paginated audit log entries.
+ * Admin-only. Supports cursor-based pagination via offset/limit query params.
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { pool } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';

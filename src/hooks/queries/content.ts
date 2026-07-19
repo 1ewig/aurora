@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/hooks/queries/content.ts
+ *
+ * React Query hooks for static content pages: editorial, materials, and category metadata.
+ * Fetches from their respective API endpoints with cache tags for ISR.
+ */
+
 import { useQuery } from '@tanstack/react-query';
 
 export interface CategoryMetadata {

@@ -1,3 +1,20 @@
+/**
+ * Aurora — src/hooks/useProductFilter.ts
+ *
+ * URL-synced product listing filters for the storefront.
+ * Uses the URL search params (useSearchParams) as the single source of truth
+ * for page, sortBy, and search. Local input state (searchQuery) is kept
+ * separate from the URL parameter to allow editing without triggering
+ * a navigation on every keystroke — the user submits to commit.
+ *
+ * Bidirectional sync:
+ *  - URL → local: initial read + useEffect when searchParam changes (back nav).
+ *  - Local → URL: on submit/clear/apply via router.push.
+ *
+ * Category changes navigate between /products and /products/category/[slug]
+ * to keep the URL semantically meaningful for SEO and sharing.
+ */
+
 import { useState, useEffect } from "react";
 import { usePaginatedProductsQuery, useCategoriesQuery } from "@/hooks/queries";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
@@ -25,7 +42,11 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
   const sortBy = searchParams.get("sortBy") || "featured";
   const searchParam = searchParams.get("search") || "";
 
-  // Local state for the text input field (allows editing without instant searching)
+  /*
+   * Local input state: tracks what the user has typed in the search box.
+   * Separate from searchParam (the committed URL value) so we don't
+   * navigate on every keystroke — only on submit or clear.
+   */
   const [searchQuery, setSearchQuery] = useState<string>(searchParam);
 
   // Sync activeCategory with initialCategory when prop changes
@@ -67,7 +88,11 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
     router.push(pathname + "?" + params.toString());
   };
 
-  // Apply both category and sorting concurrently to avoid double navigation push
+  /*
+   * Apply both category and sorting concurrently to avoid double navigation.
+   * Changing category changes the pathname, so we build the full URL
+   * including the new category path and the existing sortBy/page params.
+   */
   const applyFilters = (category: string, newSortBy: string) => {
     const slug = category === "All" ? "" : category.toLowerCase();
     const url = slug ? `/products/category/${slug}` : "/products";

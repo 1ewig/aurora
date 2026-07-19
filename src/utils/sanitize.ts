@@ -1,3 +1,16 @@
+/**
+ * Aurora — src/utils/sanitize.ts
+ *
+ * Input sanitization utilities for shipping addresses and cart items.
+ * Used by the checkout session and webhook endpoints to strip HTML
+ * tags and enforce length limits before persisting data.
+ *
+ * NOTE: The HTML-stripping regex (<[^>]*>) is a basic XSS mitigation.
+ * It handles typical injection attempts but is not a full HTML sanitizer.
+ * All address data is rendered as plain text (not dangerouslySetInnerHTML)
+ * so the risk is low.
+ */
+
 import { isValidEmail } from "./validation";
 
 export interface ShippingAddress {
@@ -19,10 +32,12 @@ export interface VerifiedItem {
   quantity: number;
 }
 
+/** Strips HTML tags, trims, and truncates to 200 chars. */
 export function sanitize(s: string): string {
   return s.trim().replace(/<[^>]*>/g, "").slice(0, 200);
 }
 
+/** Sanitizes all fields of a raw shipping address object. */
 export function sanitizeShippingAddress(raw: Record<string, any>): ShippingAddress {
   return {
     email: (raw.email || "").trim(),
@@ -34,6 +49,7 @@ export function sanitizeShippingAddress(raw: Record<string, any>): ShippingAddre
   };
 }
 
+/** Validates that all required shipping address fields are present and email is valid. */
 export function validateShippingAddress(address: Record<string, any>): string | null {
   const fields: [string, string][] = [
     ["email", "email"],

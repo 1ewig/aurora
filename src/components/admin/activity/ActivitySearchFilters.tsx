@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/components/admin/activity/ActivitySearchFilters.tsx
+ *
+ * Search input and filter controls for filtering audit logs by keyword
+ * and target type (e.g. order, product, user) with refresh support.
+ */
+
 "use client";
 
 import { Button } from "@/components/ui/Button";

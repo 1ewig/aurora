@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/stores/useAdminStore.ts
+ *
+ * Admin panel type definitions — SizeStock, ProductData, OrderData.
+ * Used by admin feature hooks and UI components for type-safe data access.
+ */
+
 export interface SizeStock {
   size: string;
   stock: number;

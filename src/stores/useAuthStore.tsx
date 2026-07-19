@@ -1,8 +1,17 @@
 /**
  * Aurora — src/stores/useAuthStore.ts
  *
- * Zustand store for authentication state and operations.
- * Wraps Better Auth client methods with error mapping and profile normalization.
+ * Zustand store for all authentication state and operations.
+ * Acts as a thin wrapper around the Better Auth browser client,
+ * exposing a unified API with:
+ *  - Human-readable error mapping (mapBetterAuthError)
+ *  - Automatic role fetching after sign-in/sign-up
+ *  - React Context provider (AuthProvider) for SSR-safe store instances
+ *  - Fallback store for when useAuthStore is called outside AuthProvider
+ *
+ * Architecture: Uses createStore (vanilla Zustand) + React Context rather
+ * than zustand/react's create() hook, to support server-side rendering
+ * and request-scoped store instances.
  */
 
 "use client";
@@ -26,13 +35,19 @@ export interface Profile {
   displayName: string;
 }
 
-/** Maps Better Auth error codes/statuses to human-readable messages. */
+/**
+ * Maps Better Auth error codes, statuses, and message patterns to
+ * user-friendly strings. Checks are ordered from most specific to
+ * most generic to avoid false matches (e.g. "account not found" vs
+ * "no account found with this email").
+ */
 function mapBetterAuthError(error: any): string {
   if (!error) return "Something went wrong.";
   const msg = (error.message || "").toLowerCase();
   const status = error.status;
   const code = (error.code || "").toLowerCase();
 
+  // Specific error codes from Better Auth SDK
   if (status === 403 || code === "email_not_verified") return "Please verify your email before signing in.";
   if (code === "user_not_found") return "No account found with this email address.";
   if (code === "invalid_password") return "Incorrect password. Try again or reset your password.";
@@ -40,6 +55,8 @@ function mapBetterAuthError(error: any): string {
   if (code === "invalid_email" || msg.includes("invalid email")) return "This email address is not valid.";
   if (code === "weak_password" || msg.includes("password is too short")) return "Password must be at least 8 characters.";
   if (code === "rate_limit" || msg.includes("rate limit") || msg.includes("too many requests")) return "Too many attempts. Please wait a moment and try again.";
+
+  // Message-pattern matching for cases where there's no structured error code
   if (msg.includes("already") && (msg.includes("exist") || msg.includes("registered") || msg.includes("taken"))) return "An account with this email already exists.";
   if (msg.includes("account") && msg.includes("not found")) return "No account found with this email address.";
   if (msg.includes("reset") && msg.includes("password") && msg.includes("expired")) return "This password reset link has expired. Please request a new one.";
@@ -74,18 +91,29 @@ export const createAuthStore = (initialUser: User | null = null) => {
 
   clearError: () => set({ error: null }),
 
+  /*
+   * Each async action follows the same pattern:
+   *  1. set({ loading: true, error: null })
+   *  2. Call the authClient method
+   *  3. On error: mapBetterAuthError, set error
+   *  4. On success: fetch role, build state, set user/profile
+   *  5. On exception: fallback error message
+   */
+
   signIn: async (email, password) => {
     set({ loading: true, error: null });
     try {
       const { data, error } = await authClient.signIn.email({ email, password });
       if (error) {
         const message = mapBetterAuthError(error);
+        // Detect email-not-verified specifically so the UI can prompt resend
         const isUnverified = error.status === 403 || (error.message || "").toLowerCase().includes("verify");
         set({ loading: false, error: message });
         return { error, needsVerification: isUnverified };
       }
 
       if (data?.user) {
+        // Fetch role (admin/user) from the server to populate isAdmin
         const role = await fetchUserRole();
         const state = buildUserState(data.user, role);
         set({ ...state, loading: false });
@@ -110,6 +138,7 @@ export const createAuthStore = (initialUser: User | null = null) => {
         return { error: message, needsVerification: false };
       }
 
+      // If email verification is disabled, the user is logged in immediately
       if (data?.user && data.user.emailVerified) {
         const role = await fetchUserRole();
         const state = buildUserState(data.user, role);
@@ -117,6 +146,7 @@ export const createAuthStore = (initialUser: User | null = null) => {
         return { error: null, needsVerification: false };
       }
 
+      // Email verification required — user needs to check their inbox
       set({ loading: false });
       return { error: null, needsVerification: true };
     } catch (err: any) {
@@ -130,7 +160,7 @@ export const createAuthStore = (initialUser: User | null = null) => {
     try {
       await authClient.signOut();
     } catch {
-      // proceed with local cleanup
+      // Proceed with local cleanup even if the API call fails
     }
     set({ user: null, profile: null, error: null });
   },
@@ -176,6 +206,7 @@ export const createAuthStore = (initialUser: User | null = null) => {
   resendVerification: async (email) => {
     set({ loading: true, error: null });
     try {
+      // The callback URL tells Better Auth where to redirect after verification
       const callbackURL = `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/profile`;
       const { error } = await authClient.sendVerificationEmail({ email, callbackURL });
       if (error) {
@@ -194,6 +225,7 @@ export const createAuthStore = (initialUser: User | null = null) => {
   sendResetPasswordEmail: async (email) => {
     set({ loading: true, error: null });
     try {
+      // The redirectTo is the page where the user will enter their new password
       const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/reset-password`;
       const { error } = await authClient.requestPasswordReset({ email, redirectTo });
       if (error) {
@@ -254,11 +286,22 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children, initialUser }: AuthProviderProps) {
+  /*
+   * Store instance is created lazily on the first render and persists
+   * via useRef (no re-creation on re-renders). This is the SSR-safe
+   * pattern recommended by Zustand for use with React Context.
+   */
   const storeRef = useRef<ReturnType<typeof createAuthStore> | undefined>(undefined);
   if (!storeRef.current) {
     storeRef.current = createAuthStore(initialUser);
   }
 
+  /*
+   * On mount, if no initialUser was provided (e.g. SSR without session),
+   * attempt to recover the session from the client-side auth cookie.
+   * This handles the case where the user refreshes the page and the
+   * server component didn't have access to the session cookie.
+   */
   useEffect(() => {
     if (initialUser) return;
 
@@ -271,7 +314,8 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
         const state = buildUserState(sessionData.user, role);
         storeRef.current?.setState({ ...state });
       } catch {
-        // silent — server-side role query may have failed transiently
+        // Silent — the server-side role query may have failed transiently
+        // or the user simply isn't logged in.
       }
     }
 
@@ -285,10 +329,14 @@ export function AuthProvider({ children, initialUser }: AuthProviderProps) {
   );
 }
 
-// Fallback store instance for static method access (tests, utilities)
+// Fallback store instance for static method access (tests, utilities, or unguarded usage)
 const fallbackStore = createAuthStore(null);
 
-// Custom hook with throw guard for missing AuthProvider context
+/**
+ * Custom hook with overloaded selector support and a fallback guard.
+ * If called outside of AuthProvider, it logs a dev warning and uses the
+ * fallback singleton store (which starts with user=null).
+ */
 export function useAuthStore(): AuthState;
 export function useAuthStore<T>(selector: (state: AuthState) => T): T;
 export function useAuthStore<T>(selector?: (state: AuthState) => T): T | AuthState {

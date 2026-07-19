@@ -2,8 +2,14 @@
  * Aurora — src/lib/insforge.server.ts
  *
  * Server-side InsForge SDK factory for API routes.
- * Signs a JWT using the Better Auth session so the client can authenticate
- * with InsForge edge functions and storage.
+ * Signs a JWT with the user's identity claims (sub, role, aud) using
+ * INSFORGE_JWT_SECRET, then creates an authenticated InsForge client
+ * with the token as an edgeFunctionToken.
+ *
+ * Returns null if no session exists (unauthenticated callers get an
+ * anon client with limited RLS access).
+ *
+ * The JWT is signed with HS256 and expires in 1 hour.
  */
 
 import { createClient } from '@insforge/sdk';
@@ -17,6 +23,12 @@ export async function createInsforgeClient() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) return null;
 
+  /*
+   * Sign a JWT with the user's ID as the subject, 'authenticated' role,
+   * and 'insforge-api' audience. This token is verified by the InsForge
+   * gateway to grant the client access to storage and edge functions
+   * with RLS policies that match on auth.jwt() -> 'sub'.
+   */
   const insforgeToken = jwt.sign(
     {
       sub: session.user.id,

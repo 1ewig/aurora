@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/admin/inventory/InventorySkeleton.tsx
+ *
+ * Loading skeleton representation of the admin inventory catalog management table.
+ */
+
 export function InventorySkeleton() {
   return (
     <div className="space-y-8 pb-12 animate-pulse">

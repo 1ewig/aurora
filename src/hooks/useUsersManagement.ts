@@ -1,3 +1,10 @@
+/**
+ * Aurora — src/hooks/useUsersManagement.ts
+ *
+ * Admin user management hook: search, paginate, verify, change roles, and delete users.
+ * Wraps TanStack Query mutations with local UI state for confirmations and loading.
+ */
+
 "use client";
 
 import { useState } from "react";
