@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import type { Product } from '@/data/products';
 
@@ -64,7 +64,6 @@ export function usePaginatedProductsQuery(params: PaginatedProductsParams) {
     queryFn: () => fetchPaginatedProducts(params),
     staleTime: 300_000,
     gcTime: 300_000,
-    placeholderData: keepPreviousData,
   });
 }
 
