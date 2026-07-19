@@ -23,12 +23,30 @@ export function ProductGrid({ products, isLoading }: ProductGridProps) {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 animate-pulse" aria-hidden="true">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className={`flex flex-col space-y-4 ${i % 4 === 1 || i % 4 === 2 ? "md:mt-8" : ""}`}>
-            <div className={`w-full bg-bg-secondary rounded-[20px] ${aspectRatios[i % aspectRatios.length]}`} />
-            <div className="space-y-2 px-2">
-              <div className="h-4 w-2/3 bg-bg-secondary rounded" />
-              <div className="h-3 w-1/3 bg-bg-secondary rounded" />
-              <div className="h-4 w-1/4 bg-bg-secondary rounded mt-2" />
+          <div
+            key={i}
+            className={`overflow-hidden rounded-[20px] bg-bg-secondary border border-transparent flex flex-col ${
+              i % 4 === 1 || i % 4 === 2 ? "md:mt-8" : ""
+            }`}
+            style={{
+              boxShadow:
+                "0 2px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
+            }}
+          >
+            {/* Image Placeholder */}
+            <div className={`w-full bg-bg-primary ${aspectRatios[i % aspectRatios.length]}`} />
+
+            {/* Info Placeholder */}
+            <div className="p-5 space-y-3">
+              {/* Category */}
+              <div className="h-3 w-1/3 bg-bg-primary rounded" />
+              {/* Name */}
+              <div className="h-4 w-2/3 bg-bg-primary rounded" />
+              {/* Price & Action */}
+              <div className="mt-4 flex items-center justify-between">
+                <div className="h-4 w-1/4 bg-bg-primary rounded" />
+                <div className="h-3 w-1/5 bg-bg-primary rounded" />
+              </div>
             </div>
           </div>
         ))}
