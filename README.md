@@ -269,3 +269,11 @@ Explore the implementation quality of the core components in this codebase:
 | **[scripts/manage-user.ts](scripts/manage-user.ts)** | Comprehensive CLI for user creations, role updating, and account deletion. |
 | **[scripts/upload-and-seed.mts](scripts/upload-and-seed.mts)** | Schema deployer, S3 bucket config, and media asset ingestion pipeline. |
 | **[scripts/optimize-images.mjs](scripts/optimize-images.mjs)** | Asset WebP preprocessing script utilizing Sharp. |
+
+---
+
+## ⚡ Performance & Lighthouse Score
+
+Aurora is optimized for maximum performance, accessibility, and SEO.
+
+![SS 2026 Lighthouse Score](public/images/SS%202026%20Collection%20_%20Aurora%20-%20Google%20Chrome%2019-Jul-26%208_00_38%20PM.png)
