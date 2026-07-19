@@ -66,7 +66,7 @@ export function UsersSearchFilters({
         <option value="unverified">Unverified</option>
       </select>
       <Button variant="ghost" size="md" onClick={onRefresh} disabled={loading}>
-        {loading ? "Refreshing..." : "Refresh"}
+        {loading ? <>Refreshing<span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /></> : "Refresh"}
       </Button>
     </div>
   );

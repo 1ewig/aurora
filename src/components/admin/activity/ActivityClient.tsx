@@ -91,7 +91,7 @@ export function ActivityClient() {
             loading={isLoading || isFetching}
           />
 
-          <div className={`bg-white border border-border-subtle rounded-2xl overflow-hidden transition-opacity duration-200 ${isFetching ? 'opacity-50 pointer-events-none' : ''}`}>
+          <div className="bg-white border border-border-subtle rounded-2xl overflow-hidden">
             {logs.length === 0 ? (
               <div className="p-12 text-center text-text-muted text-sm">No audit logs found</div>
             ) : (
@@ -106,7 +106,7 @@ export function ActivityClient() {
                       <th className="text-left px-6 py-4 font-semibold text-text-secondary uppercase tracking-wider text-xs">Target ID</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className={`transition-opacity duration-200 ${isFetching ? 'opacity-50 pointer-events-none' : ''}`}>
                     {logs.map((log) => (
                       <tr key={log.id} className="border-b border-border-subtle last:border-b-0 hover:bg-bg-secondary/30 transition-colors">
                         <td className="px-6 py-4 text-text-secondary whitespace-nowrap text-xs font-mono">
