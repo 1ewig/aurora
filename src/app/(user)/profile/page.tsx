@@ -1,7 +1,11 @@
 /**
  * Aurora — src/app/(user)/profile/page.tsx
  *
- * Profile settings page displaying user account details.
+ * User profile settings page (server component). Delegates to ProfileClient
+ * which renders the edit form for display name, email, and password change.
+ *
+ * Auth is guaranteed by the parent (user)/layout.tsx gate.
+ * robots: noindex — user account pages should not appear in search results.
  */
 
 import type { Metadata } from "next";

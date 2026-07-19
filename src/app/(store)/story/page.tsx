@@ -1,7 +1,11 @@
 /**
  * Aurora — src/app/(store)/story/page.tsx
  *
- * Brand story / about page.
+ * Brand story / about page (server component). Delegates to StoryPageClient
+ * which fetches editorial content and lookbook data via React Query and
+ * renders the multi-section brand narrative (philosophy, atelier, etc.).
+ *
+ * Metadata includes Open Graph tags for rich social sharing.
  */
 
 import type { Metadata } from "next";

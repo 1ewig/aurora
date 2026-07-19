@@ -1,7 +1,13 @@
 /**
  * Aurora — src/app/(user)/profile/layout.tsx
  *
- * Profile layout wrapper providing the sidebar shell for profile sub-pages.
+ * Profile sub-layout (server component). Nested inside (user)/layout.tsx,
+ * this provides the sidebar + workspace layout for profile sub-pages
+ * (currently: profile settings and order history).
+ *
+ * ProfileLayoutClient manages the sidebar navigation (links, active state)
+ * and renders the child page in the right-hand workspace area.
+ * Auth is already guaranteed by the parent (user)/layout.tsx gate.
  */
 
 import type { Metadata } from "next";

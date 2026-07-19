@@ -1,7 +1,10 @@
 /**
  * Aurora — src/app/(auth)/login/page.tsx
  *
- * Login / sign-in page.
+ * Sign-in page (server component). Delegates to LoginClient which
+ * renders the email/password form and calls useAuthStore.signIn().
+ *
+ * robots: noindex — auth pages should not appear in search results.
  */
 
 import type { Metadata } from "next";

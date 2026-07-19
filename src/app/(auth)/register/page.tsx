@@ -1,7 +1,10 @@
 /**
  * Aurora — src/app/(auth)/register/page.tsx
  *
- * Registration / sign-up page.
+ * Account registration page (server component). Delegates to RegisterClient
+ * which renders the sign-up form and calls useAuthStore.signUp().
+ *
+ * robots: noindex — auth pages should not appear in search results.
  */
 
 import type { Metadata } from "next";

@@ -1,7 +1,12 @@
 /**
  * Aurora — src/app/(user)/profile/orders/page.tsx
  *
- * Purchase history page listing past customer orders.
+ * User purchase history page (server component). Delegates to OrdersClient
+ * which fetches the authenticated user's past orders via useOrders() hook
+ * (GET /api/orders) and renders them in a paginated list.
+ *
+ * Auth is guaranteed by the parent (user)/layout.tsx gate.
+ * robots: noindex — user account pages should not appear in search results.
  */
 
 import type { Metadata } from "next";

@@ -1,7 +1,15 @@
 /**
  * Aurora — src/app/(store)/page.tsx
  *
- * Home / landing page — server component delegating to LandingClient container.
+ * Landing / home page (server component). Fetches all landing section data
+ * on the server and passes it as initialData to LandingClient, avoiding
+ * an extra client-side fetch waterfall. The server call to getLandingData()
+ * coalesces categories, featured products, lookbook slides, editorial content,
+ * and testimonials into a single payload.
+ *
+ * Why server-fetch here: the landing page is the highest-traffic route;
+ * server-rendering the data reduces Time-to-First-Byte (TTFB) and ensures
+ * content is immediately available before React hydrates.
  */
 
 import type { Metadata } from "next";
@@ -21,6 +29,7 @@ export const metadata: Metadata = {
 
 /** Home/landing page composing all landing sections. */
 export default async function HomePage() {
+  // Server-fetch landing data to hydrate the client component immediately.
   const landingData = await getLandingData();
   return <LandingClient initialData={landingData} />;
 }

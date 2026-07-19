@@ -1,7 +1,12 @@
 /**
  * Aurora — src/app/(auth)/verify/page.tsx
  *
- * Email verification page.
+ * Email verification page (server component). Delegates to VerifyClient
+ * which handles the verification flow triggered by the link sent in the
+ * Better Auth verification email. The token and email are read from the
+ * URL query string (?token=...&email=...).
+ *
+ * robots: noindex — auth pages should not appear in search results.
  */
 
 import type { Metadata } from "next";

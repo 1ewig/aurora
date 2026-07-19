@@ -1,7 +1,16 @@
 /**
  * Aurora — src/app/(store)/products/category/[category]/page.tsx
  *
- * Category-based product listing page.
+ * Category-filtered product listing page (server component).
+ * Resolves the URL slug to a DB category name, then passes it to
+ * ProductListingClient (which fetches filtered products via React Query).
+ *
+ * Uses Next.js 16's 'use cache' directive to cache the category slug→name
+ * mapping for 5 minutes with the 'categories' cache tag, so invalidating
+ * categories in the admin panel also busts this cache.
+ *
+ * Triggers a 404 (notFound()) if the slug does not match any category,
+ * rather than rendering an empty listing.
  */
 
 import type { Metadata } from "next";
@@ -14,7 +23,15 @@ interface CategoryPageProps {
   params: Promise<{ category: string }>;
 }
 
-/** Dynamically resolves category name from DB with persistent caching. */
+/**
+ * Resolves a URL category slug to the human-readable category name from
+ * the database. Uses 'use cache' so this query (which runs per-request
+ * in generateMetadata AND in the page body) is served from the data
+ * cache after the first call within the 5-minute window.
+ *
+ * cacheTag('categories') ties this cache entry to the categories tag,
+ * so admin updates to categories invalidate cached lookups.
+ */
 async function getCategoryName(slug: string) {
   'use cache';
   cacheLife({ stale: 300, revalidate: 300 });
@@ -61,6 +78,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = await params;
   const categoryName = await getCategoryName(category);
 
+  /*
+   * Unknown category slugs render a 404 (not a fallback or empty listing)
+   * so crawlers and users know the URL doesn't exist.
+   */
   if (!categoryName) {
     notFound();
   }

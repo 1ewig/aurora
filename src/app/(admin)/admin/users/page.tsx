@@ -1,7 +1,15 @@
 /**
  * Aurora — src/app/(admin)/admin/users/page.tsx
  *
- * Admin users management page.
+ * Admin user management page. Delegates to UsersClient which
+ * provides the user listing, email verification toggle, role
+ * assignment (user / admin), and user deletion.
+ *
+ * Uses useAdminUsersQuery for paginated listing and
+ * useToggleUserVerifyMutation / useUpdateUserRoleMutation /
+ * useDeleteUserMutation for actions.
+ *
+ * Self-deletion is blocked at the API level (route.ts).
  */
 
 import { UsersClient } from '@/components/admin/users/UsersClient';

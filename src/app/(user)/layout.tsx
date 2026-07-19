@@ -1,8 +1,14 @@
 /**
  * Aurora — src/app/(user)/layout.tsx
  *
- * Thin server component layout for user account pages.
- * Auth gating is delegated to the client wrapper.
+ * User account layout (server component). Wraps all authenticated user
+ * pages (profile, orders) in the UserLayoutClient, which performs the
+ * auth gate: if no session exists, the client redirects to /login.
+ *
+ * This prevents unauthenticated access at the layout level rather than
+ * requiring each sub-page to check auth individually.
+ *
+ * robots metadata blocks search indexing for all user account routes.
  */
 
 import type { Metadata } from "next";

@@ -1,3 +1,12 @@
+/**
+ * Aurora — src/app/(store)/checkout/loading.tsx
+ *
+ * Loading state for the checkout page. Renders a skeleton layout
+ * mimicking the two-column checkout form (order summary on the left,
+ * form fields on the right) with animated pulse placeholders.
+ * Also includes ScrollToTop for accessibility during navigation.
+ */
+
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 
 export default function CheckoutLoading() {

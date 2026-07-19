@@ -1,7 +1,11 @@
 /**
  * Aurora — src/app/(admin)/admin/dashboard/page.tsx
  *
- * Admin dashboard page.
+ * Admin dashboard (server page). Delegates to DashboardClient which
+ * fetches metrics (total sales, order counts, low-stock alerts, recent
+ * orders) via useAdminDashboardQuery and renders the stats grid.
+ *
+ * robots: noindex to prevent search crawling of admin pages.
  */
 
 import { DashboardClient } from '@/components/admin/dashboard/DashboardClient';

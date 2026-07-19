@@ -1,8 +1,15 @@
 /**
  * Aurora — src/app/(admin)/admin/layout.tsx
  *
- * Admin layout with sidebar navigation.
- * Auth guard is enforced server-side via middleware (proxy.ts).
+ * Admin panel layout (server component). Wraps all admin sub-pages
+ * (dashboard, inventory, orders, users) in the AdminLayoutClient shell
+ * which provides the sidebar navigation and role-based gating.
+ *
+ * Auth guard is enforced both here (via AdminLayoutClient's internal
+ * role check) and at the middleware level (src/proxy.ts) which redirects
+ * unauthenticated users before they reach this layout.
+ *
+ * robots metadata blocks search indexing for all admin routes.
  */
 
 import type { Metadata } from "next";

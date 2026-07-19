@@ -1,3 +1,11 @@
+/**
+ * Aurora — src/app/(store)/story/loading.tsx
+ *
+ * Loading state for the brand story page. Renders skeleton placeholders
+ * for each major section (hero, philosophy, parallax breakout, atelier,
+ * CTA) using animated pulse backgrounds that match the story page layout.
+ */
+
 export default function StoryLoading() {
   return (
     <main className="animate-pulse">

@@ -1,7 +1,12 @@
 /**
  * Aurora — src/app/(admin)/admin/orders/page.tsx
  *
- * Admin orders management page.
+ * Admin order management page. Delegates to OrdersClient which
+ * provides the order listing, status filtering, and status update
+ * controls (pending → confirmed → shipped → delivered, or cancelled).
+ *
+ * Uses useAdminOrdersQuery for paginated listing and
+ * useUpdateOrderStatusMutation for status changes.
  */
 
 import { OrdersClient } from '@/components/admin/orders/OrdersClient';
