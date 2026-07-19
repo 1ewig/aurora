@@ -154,7 +154,7 @@ export function InventoryClient() {
             open={!!productToDelete}
             title="Delete Product"
             description={`Are you sure you want to permanently delete the product "${productToDelete?.name}"? All sizes, image listings, and unused storage assets will be deleted. This cannot be undone.`}
-            confirmLabel={deleting ? "Deleting..." : "Delete"}
+            confirmLabel={deleting ? "Deleting" : "Delete"}
             cancelLabel="Cancel"
             onConfirm={handleDeleteConfirm}
             onCancel={() => setProductToDelete(null)}

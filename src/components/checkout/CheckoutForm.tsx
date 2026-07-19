@@ -180,7 +180,14 @@ export function CheckoutForm({
           disabled={loading}
           className="py-4 font-semibold uppercase tracking-wider text-xs"
         >
-          {loading ? "Redirecting to Payment..." : "Proceed to Payment"}
+          {loading ? (
+            <>
+              <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              Redirecting to Payment
+            </>
+          ) : (
+            "Proceed to Payment"
+          )}
         </Button>
       </div>
     </form>

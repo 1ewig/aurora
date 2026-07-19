@@ -139,7 +139,14 @@ export function ResetPasswordForm({
           {successMsg && <div className="text-xs text-success font-medium px-1 text-center">{successMsg}</div>}
 
           <Button type="submit" variant="filled" fullWidth size="md" disabled={loading || newPassword.length < 6}>
-            {loading ? "Saving Password..." : "Update Password"}
+            {loading ? (
+              <>
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                Saving Password
+              </>
+            ) : (
+              "Update Password"
+            )}
           </Button>
         </form>
       </motion.div>

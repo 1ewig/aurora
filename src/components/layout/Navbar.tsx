@@ -212,7 +212,7 @@ export function Navbar() {
         open={showSignOutDialog}
         title="Sign Out"
         description="Are you sure you want to sign out of your Aurora wardrobe profile? You will need to sign in again to access your account."
-        confirmLabel={signingOut ? "Signing Out..." : "Sign Out"}
+        confirmLabel={signingOut ? "Signing Out" : "Sign Out"}
         cancelLabel="Cancel"
         onConfirm={async () => {
           setSigningOut(true);

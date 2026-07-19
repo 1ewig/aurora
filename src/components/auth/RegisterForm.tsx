@@ -160,10 +160,10 @@ export function RegisterForm({
 
           <Button type="submit" variant="filled" fullWidth size="md" disabled={submitting}>
             {submitting ? (
-              <span className="flex items-center justify-center gap-2">
+              <>
                 <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                Creating Account…
-              </span>
+                Creating Account
+              </>
             ) : (
               "Sign Up"
             )}

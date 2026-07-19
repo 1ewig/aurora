@@ -134,7 +134,16 @@ export function VerifyForm({
             onClick={handleResendClick}
             disabled={countdown > 0 || resending || loading}
           >
-            {countdown > 0 ? `Resend Email (${countdown}s)` : resending ? "Sending..." : "Resend Verification Email"}
+            {countdown > 0 ? (
+              `Resend Email (${countdown}s)`
+            ) : resending ? (
+              <>
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                Sending
+              </>
+            ) : (
+              "Resend Verification Email"
+            )}
           </Button>
         </div>
 

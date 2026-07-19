@@ -110,7 +110,7 @@ export function ProfileForm({
             {updating ? (
               <>
                 <Spinner />
-                <span>Saving Changes...</span>
+                <span>Saving Changes</span>
               </>
             ) : (
               "Save Profile Details"
@@ -128,7 +128,7 @@ export function ProfileForm({
             {signingOut ? (
               <>
                 <Spinner />
-                <span>Signing Out...</span>
+                <span>Signing Out</span>
               </>
             ) : (
               "Sign Out"
@@ -141,7 +141,7 @@ export function ProfileForm({
         open={showSignOutDialog}
         title="Sign Out"
         description="Are you sure you want to sign out of your Aurora wardrobe profile? You will need to sign in again to access your account."
-        confirmLabel={signingOut ? "Signing Out..." : "Sign Out"}
+        confirmLabel={signingOut ? "Signing Out" : "Sign Out"}
         cancelLabel="Cancel"
         onConfirm={async () => {
           setSigningOut(true);
