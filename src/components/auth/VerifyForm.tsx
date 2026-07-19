@@ -138,8 +138,8 @@ export function VerifyForm({
               `Resend Email (${countdown}s)`
             ) : resending ? (
               <>
-                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 Sending
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
               </>
             ) : (
               "Resend Verification Email"

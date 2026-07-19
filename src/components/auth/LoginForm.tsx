@@ -153,8 +153,8 @@ export function LoginForm({
           <Button type="submit" variant="filled" fullWidth size="md" disabled={submitting}>
             {submitting ? (
               <>
-                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 Signing In
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
               </>
             ) : (
               "Sign In"

@@ -182,8 +182,8 @@ export function CheckoutForm({
         >
           {loading ? (
             <>
-              <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
               Redirecting to Payment
+              <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
             </>
           ) : (
             "Proceed to Payment"

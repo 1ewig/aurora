@@ -141,8 +141,8 @@ export function ResetPasswordForm({
           <Button type="submit" variant="filled" fullWidth size="md" disabled={loading || newPassword.length < 6}>
             {loading ? (
               <>
-                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 Saving Password
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
               </>
             ) : (
               "Update Password"

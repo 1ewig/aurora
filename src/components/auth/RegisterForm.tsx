@@ -161,8 +161,8 @@ export function RegisterForm({
           <Button type="submit" variant="filled" fullWidth size="md" disabled={submitting}>
             {submitting ? (
               <>
-                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                 Creating Account
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
               </>
             ) : (
               "Sign Up"
