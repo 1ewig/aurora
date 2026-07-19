@@ -2,7 +2,7 @@
 
 ### A Quiet-Luxury Digital Storefront — Minimalist, Editorial, Server-Rendered.
 
-![Aurora Storefront Preview](public/images/storefront-preview.png)
+![Aurora Storefront Preview](public/images/storefront-preview.webp)
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.2-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)](https://react.dev/)
@@ -26,12 +26,12 @@ Explore the live environment and administration panel using these credentials:
 
 Aurora is heavily optimized for speed, access, and search visibility, achieving near-perfect Core Web Vitals:
 
-*   **Performance**: **`92%`**
-*   **Accessibility**: **`93%`**
+*   **Performance**: **`99%`**
+*   **Accessibility**: **`95%`**
 *   **Best Practices**: **`100%`**
 *   **SEO**: **`100%`**
 
-*(Audited via Chrome DevTools Lighthouse tool on the live production deployment).*
+![Lighthouse Score](public/images/lighthouse-score.webp)
 
 ### Demo Accounts
 
@@ -269,11 +269,3 @@ Explore the implementation quality of the core components in this codebase:
 | **[scripts/manage-user.ts](scripts/manage-user.ts)** | Comprehensive CLI for user creations, role updating, and account deletion. |
 | **[scripts/upload-and-seed.mts](scripts/upload-and-seed.mts)** | Schema deployer, S3 bucket config, and media asset ingestion pipeline. |
 | **[scripts/optimize-images.mjs](scripts/optimize-images.mjs)** | Asset WebP preprocessing script utilizing Sharp. |
-
----
-
-## ⚡ Performance & Lighthouse Score
-
-Aurora is optimized for maximum performance, accessibility, and SEO.
-
-![SS 2026 Lighthouse Score](public/images/SS%202026%20Collection%20_%20Aurora%20-%20Google%20Chrome%2019-Jul-26%208_00_38%20PM.png)
