@@ -1,3 +1,9 @@
+/**
+ * Aurora — src/components/admin/users/UsersSkeleton.tsx
+ *
+ * Loading skeleton representation of the admin user accounts directory.
+ */
+
 export function UsersSkeleton() {
   return (
     <div className="space-y-8 pb-12 animate-pulse">
