@@ -53,7 +53,8 @@ export async function requireRole(
       `SELECT role FROM better_auth."user" WHERE id = $1`,
       [session.user.id]
     );
-    const role = userResult.rows[0]?.role || 'user';
+    const dbRole = userResult.rows[0]?.role || 'user';
+    const role = isAdmin(session.user.email, dbRole) ? 'admin' : dbRole;
     const level = ROLE_LEVELS[role] ?? 0;
 
     if (level < minLevel) {
@@ -101,17 +102,19 @@ export const getServerAuthUser = cache(async (): Promise<User | null> => {
   }
 
   // Default to 'user' role if the DB query fails
-  let role = 'user';
+  let dbRole = 'user';
   try {
     const userResult = await pool.query(
       `SELECT role FROM better_auth."user" WHERE id = $1`,
       [session.user.id]
     );
-    role = userResult.rows[0]?.role || 'user';
+    dbRole = userResult.rows[0]?.role || 'user';
   } catch (err: unknown) {
     rethrowIfDynamicServerError(err);
     console.error('getServerAuthUser: role query failed, defaulting to user:', err);
   }
+
+  const role = isAdmin(session.user.email, dbRole) ? 'admin' : dbRole;
 
   return {
     id: session.user.id,

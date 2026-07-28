@@ -56,7 +56,7 @@ export function buildUserState(
  * ADMIN_EMAILS continue to work even before they have a DB role set.
  */
 export function isAdmin(email?: string, role?: string): boolean {
-  if (role) return role === 'admin';
+  if (role === 'admin') return true;
   if (!email) return false;
   const adminEmailsStr = process.env.ADMIN_EMAILS || "";
   const adminEmails = adminEmailsStr.split(",").map((e) => e.trim().toLowerCase());

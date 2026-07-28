@@ -29,7 +29,8 @@ export async function GET() {
       `SELECT role FROM better_auth."user" WHERE id = $1`,
       [session.user.id]
     );
-    const role = userResult.rows[0]?.role || 'user';
+    const dbRole = userResult.rows[0]?.role || 'user';
+    const role = isAdmin(session.user.email, dbRole) ? 'admin' : dbRole;
 
     return NextResponse.json(
       { isAdmin: isAdmin(session.user.email, role), role },
