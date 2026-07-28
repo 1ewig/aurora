@@ -1772,8 +1772,8 @@ Cart items are sorted by `internalProductId` before `SELECT ... FOR UPDATE` to p
 ### Run Commands
 
 ```bash
-npm test          # vitest run
-npm run test:watch  # vitest watch mode
+bun run test          # vitest run
+bun run test:watch    # vitest watch mode
 ```
 
 ---

@@ -259,7 +259,7 @@ export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSum
 Before committing, run the build to type-check everything:
 
 ```bash
-npm run build
+bun run build
 ```
 
 The build compiles TypeScript and validates types. Address any errors before pushing.

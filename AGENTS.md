@@ -21,7 +21,43 @@ Key patterns:
 - For storage uploads, persist both the returned `url` and `key`.
 <!-- INSFORGE:END -->
 
-## Codebase Reference
+## Runtime & Commands
 
-For an overview of the codebase architecture, routing map, API endpoints, database schema, state management, and testing setup, see:
-- [docs/structure.md](docs/structure.md)
+- **Use `bun`**, not npm/pnpm
+- `bun run dev` — dev server
+- `bun run build` — builds + typechecks (no separate `typecheck` command)
+- `bun run lint` — ESLint
+- `bun run test` — Vitest (single run), tests in `__tests__/`
+- `bun run test -- __tests__/api/categories.test.ts` — single test file
+- `bun run test:watch` — Vitest watch mode
+
+## Architecture
+
+- **4-layer unidirectional**: Page (server) → `XxxClient.tsx` (client bridge) → Hooks/Stores → Presentational (pure props, zero store/hook imports)
+- **`@/` alias** → `src/`
+- **No ORM**: raw `pg` Pool via `@/utils/db`, parameterized `$1, $2`
+- **Auth**: Better Auth handles auth (email/password), *not* InsForge auth
+- **Guest checkout is default**: `orders.user_id` is nullable
+
+## Middleware Caveat
+
+`src/proxy.ts` is named `proxy.ts` and exports `proxy`, not `middleware.ts` / `middleware`. It is **not active** as Next.js middleware. To activate: rename to `middleware.ts` and export as `middleware`.
+
+## InsForge Usage
+
+- Used for: Postgres DB, object storage (5 buckets: `product-media`, `lookbook-media`, `editorial-media`, `material-media`, `category-media`), JWT bridge for client auth
+- Dual clients: `src/lib/insforge.ts` (browser with auto JWT refresh) vs `src/lib/insforge.server.ts` (server)
+
+## Verification Order
+
+`bun run lint` → `bun run test` → `bun run build`
+
+## Testing
+
+- Vitest 4, config in `vitest.config.ts`
+- 21 test files across `__tests__/api/` (12), `__tests__/stores/` (2), `__tests__/utils/` (7)
+- Tests require a running DB — no dedicated test DB setup found
+
+## .gitignore
+
+Excludes `.insforge` and all AI agent config dirs (`.agent`, `.claude`, `.github/copilot*`, etc.).

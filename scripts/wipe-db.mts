@@ -20,7 +20,7 @@ const dotenvPath = path.resolve(process.cwd(), '.env.local');
 if (!fs.existsSync(projectJsonPath)) {
   console.error(
     "Error: .insforge/project.json not found.\n" +
-    "Run `npx @insforge/cli create` or `npx @insforge/cli link` first."
+    "Run `bunx @insforge/cli create` or `bunx @insforge/cli link` first."
   );
   process.exit(1);
 }
