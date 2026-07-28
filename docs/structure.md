@@ -54,12 +54,12 @@ aurora/
 ├── migrations/
 │   └── 20260614145429_better-auth-setup.sql  # Better Auth schema migration
 │
-├── scripts/                             # CLI tools & DB scripts (6 files)
+├── scripts/                             # CLI tools & DB scripts (7 files)
 │
-├── __tests__/                           # Tests (19 files)
-│   ├── api/                             # 10 API integration test files
+├── __tests__/                           # Tests (21 files)
+│   ├── api/                             # 12 API integration test files
 │   ├── stores/                          # 2 store test files
-│   └── utils/                           # 6 utility test files + mocks
+│   └── utils/                           # 7 utility test files + mocks
 │
 └── src/                                 # Application source (~208 files)
     ├── proxy.ts                         # Middleware (route protection)
@@ -97,7 +97,11 @@ src/app/
 │       ├── layout.tsx         # Admin layout (Sidebar, role check)
 │       ├── loading.tsx
 │       ├── AdminLayoutClient.tsx
-│       ├── page.tsx           # Dashboard page
+│       ├── page.tsx           # Admin dashboard
+│       ├── activity/
+│       │   └── page.tsx       # Activity log
+│       ├── dashboard/
+│       │   └── page.tsx       # Dashboard (also)
 │       ├── inventory/
 │       │   ├── loading.tsx
 │       │   └── page.tsx       # Inventory management
@@ -109,10 +113,18 @@ src/app/
 │           └── page.tsx       # User management
 │
 ├── (auth)/                    # Route group: authentication (4 directories)
-│   ├── login/page.tsx
-│   ├── register/page.tsx
-│   ├── reset-password/page.tsx
-│   └── verify/page.tsx
+│   ├── login/
+│   │   ├── loading.tsx
+│   │   └── page.tsx
+│   ├── register/
+│   │   ├── loading.tsx
+│   │   └── page.tsx
+│   ├── reset-password/
+│   │   ├── loading.tsx
+│   │   └── page.tsx
+│   └── verify/
+│       ├── loading.tsx
+│       └── page.tsx
 │
 ├── (store)/                   # Route group: storefront (14 files)
 │   ├── layout.tsx             # Navbar + CartDrawer + Footer
@@ -136,8 +148,9 @@ src/app/
 │   │   ├── loading.tsx
 │   │   └── page.tsx           # Brand story
 │
-├── (user)/                    # Route group: user account (6 files)
+├── (user)/                    # Route group: user account (8 files)
 │   ├── layout.tsx             # User layout with auth redirect
+│   ├── UserLayoutClient.tsx   # Client wrapper for user layout
 │   ├── profile/
 │   │   ├── layout.tsx         # Profile page layout (sidebar + workspace)
 │   │   ├── page.tsx           # Profile details
@@ -147,8 +160,9 @@ src/app/
 │   │       ├── page.tsx       # Order history
 │   │       └── loading.tsx
 │
-└── api/                       # API route handlers (23 endpoints)
+└── api/                       # API route handlers (21 files)
     ├── admin/
+    │   ├── audit/route.ts
     │   ├── dashboard/route.ts
     │   ├── orders/route.ts + [id]/route.ts
     │   ├── products/route.ts + [id]/route.ts
@@ -156,11 +170,11 @@ src/app/
     ├── auth/
     │   ├── [...all]/route.ts  # Better Auth catch-all
     │   └── role/route.ts      # Role check endpoint
-    ├── categories/route.ts + daily/route.ts
+    ├── categories/route.ts
     ├── checkout/session/route.ts
     ├── editorial/route.ts
     ├── insforge-token/route.ts
-    ├── lookbook/route.ts
+    ├── landing/route.ts
     ├── newsletter/route.ts
     ├── orders/route.ts
     ├── products/route.ts + [slug]/route.ts
@@ -171,13 +185,15 @@ src/app/
 
 ```
 src/components/
-├── admin/                         # Admin panel (23 files)
+├── admin/                         # Admin panel (26 files)
+│   ├── activity/                  # 3 components
 │   ├── dashboard/                 # 5 components (+TaskMenu)
 │   ├── inventory/                 # 8 components (+BasicDetailsFields, BulletDetailsFields)
 │   ├── orders/                    # 4 components (+OrdersSkeleton)
-│   └── users/                     # 6 components (+UsersSearchFilters)
+│   └── users/                     # 7 components (+DeleteConfirmModal, UsersSearchFilters)
 │
-├── auth/                          # Auth forms (8 files)
+├── auth/                          # Auth forms (10 files)
+│   ├── AuthInitializer.tsx, AuthSkeleton.tsx
 │   ├── LoginClient.tsx, LoginForm.tsx
 │   ├── RegisterClient.tsx, RegisterForm.tsx
 │   ├── ResetPasswordClient.tsx, ResetPasswordForm.tsx
@@ -187,30 +203,33 @@ src/components/
 │
 ├── landing/                       # Home page sections (11 files)
 │   ├── LandingClient.tsx, Hero.tsx, FeaturedCollection.tsx
-│   ├── ProductGrid.tsx, LookbookSlider.tsx, MarqueeBar.tsx
-│   ├── DesignerStory.tsx, Craftsmanship.tsx, Testimonials.tsx, Newsletter.tsx
+│   ├── LookbookSlider.tsx, MarqueeBar.tsx, Newsletter.tsx
+│   ├── DesignerStory.tsx, MaterialIndex.tsx, SignaturePieces.tsx
+│   ├── PressClientNotes.tsx
 │   └── ui/                        # Landing-specific primitives (1 file)
 │
 ├── layout/                        # Shared layout (4 files)
 │   ├── Navbar.tsx, NavbarProfileMenu.tsx
 │   ├── MobileMenu.tsx, Footer.tsx
 │
-├── product/                       # Product pages (15 files)
-│   ├── detail/                    # 8 components
+├── product/                       # Product pages (16 files)
+│   ├── detail/                    # 9 components
 │   └── listing/                   # 7 components
 │
-├── profile/                       # User profile (7 files)
+├── profile/                       # User profile (9 files)
 │   ├── ProfileClient.tsx, ProfileForm.tsx
+│   ├── ProfileSkeleton.tsx
 │   ├── ProfileSidebar.tsx, ProfileWorkspace.tsx
-│   └── orders/                    # 3 components
+│   └── orders/                    # 4 components
 │
-├── story/                         # Brand story (6 files)
+├── story/                         # Brand story (5 files)
 │
-└── ui/                            # Shared primitives (12 files)
+└── ui/                            # Shared primitives (13 files)
     ├── Button.tsx, ProductCard.tsx, Pagination.tsx
-    ├── CartDrawer.tsx, OptimizedImage.tsx
+    ├── CartDrawer.tsx, CartDrawerWrapper.tsx
     ├── AdminSidebar.tsx, AdminHeaderPanel.tsx
     ├── AnimatedText.tsx, EyebrowLabel.tsx
+    ├── LazySection.tsx
     ├── OrderStatusBadge.tsx, ConfirmDialog.tsx
     └── ScrollToTop.tsx
 ```
@@ -294,6 +313,7 @@ src/hooks/
 | `upload-and-seed.mts` | TS | Deploy schema + upload media + seed DB (full reset) |
 | `update-catalog.mts` | TS | Upsert products without wiping orders/users (`--catalog-only`) |
 | `manage-user.ts` | TS | CLI user management (create, role, delete) |
+| `wipe-db.mts` | TS | Drop all tables and reset schema |
 | `optimize-images.mjs` | JS | Sharp-based WebP preprocessing |
 
 ### 2.10 `migrations/`
@@ -306,11 +326,30 @@ src/hooks/
 
 ```
 __tests__/
-└── api/
-    ├── categories.test.ts      # Categories endpoint tests
-    ├── checkout.test.ts        # Checkout session creation tests
-    ├── webhook.test.ts         # Lemon Squeezy webhook tests
-    └── admin-auth.test.ts      # Admin role auth tests
+├── api/
+│   ├── admin-authorization.test.ts
+│   ├── admin-orders.test.ts
+│   ├── admin-products.test.ts
+│   ├── admin-users.test.ts
+│   ├── auth-role.test.ts
+│   ├── categories.test.ts
+│   ├── checkout-session.test.ts
+│   ├── landing.test.ts
+│   ├── newsletter.test.ts
+│   ├── orders.test.ts
+│   ├── stock-locking.test.ts
+│   └── webhook-idempotency.test.ts
+├── stores/
+│   ├── auth.test.ts
+│   └── cart.test.ts
+└── utils/
+    ├── cn.test.ts
+    ├── env.test.ts
+    ├── formatCurrency.test.ts
+    ├── mocks.ts
+    ├── pricing.test.ts
+    ├── sanitize.test.ts
+    └── validation.test.ts
 ```
 
 ---
@@ -425,7 +464,9 @@ The codebase enforces a strict 4-layer architecture with unidirectional dependen
 
 | URL | File | Notes |
 |---|---|---|
-| `/admin` | `(admin)/admin/page.tsx` | `<DashboardClient />` |
+| `/admin` | `(admin)/admin/page.tsx` | Dashboard |
+| `/admin/activity` | `(admin)/admin/activity/page.tsx` | Activity log |
+| `/admin/dashboard` | `(admin)/admin/dashboard/page.tsx` | Dashboard (also) |
 | `/admin/inventory` | `(admin)/admin/inventory/page.tsx` | `<InventoryClient />` |
 | `/admin/orders` | `(admin)/admin/orders/page.tsx` | `<OrdersClient />` |
 | `/admin/users` | `(admin)/admin/users/page.tsx` | `<UsersClient />` |
@@ -439,9 +480,8 @@ The codebase enforces a strict 4-layer architecture with unidirectional dependen
 | `/api/products` | GET | None | `'use cache'` 300s, tag: `products` | List/paginate/filter/sort |
 | `/api/products/[slug]` | GET | None | `'use cache'` 300s, tag: `products` | Single product detail (with images, sizes, details) |
 | `/api/categories` | GET | None | `'use cache'` 300s, tags: `categories,products` | All categories with metadata |
-| `/api/categories/daily` | GET | None | `'use cache'` 300s, tags: `categories,products` | 3 daily rotating categories (day-of-year modulo) |
-| `/api/lookbook` | GET | None | `'use cache'` 300s, tag: `lookbook` | Lookbook slides |
 | `/api/editorial` | GET | None | `'use cache'` 600s, tag: `editorial` | Editorial content |
+| `/api/landing` | GET | None | — | Landing page data |
 | `/api/newsletter` | POST | None | — | Newsletter email subscription (welcome email) |
 | `/api/orders` | GET | Better Auth session | React Query 2min | User's orders (paginated) |
 | `/api/orders` | POST | _(removed)_ | — | ~~Create order (deactivated)~~ |
@@ -536,13 +576,7 @@ Product[]
 
 **Response**: `CategoryMetadata[]`
 
-### 5.4 `GET /api/categories/daily`
-
-**File**: `src/app/api/categories/daily/route.ts`
-
-**Behavior**: Returns 3 categories deterministically selected by day-of-year modulo. Shares the same `'use cache'` properties and tags as the regular categories route — both hit the same cached data.
-
-### 5.5 `POST /api/checkout/session`
+### 5.4 `POST /api/checkout/session`
 
 **File**: `src/app/api/checkout/session/route.ts`
 
@@ -580,7 +614,7 @@ Product[]
 
 **Response**: `{ checkoutUrl: string, checkoutId: string }`
 
-### 5.6 `POST /api/webhooks/lemonsqueezy`
+### 5.5 `POST /api/webhooks/lemonsqueezy`
 
 **File**: `src/app/api/webhooks/lemonsqueezy/route.ts`
 
@@ -601,7 +635,7 @@ Product[]
 
 **Response**: `{ received: true }` (200) or `{ error }` (401/400/500)
 
-### 5.7 `GET /api/orders`
+### 5.6 `GET /api/orders`
 
 **File**: `src/app/api/orders/route.ts`
 
@@ -612,7 +646,7 @@ Product[]
 **Response** (normal): `{ orders: Order[], total: number }`
 **Response** (`lsOrderId`): `{ orderNumber: string }`
 
-### 5.8 `GET /api/auth/role`
+### 5.7 `GET /api/auth/role`
 
 **File**: `src/app/api/auth/role/route.ts`
 
@@ -620,7 +654,7 @@ Product[]
 
 Reads from `better_auth."user"` table, falls back to `ADMIN_EMAILS` env whitelist.
 
-### 5.9 `GET /api/admin/dashboard`
+### 5.8 `GET /api/admin/dashboard`
 
 **File**: `src/app/api/admin/dashboard/route.ts`
 
@@ -641,7 +675,7 @@ Reads from `better_auth."user"` table, falls back to `ADMIN_EMAILS` env whitelis
 }
 ```
 
-### 5.10 Admin CRUD Endpoints
+### 5.9 Admin CRUD Endpoints
 
 **Pattern**: All follow `requireAdmin()` → validate → DB operation → response
 
@@ -1241,11 +1275,11 @@ All in `src/hooks/queries/`. Default config: staleTime=5min, gcTime=10min, refet
 | `useFeaturedProductsQuery(count=3)` | `['products', 'All']` | Fetches all, then `select` deterministic daily subset | Day-of-month modulo algorithm |
 | `useRelatedProductsQuery(current)` | `['products', 'All']` | Fetches all, then `select` up to 4 same-category | Falls back to any if no same-category |
 | `useProductDetailsQuery(slug)` | `['product', slug]` | `GET /api/products/[slug]` | `staleTime: 0`, `initialData` from cached product list |
-| `useLookbookQuery()` | `['lookbook']` | `GET /api/lookbook` | Lookbook slides |
+| `useLookbookQuery()` | `['lookbook']` | `GET /api/landing` | Lookbook slides (from landing endpoint) |
 | `useEditorialQuery()` | `['editorial']` | `GET /api/editorial` | Editorial content |
 | `useOrders(page=0, limit=50)` | `['orders', userId, page]` | `GET /api/orders?limit=&offset=` | staleTime=2min, enabled only when `user.id` exists |
 | `useCategoriesQuery()` | `['categories']` | `GET /api/categories` | staleTime=10min |
-| `useDailyCategoriesQuery()` | `['categories', 'daily']` | `GET /api/categories/daily` | staleTime=30min |
+| `useDailyCategoriesQuery()` | `['categories', 'daily']` | `GET /api/categories` | staleTime=30min, client-side daily subset |
 
 ### Admin Queries & Mutations
 | Hook / Mutation | Query Key | Target Endpoint | Notes |
@@ -1759,13 +1793,13 @@ Cart items are sorted by `internalProductId` before `SELECT ... FOR UPDATE` to p
 | **Runner** | Vitest 4.1.9 |
 | **Config** | `vitest.config.ts` |
 | **Location** | `__tests__/api/`, `__tests__/stores/`, `__tests__/utils/` |
-| **Tests** | 19 test files |
+| **Tests** | 21 test files |
 
 ### Test Directories
 
 | Directory | Contents |
 |---|---|
-| `__tests__/api/` | 10 files — API integration tests (categories, checkout, webhook, orders, auth, admin, stock-locking, idempotency) |
+| `__tests__/api/` | 12 files — API integration tests (categories, checkout, webhook, orders, auth, admin, stock-locking, idempotency, landing) |
 | `__tests__/stores/` | 2 files — Zustand store tests (auth, cart) |
 | `__tests__/utils/` | 7 files — Unit tests (cn, env, formatCurrency, pricing, sanitize, validation + mocks) |
 
