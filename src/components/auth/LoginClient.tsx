@@ -47,7 +47,9 @@ export function LoginClient() {
 
   useEffect(() => {
     if (user && !loading) {
-      router.push("/profile");
+      const params = new URLSearchParams(window.location.search);
+      const redirectTarget = params.get("redirect") || "/profile";
+      router.push(redirectTarget);
     }
   }, [user, loading, router]);
 
@@ -72,7 +74,10 @@ export function LoginClient() {
           setFormError(errorMsg);
         }
       } else {
-        router.push("/profile");
+        const params = new URLSearchParams(window.location.search);
+        const redirectTarget = params.get("redirect") || "/profile";
+        router.refresh();
+        router.push(redirectTarget);
       }
     } finally {
       setSubmitting(false);
