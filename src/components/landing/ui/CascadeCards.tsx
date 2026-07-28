@@ -44,7 +44,7 @@ export function CascadeCards({ products }: CascadeCardsProps) {
 
           return (
             <motion.div
-              key={product.id}
+              key={`${product.id}-${index}`}
               variants={cardCascade(index)}
               initial="hidden"
               animate="visible"
@@ -111,7 +111,7 @@ export function CascadeCards({ products }: CascadeCardsProps) {
 
           return (
             <motion.div
-              key={product.id}
+              key={`${product.id}-${index}`}
               initial={{ opacity: 0, y: 50, rotate: rotation - 4 }}
               animate={{ opacity: 1, y: 0, rotate: rotation }}
               transition={{

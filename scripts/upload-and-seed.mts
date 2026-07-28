@@ -15,6 +15,7 @@
 import { createAdminClient } from '@insforge/sdk';
 import { Client } from 'pg';
 import * as fs from 'fs';
+import * as fsPromises from 'fs/promises';
 import * as path from 'path';
 import { execSync } from 'child_process';
 
@@ -146,14 +147,27 @@ function buildStorageUrl(bucketName: string, bucketKey: string): string {
   return `${ossHost}/api/storage/buckets/${bucketName}/objects/${encodedKey}`;
 }
 
-async function eachBatch<T>(
+async function runConcurrent<T>(
   items: T[],
   concurrency: number,
   fn: (item: T) => Promise<void>,
-) {
-  for (let i = 0; i < items.length; i += concurrency) {
-    await Promise.allSettled(items.slice(i, i + concurrency).map(fn));
+): Promise<void> {
+  const iterator = items[Symbol.iterator]();
+  const running: Promise<void>[] = [];
+  let stopped = false;
+
+  async function worker() {
+    while (!stopped) {
+      const { value, done } = iterator.next();
+      if (done) return;
+      await fn(value);
+    }
   }
+
+  const workers = Array(Math.min(concurrency, items.length))
+    .fill(null)
+    .map(worker);
+  await Promise.all(workers);
 }
 
 // ════════════════════════════════════════════════════════
@@ -176,21 +190,22 @@ async function resolveImage(
     localRelPath.replace(/^\//, ''),
   );
 
-  if (!fs.existsSync(fullPath)) {
-    return { url: null, status: 'missing' };
-  }
-
   const { bucket, storageKey } = getBucketAndKey(localRelPath);
 
   if (existingKeys[bucket]?.has(storageKey)) {
     return { url: buildStorageUrl(bucket, storageKey), status: 'exists' };
   }
 
-  const buffer = fs.readFileSync(fullPath);
+  let buffer: Buffer;
+  try {
+    buffer = fs.readFileSync(fullPath);
+  } catch {
+    return { url: null, status: 'missing' };
+  }
   const mimeType = getMimeType(fullPath);
 
   try {
-    const blob = new Blob([buffer], { type: mimeType });
+    const blob = new Blob([buffer as BlobPart], { type: mimeType });
     const { data, error } = await admin.storage
       .from(bucket)
       .upload(storageKey, blob);
@@ -225,12 +240,13 @@ async function seed() {
   console.log("Initializing InsForge admin client...");
   const admin = createAdminClient({ baseUrl: ossHost, apiKey });
 
-  // Verify and prepare all five storage buckets
+  // Verify and prepare all five storage buckets (in parallel)
 
-  const bucketsList = execSync(`bunx @insforge/cli storage buckets`, { encoding: 'utf-8' });
   const existingKeys: Record<string, Set<string>> = {};
 
-  for (const [key, bucketName] of Object.entries(BUCKETS)) {
+  const bucketsList = execSync(`bunx @insforge/cli storage buckets`, { encoding: 'utf-8' });
+
+  async function prepareBucket(bucketName: string) {
     console.log(`Verifying storage bucket "${bucketName}"...`);
     let bucketExists = bucketsList.includes(bucketName);
     let hasData = false;
@@ -272,17 +288,20 @@ async function seed() {
     }
 
     // Populate existing keys
-    existingKeys[bucketName] = new Set<string>();
+    const keys = new Set<string>();
     try {
       const { data: listData } = await admin.storage.from(bucketName).list({ limit: 1000 });
       const objects = (listData as any)?.data || (listData as any)?.objects || [];
       for (const obj of objects) {
-        existingKeys[bucketName].add(obj.key);
+        keys.add(obj.key);
       }
     } catch (err: any) {
       console.warn(`Warning pre-populating keys for bucket "${bucketName}": ${err.message || err}`);
     }
+    existingKeys[bucketName] = keys;
   }
+
+  await Promise.all(Object.values(BUCKETS).map(prepareBucket));
 
   // Collect all unique image paths from data structures
   const allImagePaths = new Set<string>();
@@ -319,28 +338,33 @@ async function seed() {
   const publicDir = path.resolve(process.cwd(), 'public');
   const imagesDir = path.resolve(publicDir, 'images');
 
-  function getFilesRecursively(dir: string, baseDir: string): string[] {
+  async function getFilesRecursively(dir: string, baseDir: string): Promise<string[]> {
     let results: string[] = [];
-    if (!fs.existsSync(dir)) return results;
-    const list = fs.readdirSync(dir);
-    for (const file of list) {
-      const filePath = path.resolve(dir, file);
-      const stat = fs.statSync(filePath);
-      if (stat && stat.isDirectory()) {
-        results = results.concat(getFilesRecursively(filePath, baseDir));
+    try {
+      await fsPromises.access(dir);
+    } catch {
+      return results;
+    }
+    const entries = await fsPromises.readdir(dir, { withFileTypes: true });
+    const dirs: Promise<string[]>[] = [];
+    for (const entry of entries) {
+      const fullPath = path.resolve(dir, entry.name);
+      if (entry.isDirectory()) {
+        dirs.push(getFilesRecursively(fullPath, baseDir));
       } else {
-        const ext = path.extname(filePath).toLowerCase();
+        const ext = path.extname(entry.name).toLowerCase();
         if (['.webp', '.jpg', '.jpeg', '.png', '.svg', '.gif'].includes(ext)) {
-          const rel = path.relative(baseDir, filePath);
-          const normalized = '/' + rel.replace(/\\/g, '/');
-          results.push(normalized);
+          const rel = path.relative(baseDir, fullPath);
+          results.push('/' + rel.replace(/\\/g, '/'));
         }
       }
     }
+    const nested = await Promise.all(dirs);
+    for (const n of nested) results.push(...n);
     return results;
   }
 
-  const scannedImages = getFilesRecursively(imagesDir, publicDir);
+  const scannedImages = await getFilesRecursively(imagesDir, publicDir);
   for (const img of scannedImages) {
     allImagePaths.add(img);
   }
@@ -353,7 +377,7 @@ async function seed() {
   let exists = 0;
   let missing = 0;
 
-  await eachBatch(Array.from(allImagePaths), 5, async (localPath) => {
+  await runConcurrent(Array.from(allImagePaths), 25, async (localPath) => {
     const { url, status } = await resolveImage(admin, localPath, existingKeys);
     const label = localPath.replace(/^\/images\//, '');
 
@@ -407,13 +431,14 @@ async function seed() {
 
   // ── Seeding Categories ──
   console.log(`Inserting ${categoryDataList.length} categories...`);
-  for (const cat of categoryDataList) {
-    const imageUrl = urlMap.get(cat.image) || cat.image;
-    await client.query(
-      `INSERT INTO categories (slug, name, image, description)
-       VALUES ($1, $2, $3, $4)`,
-      [cat.slug, cat.name, imageUrl, cat.description]
-    );
+  const catParams: any[] = [];
+  const catPlaceholders = categoryDataList.map((cat, i) => {
+    const idx = i * 4;
+    catParams.push(cat.slug, cat.name, urlMap.get(cat.image) || cat.image, cat.description);
+    return `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4})`;
+  }).join(', ');
+  if (catPlaceholders) {
+    await client.query(`INSERT INTO categories (slug, name, image, description) VALUES ${catPlaceholders}`, catParams);
   }
 
   // ── Seeding Products ──
@@ -518,35 +543,38 @@ async function seed() {
 
   // ── Seeding Lookbook Slides ──
   console.log("Seeding lookbook slides...");
-  for (const slide of lookbookSlides) {
-    const imageUrl = urlMap.get(slide.originalImage) || slide.originalImage;
-    await client.query(
-      `INSERT INTO lookbook_slides (slide_number, original_image, image_url, alt_text, tag, title, link)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [slide.slideNumber, slide.originalImage, imageUrl, slide.altText, slide.tag || null, slide.title || null, slide.link || null]
-    );
+  const lookbookParams: any[] = [];
+  const lookbookPlaceholders = lookbookSlides.map((slide, i) => {
+    const idx = i * 7;
+    lookbookParams.push(slide.slideNumber, slide.originalImage, urlMap.get(slide.originalImage) || slide.originalImage, slide.altText, slide.tag || null, slide.title || null, slide.link || null);
+    return `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${idx + 6}, $${idx + 7})`;
+  }).join(', ');
+  if (lookbookPlaceholders) {
+    await client.query(`INSERT INTO lookbook_slides (slide_number, original_image, image_url, alt_text, tag, title, link) VALUES ${lookbookPlaceholders}`, lookbookParams);
   }
 
   // ── Seeding Editorial Content ──
   console.log("Seeding editorial content...");
-  for (const item of editorialItems) {
-    const imageUrl = urlMap.get(item.originalImage) || item.originalImage;
-    await client.query(
-      `INSERT INTO editorial_content (id, original_image, image_url, alt_text, title, description)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [item.id, item.originalImage, imageUrl, item.altText, item.title, item.description || null]
-    );
+  const editorialParams: any[] = [];
+  const editorialPlaceholders = editorialItems.map((item, i) => {
+    const idx = i * 6;
+    editorialParams.push(item.id, item.originalImage, urlMap.get(item.originalImage) || item.originalImage, item.altText, item.title, item.description || null);
+    return `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${idx + 6})`;
+  }).join(', ');
+  if (editorialPlaceholders) {
+    await client.query(`INSERT INTO editorial_content (id, original_image, image_url, alt_text, title, description) VALUES ${editorialPlaceholders}`, editorialParams);
   }
 
   // ── Seeding Materials ──
   console.log("Seeding materials...");
-  for (const mat of materials) {
-    const imageUrl = urlMap.get(mat.image) || mat.image;
-    await client.query(
-      `INSERT INTO materials (name, source, original_image, image_url, description, properties)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [mat.name, mat.source, mat.image, imageUrl, mat.description, mat.properties]
-    );
+  const matParams: any[] = [];
+  const matPlaceholders = materials.map((mat, i) => {
+    const idx = i * 6;
+    matParams.push(mat.name, mat.source, mat.image, urlMap.get(mat.image) || mat.image, mat.description, mat.properties);
+    return `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${idx + 6})`;
+  }).join(', ');
+  if (matPlaceholders) {
+    await client.query(`INSERT INTO materials (name, source, original_image, image_url, description, properties) VALUES ${matPlaceholders}`, matParams);
   }
 
   await client.end();

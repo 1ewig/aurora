@@ -42,9 +42,15 @@ export default function LandingClient({ initialData }: LandingClientProps) {
   const heroProducts = useMemo(() => {
     if (!allProducts.length) return [];
     const len = allProducts.length;
+    const count = Math.min(5, len);
     const selected: Product[] = [];
-    for (let i = 0; i < Math.min(5, len); i++) {
-      const index = (serverDay + i * 3) % len;
+    const used = new Set<number>();
+    for (let i = 0; i < count; i++) {
+      let index = (serverDay + i * 3) % len;
+      while (used.has(index)) {
+        index = (index + 1) % len;
+      }
+      used.add(index);
       selected.push(allProducts[index]);
     }
     return selected;
