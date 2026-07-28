@@ -151,7 +151,7 @@ bun scripts/upload-and-seed.mts
 This performs a completely automated setup and seeding:
 1. **Multi-Bucket Verification & Wipe**: Checks and prepares three buckets: `product-media`, `lookbook-media`, and `editorial-media`. If missing, it creates them. If they exist with data, it wipes them to prevent name collisions.
 2. **Recursive Image Scan & Route**: Uploads all local assets recursively to their corresponding storage buckets (`/images/lookbook/*` -> `lookbook-media`, `/images/editorial/*` -> `editorial-media`, and products -> `product-media`).
-3. **Database Schema Creation**: Automatically drops existing tables and executes [`scripts/create-tables.sql`](file:///c:/Users/moshu%20moshu/Desktop/aurora/scripts/create-tables.sql) to build the database from scratch (excluding the Better Auth tables, which are handled in the previous step).
+3. **Database Schema Creation**: Automatically drops existing tables and executes [`scripts/create-tables.sql`](file:///c:/Users/Asad/Desktop/projects/aurora/scripts/create-tables.sql) to build the database from scratch (excluding the Better Auth tables, which are handled in the previous step).
 4. **Data Seeding**: Seeds all products, gallery image relations, sizes, detail bullets, lookbook slides, and editorial content.
 
 ---
