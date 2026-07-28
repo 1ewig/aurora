@@ -8,7 +8,7 @@
  * across all five buckets (product-media, lookbook-media, editorial-media, material-media, category-media).
  *
  * Usage:
- *   npx tsx scripts/update-catalog.mts
+ *   bun scripts/update-catalog.mts
  */
 
 import { createAdminClient } from '@insforge/sdk';
@@ -213,7 +213,7 @@ function getStorageKeyFromUrl(url: string, bucketName: string = 'product-media')
 }
 
 async function ensureBucketsExist(admin: ReturnType<typeof createAdminClient>): Promise<void> {
-  const bucketsList = execSync(`npx @insforge/cli storage buckets`, { encoding: 'utf-8' });
+  const bucketsList = execSync(`bunx @insforge/cli storage buckets`, { encoding: 'utf-8' });
 
   for (const bucketName of Object.values(BUCKETS)) {
     if (bucketsList.includes(bucketName)) {
@@ -221,7 +221,7 @@ async function ensureBucketsExist(admin: ReturnType<typeof createAdminClient>): 
     } else {
       console.log(`  Bucket "${bucketName}" not found. Creating...`);
       try {
-        const createOut = execSync(`npx @insforge/cli storage create-bucket ${bucketName}`, { encoding: 'utf-8' });
+        const createOut = execSync(`bunx @insforge/cli storage create-bucket ${bucketName}`, { encoding: 'utf-8' });
         console.log(`  ${createOut.trim()}`);
       } catch (err: any) {
         console.error(`  Failed to create bucket "${bucketName}":`, err.message || err);

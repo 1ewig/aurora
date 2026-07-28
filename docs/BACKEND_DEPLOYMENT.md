@@ -78,7 +78,7 @@ You now have these values:
 | `NEXT_PUBLIC_INSFORGE_ANON_KEY` | `bunx @insforge/cli secrets get ANON_KEY` |
 | `INSFORGE_API_KEY` | `.insforge/project.json` → `api_key` |
 | `INSFORGE_JWT_SECRET` | `bunx @insforge/cli secrets get JWT_SECRET` |
-| `BETTER_AUTH_SECRET` | Generate: `openssl rand -base64 32` |
+| `BETTER_AUTH_SECRET` | Generate: `bun -e "console.log(Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('base64'))"` |
 | `BETTER_AUTH_URL` | `http://localhost:3000` (dev) or production URL |
 | `NEXT_PUBLIC_BETTER_AUTH_URL` | Same as `BETTER_AUTH_URL` |
 | `ADMIN_EMAILS` | Comma-separated admin email addresses |

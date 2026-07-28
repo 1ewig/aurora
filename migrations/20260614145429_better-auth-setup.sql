@@ -41,7 +41,16 @@ ALTER TABLE better_auth."user" ADD COLUMN IF NOT EXISTS ls_customer_id TEXT;
 CREATE INDEX IF NOT EXISTS idx_user_ls_customer_id ON better_auth."user"(ls_customer_id);
 
 GRANT USAGE ON SCHEMA public TO authenticated;
-GRANT SELECT, INSERT, UPDATE ON public.orders TO authenticated;
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'orders'
+  ) THEN
+    GRANT SELECT, INSERT, UPDATE ON public.orders TO authenticated;
+  END IF;
+END $$;
 
 DO $$
 BEGIN

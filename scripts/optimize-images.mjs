@@ -1,3 +1,13 @@
+/**
+ * optimize-images.mjs
+ * ===================
+ *
+ * Sharp-based WebP image preprocessing script.
+ *
+ * Usage:
+ *   bun scripts/optimize-images.mjs
+ */
+
 import sharp from "sharp";
 import { readdir, mkdir } from "fs/promises";
 import { join, parse } from "path";

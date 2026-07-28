@@ -1,3 +1,13 @@
+/**
+ * setup-db.js
+ * ===========
+ *
+ * Initializes the better_auth schema and core tables in PostgreSQL.
+ *
+ * Usage:
+ *   bun scripts/setup-db.js
+ */
+
 const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
@@ -23,6 +33,8 @@ async function run() {
       email TEXT NOT NULL UNIQUE,
       "emailVerified" BOOLEAN NOT NULL DEFAULT FALSE,
       image TEXT,
+      role TEXT NOT NULL DEFAULT 'user',
+      ls_customer_id TEXT,
       "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )`);
@@ -71,7 +83,7 @@ async function run() {
     const migrationPath = path.join(__dirname, '..', 'migrations', '20260614145429_better-auth-setup.sql');
     const migrationSql = fs.readFileSync(migrationPath, 'utf8');
     await pool.query(migrationSql);
-    console.log('App schema migration applied');
+    console.log('App schema migration applied.');
 
     console.log('Database setup complete.');
   } catch (e) {

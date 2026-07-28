@@ -229,9 +229,20 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON products
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON orders
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- ========================================================
---  Row Level Security (RLS) Policies
--- ========================================================
+-- Ensure better_auth schema and user table with role column exist prior to setting up RLS policies
+CREATE SCHEMA IF NOT EXISTS better_auth;
+CREATE TABLE IF NOT EXISTS better_auth."user" (
+  id TEXT PRIMARY KEY,
+  name TEXT,
+  email TEXT NOT NULL UNIQUE,
+  "emailVerified" BOOLEAN NOT NULL DEFAULT FALSE,
+  image TEXT,
+  role TEXT NOT NULL DEFAULT 'user',
+  ls_customer_id TEXT,
+  "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+ALTER TABLE better_auth."user" ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'user';
 
 -- 1. Categories
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;

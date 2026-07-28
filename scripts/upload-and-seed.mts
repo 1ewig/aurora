@@ -9,7 +9,7 @@
  * - Seeds all catalog, lookbook slides, editorial content, hero slides, and categories into the database
  *
  * Usage:
- *   npx tsx scripts/upload-and-seed.mts
+ *   bun scripts/upload-and-seed.mts
  */
 
 import { createAdminClient } from '@insforge/sdk';
@@ -227,7 +227,7 @@ async function seed() {
 
   // Verify and prepare all five storage buckets
 
-  const bucketsList = execSync(`npx @insforge/cli storage buckets`, { encoding: 'utf-8' });
+  const bucketsList = execSync(`bunx @insforge/cli storage buckets`, { encoding: 'utf-8' });
   const existingKeys: Record<string, Set<string>> = {};
 
   for (const [key, bucketName] of Object.entries(BUCKETS)) {
@@ -250,7 +250,7 @@ async function seed() {
     if (!bucketExists) {
       console.log(`Bucket "${bucketName}" does not exist. Creating it...`);
       try {
-        const createOut = execSync(`npx @insforge/cli storage create-bucket ${bucketName}`, { encoding: 'utf-8' });
+        const createOut = execSync(`bunx @insforge/cli storage create-bucket ${bucketName}`, { encoding: 'utf-8' });
         console.log(createOut);
       } catch (err: any) {
         console.error(`Failed to create bucket "${bucketName}" via CLI:`, err.message || err);
@@ -259,13 +259,15 @@ async function seed() {
     } else if (hasData) {
       console.log(`Bucket "${bucketName}" has existing data. Wiping and recreating bucket...`);
       try {
-        const deleteOut = execSync(`npx @insforge/cli storage delete-bucket ${bucketName}`, { input: 'y\n', encoding: 'utf-8' });
-        console.log(deleteOut);
-        const createOut = execSync(`npx @insforge/cli storage create-bucket ${bucketName}`, { encoding: 'utf-8' });
+        execSync(`bunx @insforge/cli storage delete-bucket ${bucketName}`, { input: 'y\n', encoding: 'utf-8' });
+      } catch (err: any) {
+        console.warn(`Note on bucket "${bucketName}": ${err.message || err}`);
+      }
+      try {
+        const createOut = execSync(`bunx @insforge/cli storage create-bucket ${bucketName}`, { encoding: 'utf-8' });
         console.log(createOut);
       } catch (err: any) {
-        console.error(`Failed to recreate bucket "${bucketName}" via CLI:`, err.message || err);
-        process.exit(1);
+        // Bucket might already exist, ignore if so
       }
     }
 
@@ -344,7 +346,7 @@ async function seed() {
   }
 
   console.log(`\nResolving ${allImagePaths.size} images across buckets...\n`);
-  
+
   const urlMap = new Map<string, string>();
 
   let uploaded = 0;

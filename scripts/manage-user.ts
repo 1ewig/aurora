@@ -1,11 +1,11 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env bun
 /**
  * Aurora — scripts/manage-user.ts
  *
  * Interactive CLI to manage database users — create, update roles, or delete users.
  *
  * Usage:
- *   npx tsx scripts/manage-user.ts
+ *   bun scripts/manage-user.ts
  */
 
 import { Client } from 'pg';
