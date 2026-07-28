@@ -19,28 +19,20 @@ import { betterAuth } from 'better-auth';
 import { Pool } from 'pg';
 import { requireEnv } from '@/utils/env';
 import { sendEmail } from './email';
+import {
+  verificationEmailHtml,
+  verificationEmailText,
+  resetPasswordEmailHtml,
+  resetPasswordEmailText,
+  signUpAlertHtml,
+  signUpAlertText,
+} from './email-templates';
 
 // Dedicated pool scoped to better_auth schema — never use the public pool for auth
 const pool = new Pool({ connectionString: requireEnv('DATABASE_URL') });
 pool.on('connect', (client) => {
   client.query('SET search_path TO better_auth, public').catch(() => {});
 });
-
-/** Inline HTML for password-reset emails. */
-function resetHtml(url: string): string {
-  return `<h2>Reset your Aurora password</h2>
-<p>Click the link below to reset your password. This link expires in 1 hour.</p>
-<a href="${url}" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:6px;text-decoration:none;">Reset Password</a>
-<p style="margin-top:1.5rem;color:#6b7280;">If you didn't request this, please ignore this email.</p>`;
-}
-
-/** Inline HTML for email-verification emails. */
-function verifyHtml(url: string): string {
-  return `<h2>Verify your Aurora email</h2>
-<p>Click the link below to verify your email address.</p>
-<a href="${url}" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:6px;text-decoration:none;">Verify Email</a>
-<p style="margin-top:1.5rem;color:#6b7280;">This link expires in 1 hour.</p>`;
-}
 
 /** Better Auth server instance. */
 export const auth = betterAuth({
@@ -97,8 +89,8 @@ export const auth = betterAuth({
       const { sent, error } = await sendEmail({
         to: user.email,
         subject: 'Reset your Aurora password',
-        text: `Click the link to reset your password: ${url}`,
-        html: resetHtml(url),
+        text: resetPasswordEmailText(url, user.name),
+        html: resetPasswordEmailHtml(url, user.name),
       });
       if (!sent) throw new Error(error || 'Failed to send password reset email');
     },
@@ -107,7 +99,8 @@ export const auth = betterAuth({
       const { sent } = await sendEmail({
         to: user.email,
         subject: 'Sign-up attempt detected',
-        text: 'Someone tried to create an Aurora account using your email address. If this was you, sign in instead. If not, you can ignore this email.',
+        text: signUpAlertText(user.email),
+        html: signUpAlertHtml(user.email),
       });
       if (!sent) console.warn('[auth] Failed to send sign-up alert email');
     },
@@ -121,8 +114,8 @@ export const auth = betterAuth({
       const { sent, error } = await sendEmail({
         to: user.email,
         subject: 'Verify your Aurora email',
-        text: `Click the link to verify your email: ${url}`,
-        html: verifyHtml(url),
+        text: verificationEmailText(url, user.name),
+        html: verificationEmailHtml(url, user.name),
       });
       if (!sent) throw new Error(error || 'Failed to send verification email');
     },

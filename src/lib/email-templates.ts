@@ -32,6 +32,134 @@ function escapeHtml(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
+/** Reusable email shell — wraps content in the Aurora brand frame. */
+function emailShell(contentHtml: string): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:40px auto;background:#fff;border-radius:12px;overflow:hidden">
+    <tr>
+      <td style="padding:32px 32px 0;text-align:center">
+        <h1 style="font-size:24px;letter-spacing:4px;text-transform:uppercase;margin:0 0 4px;color:#111;font-weight:400">Aurora</h1>
+        <p style="color:#999;font-size:11px;letter-spacing:1px;text-transform:uppercase;margin:0 0 24px">Curated Wardrobe Essentials</p>
+      </td>
+    </tr>
+    <tr><td style="height:1px;background:#eee;display:block;margin:0 32px"><div style="height:1px;background:#eee"></div></td></tr>
+    ${contentHtml}
+    <tr>
+      <td style="padding:0 32px 32px;text-align:center">
+        <p style="font-size:12px;color:#999;margin:0;line-height:1.6">
+          Aurora — Curated Wardrobe Essentials<br>
+          <span style="font-size:11px">If you didn&rsquo;t request this email, you can safely ignore it.</span>
+        </p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+/** Verification email — HTML */
+export function verificationEmailHtml(url: string, name?: string): string {
+  const greeting = name ? `Hi ${escapeHtml(name)},` : 'Hi there,';
+  return emailShell(`
+    <tr>
+      <td style="padding:32px 32px 0;text-align:center">
+        <h2 style="font-size:20px;letter-spacing:1px;margin:0 0 8px;color:#111;font-weight:500">Verify Your Email Address</h2>
+        <p style="font-size:14px;color:#666;margin:0;line-height:1.6">${greeting}</p>
+        <p style="font-size:14px;color:#666;margin:8px 0 0;line-height:1.6">Thanks for joining Aurora. Please verify your email address to get started with your account.</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:24px 32px 32px;text-align:center">
+        <a href="${url}" style="display:inline-block;padding:14px 40px;background:#111;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500">Verify Email</a>
+        <p style="font-size:12px;color:#999;margin:16px 0 0">This link expires in 1 hour.</p>
+      </td>
+    </tr>
+  `);
+}
+
+/** Verification email — plain text */
+export function verificationEmailText(url: string, name?: string): string {
+  const greeting = name ? `Hi ${name},` : 'Hi there,';
+  return [
+    'Verify Your Email Address',
+    '',
+    greeting,
+    'Thanks for joining Aurora. Please verify your email address to get started.',
+    '',
+    `Verify: ${url}`,
+    '',
+    'This link expires in 1 hour.',
+    '— Aurora',
+  ].join('\n');
+}
+
+/** Password reset email — HTML */
+export function resetPasswordEmailHtml(url: string, name?: string): string {
+  const greeting = name ? `Hi ${escapeHtml(name)},` : 'Hi there,';
+  return emailShell(`
+    <tr>
+      <td style="padding:32px 32px 0;text-align:center">
+        <h2 style="font-size:20px;letter-spacing:1px;margin:0 0 8px;color:#111;font-weight:500">Reset Your Password</h2>
+        <p style="font-size:14px;color:#666;margin:0;line-height:1.6">${greeting}</p>
+        <p style="font-size:14px;color:#666;margin:8px 0 0;line-height:1.6">We received a request to reset the password for your Aurora account. Click the button below to set a new password.</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:24px 32px 32px;text-align:center">
+        <a href="${url}" style="display:inline-block;padding:14px 40px;background:#111;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:500">Reset Password</a>
+        <p style="font-size:12px;color:#999;margin:16px 0 0">This link expires in 1 hour. If you didn&rsquo;t request this, please ignore this email.</p>
+      </td>
+    </tr>
+  `);
+}
+
+/** Password reset email — plain text */
+export function resetPasswordEmailText(url: string, name?: string): string {
+  const greeting = name ? `Hi ${name},` : 'Hi there,';
+  return [
+    'Reset Your Password',
+    '',
+    greeting,
+    'We received a request to reset the password for your Aurora account.',
+    '',
+    `Reset: ${url}`,
+    '',
+    'This link expires in 1 hour. If you didn\'t request this, please ignore this email.',
+    '— Aurora',
+  ].join('\n');
+}
+
+/** Sign-up alert email — HTML */
+export function signUpAlertHtml(email: string): string {
+  return emailShell(`
+    <tr>
+      <td style="padding:32px 32px 0;text-align:center">
+        <h2 style="font-size:20px;letter-spacing:1px;margin:0 0 8px;color:#111;font-weight:500">Sign-Up Attempt Detected</h2>
+        <p style="font-size:14px;color:#666;margin:0;line-height:1.6">Hi there,</p>
+        <p style="font-size:14px;color:#666;margin:8px 0 0;line-height:1.6">Someone tried to create an Aurora account using <strong>${escapeHtml(email)}</strong>.</p>
+        <p style="font-size:14px;color:#666;margin:8px 0 0;line-height:1.6">If this was you, please <a href="https://aurora.com/login" style="color:#111;text-decoration:underline">sign in</a> instead. If not, you can safely ignore this email.</p>
+      </td>
+    </tr>
+  `);
+}
+
+/** Sign-up alert email — plain text */
+export function signUpAlertText(email: string): string {
+  return [
+    'Sign-Up Attempt Detected',
+    '',
+    'Hi there,',
+    `Someone tried to create an Aurora account using ${email}.`,
+    '',
+    'If this was you, sign in instead. If not, you can safely ignore this email.',
+    '— Aurora',
+  ].join('\n');
+}
+
 /** Builds a styled HTML email for order confirmation. */
 export function orderConfirmationHtml(data: OrderConfirmationData): string {
   const itemsHtml = data.items

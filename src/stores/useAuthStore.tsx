@@ -207,7 +207,7 @@ export const createAuthStore = (initialUser: User | null = null) => {
     set({ loading: true, error: null });
     try {
       // The callback URL tells Better Auth where to redirect after verification
-      const callbackURL = `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/profile`;
+      const callbackURL = `${process.env.NEXT_PUBLIC_BETTER_AUTH_URL || window.location.origin}/profile`;
       const { error } = await authClient.sendVerificationEmail({ email, callbackURL });
       if (error) {
         const message = mapBetterAuthError(error);
@@ -226,7 +226,7 @@ export const createAuthStore = (initialUser: User | null = null) => {
     set({ loading: true, error: null });
     try {
       // The redirectTo is the page where the user will enter their new password
-      const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/reset-password`;
+      const redirectTo = `${process.env.NEXT_PUBLIC_BETTER_AUTH_URL || window.location.origin}/reset-password`;
       const { error } = await authClient.requestPasswordReset({ email, redirectTo });
       if (error) {
         const message = mapBetterAuthError(error);
