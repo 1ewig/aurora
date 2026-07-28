@@ -227,7 +227,7 @@ To spin up a local instance of Aurora, clone the repository and execute the setu
 # 1. Clone the project and install dependencies
 git clone https://github.com/1ewig/aurora.git
 cd aurora
-npm install
+bun install
 
 # 2. Configure environment parameters
 cp .env.example .env.local
@@ -238,16 +238,16 @@ Follow the **[Backend Deployment Guide](docs/BACKEND_DEPLOYMENT.md)** to configu
 
 ```bash
 # Initialize Better Auth schema and tables
-node scripts/setup-db.js
+bun scripts/setup-db.js
 
 # Deploy full database structures and store media resources
-npx tsx scripts/upload-and-seed.mts
+bun scripts/upload-and-seed.mts
 
 # Manage admin user accounts and roles
-npx tsx scripts/manage-user.ts
+bun scripts/manage-user.ts
 
 # Start local server
-npm run dev
+bun run dev
 ```
 
 Visit `http://localhost:3000` to interact with your local environment.
