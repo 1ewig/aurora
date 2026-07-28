@@ -1574,7 +1574,7 @@ getStorageKeyFromUrl(url: string): string | null
 | Script | Language | Purpose | When to Run |
 |---|---|---|---|
 | `scripts/create-tables.sql` | SQL | Full DDL (categories, products, product_*, orders, reservations, lookbook, editorial, materials, indexes, RLS helper) | Auto by upload-and-seed |
-| `scripts/setup-db.js` | JS | Initialize Better Auth schema (`npx @better-auth/cli` equivalent) | First-time setup |
+| `scripts/setup-db.js` | JS | Initialize Better Auth schema (`bunx @better-auth/cli` equivalent) | First-time setup |
 | `scripts/upload-and-seed.mts` | TS | Deploy schema + upload media to InsForge Storage + seed all DB tables | First-time setup or full reset |
 | `scripts/update-catalog.mts` | TS | Upsert products/media from `src/data/products.ts` | Adding/updating products (safe for production — uses `--catalog-only` flag) |
 | `scripts/manage-user.ts` | TS | CLI user management (create, set role, delete) | Admin account setup |
