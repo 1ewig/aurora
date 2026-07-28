@@ -8,6 +8,7 @@ Covers architecture, routing, data flow, types, stores, hooks, API routes, datab
 ## 1. Project Overview
 
 | Attribute | Value |
+|---|---|
 | **Runtime** | Bun 1.0+ |
 | **Framework** | Next.js 16.2.9 (App Router) |
 | **Language** | TypeScript 5.9.3 (strict mode) |
