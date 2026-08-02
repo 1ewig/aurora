@@ -16,7 +16,7 @@
   - **Security:** RBAC role gates on every admin endpoint (401/403), DB-backed rate limiting (auth endpoints, newsletter, checkout), CSRF protection, secure cookies in production, input sanitization (HTML-strip + length caps), JSON-LD XSS escaping, parameterized SQL everywhere, whitelisted sort/status/role enums.
   - **Performance:** `use cache` directive-based caching (60s–60min TTLs), `json_agg` single-roundtrip queries (no N+1), parallel dashboard queries, client-side React Query caching (5 min stale / 10 min GC), AVIF/WebP image optimization, code-split below-fold landing sections.
   - **Compliance/traceability:** full audit log (`audit_logs`) of every admin mutation with old→new diffs; idempotent payment event ledger.
-- **Operational metrics of note:** 15 public tables + 5 `better_auth` tables; 17 pages; 20 API route handlers; 101 components; 21 test files; two cron jobs (reservation + rate-limit cleanup).
+- **Operational metrics of note:** 15 public tables + 5 `better_auth` tables; 17 pages; 20 API route handlers; 101 components; 24 test files; two cron jobs (reservation + rate-limit cleanup).
 
 ## 2. Technical Stack & Infrastructure
 
@@ -37,7 +37,7 @@
 | Form Validation | Hand-rolled (no RHF/Zod) | Checkout + admin forms | `src/utils/validation.ts` (per-field regex validators, Luhn-length card checks, MM/YY expiry) + `src/utils/sanitize.ts` (HTML strip, 200-char caps, address validation) |
 | Motion/UI | Framer Motion 12.38, Embla Carousel 8.6 | Scroll animations, drawers, carousels | Shared presets in `src/animations/` (`easeOutQuart` house easing, spring presets, stagger variants) |
 | Email | Nodemailer 9 + Brevo (Sendinblue) SMTP | Verification, password reset, sign-up alert, order confirmation | Silently skips when SMTP env vars absent (dev); send failures are non-fatal except in Better Auth callbacks (which throw) |
-| Testing | Vitest 4.1.9 | Unit + API integration tests | `globals: true`, node env, `@` alias; all DB access mocked via `vi.mock` (no live DB needed despite AGENTS.md claim); route handlers dynamically imported per-test |
+| Testing | Vitest 4.1.9 | Unit + API integration tests | `globals: true`, node env, `@` alias; all DB access mocked via `vi.mock` — no live DB needed; route handlers dynamically imported per-test; coverage via `bun run test:coverage` (istanbul provider — v8 is unsupported under Bun) |
 | Linting | ESLint 10 (flat config) | Code quality | `next/core-web-vitals` + `next/recommended`, `@typescript-eslint/parser` |
 | Analytics | `@vercel/analytics` | Web vitals tracking | Injected once in root layout |
 | Image pipeline | `sharp` 0.34.5 | Offline image optimization | `scripts/optimize-images.mjs`: JPG/PNG → WebP (q100, 2000px max) into `public/images/` |
@@ -185,7 +185,7 @@ aurora/
 │  └─ animations/                 ← framer-motion variants + transition presets (house style)
 ├─ scripts/                       ← infra/ops tooling (see §7.4)
 ├─ migrations/                    ← single SQL migration (better-auth setup, orders.user_id UUID→TEXT)
-├─ __tests__/                     ← 21 Vitest files (api/ 12, stores/ 2, utils/ 7)
+├─ __tests__/                     ← 24 Vitest files (api/ 13, stores/ 2, utils/ 9)
 ├─ docs/                          ← SUMMARY.md (single architecture reference), CODING_STANDARDS.md,
 │                                   performance-analysis.md, BACKEND_DEPLOYMENT.md
 ├─ public/images/                 ← optimized WebP catalog assets (uploaded to InsForge buckets)
@@ -373,7 +373,7 @@ Future AI agents MUST follow these when modifying this codebase:
 13. **`src/proxy.ts` is ACTIVE edge protection** — it is the Next.js 16 proxy convention (v16 renamed `middleware` → `proxy`; `proxy.ts` exporting `proxy` is the correct, active form). Changes to it affect `/profile` and `/admin` gating: keep the cookie fast-path and role/session checks in sync with Better Auth config.
 14. **Auth is Better Auth, not InsForge auth** — InsForge is used for Postgres, storage, and the JWT bridge only.
 15. **Validation before both client and server:** checkout fields are validated client-side AND re-sanitized server-side (never trust the client; server re-prices from DB).
-16. **Verification order:** `bun run lint` → `bun run test` → `bun run build`. Tests mock the DB (`vi.mock` + shared `__tests__/utils/mocks.ts`); keep route handlers dynamically importable so env-dependent tests work.
+16. **Verification order:** `bun run lint` → `bun run test` → `bun run build`. Tests mock the DB (`vi.mock` + shared `__tests__/utils/mocks.ts`); keep route handlers dynamically importable so env-dependent tests work. GitHub Actions (`.github/workflows/ci.yml`) runs lint + test on every PR/push to `main`; `next build` is NOT in CI (it prerenders storefront data against the live Postgres) — Vercel builds on push.
 
 ### 9.1 Known gotchas & landmines
 
@@ -381,6 +381,7 @@ Future AI agents MUST follow these when modifying this codebase:
 - **Build hangs on open pg connections** — the pool's 1-second idle timeout exists specifically to let `next build` exit; don't "fix" it by removing it.
 - **Tests do NOT need a live DB** — all DB access is mocked via `vi.mock("@/utils/db")`; the route handlers are re-imported per test so env vars applied mid-test take effect.
 - **`use cache` requires `cacheComponents: true`** in `next.config.ts` — adding a `use cache` directive without it fails at build; keep the flag.
+- **v8 coverage crashes under Bun** — `node:inspector` APIs are unsupported, so `@vitest/coverage-v8` fails with "Coverage APIs are not supported". Use `bun run test:coverage` (istanbul provider, `@vitest/coverage-istanbul`); `coverage/` is gitignored and ESLint-ignored.
 - **Reservation semantics:** stock is never decremented at checkout — only row-locked. Adding a decrement in the checkout handler would double-debit once the webhook runs.
 - **Webhook body ordering:** the LS webhook must read the raw body via `req.text()` BEFORE any parsing; JSON-parsing first silently breaks HMAC verification.
 - **camelCase convention:** all DB rows are mapped snake→camel at the API boundary; new endpoints must keep this or client types drift.

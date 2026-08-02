@@ -30,6 +30,7 @@ Key patterns:
 - `bun run test` — Vitest (single run), tests in `__tests__/`
 - `bun run test -- __tests__/api/categories.test.ts` — single test file
 - `bun run test:watch` — Vitest watch mode
+- `bun run test:coverage` — istanbul coverage report (v8 provider is unsupported under Bun; `coverage/` output is gitignored)
 
 ## Architecture
 
@@ -53,10 +54,12 @@ Key patterns:
 
 `bun run lint` → `bun run test` → `bun run build`
 
+GitHub Actions (`.github/workflows/ci.yml`) runs `bun run lint` + `bun run test` on every PR and push to `main`. `next build` is NOT in CI — it prerenders storefront data against the live Postgres — Vercel covers the build on push.
+
 ## Testing
 
 - Vitest 4, config in `vitest.config.ts`
-- 21 test files across `__tests__/api/` (12), `__tests__/stores/` (2), `__tests__/utils/` (7)
+- 24 test files across `__tests__/api/` (13), `__tests__/stores/` (2), `__tests__/utils/` (9)
 - Tests mock the DB via `vi.mock` (shared helpers in `__tests__/utils/mocks.ts`) — no live database required
 
 ## .gitignore
