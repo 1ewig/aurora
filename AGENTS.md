@@ -42,7 +42,7 @@ Key patterns:
 
 ## Middleware Caveat
 
-`src/proxy.ts` is named `proxy.ts` and exports `proxy`, not `middleware.ts` / `middleware`. It is **not active** as Next.js middleware. To activate: rename to `middleware.ts` and export as `middleware`.
+`src/proxy.ts` is the **active** Next.js 16 edge proxy. In v16 the `middleware` convention was renamed to `proxy` — `proxy.ts` exporting `proxy` is the correct, active form. It gates `/profile/*` and `/admin*` (session-cookie fast path → login redirect; admin role check via `/api/auth/role`; profile session check via `/api/auth/get-session`). Keep it in sync with Better Auth config.
 
 ## InsForge Usage
 

@@ -22,7 +22,7 @@
 
 | Layer | Technology / Library | Purpose in this Project | Key Configuration / Notes |
 |---|---|---|---|
-| Framework | Next.js 16.2.9 (App Router) | Full-stack framework: RSC pages, route handlers, caching, metadata | `next.config.ts` sets `cacheComponents: true` (enables `use cache`); NO `middleware.ts`, NO `generateStaticParams`, NO `export const revalidate` — caching is exclusively `use cache` directives |
+| Framework | Next.js 16.2.9 (App Router) | Full-stack framework: RSC pages, route handlers, caching, metadata | `next.config.ts` sets `cacheComponents: true` (enables `use cache`); NO `middleware.ts` — v16 renamed middleware → proxy (`src/proxy.ts` is the active edge protection); NO `generateStaticParams`, NO `export const revalidate` — caching is exclusively `use cache` directives |
 | UI Runtime | React 19.2.7 | Server + Client Components | Async `params`/`headers` (awaited promises, Next 15+/16 convention); streaming via `<Suspense>`; `react.cache()` for per-request memoization |
 | Language | TypeScript 5.9.3 (strict) | All code | `moduleResolution: bundler`, `noUnusedLocals/Parameters`, `noFallthroughCasesInSwitch`, path alias `@/*` → `src/*` |
 | Runtime / Tooling | Bun | Package manager + dev/build/test runner | ALWAYS `bun`, never npm/pnpm/npx; `bun run dev / build / lint / test` |
@@ -103,10 +103,10 @@ Every feature follows a strict 4-layer pipeline (documented in `docs/CODING_STAN
 - **Session:** Better Auth cookie (`better-auth.session_token`), 7-day expiry with 1-day sliding renewal, 5-min cookie cache. Email verification required before sign-in; `autoSignInAfterVerification`; 1 h verification/reset token TTL.
 - **RBAC:** `role` column on `better_auth."user"` maps to levels — `user=0`, `explorer=1`, `admin=10`. Guards: `requireRole(minLevel)` / `requireAdmin()` return 401 (no session) / 403 (insufficient role). **Legacy fallback:** `ADMIN_EMAILS` env whitelist still promoted to admin while DB roles roll out (`isAdmin()` checks role first, then whitelist).
 - **Enforcement layers:**
-  1. `src/proxy.ts` — a **middleware that is NOT active** (file named `proxy.ts` exporting `proxy`, not `middleware.ts`/`middleware`). If renamed/activated it would protect `/admin` and `/profile` at the edge (cookie fast-path + role fetch). Today it is dead code.
-  2. **API-level guards** (`requireAdmin` in every `/api/admin/*` handler) — the real enforcement today.
+  1. `src/proxy.ts` — the **active** Next.js 16 edge proxy (v16 renamed `middleware` → `proxy`; `proxy.ts` exporting `proxy` is the correct convention). Protects `/admin` and `/profile` at the edge: session-cookie fast path → login redirect, admin role check via `/api/auth/role`, profile session check via `/api/auth/get-session`.
+  2. **API-level guards** (`requireAdmin` in every `/api/admin/*` handler) — defense-in-depth alongside the edge proxy; every data endpoint independently 401/403s.
   3. **Client gates:** `UserLayoutClient` redirects unauthenticated users from `/profile*` to `/login`; admin pages are thin shells over guarded APIs.
-- **Route protection summary:** storefront + auth pages public; `/profile*` = client gate + (inactive) middleware; `/admin*` = API guards + (inactive) middleware. Admin pages serve HTML to anyone, but every data endpoint 401/403s.
+- **Route protection summary:** storefront + auth pages public; `/profile*` = edge proxy + client gate; `/admin*` = edge proxy + API guards + client shells.
 - **Role to the client:** `/api/auth/role` returns `{isAdmin, role}`; `getServerAuthUser()` (React `cache()`-memoized per request) gives RSC pages a client-safe user object.
 
 ### 3.6 Design, motion & content conventions
@@ -178,7 +178,7 @@ aurora/
 │  │  ├─ env.ts                   ← requireEnv() type-safe env access
 │  │  ├─ insforge.ts + insforge/  ← storage URL↔key mapping; client/server SDK factories
 │  │  ├─ admin.ts / formatCurrency.ts / cn.ts
-│  │  └─ proxy.ts                 ← INACTIVE middleware (must be renamed middleware.ts to activate)
+│  │  └─ proxy.ts                 ← ACTIVE Next.js 16 edge proxy (v16 renamed middleware → proxy); gates /profile + /admin
 │  ├─ data/                       ← static seed source-of-truth (products, categories, navigation,
 │  │                               materials, lookbook, editorial, testimonials) — consumed by seed scripts
 │  ├─ types/lemonsqueezy.d.ts     ← window augmentation for LS overlay widget
@@ -241,7 +241,7 @@ Schema lives in `scripts/create-tables.sql` (master DDL with RLS, triggers, cron
 | `/login` `/register` | RSC | Public, noindex | Auth forms (redirect-aware `?redirect=`) | LoginClient/LoginForm, RegisterClient/RegisterForm |
 | `/verify` | RSC | Public, noindex | Email verification (`?token=&email=`), resend | VerifyClient/VerifyForm |
 | `/reset-password` | RSC | Public, noindex | Request reset email + set new password (`?token=`) | ResetPasswordClient/ResetPasswordForm |
-| `/profile` | RSC | Authed (client gate; middleware inactive) | Account settings: name, email, password, verification status | `ProfileClient`, ProfileForm, ProfileSidebar, ProfileWorkspace |
+| `/profile` | RSC | Authed (edge proxy + client gate) | Account settings: name, email, password, verification status | `ProfileClient`, ProfileForm, ProfileSidebar, ProfileWorkspace |
 | `/profile/orders` | RSC | Authed | Purchase history (own orders only) | `OrdersClient`, OrderCard, OrderDetailModal, OrderListLoader |
 | `/admin` | RSC | Admin (API-guarded) | Server `redirect()` → `/admin/dashboard` (no flash) | — |
 | `/admin/dashboard` | RSC | Admin | KPIs + recent orders + low-stock; parallel queries | `DashboardClient`, MetricsGrid, RecentOrdersList, TaskMenu |
@@ -370,16 +370,16 @@ Future AI agents MUST follow these when modifying this codebase:
 10. **Rate-limit public mutation endpoints** via `rateLimit()` (DB-backed); keep the `rate_limits` contract (ip, route, minute window).
 11. **Keep the schema source-of-truth in `scripts/create-tables.sql`** — the `migrations/` folder is not a general migration framework. Update DDL + RLS + cron there, then apply via `setup-db.js` flow.
 12. **Guest checkout stays default:** `orders.user_id` is nullable; don't add NOT NULL or FK constraints. Orders store line items as JSONB snapshots — no `order_items` table.
-13. **Do not rename/activate `src/proxy.ts` without intent** — it is deliberately inactive middleware; if activated it must be `middleware.ts` exporting `middleware`.
+13. **`src/proxy.ts` is ACTIVE edge protection** — it is the Next.js 16 proxy convention (v16 renamed `middleware` → `proxy`; `proxy.ts` exporting `proxy` is the correct, active form). Changes to it affect `/profile` and `/admin` gating: keep the cookie fast-path and role/session checks in sync with Better Auth config.
 14. **Auth is Better Auth, not InsForge auth** — InsForge is used for Postgres, storage, and the JWT bridge only.
 15. **Validation before both client and server:** checkout fields are validated client-side AND re-sanitized server-side (never trust the client; server re-prices from DB).
 16. **Verification order:** `bun run lint` → `bun run test` → `bun run build`. Tests mock the DB (`vi.mock` + shared `__tests__/utils/mocks.ts`); keep route handlers dynamically importable so env-dependent tests work.
 
 ### 9.1 Known gotchas & landmines
 
-- **`src/proxy.ts` is inert** — the middleware caveat is easy to trip over: features assuming edge protection (e.g., "role-gated admin layout") actually rely on API guards. Do not assume middleware runs.
+- **`src/proxy.ts` is active edge protection** — it gates `/profile` and `/admin` before any page renders (cookie fast-path → login redirect; role/session checks via `/api/auth/*`). Do not assume it is dead code, and keep its matcher/checks in sync with Better Auth config.
 - **Build hangs on open pg connections** — the pool's 1-second idle timeout exists specifically to let `next build` exit; don't "fix" it by removing it.
-- **Tests do NOT need a live DB** despite AGENTS.md's claim — all DB access is mocked via `vi.mock("@/utils/db")`; the route handlers are re-imported per test so env vars applied mid-test take effect.
+- **Tests do NOT need a live DB** — all DB access is mocked via `vi.mock("@/utils/db")`; the route handlers are re-imported per test so env vars applied mid-test take effect.
 - **`use cache` requires `cacheComponents: true`** in `next.config.ts` — adding a `use cache` directive without it fails at build; keep the flag.
 - **Reservation semantics:** stock is never decremented at checkout — only row-locked. Adding a decrement in the checkout handler would double-debit once the webhook runs.
 - **Webhook body ordering:** the LS webhook must read the raw body via `req.text()` BEFORE any parsing; JSON-parsing first silently breaks HMAC verification.
@@ -395,7 +395,7 @@ Future AI agents MUST follow these when modifying this codebase:
 2. Create `page.tsx` as a **Server Component**: set `metadata`/`generateMetadata`, fetch data server-side where possible (reuse cached accessors like `getLandingData`/`getCachedCategories` or direct `pool` queries), and pass `initialData` to a new `XxxClient.tsx`.
 3. Create `components/feature/XxxClient.tsx` (client orchestrator) + presentational children with zero store/hook imports. Add a `loading.tsx` with a matching `*Skeleton` component.
 4. If the page needs data in the client, add query hooks to `src/hooks/queries/` following the prefix key convention.
-5. Protect as needed: `(user)` pages rely on the group layout gate; `(admin)` pages rely on API guards (and note `proxy.ts` is inactive).
+5. Protect as needed: `(user)` pages rely on the group layout gate; `(admin)` pages rely on API guards (plus `proxy.ts` edge protection).
 6. Verify: `bun run lint` → `bun run test` → `bun run build`.
 
 ### 10.2 Add a new database model and expose it to the UI
