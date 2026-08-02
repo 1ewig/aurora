@@ -1,12 +1,22 @@
 # Aurora Performance Analysis — 20 Research-Backed Claims
 
-*Generated July 2026 — each claim backed by web research with sourced links and estimated performance gains.*
+*Generated July 2026 — each claim backed by web research with sourced links and estimated performance gains. Updated August 2026 for accuracy against the current codebase.*
 
 ---
 
 ## 1. Next.js 16 `'use cache'` on public endpoints
 
-Products, categories, lookbook, and editorial routes use `'use cache'` with `cacheLife({ stale: 300, revalidate: 300 })` and `cacheTag`. This is Next.js 16's explicit opt-in cache model — no more implicit fetch caching.
+The catalog, categories, landing, editorial, and sitemap accessors use `'use cache'` with `cacheLife` + `cacheTag`. TTLs are per-route, not uniform:
+
+| Endpoint / Accessor | `cacheLife` TTL | `cacheTag` |
+|---|---|---|
+| `/api/products`, `/api/products/[slug]`, category name lookup | 300 s | `products` / `categories` |
+| `/api/categories` | 300 s | `categories`, `products` |
+| `/api/landing` (also serves lookbook slides) | 60 s | `landing` |
+| `/api/editorial` | 600 s | `editorial` |
+| `sitemap.ts` | 3600 s | `products` / `categories` |
+
+This is Next.js 16's explicit opt-in cache model — no more implicit fetch caching. Note: there is no dedicated lookbook endpoint; lookbook data is served from `/api/landing`.
 
 **Sources:**
 - [Next.js 16 Blog — Cache Components](https://nextjs.org/blog/next-16): stale-while-revalidate semantics, "stale content is served immediately while fresh content loads in the background"
@@ -20,7 +30,7 @@ Products, categories, lookbook, and editorial routes use `'use cache'` with `cac
 
 ## 2. `json_agg` N+1 elimination in product detail endpoint
 
-Single query consolidates 4 related tables (images, sizes, details) via `COALESCE(json_agg(...), '[]'::json)` subqueries instead of N+1 per-relation fetching.
+Single query consolidates 3 related tables (images, sizes, details) via `COALESCE(json_agg(...), '[]'::json)` subqueries instead of N+1 per-relation fetching.
 
 **Sources:**
 - [Stack Insight empirical study (Feb 2026)](https://stackinsight.dev/blog/n-plus-1-query-empirical-study): "On a tiny dataset — 100 users — the worst pattern was **22× slower** and fired **200 unnecessary queries**"
@@ -32,7 +42,7 @@ Single query consolidates 4 related tables (images, sizes, details) via `COALESC
 
 ## 3. `SELECT ... FOR UPDATE` with sorted row locking in checkout
 
-Cart items sorted by `internalProductId` before `FOR UPDATE` to prevent deadlocks — the canonical PostgreSQL concurrency pattern for inventory locking.
+Cart items sorted by `(product_id, size)` before `FOR UPDATE` to prevent deadlocks — the canonical PostgreSQL concurrency pattern for inventory locking.
 
 **Sources:**
 - [PostgreSQL docs — Explicit Locking](https://www.postgresql.org/docs/current/explicit-locking.html): "The best defense against deadlocks is generally to avoid them by being certain that all applications using a database acquire locks on multiple objects in a consistent order"
@@ -46,7 +56,7 @@ Cart items sorted by `internalProductId` before `FOR UPDATE` to prevent deadlock
 
 ## 4. Parameterized SQL queries everywhere (`$1`, `$2` syntax)
 
-All 22 API routes use direct `pg` pool queries with parameterized placeholders. No string interpolation. Eliminates SQL injection entirely.
+All 20 API route handlers use direct `pg` pool queries with parameterized placeholders. No string interpolation. Eliminates SQL injection entirely.
 
 **Sources:**
 - [Prisma GitHub Issue #23573](https://github.com/prisma/prisma/issues/23573): confirmed **2× worse performance** running raw queries through Prisma vs `pg` directly
@@ -190,7 +200,7 @@ Tailwind 4 generates only used classes. Production CSS is typically 5-15KB vs Bo
 
 ## 15. `cacheTag`-based selective invalidation on product mutations
 
-Admin CRUD endpoints call `revalidateTag('products')` after mutations. Invalidates only the products cache — not the entire page.
+Admin CRUD endpoints call `revalidateTag('products', { expire: 0 })` and `revalidateTag('landing', { expire: 0 })` after mutations. Invalidates only the products + landing caches — not the entire page. The `{ expire: 0 }` option forces immediate expiry rather than waiting for the next TTL.
 
 **Sources:**
 - [Next.js `revalidateTag` docs](https://nextjs.org/docs/app/api-reference/functions/revalidateTag): "`revalidateTag` marks tagged data as stale... targeted invalidation rather than full page rebuild"
@@ -236,15 +246,15 @@ Polls `/api/orders?lsOrderId=` with 1.5s between retries (max 10 attempts). Avoi
 
 ---
 
-## 19. Product reservations with 35-min TTL + passive cleanup
+## 19. Product reservations with 35-min TTL + scheduled cleanup
 
-`product_reservations` uses `NOW() + INTERVAL '35 minutes'` expiry, checked via `WHERE expires_at > NOW()`. No cron job needed.
+`product_reservations` uses `NOW() + INTERVAL '35 minutes'` expiry, with queries filtering on `WHERE expires_at > NOW()` (passive TTL). In addition, a `pg_cron` job (`cleanup-expired-reservations`, every 5 minutes) purges expired rows, and a second hourly job (`cleanup-rate-limits`) purges stale rate-limit windows — both scheduled in `scripts/create-tables.sql`.
 
 **Sources:**
 - [PostgreSQL date/time functions](https://www.postgresql.org/docs/current/functions-datetime.html): standard interval arithmetic
 - General PostgreSQL pattern: passive TTL via `WHERE expires_at > NOW()` is well-documented and preferred over scheduled cleanup for simple expiry
 
-**Estimated gain: zero maintenance overhead** compared to a cleanup cron. Expired rows are silently ignored on every query. No external scheduler, no missed cleanups.
+**Estimated gain: near-zero maintenance overhead** — passive TTL filtering keeps queries correct without a scheduler, and the 5-minute cron bounds table growth so expired reservations cannot accumulate between queries.
 
 ---
 

@@ -33,6 +33,7 @@ Key patterns:
 
 ## Architecture
 
+- **`docs/SUMMARY.md` is the single architecture reference** — read it before modifying anything: mental model, domain models, routing, API map, and the mandatory conventions in §9. Keep it in sync when architecture, routes, or schema change.
 - **4-layer unidirectional**: Page (server) → `XxxClient.tsx` (client bridge) → Hooks/Stores → Presentational (pure props, zero store/hook imports)
 - **`@/` alias** → `src/`
 - **No ORM**: raw `pg` Pool via `@/utils/db`, parameterized `$1, $2`
@@ -56,7 +57,7 @@ Key patterns:
 
 - Vitest 4, config in `vitest.config.ts`
 - 21 test files across `__tests__/api/` (12), `__tests__/stores/` (2), `__tests__/utils/` (7)
-- Tests require a running DB — no dedicated test DB setup found
+- Tests mock the DB via `vi.mock` (shared helpers in `__tests__/utils/mocks.ts`) — no live database required
 
 ## .gitignore
 
