@@ -3,6 +3,7 @@ dist/
 .next/
 next-env.d.ts
 tsconfig.tsbuildinfo
+coverage/
 
 # Environment files
 .env

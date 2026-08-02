@@ -1,0 +1,70 @@
+import { describe, it, expect, vi, beforeEach, afterAll } from "vitest";
+import jwt from "jsonwebtoken";
+
+const mockGetSession = vi.fn();
+
+vi.mock("@/lib/auth", () => ({
+  auth: { api: { getSession: (...args: unknown[]) => mockGetSession(...args) } },
+}));
+
+vi.mock("next/headers", () => ({
+  headers: vi.fn().mockResolvedValue(new Headers()),
+}));
+
+const ORIGINAL_ENV = { ...process.env };
+const SECRET = "test-secret-123";
+
+describe("GET /api/insforge-token", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    mockGetSession.mockReset();
+    process.env.INSFORGE_JWT_SECRET = SECRET;
+  });
+
+  afterAll(() => {
+    process.env = ORIGINAL_ENV;
+  });
+
+  it("returns 401 when not signed in", async () => {
+    mockGetSession.mockResolvedValue(null);
+
+    const { GET } = await import("@/app/api/insforge-token/route");
+    const res = await GET();
+    const json = await res.json();
+
+    expect(res.status).toBe(401);
+    expect(json.error).toBe("not signed in");
+  });
+
+  it("signs a 1h HS256 JWT with the user id and insforge audience", async () => {
+    mockGetSession.mockResolvedValue({ user: { id: "user-42" } });
+
+    const { GET } = await import("@/app/api/insforge-token/route");
+    const res = await GET();
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Cache-Control")).toBe("no-store");
+
+    const decoded = jwt.verify(json.token, SECRET) as {
+      sub: string;
+      role: string;
+      aud: string;
+      exp: number;
+      iat: number;
+    };
+    expect(decoded.sub).toBe("user-42");
+    expect(decoded.role).toBe("authenticated");
+    expect(decoded.aud).toBe("insforge-api");
+    expect(decoded.exp - decoded.iat).toBe(3600);
+  });
+
+  it("throws when INSFORGE_JWT_SECRET is missing", async () => {
+    mockGetSession.mockResolvedValue({ user: { id: "user-42" } });
+    delete process.env.INSFORGE_JWT_SECRET;
+
+    const { GET } = await import("@/app/api/insforge-token/route");
+
+    await expect(GET()).rejects.toThrow("Missing required env var: INSFORGE_JWT_SECRET");
+  });
+});
