@@ -245,7 +245,7 @@ Schema lives in `scripts/create-tables.sql` (master DDL with RLS, triggers, cron
 | `/profile/orders` | RSC | Authed | Purchase history (own orders only) | `OrdersClient`, OrderCard, OrderDetailModal, OrderListLoader |
 | `/admin` | RSC | Admin (API-guarded) | Server `redirect()` → `/admin/dashboard` (no flash) | — |
 | `/admin/dashboard` | RSC | Admin | KPIs + recent orders + low-stock; parallel queries | `DashboardClient`, MetricsGrid, RecentOrdersList, TaskMenu |
-| `/admin/users` | RSC | Admin | User management (search/filter/sort, verify, role, delete) | `UsersClient`, UsersTable, UsersSearchFilters, UserDetailModal, DeleteConfirmModal |
+| `/admin/users` | RSC | Admin | User management (search/filter/sort, verify, role, delete) | `UsersClient`, UsersTable, UsersSearchFilters, UserDetailModal |
 | `/admin/orders` | RSC | Admin | Order management + status updates | `OrdersClient`, OrdersTable, OrderDetailModal |
 | `/admin/inventory` | RSC | Admin | Product CRUD + InsForge image uploads + size/stock editing | `InventoryClient`, InventoryTable, ProductFormModal (BasicDetails/MediaUpload/SizeStock/BulletDetails fields) |
 | `/admin/activity` | RSC | Admin | Audit log browser | `ActivityClient`, ActivitySearchFilters |

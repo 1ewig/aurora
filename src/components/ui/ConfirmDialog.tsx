@@ -38,7 +38,7 @@ export function ConfirmDialog({
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 bg-black/55 backdrop-blur-sm"
             onClick={onCancel}
           />
 
@@ -59,13 +59,12 @@ export function ConfirmDialog({
               {description}
             </p>
 
-            <div className="flex flex-col gap-3 justify-end">
+            <div className="flex items-center justify-end gap-3">
               <Button
                 onClick={onCancel}
                 disabled={disabled || loading}
                 variant="ghost"
                 size="sm"
-                fullWidth
               >
                 {cancelLabel}
               </Button>
@@ -74,7 +73,6 @@ export function ConfirmDialog({
                 disabled={disabled || loading}
                 variant="ghost"
                 size="sm"
-                fullWidth
                 className="border-error text-error hover:bg-error hover:text-white hover:border-error"
               >
                 {loading ? (

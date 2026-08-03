@@ -14,7 +14,7 @@ import { AdminHeaderPanel } from "@/components/ui/AdminHeaderPanel";
 import { UserDetailModal } from "./UserDetailModal";
 import { UsersSearchFilters } from "./UsersSearchFilters";
 import { UsersTable } from "./UsersTable";
-import { DeleteConfirmModal } from "./DeleteConfirmModal";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { UsersSkeleton } from "./UsersSkeleton";
 import { useUsersManagement } from "@/hooks/useUsersManagement";
 import type { SortKey } from "@/hooks/useUsersManagement";
@@ -144,22 +144,24 @@ export function UsersClient() {
         onClose={() => setSelectedUser(null)}
         onToggleVerify={handleToggleVerify}
         onRoleChange={handleRoleChange}
-        onDelete={(u) => {
-          setSelectedUser(null);
-          setConfirmDelete(u);
-        }}
+        onDelete={(u) => setConfirmDelete(u)}
         isAdmin={isAdmin}
         updatingVerifyId={updatingVerify}
       />
 
-      {confirmDelete && (
-        <DeleteConfirmModal
-          user={confirmDelete}
-          deleting={deleting}
-          onClose={() => setConfirmDelete(null)}
-          onConfirm={handleDelete}
-        />
-      )}
+      <ConfirmDialog
+        open={!!confirmDelete}
+        title="Delete User"
+        description={`Are you sure you want to delete ${
+          confirmDelete?.name || confirmDelete?.email
+        }? This will permanently remove the user, their sessions, and linked accounts.`}
+        confirmLabel={deleting ? "Deleting..." : "Delete Forever"}
+        cancelLabel="Cancel"
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(null)}
+        disabled={deleting}
+        loading={deleting}
+      />
     </div>
   );
 }
