@@ -11,6 +11,21 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { LoginForm } from "./LoginForm";
 
+/**
+ * Validates and sanitizes the ?redirect= query parameter.
+ * Only allows relative paths (starting with /) that do not contain
+ * protocol markers or authority prefixes — prevents open redirect attacks.
+ */
+function sanitizeRedirect(raw: string | null): string {
+  if (!raw) return "/profile";
+  const trimmed = raw.trim();
+  // Must start with exactly one `/` and not `//` (protocol-relative URL)
+  if (!trimmed.startsWith("/") || trimmed.startsWith("//")) return "/profile";
+  // Block any embedded protocol schemes (e.g., /login?redirect=javascript:...)
+  if (/^[a-z]+:/i.test(trimmed)) return "/profile";
+  return trimmed;
+}
+
 /** Client-side login orchestrator with form state, validation, and auth-store integration. */
 export function LoginClient() {
   const [email, setEmail] = useState("");
@@ -48,7 +63,7 @@ export function LoginClient() {
   useEffect(() => {
     if (user && !loading) {
       const params = new URLSearchParams(window.location.search);
-      const redirectTarget = params.get("redirect") || "/profile";
+      const redirectTarget = sanitizeRedirect(params.get("redirect"));
       router.push(redirectTarget);
     }
   }, [user, loading, router]);
@@ -75,7 +90,7 @@ export function LoginClient() {
         }
       } else {
         const params = new URLSearchParams(window.location.search);
-        const redirectTarget = params.get("redirect") || "/profile";
+        const redirectTarget = sanitizeRedirect(params.get("redirect"));
         router.refresh();
         router.push(redirectTarget);
       }
