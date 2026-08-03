@@ -1,7 +1,7 @@
 /**
- * Aurora — src/middleware.ts
+ * Aurora — src/proxy.ts
  *
- * Next.js middleware for route protection.
+ * Next.js 16 edge proxy for route protection.
  * - Redirects unauthenticated users to /login
  * - Redirects non-admin users away from /admin routes
  * - Uses Better Auth session cookie for auth checks
@@ -32,7 +32,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const baseUrl = process.env.BETTER_AUTH_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+  const baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
   const cookie = request.headers.get('cookie') || '';
 
   // Fast-path: Check if the session cookie exists before making any network calls.
