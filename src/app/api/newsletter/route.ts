@@ -8,13 +8,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
 import { pool } from "@/utils/db";
-import { rateLimit } from "@/utils/rateLimit";
+import { rateLimit, getClientIp } from "@/utils/rateLimit";
 import { rethrowIfDynamicServerError } from "@/utils/errors";
 import { isValidEmail } from "@/utils/validation";
 
 export async function POST(request: NextRequest) {
   try {
-    const ip = (request as any).ip || request.headers.get('x-real-ip') || '127.0.0.1';
+    const ip = getClientIp(request);
     if (!await rateLimit(ip, 'newsletter', 3)) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }

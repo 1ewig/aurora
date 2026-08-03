@@ -103,10 +103,10 @@ Every feature follows a strict 4-layer pipeline (documented in `docs/CODING_STAN
 - **Session:** Better Auth cookie (`better-auth.session_token`), 7-day expiry with 1-day sliding renewal, 5-min cookie cache. Email verification required before sign-in; `autoSignInAfterVerification`; 1 h verification/reset token TTL.
 - **RBAC:** `role` column on `better_auth."user"` maps to levels — `user=0`, `explorer=1`, `admin=10`. Guards: `requireRole(minLevel)` / `requireAdmin()` return 401 (no session) / 403 (insufficient role). **Legacy fallback:** `ADMIN_EMAILS` env whitelist still promoted to admin while DB roles roll out (`isAdmin()` checks role first, then whitelist).
 - **Enforcement layers:**
-  1. `src/proxy.ts` — the **active** Next.js 16 edge proxy (v16 renamed `middleware` → `proxy`; `proxy.ts` exporting `proxy` is the correct convention). Protects `/admin` and `/profile` at the edge: session-cookie fast path → login redirect, admin role check via `/api/auth/role`, profile session check via `/api/auth/get-session`.
-  2. **API-level guards** (`requireAdmin` in every `/api/admin/*` handler) — defense-in-depth alongside the edge proxy; every data endpoint independently 401/403s.
-  3. **Client gates:** `UserLayoutClient` redirects unauthenticated users from `/profile*` to `/login`; admin pages are thin shells over guarded APIs.
-- **Route protection summary:** storefront + auth pages public; `/profile*` = edge proxy + client gate; `/admin*` = edge proxy + API guards + client shells.
+  1. `src/proxy.ts` — the **active** Next.js 16 edge proxy (v16 renamed `middleware` → `proxy`; `proxy.ts` exporting `proxy` is the correct convention). Protects `/admin` and `/profile` at the edge: session-cookie fast path → login redirect, admin role check via `/api/auth/role`, profile session check via `/api/auth/get-session`. Base URL derived dynamically from incoming request origin.
+  2. **Server Layout Gates & API-level guards:** `(admin)/admin/layout.tsx` enforces `requireAdmin()` and `(user)/layout.tsx` enforces `getServerAuthUser()` server-side before rendering client shells; all `/api/admin/*` and `/api/insforge-token` endpoints independently enforce `requireAdmin()` (401/403).
+  3. **Client gates:** `UserLayoutClient` and `AdminLayoutClient` provide redundant client-side navigation UI gates.
+- **Route protection summary:** storefront + auth pages public; `/profile*` = edge proxy + layout server gate + client gate; `/admin*` = edge proxy + layout server gate + API guards + client shells.
 - **Role to the client:** `/api/auth/role` returns `{isAdmin, role}`; `getServerAuthUser()` (React `cache()`-memoized per request) gives RSC pages a client-safe user object.
 
 ### 3.6 Design, motion & content conventions
@@ -245,7 +245,7 @@ Schema lives in `scripts/create-tables.sql` (master DDL with RLS, triggers, cron
 | `/profile/orders` | RSC | Authed | Purchase history (own orders only) | `OrdersClient`, OrderCard, OrderDetailModal, OrderListLoader |
 | `/admin` | RSC | Admin (API-guarded) | Server `redirect()` → `/admin/dashboard` (no flash) | — |
 | `/admin/dashboard` | RSC | Admin | KPIs + recent orders + low-stock; parallel queries | `DashboardClient`, MetricsGrid, RecentOrdersList, TaskMenu |
-| `/admin/users` | RSC | Admin | User management (search/filter/sort, verify, role, delete) | `UsersClient`, UsersTable, UsersSearchFilters, UserDetailModal, DeleteConfirmModal |
+| `/admin/users` | RSC | Admin | User management (search/filter/sort, verify, role, delete) | `UsersClient`, UsersTable, UsersSearchFilters, UserDetailModal |
 | `/admin/orders` | RSC | Admin | Order management + status updates | `OrdersClient`, OrdersTable, OrderDetailModal |
 | `/admin/inventory` | RSC | Admin | Product CRUD + InsForge image uploads + size/stock editing | `InventoryClient`, InventoryTable, ProductFormModal (BasicDetails/MediaUpload/SizeStock/BulletDetails fields) |
 | `/admin/activity` | RSC | Admin | Audit log browser | `ActivityClient`, ActivitySearchFilters |
@@ -284,13 +284,13 @@ This codebase deliberately does **not** use Next.js Server Actions. Every mutati
 |---|---|---|---|
 | `/api/auth/[...all]` | GET/POST | Better Auth catch-all (sign-in/up, session, verify, reset) | BA's built-in DB rate limits + CSRF; 7-day sessions |
 | `/api/auth/role` | GET | `{isAdmin, role}` for UI gating | 401 → guest shape; `Cache-Control: no-store` |
-| `/api/insforge-token` | GET | HS256 JWT bridge token (sub, role, aud `insforge-api`, 1 h) | 401 without session; `no-store` |
 | `/api/orders` | GET | Dual mode: `?lsOrderId=` public order-number lookup (guest success page); else current user's orders | Limit capped 100; snake→camel mapping |
 
 **Admin-only (all guarded by `requireAdmin()`):**
 
 | Endpoint | Method | Purpose | Validation / Notes |
 |---|---|---|---|
+| `/api/insforge-token` | GET | HS256 JWT bridge token (`sub`, `role: 'admin'`, `aud: 'insforge-api'`, 1 h) | Requires `requireAdmin()` (401/403); `no-store` |
 | `/api/admin/dashboard` | GET | KPIs + 5 recent orders | 5 parallel queries; AOV computed server-side; low-stock = distinct products stock < 5 |
 | `/api/admin/users` | GET | Paginated user search | ILIKE + verified filter + **whitelisted sort map** (SQL-injection safe) |
 | `/api/admin/users/[id]` | GET/PATCH/DELETE | Detail (+sessions), update, delete | PATCH field whitelist (`name`, `emailVerified`, `role` w/ enum); audit with field diff; self-delete blocked (400) |

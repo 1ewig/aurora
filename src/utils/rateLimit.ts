@@ -5,7 +5,27 @@
  * Returns false when the caller exceeds the configured max requests per minute.
  */
 
+import { type NextRequest } from 'next/server';
 import { pool } from '@/utils/db';
+
+/**
+ * Extracts the real client IP address from request headers.
+ * Prefers x-forwarded-for (first entry), falling back to x-real-ip or req.ip.
+ */
+export function getClientIp(req: NextRequest): string {
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const clientIp = forwardedFor.split(',')[0].trim();
+    if (clientIp) return clientIp;
+  }
+
+  const realIp = req.headers.get('x-real-ip');
+  if (realIp && realIp.trim()) {
+    return realIp.trim();
+  }
+
+  return (req as any).ip || '127.0.0.1';
+}
 
 export async function rateLimit(ip: string, route: string, maxRequests: number): Promise<boolean> {
   const result = await pool.query(

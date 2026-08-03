@@ -18,17 +18,32 @@ if (!connectionString) {
   console.warn("Warning: DATABASE_URL environment variable is missing.");
 }
 
+function getSslConfig() {
+  if (!connectionString) return undefined;
+
+  if (process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== undefined) {
+    return { rejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === 'true' };
+  }
+
+  const lower = connectionString.toLowerCase();
+  if (lower.includes('sslmode=verify-full') || lower.includes('sslmode=verify-ca')) {
+    return { rejectUnauthorized: true };
+  }
+
+  if (lower.includes('sslmode=require') || lower.includes('sslmode=no-verify') || lower.includes('sslmode=')) {
+    return { rejectUnauthorized: false };
+  }
+
+  return undefined;
+}
+
 /*
- * SSL config: only set rejectUnauthorized: false when the connection
- * string includes sslmode=require or sslmode=verify-full (common for
- * cloud-hosted Postgres like Neon, Supabase, etc.). Local dev without
- * SSL leaves the option undefined.
+ * SSL config: respects verify-full / verify-ca with strict certificate checks
+ * while supporting cloud-hosted Postgres requiring unverified SSL mode.
  */
 export const pool = new Pool({
   connectionString,
-  ssl: (connectionString?.includes('sslmode=require') || connectionString?.includes('sslmode=verify-full'))
-    ? { rejectUnauthorized: false } 
-    : undefined,
+  ssl: getSslConfig(),
   // 1s idle timeout prevents build from hanging on open connections
   idleTimeoutMillis: 1000,
 });

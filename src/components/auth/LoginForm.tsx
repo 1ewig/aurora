@@ -150,10 +150,10 @@ export function LoginForm({
             </div>
           )}
 
-          <Button type="submit" variant="filled" fullWidth size="md" disabled={submitting}>
-            {submitting ? (
+          <Button type="submit" variant="filled" fullWidth size="md" disabled={submitting || !!(successMsg && successMsg.includes("Redirecting"))}>
+            {submitting || (successMsg && successMsg.includes("Redirecting")) ? (
               <>
-                Signing In
+                {successMsg && successMsg.includes("Redirecting") ? "Redirecting..." : "Signing In..."}
                 <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
               </>
             ) : (

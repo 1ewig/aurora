@@ -53,10 +53,20 @@ export function ProductFormModal({
               className="flex flex-col max-h-[85vh]"
             >
               {/* Sticky Header */}
-              <div className="flex-shrink-0 px-6 sm:px-6 py-4 sm:py-4 border-b border-border-subtle">
+              <div className="flex-shrink-0 flex items-center justify-between px-6 sm:px-6 py-4 sm:py-4 border-b border-border-subtle">
                 <h2 className="font-display font-black text-2xl uppercase tracking-wider truncate">
                   {editingProduct ? `Edit — ${editingProduct.name}` : "Add New Product"}
                 </h2>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="p-1.5 ml-4 text-text-secondary hover:text-text-primary transition-colors cursor-pointer rounded-full hover:bg-bg-primary"
+                  aria-label="Close form"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
 
               {/* Scrollable Body */}
@@ -145,9 +155,6 @@ export function ProductFormModal({
                   <div />
                 )}
                 <div className="flex items-center gap-3">
-                  <Button type="button" onClick={onClose} disabled={deleting || form.saving || form.uploading} variant="ghost" size="sm">
-                    Cancel
-                  </Button>
                   <Button type="submit" disabled={!form.hasChanges || form.uploading || form.saving || deleting} variant="gold" size="sm">
                     {form.uploading ? "Uploading..." : form.saving ? "Saving..." : "Save Product"}
                   </Button>

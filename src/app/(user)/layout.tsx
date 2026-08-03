@@ -13,6 +13,8 @@
 
 import type { Metadata } from "next";
 import { UserLayoutClient } from "./UserLayoutClient";
+import { getServerAuthUser } from "@/utils/admin";
+import { redirect } from "next/navigation";
 
 /** Metadata for user routes. Prevent search indexing. */
 export const metadata: Metadata = {
@@ -24,11 +26,16 @@ export const metadata: Metadata = {
   },
 };
 
-/** Auth-gated layout that delegates to the client wrapper. */
-export default function UserLayout({
+/** Auth-gated layout that verifies session server-side then delegates to the client wrapper. */
+export default async function UserLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const user = await getServerAuthUser();
+  if (!user) {
+    redirect("/login");
+  }
+
   return <UserLayoutClient>{children}</UserLayoutClient>;
 }
