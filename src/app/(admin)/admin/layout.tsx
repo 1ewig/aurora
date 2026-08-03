@@ -14,6 +14,8 @@
 
 import type { Metadata } from "next";
 import { AdminLayoutClient } from "./AdminLayoutClient";
+import { requireAdmin } from "@/utils/admin";
+import { redirect } from "next/navigation";
 
 /** Metadata for the admin layout. Prevent search indexing. */
 export const metadata: Metadata = {
@@ -25,11 +27,16 @@ export const metadata: Metadata = {
   },
 };
 
-/** Server component layout that exports metadata and renders the client shell. */
-export default function AdminLayout({
+/** Server component layout that checks admin auth and renders the client shell. */
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { error } = await requireAdmin();
+  if (error) {
+    redirect("/login");
+  }
+
   return <AdminLayoutClient>{children}</AdminLayoutClient>;
 }
