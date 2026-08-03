@@ -209,32 +209,24 @@ export function UserDetailModal({
                   Delete User
                 </Button>
               )}
-              <div className="flex items-center gap-3 ml-auto">
-                {isAdmin && (
-                  <Button
-                    type="button"
-                    disabled={updatingVerifyId === user.id}
-                    onClick={() => onToggleVerify(user, !user.emailVerified)}
-                    variant="ghost"
-                    size="sm"
-                    className="bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 border-0"
-                  >
-                    {updatingVerifyId === user.id
-                      ? "Updating..."
-                      : user.emailVerified
-                      ? "Mark Unverified"
-                      : "Mark Verified"}
-                  </Button>
-                )}
-                <Button
-                  type="button"
-                  onClick={onClose}
-                  variant="ghost"
-                  size="sm"
-                >
-                  Close
-                </Button>
-              </div>
+                <div className="flex items-center gap-3 ml-auto">
+                  {isAdmin && (
+                    <Button
+                      type="button"
+                      disabled={updatingVerifyId === user.id}
+                      onClick={() => onToggleVerify(user, !user.emailVerified)}
+                      variant="ghost"
+                      size="sm"
+                      className="bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 border-0"
+                    >
+                      {updatingVerifyId === user.id
+                        ? "Updating..."
+                        : user.emailVerified
+                        ? "Mark Unverified"
+                        : "Mark Verified"}
+                    </Button>
+                  )}
+                </div>
             </div>
           </div>
         </div>

@@ -9,7 +9,6 @@
 
 import Link from "next/link";
 // framer-motion animation removed
-import { Button } from "@/components/ui/Button";
 import { type OrderData } from "@/stores/useAdminStore";
 import { OrderStatusBadge } from "@/components/ui/OrderStatusBadge";
 
@@ -219,13 +218,6 @@ export function OrderDetailModal({
                   )}
                 </div>
               </div>
-            </div>
-
-            {/* Sticky Footer */}
-            <div className="flex-shrink-0 flex items-center justify-end px-6 sm:px-8 py-4 border-t border-border-subtle bg-bg-primary/30">
-              <Button onClick={onClose} variant="ghost" size="sm">
-                Close Detail
-              </Button>
             </div>
           </div>
         </div>
