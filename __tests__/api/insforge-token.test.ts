@@ -2,9 +2,16 @@ import { describe, it, expect, vi, beforeEach, afterAll } from "vitest";
 import jwt from "jsonwebtoken";
 
 const mockGetSession = vi.fn();
+const mockQuery = vi.fn();
+
+vi.mock("server-only", () => ({}));
 
 vi.mock("@/lib/auth", () => ({
   auth: { api: { getSession: (...args: unknown[]) => mockGetSession(...args) } },
+}));
+
+vi.mock("@/utils/db", () => ({
+  pool: { query: (...args: unknown[]) => mockQuery(...args) },
 }));
 
 vi.mock("next/headers", () => ({
@@ -18,7 +25,9 @@ describe("GET /api/insforge-token", () => {
   beforeEach(() => {
     vi.resetModules();
     mockGetSession.mockReset();
+    mockQuery.mockReset();
     process.env.INSFORGE_JWT_SECRET = SECRET;
+    process.env.ADMIN_EMAILS = "admin@example.com";
   });
 
   afterAll(() => {
@@ -33,11 +42,24 @@ describe("GET /api/insforge-token", () => {
     const json = await res.json();
 
     expect(res.status).toBe(401);
-    expect(json.error).toBe("not signed in");
+    expect(json.error).toBe("Unauthorized");
   });
 
-  it("signs a 1h HS256 JWT with the user id and insforge audience", async () => {
-    mockGetSession.mockResolvedValue({ user: { id: "user-42" } });
+  it("returns 403 when user is not an admin", async () => {
+    mockGetSession.mockResolvedValue({ user: { id: "user-42", email: "user@example.com" } });
+    mockQuery.mockResolvedValue({ rows: [{ role: "user" }] });
+
+    const { GET } = await import("@/app/api/insforge-token/route");
+    const res = await GET();
+    const json = await res.json();
+
+    expect(res.status).toBe(403);
+    expect(json.error).toBe("Forbidden");
+  });
+
+  it("signs a 1h HS256 JWT with admin role for authorized admin users", async () => {
+    mockGetSession.mockResolvedValue({ user: { id: "user-42", email: "admin@example.com" } });
+    mockQuery.mockResolvedValue({ rows: [{ role: "admin" }] });
 
     const { GET } = await import("@/app/api/insforge-token/route");
     const res = await GET();
@@ -54,13 +76,14 @@ describe("GET /api/insforge-token", () => {
       iat: number;
     };
     expect(decoded.sub).toBe("user-42");
-    expect(decoded.role).toBe("authenticated");
+    expect(decoded.role).toBe("admin");
     expect(decoded.aud).toBe("insforge-api");
     expect(decoded.exp - decoded.iat).toBe(3600);
   });
 
   it("throws when INSFORGE_JWT_SECRET is missing", async () => {
-    mockGetSession.mockResolvedValue({ user: { id: "user-42" } });
+    mockGetSession.mockResolvedValue({ user: { id: "user-42", email: "admin@example.com" } });
+    mockQuery.mockResolvedValue({ rows: [{ role: "admin" }] });
     delete process.env.INSFORGE_JWT_SECRET;
 
     const { GET } = await import("@/app/api/insforge-token/route");

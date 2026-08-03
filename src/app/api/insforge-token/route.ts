@@ -5,22 +5,19 @@
  * allowing the browser client to authenticate with InsForge services.
  */
 
-import { auth } from '@/lib/auth';
+import { requireAdmin } from '@/utils/admin';
 import jwt from 'jsonwebtoken';
-import { headers } from 'next/headers';
 import { requireEnv } from '@/utils/env';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) {
-    return NextResponse.json({ error: 'not signed in' }, { status: 401 });
-  }
+  const { user, error } = await requireAdmin();
+  if (error) return error;
 
   const token = jwt.sign(
     {
-      sub: session.user.id,
-      role: 'authenticated',
+      sub: user.id,
+      role: 'admin',
       aud: 'insforge-api',
     },
     requireEnv('INSFORGE_JWT_SECRET'),
