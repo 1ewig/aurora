@@ -62,6 +62,7 @@ export function LoginClient() {
 
   useEffect(() => {
     if (user && !loading) {
+      setSuccessMsg("Signed in. Redirecting...");
       const params = new URLSearchParams(window.location.search);
       const redirectTarget = sanitizeRedirect(params.get("redirect"));
       router.push(redirectTarget);
@@ -89,6 +90,7 @@ export function LoginClient() {
           setFormError(errorMsg);
         }
       } else {
+        setSuccessMsg("Signed in successfully! Redirecting...");
         const params = new URLSearchParams(window.location.search);
         const redirectTarget = sanitizeRedirect(params.get("redirect"));
         router.refresh();
