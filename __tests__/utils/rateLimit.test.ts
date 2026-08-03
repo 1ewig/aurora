@@ -53,3 +53,30 @@ describe("rateLimit", () => {
     expect(mockPoolQuery.mock.calls[0][0]).toContain("ON CONFLICT (ip, route, window_start)");
   });
 });
+
+describe("getClientIp", () => {
+  it("extracts the first IP from x-forwarded-for header", async () => {
+    const { getClientIp } = await import("@/utils/rateLimit");
+    const req = new Request("http://localhost/api/test", {
+      headers: { "x-forwarded-for": "203.0.113.195, 70.41.3.18, 150.172.238.178" },
+    }) as any;
+
+    expect(getClientIp(req)).toBe("203.0.113.195");
+  });
+
+  it("falls back to x-real-ip if x-forwarded-for is missing", async () => {
+    const { getClientIp } = await import("@/utils/rateLimit");
+    const req = new Request("http://localhost/api/test", {
+      headers: { "x-real-ip": "198.51.100.1" },
+    }) as any;
+
+    expect(getClientIp(req)).toBe("198.51.100.1");
+  });
+
+  it("falls back to 127.0.0.1 if no IP headers are present", async () => {
+    const { getClientIp } = await import("@/utils/rateLimit");
+    const req = new Request("http://localhost/api/test") as any;
+
+    expect(getClientIp(req)).toBe("127.0.0.1");
+  });
+});

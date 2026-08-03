@@ -27,7 +27,7 @@ import {
   validateShippingAddress,
   type ShippingAddress,
 } from "@/utils/sanitize";
-import { rateLimit } from "@/utils/rateLimit";
+import { rateLimit, getClientIp } from "@/utils/rateLimit";
 import { rethrowIfDynamicServerError } from "@/utils/errors";
 import crypto from "node:crypto";
 
@@ -44,7 +44,7 @@ export interface CheckoutSessionRequest {
 export async function POST(req: NextRequest) {
   try {
     // Rate limit: 10 checkout attempts per minute per IP
-    const ip = (req as any).ip || req.headers.get('x-real-ip') || '127.0.0.1';
+    const ip = getClientIp(req);
     if (!await rateLimit(ip, 'checkout', 10)) {
       return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
