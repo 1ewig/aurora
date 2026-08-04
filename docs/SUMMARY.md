@@ -101,7 +101,7 @@ Every feature follows a strict 4-layer pipeline (documented in `docs/CODING_STAN
 ### 3.5 Authentication & Authorization
 
 - **Session:** Better Auth cookie (`better-auth.session_token`), 7-day expiry with 1-day sliding renewal, 5-min cookie cache. Email verification required before sign-in; `autoSignInAfterVerification`; 1 h verification/reset token TTL.
-- **RBAC:** `role` column on `better_auth."user"` maps to levels — `user=0`, `explorer=1`, `admin=10`. Guards: `requireRole(minLevel)` / `requireAdmin()` return 401 (no session) / 403 (insufficient role). **Legacy fallback:** `ADMIN_EMAILS` env whitelist still promoted to admin while DB roles roll out (`isAdmin()` checks role first, then whitelist).
+- **RBAC:** `role` column on `better_auth."user"` maps to levels — `user=0`, `admin=10`. Guards: `requireRole(minLevel)` / `requireAdmin()` return 401 (no session) / 403 (insufficient role). **Legacy fallback:** `ADMIN_EMAILS` env whitelist still promoted to admin while DB roles roll out (`isAdmin()` checks role first, then whitelist).
 - **Enforcement layers:**
   1. `src/proxy.ts` — the **active** Next.js 16 edge proxy (v16 renamed `middleware` → `proxy`; `proxy.ts` exporting `proxy` is the correct convention). Protects `/admin` and `/profile` at the edge: session-cookie fast path → login redirect, admin role check via `/api/auth/role`, profile session check via `/api/auth/get-session`. Base URL derived dynamically from incoming request origin.
   2. **Server Layout Gates & API-level guards:** `(admin)/admin/layout.tsx` enforces `requireAdmin()` and `(user)/layout.tsx` enforces `getServerAuthUser()` server-side before rendering client shells; all `/api/admin/*` and `/api/insforge-token` endpoints independently enforce `requireAdmin()` (401/403).
@@ -366,14 +366,14 @@ Future AI agents MUST follow these when modifying this codebase:
 6. **Validate URL params and dynamic route params** (Zod or hand-rolled) before any query execution; use `await params`/`await headers()` (Next 15+/16 async convention).
 7. **Cache with `use cache` + `cacheLife` + `cacheTag`** (never `export const revalidate`). After any admin catalog mutation call `revalidateTag('products', {expire: 0})` and `revalidateTag('landing', {expire: 0})`.
 8. **Never swallow `DynamicServerError`** — always run errors through `rethrowIfDynamicServerError()` in route handlers/server utilities before logging.
-9. **Guard every admin endpoint with `requireAdmin()`** and audit every admin mutation with `logAudit()` (include field diffs for updates). Respect the role levels `user=0 / explorer=1 / admin=10`.
+9. **Guard every admin endpoint with `requireAdmin()`** and audit every admin mutation with `logAudit()` (include field diffs for updates). Respect the role levels `user=0 / admin=10`.
 10. **Rate-limit public mutation endpoints** via `rateLimit()` (DB-backed); keep the `rate_limits` contract (ip, route, minute window).
 11. **Keep the schema source-of-truth in `scripts/create-tables.sql`** — the `migrations/` folder is not a general migration framework. Update DDL + RLS + cron there, then apply via `setup-db.js` flow.
 12. **Guest checkout stays default:** `orders.user_id` is nullable; don't add NOT NULL or FK constraints. Orders store line items as JSONB snapshots — no `order_items` table.
 13. **`src/proxy.ts` is ACTIVE edge protection** — it is the Next.js 16 proxy convention (v16 renamed `middleware` → `proxy`; `proxy.ts` exporting `proxy` is the correct, active form). Changes to it affect `/profile` and `/admin` gating: keep the cookie fast-path and role/session checks in sync with Better Auth config.
 14. **Auth is Better Auth, not InsForge auth** — InsForge is used for Postgres, storage, and the JWT bridge only.
 15. **Validation before both client and server:** checkout fields are validated client-side AND re-sanitized server-side (never trust the client; server re-prices from DB).
-16. **Verification order:** `bun run lint` → `bun run test` → `bun run build`. Tests mock the DB (`vi.mock` + shared `__tests__/utils/mocks.ts`); keep route handlers dynamically importable so env-dependent tests work. GitHub Actions (`.github/workflows/ci.yml`) runs lint + test on every PR/push to `main`; `next build` is NOT in CI (it prerenders storefront data against the live Postgres) — Vercel builds on push.
+16. **Verification order:** `bun run lint` → `bun run test` → `bun run build`. Tests mock the DB (`vi.mock` + shared `__tests__/utils/mocks.ts`); keep route handlers dynamically importable so env-dependent tests work. GitHub Actions (`.github/workflows/ci.yml`) runs lint + test on every PR/push to `main`, and `bun run build` completes full verification by building and typechecking the production bundle.
 
 ### 9.1 Known gotchas & landmines
 
