@@ -2,7 +2,7 @@
  * Aurora — src/utils/admin.ts
  *
  * Server-only authorization helpers with role-based access control (RBAC).
- * Each role maps to a numeric level (user=0, explorer=1, admin=10).
+ * Each role maps to a numeric level (user=0, admin=10).
  * Guards query the DB-backed `role` column in better_auth."user" and
  * compare the user's level against the required minimum.
  *
@@ -26,7 +26,6 @@ import type { User } from '@/stores/useAuthStore';
 
 export const ROLE_LEVELS: Record<string, number> = {
   user: 0,
-  explorer: 1,
   admin: 10,
 };
 

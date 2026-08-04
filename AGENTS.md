@@ -54,7 +54,7 @@ Key patterns:
 
 `bun run lint` → `bun run test` → `bun run build`
 
-GitHub Actions (`.github/workflows/ci.yml`) runs `bun run lint` + `bun run test` on every PR and push to `main`. `next build` is NOT in CI — it prerenders storefront data against the live Postgres — Vercel covers the build on push.
+GitHub Actions (`.github/workflows/ci.yml`) runs `bun run lint` + `bun run test` on every PR and push to `main`. `bun run build` completes the full verification order by building and typechecking the production bundle.
 
 ## Testing
 
