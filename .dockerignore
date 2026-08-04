@@ -1,0 +1,10 @@
+.git
+.github
+.insforge
+.next
+node_modules
+coverage
+images-sources
+docs
+README.md
+*.log

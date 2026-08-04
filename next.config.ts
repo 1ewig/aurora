@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   cacheComponents: true,
   allowedDevOrigins: ['harmonics-paternity-blighted.ngrok-free.dev'],
   images: {
