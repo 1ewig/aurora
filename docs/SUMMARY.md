@@ -34,7 +34,7 @@
 | Styling | Tailwind CSS 4.1.17 | Design system + animations | `@tailwindcss/postcss`; `clsx` + `tailwind-merge` (`cn()`); Google Fonts (Inter + Playfair Display) via `next/font` as CSS vars (`--font-inter`, `--font-playfair`) |
 | Client State | Zustand 5.0.13 | Cart (persisted), auth, UI | Cart persisted to localStorage; auth store is vanilla `createStore` + React Context (SSR-safe) |
 | Server State | TanStack React Query 5.101 | All API fetching on client | `staleTime: 5 min`, `gcTime: 10 min`, `refetchOnWindowFocus: false`; admin queries use `staleTime: 0` + `keepPreviousData` |
-| Form Validation | Hand-rolled (no RHF/Zod) | Checkout + admin forms | `src/utils/validation.ts` (per-field regex validators, Luhn-length card checks, MM/YY expiry) + `src/utils/sanitize.ts` (HTML strip, 200-char caps, address validation) |
+| Validation & Schemas | Zod 3.24 + Hand-rolled | Admin payload schemas + checkout & address validation | Strict Zod schemas (`src/utils/schemas.ts`, `.strict()`, HTTPS media URL sanitization); checkout per-field validators (`src/utils/validation.ts`, `src/utils/sanitize.ts`) |
 | Motion/UI | Framer Motion 12.38, Embla Carousel 8.6 | Scroll animations, drawers, carousels | Shared presets in `src/animations/` (`easeOutQuart` house easing, spring presets, stagger variants) |
 | Email | Nodemailer 9 + Brevo (Sendinblue) SMTP | Verification, password reset, sign-up alert, order confirmation | Silently skips when SMTP env vars absent (dev); send failures are non-fatal except in Better Auth callbacks (which throw) |
 | Testing | Vitest 4.1.9 | Unit + API integration tests | `globals: true`, node env, `@` alias; all DB access mocked via `vi.mock` — no live DB needed; route handlers dynamically imported per-test; coverage via `bun run test:coverage` (istanbul provider — v8 is unsupported under Bun) |
@@ -170,9 +170,10 @@ aurora/
 │  │  ├─ admin.ts                 ← requireRole/requireAdmin/getServerAuthUser (React.cache)
 │  │  ├─ auth.ts                  ← isAdmin (role→ADMIN_EMAILS fallback), buildUserState, fetchUserRole
 │  │  ├─ validation.ts            ← per-field checkout validators (email, ZIP, card, CVC)
+│  │  ├─ schemas.ts               ← strict Zod schemas for admin mutation payloads & media URL sanitization
 │  │  ├─ sanitize.ts              ← HTML-strip + address validation (ShippingAddress, VerifiedItem)
 │  │  ├─ pricing.ts               ← shipping ($25, free >$500) + 8% tax calculator
-│  │  ├─ rateLimit.ts             ← DB sliding-window rate limiter (rate_limits table)
+│  │  ├─ rateLimit.ts             ← DB sliding-window rate limiter (rate_limits table, anti-spoofing)
 │  │  ├─ audit.ts                 ← logAudit() inserts into audit_logs
 │  │  ├─ errors.ts                ← rethrowIfDynamicServerError()
 │  │  ├─ env.ts                   ← requireEnv() type-safe env access
@@ -185,7 +186,7 @@ aurora/
 │  └─ animations/                 ← framer-motion variants + transition presets (house style)
 ├─ scripts/                       ← infra/ops tooling (see §7.4)
 ├─ migrations/                    ← single SQL migration (better-auth setup, orders.user_id UUID→TEXT)
-├─ __tests__/                     ← 24 Vitest files (api/ 13, stores/ 2, utils/ 9)
+├─ __tests__/                     ← 24 Vitest files (api/ 13, stores/ 2, utils/ 10 — 230 tests)
 ├─ docs/                          ← SUMMARY.md (single architecture reference), CODING_STANDARDS.md,
 │                                   performance-analysis.md, BACKEND_DEPLOYMENT.md
 ├─ public/images/                 ← optimized WebP catalog assets (uploaded to InsForge buckets)

@@ -59,7 +59,7 @@ GitHub Actions (`.github/workflows/ci.yml`) runs `bun run lint` + `bun run test`
 ## Testing
 
 - Vitest 4, config in `vitest.config.ts`
-- 24 test files across `__tests__/api/` (13), `__tests__/stores/` (2), `__tests__/utils/` (9)
+- 24 test files across `__tests__/api/` (13), `__tests__/stores/` (2), `__tests__/utils/` (10)
 - Tests mock the DB via `vi.mock` (shared helpers in `__tests__/utils/mocks.ts`) — no live database required
 
 ## .gitignore
