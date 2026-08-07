@@ -20,6 +20,7 @@ import { createAdminClient } from '@insforge/sdk';
 import { getStorageKeyFromUrl } from '@/utils/insforge';
 import { revalidateTag } from 'next/cache';
 import { rethrowIfDynamicServerError } from '@/utils/errors';
+import { updateProductSchema } from '@/utils/schemas';
 
 const admin = createAdminClient({
   baseUrl: process.env.NEXT_PUBLIC_INSFORGE_URL || '',
@@ -64,6 +65,14 @@ export async function PUT(
     if (error) return error;
 
     const body = await request.json();
+    const parseResult = updateProductSchema.safeParse(body);
+    if (!parseResult.success) {
+      return NextResponse.json(
+        { error: parseResult.error.issues[0]?.message || 'Invalid product payload' },
+        { status: 400 }
+      );
+    }
+
     const {
       slug,
       name,
@@ -75,14 +84,10 @@ export async function PUT(
       span,
       aspectRatio,
       description,
-      images = [],
-      sizes = [],
-      details = [],
-    } = body;
-
-    if (!slug || !name || !category || typeof price !== 'number' || !image || !altText || !description) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
+      images,
+      sizes,
+      details,
+    } = parseResult.data;
 
     return await withTransaction(async (client) => {
       // Fetch the existing product to compare fields for audit diff

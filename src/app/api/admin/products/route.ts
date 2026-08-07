@@ -16,6 +16,7 @@ import { requireAdmin } from '@/utils/admin';
 import { logAudit } from '@/utils/audit';
 import { revalidateTag } from 'next/cache';
 import { rethrowIfDynamicServerError } from '@/utils/errors';
+import { createProductSchema } from '@/utils/schemas';
 
 export async function GET(request: Request) {
   try {
@@ -116,6 +117,14 @@ export async function POST(request: Request) {
     if (error) return error;
 
     const body = await request.json();
+    const parseResult = createProductSchema.safeParse(body);
+    if (!parseResult.success) {
+      return NextResponse.json(
+        { error: parseResult.error.issues[0]?.message || 'Invalid product payload' },
+        { status: 400 }
+      );
+    }
+
     const {
       id,
       slug,
@@ -128,14 +137,10 @@ export async function POST(request: Request) {
       span,
       aspectRatio,
       description,
-      images = [],
-      sizes = [],
-      details = [],
-    } = body;
-
-    if (!id || !slug || !name || !category || typeof price !== 'number' || !image || !altText || !description) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
+      images,
+      sizes,
+      details,
+    } = parseResult.data;
 
     return await withTransaction(async (client) => {
       // Check for duplicate ID or slug before attempting insert

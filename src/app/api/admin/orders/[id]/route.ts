@@ -10,8 +10,7 @@ import { pool } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
 import { logAudit } from '@/utils/audit';
 import { rethrowIfDynamicServerError } from '@/utils/errors';
-
-const VALID_STATUSES = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
+import { updateOrderStatusSchema } from '@/utils/schemas';
 
 export async function PATCH(
   request: Request,
@@ -23,11 +22,12 @@ export async function PATCH(
     if (error) return error;
 
     const body = await request.json();
-    const { status } = body;
-
-    if (!status || !VALID_STATUSES.includes(status)) {
+    const parseResult = updateOrderStatusSchema.safeParse(body);
+    if (!parseResult.success) {
       return NextResponse.json({ error: 'Invalid or missing status' }, { status: 400 });
     }
+
+    const { status } = parseResult.data;
 
     const { rows: existing } = await pool.query(
       'SELECT status FROM orders WHERE id = $1', [id]
