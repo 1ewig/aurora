@@ -68,14 +68,14 @@ export function DesignerStory({ imageUrl }: DesignerStoryProps) {
 
         <motion.div
           variants={fadeInUp}
-          className="mt-10 border-t border-border-subtle pt-8 w-full"
+          className="mt-10 border-t border-border-subtle pt-8 w-full flex justify-center lg:justify-start"
         >
-          <p className="font-display text-lg text-text-primary italic">
-            — Elena Voss
-          </p>
-          <p className="text-text-muted text-sm mt-1">
-            Founder & Creative Director, Aurora
-          </p>
+          <Link href="/story">
+            <button className="px-6 py-3 rounded-full border border-border-medium text-text-primary text-sm font-medium hover:border-text-primary hover:bg-bg-secondary transition-colors cursor-pointer inline-flex items-center gap-2">
+              <span>Read The Full Story</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </Link>
         </motion.div>
       </motion.div>
 
@@ -103,13 +103,14 @@ export function DesignerStory({ imageUrl }: DesignerStoryProps) {
             mixBlendMode: "multiply",
           }}
         />
-        {/* Read The Full Story button overlay on bottom right */}
-        <div className="absolute bottom-8 right-8 z-20">
-          <Link href="/story">
-            <button className="px-5 py-2 rounded-full border border-white/50 text-white text-sm font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors cursor-pointer">
-              Read The Full Story →
-            </button>
-          </Link>
+        {/* Signature overlay on bottom right */}
+        <div className="absolute bottom-8 right-8 z-20 text-right backdrop-blur-sm bg-black/30 border border-white/10 px-5 py-3 rounded-2xl">
+          <p className="font-display text-base sm:text-lg text-white italic">
+            — Elena Voss
+          </p>
+          <p className="text-white/80 text-xs mt-0.5 tracking-wide">
+            Founder & Creative Director, Aurora
+          </p>
         </div>
       </div>
     </section>
