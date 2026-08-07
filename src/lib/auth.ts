@@ -124,7 +124,7 @@ export const auth = betterAuth({
   advanced: {
     useSecureCookies: process.env.NODE_ENV === 'production',
     ipAddress: {
-      ipAddressHeaders: ['x-forwarded-for'],
+      ipAddressHeaders: ['x-real-ip', 'cf-connecting-ip', 'x-vercel-forwarded-for', 'x-forwarded-for'],
     },
   },
 

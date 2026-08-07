@@ -9,22 +9,40 @@ import { type NextRequest } from 'next/server';
 import { pool } from '@/utils/db';
 
 /**
- * Extracts the real client IP address from request headers.
- * Prefers x-forwarded-for (first entry), falling back to x-real-ip or req.ip.
+ * Extracts the real client IP address from request headers safely.
+ * Prefers trusted single-source edge headers (x-real-ip, cf-connecting-ip,
+ * x-vercel-forwarded-for) before falling back to x-forwarded-for or req.ip.
  */
 export function getClientIp(req: NextRequest): string {
-  const forwardedFor = req.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    const clientIp = forwardedFor.split(',')[0].trim();
-    if (clientIp) return clientIp;
-  }
+  // 1. Direct reverse-proxy headers (cannot be prepended by client spoofing)
+  const realIp =
+    req.headers.get('x-real-ip') ||
+    req.headers.get('cf-connecting-ip') ||
+    req.headers.get('x-vercel-forwarded-for');
 
-  const realIp = req.headers.get('x-real-ip');
   if (realIp && realIp.trim()) {
     return realIp.trim();
   }
 
-  return (req as any).ip || '127.0.0.1';
+  // 2. Next.js server / edge request IP if present
+  const nextIp = (req as any).ip;
+  if (nextIp && typeof nextIp === 'string' && nextIp.trim()) {
+    return nextIp.trim();
+  }
+
+  // 3. Forwarded header fallback
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const parts = forwardedFor
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean);
+    if (parts.length > 0) {
+      return parts[0];
+    }
+  }
+
+  return '127.0.0.1';
 }
 
 export async function rateLimit(ip: string, route: string, maxRequests: number): Promise<boolean> {

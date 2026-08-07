@@ -12,6 +12,7 @@ import { pool } from '@/utils/db';
 import { requireAdmin } from '@/utils/admin';
 import { logAudit } from '@/utils/audit';
 import { rethrowIfDynamicServerError } from '@/utils/errors';
+import { updateUserSchema } from '@/utils/schemas';
 
 export async function GET(
   request: Request,
@@ -63,23 +64,30 @@ export async function PATCH(
     if (error) return error;
 
     const body = await request.json();
+    const parseResult = updateUserSchema.safeParse(body);
+    if (!parseResult.success) {
+      const issue = parseResult.error.issues[0];
+      const isRoleIssue = issue?.path?.includes('role');
+      return NextResponse.json(
+        { error: isRoleIssue ? 'Invalid role' : (issue?.message || 'Invalid user payload') },
+        { status: 400 }
+      );
+    }
+
+    const validatedData = parseResult.data;
     const allowedFields = ['name', 'emailVerified', 'role'] as const;
     const updates: string[] = [];
     const values: any[] = [];
     let idx = 1;
 
-    if ('role' in body && !['user', 'admin'].includes(body.role)) {
-      return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
-    }
-
     for (const field of allowedFields) {
-      if (field in body) {
+      if (field in validatedData && validatedData[field] !== undefined) {
         if (field === 'emailVerified') {
           updates.push(`"emailVerified" = $${idx}`);
-          values.push(body[field] === true || body[field] === 'true');
+          values.push(validatedData[field] === true || validatedData[field] === 'true');
         } else {
           updates.push(`"${field}" = $${idx}`);
-          values.push(body[field]);
+          values.push(validatedData[field]);
         }
         idx++;
       }
@@ -89,7 +97,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
     }
 
-    const changedFields = Object.keys(body).filter(k => allowedFields.includes(k as any));
+    const changedFields = Object.keys(validatedData).filter(k => allowedFields.includes(k as any));
     const oldResult = await pool.query(
       `SELECT name, email, "emailVerified", role FROM better_auth."user" WHERE id = $1`,
       [id]

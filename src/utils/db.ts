@@ -18,6 +18,12 @@ if (!connectionString) {
   console.warn("Warning: DATABASE_URL environment variable is missing.");
 }
 
+function getCleanConnectionString(url?: string): string | undefined {
+  if (!url) return undefined;
+  // Normalize sslmode parameter to prevent pg-connection-string libpq deprecation warnings
+  return url.replace(/sslmode=(require|prefer|verify-ca)/gi, 'sslmode=verify-full');
+}
+
 function getSslConfig() {
   if (!connectionString) return undefined;
 
@@ -42,7 +48,7 @@ function getSslConfig() {
  * while supporting cloud-hosted Postgres requiring unverified SSL mode.
  */
 export const pool = new Pool({
-  connectionString,
+  connectionString: getCleanConnectionString(connectionString),
   ssl: getSslConfig(),
   // 1s idle timeout prevents build from hanging on open connections
   idleTimeoutMillis: 1000,

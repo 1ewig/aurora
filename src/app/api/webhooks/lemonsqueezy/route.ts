@@ -78,7 +78,6 @@ export async function POST(req: NextRequest) {
     const lsEventId = payload.data?.id;
 
     console.log(`[LS Webhook] Received event: ${eventName} (Event ID: ${lsEventId})`);
-    console.log("[LS Webhook] Meta data:", JSON.stringify(payload.meta, null, 2));
 
     if (!lsEventId) {
       return NextResponse.json({ error: "Missing event ID." }, { status: 400 });
