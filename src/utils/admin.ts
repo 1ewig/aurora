@@ -19,7 +19,7 @@ import { cache } from "react";
 import { auth } from "@/lib/auth";
 import { pool } from "@/utils/db";
 import { headers } from "next/headers";
-import { NextResponse } from "next/server";
+import { connection, NextResponse } from "next/server";
 import { isAdmin } from "@/utils/auth";
 import { rethrowIfDynamicServerError } from "@/utils/errors";
 import type { User } from "@/stores/useAuthStore";
@@ -100,6 +100,12 @@ export const requireAdmin = cache(
  * Returns a client-safe User object or null if unauthenticated.
  */
 export const getServerAuthUser = cache(async (): Promise<User | null> => {
+  try {
+    await connection();
+  } catch {
+    // Tolerated outside of Next.js request store (e.g. Vitest unit tests)
+  }
+
   let session;
   try {
     session = await auth.api.getSession({ headers: await headers() });

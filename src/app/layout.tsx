@@ -83,7 +83,9 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <AuthInitializer>{children}</AuthInitializer>
           </Suspense>
-          <Analytics />
+          <Suspense fallback={null}>
+            <Analytics />
+          </Suspense>
         </Providers>
       </body>
     </html>
