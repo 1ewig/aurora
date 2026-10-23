@@ -5,13 +5,14 @@
  * images, sizes, and description in a single query.
  */
 
-import { NextResponse } from 'next/server';
-import { pool } from '@/utils/db';
-import { cacheLife, cacheTag } from 'next/cache';
-import { rethrowIfDynamicServerError } from '@/utils/errors';
+import { NextResponse } from "next/server";
+import { pool } from "@/utils/db";
+import { cacheLife, cacheTag } from "next/cache";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
 
 const fetchProductDetail = async (slug: string) => {
-  const result = await pool.query(`
+  const result = await pool.query(
+    `
     SELECT 
       p.id, 
       p.slug, 
@@ -41,31 +42,30 @@ const fetchProductDetail = async (slug: string) => {
       ) as details
     FROM products p
     WHERE LOWER(p.slug) = LOWER($1)
-  `, [slug]);
+  `,
+    [slug],
+  );
 
   return result.rows[0] || null;
 };
 
 async function getCachedProductDetail(slug: string) {
-  'use cache';
+  "use cache";
   cacheLife({ stale: 300, revalidate: 300 });
-  cacheTag('products');
+  cacheTag("products");
   return fetchProductDetail(slug);
 }
 
 export async function GET(
   _request: Request,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
     const { slug } = await params;
     const row = await getCachedProductDetail(slug);
 
     if (!row) {
-      return NextResponse.json(
-        { error: 'Product not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
     const product = {
@@ -90,8 +90,8 @@ export async function GET(
     rethrowIfDynamicServerError(error);
     console.error("Failed to fetch product details:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch product details' },
-      { status: 500 }
+      { error: "Failed to fetch product details" },
+      { status: 500 },
     );
   }
 }

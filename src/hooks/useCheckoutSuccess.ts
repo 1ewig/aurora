@@ -53,7 +53,11 @@ export function useCheckoutSuccess() {
       return null;
     }
   });
-  const isLoaded = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const isLoaded = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
   useEffect(() => {
     // Clear cart immediately — items are now a confirmed order, not in a cart
@@ -78,7 +82,9 @@ export function useCheckoutSuccess() {
 
     async function poll() {
       try {
-        const res = await fetch(`/api/orders?lsOrderId=${encodeURIComponent(orderId || "")}`);
+        const res = await fetch(
+          `/api/orders?lsOrderId=${encodeURIComponent(orderId || "")}`,
+        );
         if (res.ok) {
           const data = await res.json();
           if (data?.orderNumber) {

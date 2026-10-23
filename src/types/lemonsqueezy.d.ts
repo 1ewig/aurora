@@ -12,9 +12,7 @@ interface LemonSqueezyUrlObject {
 
 interface LemonSqueezyObject {
   Url: LemonSqueezyUrlObject;
-  Setup: (config: {
-    eventHandler: (event: { event: string }) => void;
-  }) => void;
+  Setup: (config: { eventHandler: (event: { event: string }) => void }) => void;
 }
 
 declare global {

@@ -15,23 +15,28 @@
  * without a manual refetch.
  */
 
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import type {
   DashboardMetrics,
   RecentOrder,
   OrderData,
   ProductData,
-} from '@/stores/useAdminStore';
+} from "@/stores/useAdminStore";
 
 // ── Dashboard ───────────────────────────────────────────────────────────
 
 /** Fetches admin dashboard metrics and recent orders. */
 export function useAdminDashboardQuery() {
   return useQuery<{ metrics: DashboardMetrics; recentOrders: RecentOrder[] }>({
-    queryKey: ['admin', 'dashboard'],
+    queryKey: ["admin", "dashboard"],
     queryFn: async () => {
-      const res = await fetch('/api/admin/dashboard');
-      if (!res.ok) throw new Error('Failed to load dashboard metrics');
+      const res = await fetch("/api/admin/dashboard");
+      if (!res.ok) throw new Error("Failed to load dashboard metrics");
       return res.json();
     },
     staleTime: 30_000,
@@ -113,16 +118,16 @@ interface AdminUsersParams {
 /** Fetches paginated products for inventory management. */
 export function useAdminProductsQuery(params: AdminProductsParams = {}) {
   return useQuery({
-    queryKey: ['admin', 'products', params],
+    queryKey: ["admin", "products", params],
     queryFn: async (): Promise<AdminPaginatedProductsResponse> => {
       const sp = new URLSearchParams();
-      if (params.page) sp.set('page', String(params.page));
-      if (params.limit) sp.set('limit', String(params.limit));
-      if (params.search) sp.set('search', params.search);
-      if (params.category) sp.set('category', params.category);
+      if (params.page) sp.set("page", String(params.page));
+      if (params.limit) sp.set("limit", String(params.limit));
+      if (params.search) sp.set("search", params.search);
+      if (params.category) sp.set("category", params.category);
       const qs = sp.toString();
-      const res = await fetch(`/api/admin/products${qs ? `?${qs}` : ''}`);
-      if (!res.ok) throw new Error('Failed to load products');
+      const res = await fetch(`/api/admin/products${qs ? `?${qs}` : ""}`);
+      if (!res.ok) throw new Error("Failed to load products");
       return res.json();
     },
     placeholderData: keepPreviousData,
@@ -133,16 +138,17 @@ export function useAdminProductsQuery(params: AdminProductsParams = {}) {
 /** Fetches paginated orders for admin order processing. */
 export function useAdminOrdersQuery(params: AdminOrdersParams = {}) {
   return useQuery({
-    queryKey: ['admin', 'orders', params],
+    queryKey: ["admin", "orders", params],
     queryFn: async (): Promise<PaginatedOrdersResponse> => {
       const sp = new URLSearchParams();
-      if (params.page) sp.set('page', String(params.page));
-      if (params.limit) sp.set('limit', String(params.limit));
-      if (params.search) sp.set('search', params.search);
-      if (params.status && params.status !== 'all') sp.set('status', params.status);
+      if (params.page) sp.set("page", String(params.page));
+      if (params.limit) sp.set("limit", String(params.limit));
+      if (params.search) sp.set("search", params.search);
+      if (params.status && params.status !== "all")
+        sp.set("status", params.status);
       const qs = sp.toString();
-      const res = await fetch(`/api/admin/orders${qs ? `?${qs}` : ''}`);
-      if (!res.ok) throw new Error('Failed to load orders');
+      const res = await fetch(`/api/admin/orders${qs ? `?${qs}` : ""}`);
+      if (!res.ok) throw new Error("Failed to load orders");
       return res.json();
     },
     placeholderData: keepPreviousData,
@@ -153,18 +159,18 @@ export function useAdminOrdersQuery(params: AdminOrdersParams = {}) {
 /** Fetches paginated users for admin user management. */
 export function useAdminUsersQuery(params: AdminUsersParams = {}) {
   return useQuery({
-    queryKey: ['admin', 'users', params],
+    queryKey: ["admin", "users", params],
     queryFn: async (): Promise<PaginatedUsersResponse> => {
       const sp = new URLSearchParams();
-      if (params.page) sp.set('page', String(params.page));
-      if (params.limit) sp.set('limit', String(params.limit));
-      if (params.search) sp.set('search', params.search);
-      if (params.verified) sp.set('verified', params.verified);
-      if (params.sortBy) sp.set('sortBy', params.sortBy);
-      if (params.sortDir) sp.set('sortDir', params.sortDir);
+      if (params.page) sp.set("page", String(params.page));
+      if (params.limit) sp.set("limit", String(params.limit));
+      if (params.search) sp.set("search", params.search);
+      if (params.verified) sp.set("verified", params.verified);
+      if (params.sortBy) sp.set("sortBy", params.sortBy);
+      if (params.sortDir) sp.set("sortDir", params.sortDir);
       const qs = sp.toString();
-      const res = await fetch(`/api/admin/users${qs ? `?${qs}` : ''}`);
-      if (!res.ok) throw new Error('Failed to load users');
+      const res = await fetch(`/api/admin/users${qs ? `?${qs}` : ""}`);
+      if (!res.ok) throw new Error("Failed to load users");
       return res.json();
     },
     placeholderData: keepPreviousData,
@@ -175,11 +181,11 @@ export function useAdminUsersQuery(params: AdminUsersParams = {}) {
 /** Fetches sessions for a specific user (admin user detail modal). */
 export function useAdminUserSessionsQuery(userId: string | null) {
   return useQuery({
-    queryKey: ['admin', 'users', userId, 'sessions'],
+    queryKey: ["admin", "users", userId, "sessions"],
     queryFn: async () => {
       if (!userId) return [];
       const res = await fetch(`/api/admin/users/${userId}?include=sessions`);
-      if (!res.ok) throw new Error('Failed to load user sessions');
+      if (!res.ok) throw new Error("Failed to load user sessions");
       const data = await res.json();
       return data.sessions || [];
     },
@@ -200,7 +206,13 @@ export function useAdminUserSessionsQuery(userId: string | null) {
 export function useUpdateOrderStatusMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ orderId, status }: { orderId: string; status: string }) => {
+    mutationFn: async ({
+      orderId,
+      status,
+    }: {
+      orderId: string;
+      status: string;
+    }) => {
       const res = await fetch(`/api/admin/orders/${orderId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -213,8 +225,8 @@ export function useUpdateOrderStatusMutation() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] });
-      queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "orders"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "dashboard"] });
     },
   });
 }
@@ -228,7 +240,13 @@ export function useUpdateOrderStatusMutation() {
 export function useSaveProductMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ product, id }: { product: Partial<ProductData>; id?: string }) => {
+    mutationFn: async ({
+      product,
+      id,
+    }: {
+      product: Partial<ProductData>;
+      id?: string;
+    }) => {
       const url = id ? `/api/admin/products/${id}` : "/api/admin/products";
       const method = id ? "PUT" : "POST";
       const res = await fetch(url, {
@@ -244,9 +262,9 @@ export function useSaveProductMutation() {
     },
     onSuccess: () => {
       // Invalidate both admin and public product caches
-      queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-      queryClient.invalidateQueries({ queryKey: ['product'] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
     },
   });
 }
@@ -256,7 +274,9 @@ export function useDeleteProductMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/products/${id}`, {
+        method: "DELETE",
+      });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Failed to delete product");
@@ -264,9 +284,9 @@ export function useDeleteProductMutation() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
-      queryClient.invalidateQueries({ queryKey: ['products'] });
-      queryClient.invalidateQueries({ queryKey: ['product'] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
     },
   });
 }
@@ -275,7 +295,13 @@ export function useDeleteProductMutation() {
 export function useToggleUserVerifyMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ userId, emailVerified }: { userId: string; emailVerified: boolean }) => {
+    mutationFn: async ({
+      userId,
+      emailVerified,
+    }: {
+      userId: string;
+      emailVerified: boolean;
+    }) => {
       const res = await fetch(`/api/admin/users/${userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -285,7 +311,7 @@ export function useToggleUserVerifyMutation() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
     },
   });
 }
@@ -307,7 +333,7 @@ export function useUpdateUserRoleMutation() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
     },
   });
 }
@@ -341,17 +367,17 @@ interface AdminAuditLogsParams {
 
 export function useAdminAuditLogsQuery(params: AdminAuditLogsParams = {}) {
   return useQuery({
-    queryKey: ['admin', 'audit', params],
+    queryKey: ["admin", "audit", params],
     queryFn: async (): Promise<PaginatedAuditLogsResponse> => {
       const sp = new URLSearchParams();
-      if (params.page) sp.set('page', String(params.page));
-      if (params.limit) sp.set('limit', String(params.limit));
-      if (params.targetType) sp.set('targetType', params.targetType);
-      if (params.action) sp.set('action', params.action);
-      if (params.search) sp.set('search', params.search);
+      if (params.page) sp.set("page", String(params.page));
+      if (params.limit) sp.set("limit", String(params.limit));
+      if (params.targetType) sp.set("targetType", params.targetType);
+      if (params.action) sp.set("action", params.action);
+      if (params.search) sp.set("search", params.search);
       const qs = sp.toString();
-      const res = await fetch(`/api/admin/audit${qs ? `?${qs}` : ''}`);
-      if (!res.ok) throw new Error('Failed to load audit logs');
+      const res = await fetch(`/api/admin/audit${qs ? `?${qs}` : ""}`);
+      if (!res.ok) throw new Error("Failed to load audit logs");
       return res.json();
     },
     placeholderData: keepPreviousData,
@@ -364,7 +390,9 @@ export function useDeleteUserMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (userId: string) => {
-      const res = await fetch(`/api/admin/users/${userId}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: "DELETE",
+      });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || "Failed to delete");
@@ -372,7 +400,7 @@ export function useDeleteUserMutation() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
     },
   });
 }

@@ -16,11 +16,7 @@ interface MobileMenuProps {
   navLinks: Array<{ href: string; label: string }>;
 }
 
-export function MobileMenu({
-  isOpen,
-  onClose,
-  navLinks,
-}: MobileMenuProps) {
+export function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProps) {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -31,8 +27,16 @@ export function MobileMenu({
           exit="exit"
           variants={{
             hidden: { x: "100%", opacity: 0 },
-            visible: { x: 0, opacity: 1, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
-            exit: { x: "100%", opacity: 0, transition: { duration: 0.4, ease: [0.55, 0.06, 0.68, 0.19] } },
+            visible: {
+              x: 0,
+              opacity: 1,
+              transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+            },
+            exit: {
+              x: "100%",
+              opacity: 0,
+              transition: { duration: 0.4, ease: [0.55, 0.06, 0.68, 0.19] },
+            },
           }}
           className="fixed inset-0 z-[55] bg-bg-ink flex flex-col items-start justify-center px-10"
         >
@@ -63,8 +67,6 @@ export function MobileMenu({
                 </SectionLink>
               </motion.li>
             ))}
-            
-
           </motion.ul>
 
           <div className="mt-16">

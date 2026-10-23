@@ -13,7 +13,7 @@ describe("validateField", () => {
 
     it("returns error for invalid email format", () => {
       expect(validateField("email", "not-an-email")).toBe(
-        "Enter a valid email address."
+        "Enter a valid email address.",
       );
     });
 
@@ -33,7 +33,7 @@ describe("validateField", () => {
 
     it("returns error for single character", () => {
       expect(validateField("firstName", "J")).toBe(
-        "First name must be at least 2 characters."
+        "First name must be at least 2 characters.",
       );
     });
   });
@@ -49,7 +49,7 @@ describe("validateField", () => {
 
     it("returns error for single character", () => {
       expect(validateField("lastName", "D")).toBe(
-        "Last name must be at least 2 characters."
+        "Last name must be at least 2 characters.",
       );
     });
   });
@@ -85,45 +85,41 @@ describe("validateField", () => {
 
     it("returns error for empty ZIP", () => {
       expect(validateField("zipCode", "")).toBe(
-        "Postal / ZIP code is required."
+        "Postal / ZIP code is required.",
       );
     });
 
     it("returns error for non-numeric ZIP", () => {
       expect(validateField("zipCode", "ABCDE")).toBe(
-        "Enter a valid ZIP code (e.g. 10001 or 10001-1234)."
+        "Enter a valid ZIP code (e.g. 10001 or 10001-1234).",
       );
     });
 
     it("returns error for too-short ZIP", () => {
       expect(validateField("zipCode", "123")).toBe(
-        "Enter a valid ZIP code (e.g. 10001 or 10001-1234)."
+        "Enter a valid ZIP code (e.g. 10001 or 10001-1234).",
       );
     });
   });
 
   describe("cardNumber", () => {
     it("returns undefined for valid card number", () => {
-      expect(
-        validateField("cardNumber", "4242424242424242")
-      ).toBeUndefined();
+      expect(validateField("cardNumber", "4242424242424242")).toBeUndefined();
     });
 
     it("allows spaces in input", () => {
       expect(
-        validateField("cardNumber", "4242 4242 4242 4242")
+        validateField("cardNumber", "4242 4242 4242 4242"),
       ).toBeUndefined();
     });
 
     it("returns error for empty card number", () => {
-      expect(validateField("cardNumber", "")).toBe(
-        "Card number is required."
-      );
+      expect(validateField("cardNumber", "")).toBe("Card number is required.");
     });
 
     it("returns error for too-short number", () => {
       expect(validateField("cardNumber", "123")).toBe(
-        "Enter a valid card number."
+        "Enter a valid card number.",
       );
     });
   });
@@ -136,26 +132,22 @@ describe("validateField", () => {
 
     it("returns error for empty expiry", () => {
       expect(validateField("cardExpiry", "")).toBe(
-        "Expiration date is required."
+        "Expiration date is required.",
       );
     });
 
     it("returns error for wrong format", () => {
       expect(validateField("cardExpiry", "12-28")).toBe(
-        "Use MM/YY format (e.g. 12/28)."
+        "Use MM/YY format (e.g. 12/28).",
       );
     });
 
     it("returns error for invalid month", () => {
-      expect(validateField("cardExpiry", "13/28")).toBe(
-        "Month must be 01–12."
-      );
+      expect(validateField("cardExpiry", "13/28")).toBe("Month must be 01–12.");
     });
 
     it("returns error for zero month", () => {
-      expect(validateField("cardExpiry", "00/28")).toBe(
-        "Month must be 01–12."
-      );
+      expect(validateField("cardExpiry", "00/28")).toBe("Month must be 01–12.");
     });
 
     it("returns error for expired date", () => {
@@ -178,14 +170,12 @@ describe("validateField", () => {
 
     it("returns error for non-numeric CVC", () => {
       expect(validateField("cardCVC", "abc")).toBe(
-        "CVC must be 3 or 4 digits."
+        "CVC must be 3 or 4 digits.",
       );
     });
 
     it("returns error for 2-digit CVC", () => {
-      expect(validateField("cardCVC", "12")).toBe(
-        "CVC must be 3 or 4 digits."
-      );
+      expect(validateField("cardCVC", "12")).toBe("CVC must be 3 or 4 digits.");
     });
   });
 

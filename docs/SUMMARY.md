@@ -18,21 +18,21 @@
 
 ## 2. Technical Stack & Infrastructure
 
-| Layer | Technology | Key Responsibility & Configuration |
-| :--- | :--- | :--- |
-| **Framework** | Next.js 16.2 (App Router) | React Server Components, Route Handlers, `'use cache'` directives (`cacheComponents: true`). |
-| **UI Runtime** | React 19.2 | Server Components default; async `params`/`headers` promises; `<Suspense>` streaming boundaries. |
-| **Language & Tooling** | TypeScript 5.9 + Bun | Strict typing (`@/*` alias); Bun is the sole package manager and task runner across dev/build/test. |
-| **Database** | PostgreSQL (via InsForge BaaS) | Raw connection pooling (`pg` Pool in `@/utils/db`), parameterized queries (`$1, $2`). No ORM. |
-| **BaaS / Storage** | InsForge (`@insforge/sdk`) | Postgres hosting, HS256 JWT bridge, and 5 S3 buckets (`product/lookbook/editorial/material/category-media`). |
-| **Authentication** | Better Auth 1.6 (email/password) | Own `better_auth` schema and pool, edge session validation, sliding 7-day cookie windows. |
-| **Payments** | Lemon Squeezy (REST API + Webhooks) | Dynamic checkout session generation and cryptographically verified webhook order fulfillment. |
-| **Client State** | Zustand 5 | Cart persisted in `localStorage` (`useCartStore`); SSR-safe React Context auth store (`useAuthStore`). |
-| **Server State** | TanStack React Query 5 | Server cache: 5m stale / 10m GC. Admin queries use `staleTime: 0` + `keepPreviousData`. |
-| **Styling & Motion** | Tailwind CSS 4 + Framer Motion 12 | Minimalist luxury design tokens (`@theme`); Framer Motion entrance and drawer transitions. |
-| **Asset Pipeline** | Sharp 0.34 (`optimize-images.ts`) | Offline WebP conversion for committed assets; Next.js `remotePatterns` for runtime AVIF/WebP. |
-| **Email Transport** | Nodemailer 9 + Brevo SMTP | Transactional verification and order emails; silent-skip in local development when unconfigured. |
-| **Testing & Linting** | Vitest 4 + Oxlint | Unit/API integration tests with mocked DB (`vi.mock`); ultra-fast Rust-based Oxlint configuration. |
+| Layer                  | Technology                          | Key Responsibility & Configuration                                                                           |
+| :--------------------- | :---------------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| **Framework**          | Next.js 16.2 (App Router)           | React Server Components, Route Handlers, `'use cache'` directives (`cacheComponents: true`).                 |
+| **UI Runtime**         | React 19.2                          | Server Components default; async `params`/`headers` promises; `<Suspense>` streaming boundaries.             |
+| **Language & Tooling** | TypeScript 5.9 + Bun                | Strict typing (`@/*` alias); Bun is the sole package manager and task runner across dev/build/test.          |
+| **Database**           | PostgreSQL (via InsForge BaaS)      | Raw connection pooling (`pg` Pool in `@/utils/db`), parameterized queries (`$1, $2`). No ORM.                |
+| **BaaS / Storage**     | InsForge (`@insforge/sdk`)          | Postgres hosting, HS256 JWT bridge, and 5 S3 buckets (`product/lookbook/editorial/material/category-media`). |
+| **Authentication**     | Better Auth 1.6 (email/password)    | Own `better_auth` schema and pool, edge session validation, sliding 7-day cookie windows.                    |
+| **Payments**           | Lemon Squeezy (REST API + Webhooks) | Dynamic checkout session generation and cryptographically verified webhook order fulfillment.                |
+| **Client State**       | Zustand 5                           | Cart persisted in `localStorage` (`useCartStore`); SSR-safe React Context auth store (`useAuthStore`).       |
+| **Server State**       | TanStack React Query 5              | Server cache: 5m stale / 10m GC. Admin queries use `staleTime: 0` + `keepPreviousData`.                      |
+| **Styling & Motion**   | Tailwind CSS 4 + Framer Motion 12   | Minimalist luxury design tokens (`@theme`); Framer Motion entrance and drawer transitions.                   |
+| **Asset Pipeline**     | Sharp 0.34 (`optimize-images.ts`)   | Offline WebP conversion for committed assets; Next.js `remotePatterns` for runtime AVIF/WebP.                |
+| **Email Transport**    | Nodemailer 9 + Brevo SMTP           | Transactional verification and order emails; silent-skip in local development when unconfigured.             |
+| **Testing & Linting**  | Vitest 4 + Oxlint                   | Unit/API integration tests with mocked DB (`vi.mock`); ultra-fast Rust-based Oxlint configuration.           |
 
 ---
 
@@ -53,12 +53,12 @@ RSC Page (src/app/) ──renders──▶ XxxClient.tsx (Client Orchestrator)
 
 ### Layer Contracts & Boundaries
 
-| Layer | Primary Location | Permitted Imports & Logic | Forbidden Patterns |
-| :--- | :--- | :--- | :--- |
-| **1. Server Page** | `src/app/**/page.tsx` | Direct SQL via `db.ts`, cached accessors, SEO metadata exports | Store/hook imports, client event listeners |
-| **2. Client Orchestrator** | `src/components/**/XxxClient.tsx` | TanStack Query hooks, Zustand stores, layout assembly | Direct DB queries, raw SQL, bypassing hooks |
-| **3. Hooks & Stores** | `src/hooks/`, `src/stores/` | Query keys, mutation functions, client persistence logic | JSX presentation markup, direct DOM mutations |
-| **4. Presentational** | `src/components/*` | Pure visual JSX, Framer Motion animations, prop callbacks | Store or hook imports (even if `"use client"`) |
+| Layer                      | Primary Location                  | Permitted Imports & Logic                                      | Forbidden Patterns                             |
+| :------------------------- | :-------------------------------- | :------------------------------------------------------------- | :--------------------------------------------- |
+| **1. Server Page**         | `src/app/**/page.tsx`             | Direct SQL via `db.ts`, cached accessors, SEO metadata exports | Store/hook imports, client event listeners     |
+| **2. Client Orchestrator** | `src/components/**/XxxClient.tsx` | TanStack Query hooks, Zustand stores, layout assembly          | Direct DB queries, raw SQL, bypassing hooks    |
+| **3. Hooks & Stores**      | `src/hooks/`, `src/stores/`       | Query keys, mutation functions, client persistence logic       | JSX presentation markup, direct DOM mutations  |
+| **4. Presentational**      | `src/components/*`                | Pure visual JSX, Framer Motion animations, prop callbacks      | Store or hook imports (even if `"use client"`) |
 
 - **Server-to-Client Hydration:** Server pages pass `initialData` into client orchestrators to eliminate client-side fetching waterfalls and ensure instant first-render displays.
 - **Streaming & Suspense Boundaries:** The root layout wraps `AuthInitializer` in `<Suspense fallback={null}>` so session verification never blocks initial HTML streaming. Checkout success wraps query consumers in `<Suspense>` to prevent whole-page CSR bailouts.
@@ -110,19 +110,19 @@ Checkout follows an atomic, pessimistic locking workflow to guarantee stock cons
 
 The App Router tree is partitioned into four explicit route groups:
 
-| Route Group | Path Scope | Access Level | Gate Mechanism | SEO Policy |
-| :--- | :--- | :--- | :--- | :--- |
-| **Storefront `(store)`** | `/`, `/products/*`, `/story`, `/checkout/*` | Public / Guest | None | Indexed, semantic metadata, JSON-LD |
-| **Auth Flows `(auth)`** | `/login`, `/register`, `/verify`, `/reset-password` | Public / Guest | Redirect if authed | `robots: noindex` |
-| **Customer `(user)`** | `/profile`, `/profile/orders` | Authed Customer | Edge proxy (`proxy.ts`) + Layout gate | `robots: noindex` |
-| **Admin `(admin)`** | `/admin/dashboard`, `/users`, `/orders`, `/inventory` | Admin (Role $\ge$ 10) | Edge proxy + Layout gate + API checks | `robots: noindex` |
+| Route Group              | Path Scope                                            | Access Level          | Gate Mechanism                        | SEO Policy                          |
+| :----------------------- | :---------------------------------------------------- | :-------------------- | :------------------------------------ | :---------------------------------- |
+| **Storefront `(store)`** | `/`, `/products/*`, `/story`, `/checkout/*`           | Public / Guest        | None                                  | Indexed, semantic metadata, JSON-LD |
+| **Auth Flows `(auth)`**  | `/login`, `/register`, `/verify`, `/reset-password`   | Public / Guest        | Redirect if authed                    | `robots: noindex`                   |
+| **Customer `(user)`**    | `/profile`, `/profile/orders`                         | Authed Customer       | Edge proxy (`proxy.ts`) + Layout gate | `robots: noindex`                   |
+| **Admin `(admin)`**      | `/admin/dashboard`, `/users`, `/orders`, `/inventory` | Admin (Role $\ge$ 10) | Edge proxy + Layout gate + API checks | `robots: noindex`                   |
 
 - **API Route Tiers:**
-  - *Public Read:* `/api/products*`, `/api/categories`, `/api/editorial`, `/api/landing` (cached via Next.js 16 `'use cache'`).
-  - *Public Mutation:* `/api/checkout/session`, `/api/newsletter` (rate-limited via DB sliding-window).
-  - *Session-Authed:* `/api/auth/[...all]`, `/api/auth/role`, `/api/orders` (customer history or guest lookup).
-  - *Admin-Guarded:* `/api/admin/*` and `/api/insforge-token` (require admin role level 10 + audit logging).
-  - *Webhooks:* `/api/webhooks/lemonsqueezy` (cryptographic HMAC-SHA256 signature verification).
+  - _Public Read:_ `/api/products*`, `/api/categories`, `/api/editorial`, `/api/landing` (cached via Next.js 16 `'use cache'`).
+  - _Public Mutation:_ `/api/checkout/session`, `/api/newsletter` (rate-limited via DB sliding-window).
+  - _Session-Authed:_ `/api/auth/[...all]`, `/api/auth/role`, `/api/orders` (customer history or guest lookup).
+  - _Admin-Guarded:_ `/api/admin/*` and `/api/insforge-token` (require admin role level 10 + audit logging).
+  - _Webhooks:_ `/api/webhooks/lemonsqueezy` (cryptographic HMAC-SHA256 signature verification).
 - **Caching Backbone:** Public endpoints leverage Next.js 16 `'use cache'` paired with `cacheLife({ stale, revalidate })` and `cacheTag(...)`: `landing` (60s), `products` (300s), `categories` (300s), `editorial` (600s).
 - **Cache Invalidation:** Admin catalog mutations immediately invalidate server caches via `revalidateTag('products', { expire: 0 })` and `revalidateTag('landing', { expire: 0 })`.
 

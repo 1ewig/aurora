@@ -19,7 +19,8 @@ import {
 } from "@/hooks/queries";
 
 export type UserRow = AdminUserRow;
-export type SortKey = "name" | "email" | "emailVerified" | "createdAt" | "sessionCount";
+export type SortKey =
+  "name" | "email" | "emailVerified" | "createdAt" | "sessionCount";
 export type FilterVerified = "all" | "verified" | "unverified";
 
 export function useUsersManagement(
@@ -34,7 +35,7 @@ export function useUsersManagement(
     page,
     limit: 20,
     search,
-    verified: verified === 'all' ? undefined : verified,
+    verified: verified === "all" ? undefined : verified,
     sortBy,
     sortDir,
   });
@@ -48,14 +49,20 @@ export function useUsersManagement(
   const [updatingVerify, setUpdatingVerify] = useState<string | null>(null);
   const [updatingRole, setUpdatingRole] = useState<string | null>(null);
 
-  const { data: sessions = [], isLoading: sessionsLoading } = useAdminUserSessionsQuery(selectedUser?.id ?? null);
+  const { data: sessions = [], isLoading: sessionsLoading } =
+    useAdminUserSessionsQuery(selectedUser?.id ?? null);
 
   const handleToggleVerify = async (user: UserRow, newStatus: boolean) => {
     setUpdatingVerify(user.id);
     try {
-      await toggleVerifyMutation.mutateAsync({ userId: user.id, emailVerified: newStatus });
+      await toggleVerifyMutation.mutateAsync({
+        userId: user.id,
+        emailVerified: newStatus,
+      });
       if (selectedUser?.id === user.id) {
-        setSelectedUser((prev) => (prev ? { ...prev, emailVerified: newStatus } : null));
+        setSelectedUser((prev) =>
+          prev ? { ...prev, emailVerified: newStatus } : null,
+        );
       }
     } catch (err: any) {
       alert(err.message || "Failed to update verification status");

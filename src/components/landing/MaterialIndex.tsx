@@ -41,7 +41,8 @@ export function MaterialIndex({ materials }: MaterialIndexProps) {
           </h2>
         </div>
         <p className="text-text-secondary font-light text-sm md:text-base max-w-sm mt-4 md:mt-0 leading-relaxed text-center md:text-left">
-          Noble heritage fabrics chosen with intention and crafted to age with grace.
+          Noble heritage fabrics chosen with intention and crafted to age with
+          grace.
         </p>
       </motion.div>
 
@@ -53,10 +54,7 @@ export function MaterialIndex({ materials }: MaterialIndexProps) {
         className="grid grid-cols-1 md:grid-cols-3 gap-8"
       >
         {materials.map((material) => (
-          <motion.div
-            key={material.name}
-            variants={scaleIn}
-          >
+          <motion.div key={material.name} variants={scaleIn}>
             <FeatureCard
               image={material.image}
               alt={`Macro texture close-up of ${material.name}`}

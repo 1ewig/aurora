@@ -16,7 +16,11 @@ interface SizeGuideModalProps {
 }
 
 /** Renders an animated size-guide modal with apparel or belt sizing tables and a unit switcher. */
-export function SizeGuideModal({ isOpen, onClose, category }: SizeGuideModalProps) {
+export function SizeGuideModal({
+  isOpen,
+  onClose,
+  category,
+}: SizeGuideModalProps) {
   const [unit, setUnit] = useState<"in" | "cm">("cm");
 
   useBodyScrollLock(isOpen);
@@ -27,19 +31,89 @@ export function SizeGuideModal({ isOpen, onClose, category }: SizeGuideModalProp
 
   // Sizing data
   const apparelSizes = [
-    { size: "XS", chestIn: "32-34", chestCm: "81-86", waistIn: "26-28", waistCm: "66-71", hipsIn: "33-35", hipsCm: "84-89" },
-    { size: "S", chestIn: "35-37", chestCm: "89-94", waistIn: "29-31", waistCm: "74-79", hipsIn: "36-38", hipsCm: "91-97" },
-    { size: "M", chestIn: "38-40", chestCm: "97-102", waistIn: "32-34", waistCm: "81-86", hipsIn: "39-41", hipsCm: "99-104" },
-    { size: "L", chestIn: "41-43", chestCm: "104-109", waistIn: "35-37", waistCm: "89-94", hipsIn: "42-44", hipsCm: "107-112" },
-    { size: "XL", chestIn: "44-46", chestCm: "112-117", waistIn: "38-40", waistCm: "97-102", hipsIn: "45-47", hipsCm: "114-119" },
+    {
+      size: "XS",
+      chestIn: "32-34",
+      chestCm: "81-86",
+      waistIn: "26-28",
+      waistCm: "66-71",
+      hipsIn: "33-35",
+      hipsCm: "84-89",
+    },
+    {
+      size: "S",
+      chestIn: "35-37",
+      chestCm: "89-94",
+      waistIn: "29-31",
+      waistCm: "74-79",
+      hipsIn: "36-38",
+      hipsCm: "91-97",
+    },
+    {
+      size: "M",
+      chestIn: "38-40",
+      chestCm: "97-102",
+      waistIn: "32-34",
+      waistCm: "81-86",
+      hipsIn: "39-41",
+      hipsCm: "99-104",
+    },
+    {
+      size: "L",
+      chestIn: "41-43",
+      chestCm: "104-109",
+      waistIn: "35-37",
+      waistCm: "89-94",
+      hipsIn: "42-44",
+      hipsCm: "107-112",
+    },
+    {
+      size: "XL",
+      chestIn: "44-46",
+      chestCm: "112-117",
+      waistIn: "38-40",
+      waistCm: "97-102",
+      hipsIn: "45-47",
+      hipsCm: "114-119",
+    },
   ];
 
   const beltSizes = [
-    { size: "80", lengthIn: "36.5", lengthCm: "93", waistIn: "29-31", waistCm: "74-79" },
-    { size: "85", lengthIn: "38.5", lengthCm: "98", waistIn: "31-33", waistCm: "79-84" },
-    { size: "90", lengthIn: "40.5", lengthCm: "103", waistIn: "33-35", waistCm: "84-89" },
-    { size: "95", lengthIn: "42.5", lengthCm: "108", waistIn: "35-37", waistCm: "89-94" },
-    { size: "100", lengthIn: "44.5", lengthCm: "113", waistIn: "37-39", waistCm: "94-99" },
+    {
+      size: "80",
+      lengthIn: "36.5",
+      lengthCm: "93",
+      waistIn: "29-31",
+      waistCm: "74-79",
+    },
+    {
+      size: "85",
+      lengthIn: "38.5",
+      lengthCm: "98",
+      waistIn: "31-33",
+      waistCm: "79-84",
+    },
+    {
+      size: "90",
+      lengthIn: "40.5",
+      lengthCm: "103",
+      waistIn: "33-35",
+      waistCm: "84-89",
+    },
+    {
+      size: "95",
+      lengthIn: "42.5",
+      lengthCm: "108",
+      waistIn: "35-37",
+      waistCm: "89-94",
+    },
+    {
+      size: "100",
+      lengthIn: "44.5",
+      lengthCm: "113",
+      waistIn: "37-39",
+      waistCm: "94-99",
+    },
   ];
 
   return (
@@ -86,7 +160,11 @@ export function SizeGuideModal({ isOpen, onClose, category }: SizeGuideModalProp
                   stroke="currentColor"
                   className="w-5 h-5"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -132,13 +210,22 @@ export function SizeGuideModal({ isOpen, onClose, category }: SizeGuideModalProp
                     </thead>
                     <tbody className="divide-y divide-border-subtle text-text-secondary">
                       {beltSizes.map((row) => (
-                        <tr key={row.size} className="hover:bg-bg-secondary/40 transition-colors">
-                          <td className="p-3 font-semibold text-text-primary">{row.size}</td>
-                          <td className="p-3">
-                            {unit === "in" ? `${row.waistIn}″` : `${row.waistCm} cm`}
+                        <tr
+                          key={row.size}
+                          className="hover:bg-bg-secondary/40 transition-colors"
+                        >
+                          <td className="p-3 font-semibold text-text-primary">
+                            {row.size}
                           </td>
                           <td className="p-3">
-                            {unit === "in" ? `${row.lengthIn}″` : `${row.lengthCm} cm`}
+                            {unit === "in"
+                              ? `${row.waistIn}″`
+                              : `${row.waistCm} cm`}
+                          </td>
+                          <td className="p-3">
+                            {unit === "in"
+                              ? `${row.lengthIn}″`
+                              : `${row.lengthCm} cm`}
                           </td>
                         </tr>
                       ))}
@@ -158,16 +245,27 @@ export function SizeGuideModal({ isOpen, onClose, category }: SizeGuideModalProp
                     </thead>
                     <tbody className="divide-y divide-border-subtle text-text-secondary">
                       {apparelSizes.map((row) => (
-                        <tr key={row.size} className="hover:bg-bg-secondary/40 transition-colors">
-                          <td className="p-3 font-semibold text-text-primary">{row.size}</td>
-                          <td className="p-3">
-                            {unit === "in" ? `${row.chestIn}″` : `${row.chestCm} cm`}
+                        <tr
+                          key={row.size}
+                          className="hover:bg-bg-secondary/40 transition-colors"
+                        >
+                          <td className="p-3 font-semibold text-text-primary">
+                            {row.size}
                           </td>
                           <td className="p-3">
-                            {unit === "in" ? `${row.waistIn}″` : `${row.waistCm} cm`}
+                            {unit === "in"
+                              ? `${row.chestIn}″`
+                              : `${row.chestCm} cm`}
                           </td>
                           <td className="p-3">
-                            {unit === "in" ? `${row.hipsIn}″` : `${row.hipsCm} cm`}
+                            {unit === "in"
+                              ? `${row.waistIn}″`
+                              : `${row.waistCm} cm`}
+                          </td>
+                          <td className="p-3">
+                            {unit === "in"
+                              ? `${row.hipsIn}″`
+                              : `${row.hipsCm} cm`}
                           </td>
                         </tr>
                       ))}
@@ -183,13 +281,17 @@ export function SizeGuideModal({ isOpen, onClose, category }: SizeGuideModalProp
                 </h4>
                 <ul className="space-y-2.5 text-xs text-text-secondary list-disc pl-4 leading-relaxed">
                   <li>
-                    <strong>Chest:</strong> Measure around the fullest part of your chest, keeping the tape horizontal.
+                    <strong>Chest:</strong> Measure around the fullest part of
+                    your chest, keeping the tape horizontal.
                   </li>
                   <li>
-                    <strong>Waist:</strong> Measure around the narrowest part of your waistline, typically where your body bends side to side.
+                    <strong>Waist:</strong> Measure around the narrowest part of
+                    your waistline, typically where your body bends side to
+                    side.
                   </li>
                   <li>
-                    <strong>Hips:</strong> Measure around the fullest part of your hips, keeping the feet together.
+                    <strong>Hips:</strong> Measure around the fullest part of
+                    your hips, keeping the feet together.
                   </li>
                 </ul>
               </div>

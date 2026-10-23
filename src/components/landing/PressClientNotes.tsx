@@ -19,15 +19,18 @@ interface PressMention {
 const pressMentions: PressMention[] = [
   {
     publication: "MONO Journal",
-    quote: "A masterclass in quiet restraint. Aurora is defining the modern silhouette.",
+    quote:
+      "A masterclass in quiet restraint. Aurora is defining the modern silhouette.",
   },
   {
     publication: "Atelier Review",
-    quote: "Exceptional materials sourced with transparency, tailored to perfection.",
+    quote:
+      "Exceptional materials sourced with transparency, tailored to perfection.",
   },
   {
     publication: "The Wardrobe Index",
-    quote: "In a world of excessive noise, Aurora represents a welcome silence.",
+    quote:
+      "In a world of excessive noise, Aurora represents a welcome silence.",
   },
 ];
 
@@ -39,7 +42,6 @@ export function PressClientNotes() {
       className="py-20 bg-white overflow-hidden border-t border-border-subtle"
     >
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20">
-        
         {/* Section Header */}
         <motion.div
           variants={fadeInUp}
@@ -56,7 +58,8 @@ export function PressClientNotes() {
             className="font-sans font-black leading-tight tracking-[-0.02em] mt-4 text-text-primary text-center"
             style={{ fontSize: "clamp(2rem, 4.5vw, 4.5rem)" }}
           >
-            Seen In &amp; Client <span className="text-accent-primary">Notes.</span>
+            Seen In &amp; Client{" "}
+            <span className="text-accent-primary">Notes.</span>
           </p>
         </motion.div>
 
@@ -83,7 +86,6 @@ export function PressClientNotes() {
             </motion.div>
           ))}
         </motion.div>
-
       </div>
     </section>
   );

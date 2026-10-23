@@ -56,13 +56,11 @@ export function Button({
       disabled={disabled}
       className={cn(
         "rounded-full font-medium transition-colors duration-300 inline-flex items-center justify-center gap-2 select-none focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2",
-        disabled
-          ? "opacity-50 cursor-not-allowed"
-          : "cursor-pointer",
+        disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer",
         buttonStyles[variant],
         sizeStyles[size],
         fullWidth && "w-full",
-        className
+        className,
       )}
       {...props}
     >

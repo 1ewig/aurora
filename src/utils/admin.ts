@@ -13,24 +13,27 @@
  *    for server components that need the current user.
  */
 
-import 'server-only';
+import "server-only";
 
-import { cache } from 'react';
-import { auth } from '@/lib/auth';
-import { pool } from '@/utils/db';
-import { headers } from 'next/headers';
-import { NextResponse } from 'next/server';
-import { isAdmin } from '@/utils/auth';
-import { rethrowIfDynamicServerError } from '@/utils/errors';
-import type { User } from '@/stores/useAuthStore';
+import { cache } from "react";
+import { auth } from "@/lib/auth";
+import { pool } from "@/utils/db";
+import { headers } from "next/headers";
+import { NextResponse } from "next/server";
+import { isAdmin } from "@/utils/auth";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
+import type { User } from "@/stores/useAuthStore";
 
 export const ROLE_LEVELS: Record<string, number> = {
   user: 0,
   admin: 10,
 };
 
-const UNAUTHORIZED = NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-const FORBIDDEN = NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+const UNAUTHORIZED = NextResponse.json(
+  { error: "Unauthorized" },
+  { status: 401 },
+);
+const FORBIDDEN = NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
 /**
  * Fetches the current session and verifies the user's role level meets
@@ -42,21 +45,21 @@ const FORBIDDEN = NextResponse.json({ error: 'Forbidden' }, { status: 403 });
  */
 export const requireRole = cache(
   async (
-    minLevel: number = 10
+    minLevel: number = 10,
   ): Promise<{ user: any; role: string; error?: NextResponse }> => {
     try {
       const session = await auth.api.getSession({ headers: await headers() });
       if (!session?.user) {
-        return { user: null, role: 'user', error: UNAUTHORIZED };
+        return { user: null, role: "user", error: UNAUTHORIZED };
       }
 
       // Query the user's role directly from the database
       const userResult = await pool.query(
         `SELECT role FROM better_auth."user" WHERE id = $1`,
-        [session.user.id]
+        [session.user.id],
       );
-      const dbRole = userResult.rows[0]?.role || 'user';
-      const role = isAdmin(session.user.email, dbRole) ? 'admin' : dbRole;
+      const dbRole = userResult.rows[0]?.role || "user";
+      const role = isAdmin(session.user.email, dbRole) ? "admin" : dbRole;
       const level = ROLE_LEVELS[role] ?? 0;
 
       if (level < minLevel) {
@@ -66,14 +69,17 @@ export const requireRole = cache(
       return { user: session.user, role };
     } catch (err: unknown) {
       rethrowIfDynamicServerError(err);
-      console.error('requireRole error:', err);
+      console.error("requireRole error:", err);
       return {
         user: null,
-        role: 'user',
-        error: NextResponse.json({ error: 'Internal server error' }, { status: 500 }),
+        role: "user",
+        error: NextResponse.json(
+          { error: "Internal server error" },
+          { status: 500 },
+        ),
       };
     }
-  }
+  },
 );
 
 /**
@@ -84,7 +90,7 @@ export const requireAdmin = cache(
   async (): Promise<{ user: any; error?: NextResponse }> => {
     const result = await requireRole(10);
     return { user: result.user, error: result.error };
-  }
+  },
 );
 
 /**
@@ -99,7 +105,7 @@ export const getServerAuthUser = cache(async (): Promise<User | null> => {
     session = await auth.api.getSession({ headers: await headers() });
   } catch (err: unknown) {
     rethrowIfDynamicServerError(err);
-    console.error('getServerAuthUser: session fetch failed:', err);
+    console.error("getServerAuthUser: session fetch failed:", err);
     return null;
   }
 
@@ -108,19 +114,22 @@ export const getServerAuthUser = cache(async (): Promise<User | null> => {
   }
 
   // Default to 'user' role if the DB query fails
-  let dbRole = 'user';
+  let dbRole = "user";
   try {
     const userResult = await pool.query(
       `SELECT role FROM better_auth."user" WHERE id = $1`,
-      [session.user.id]
+      [session.user.id],
     );
-    dbRole = userResult.rows[0]?.role || 'user';
+    dbRole = userResult.rows[0]?.role || "user";
   } catch (err: unknown) {
     rethrowIfDynamicServerError(err);
-    console.error('getServerAuthUser: role query failed, defaulting to user:', err);
+    console.error(
+      "getServerAuthUser: role query failed, defaulting to user:",
+      err,
+    );
   }
 
-  const role = isAdmin(session.user.email, dbRole) ? 'admin' : dbRole;
+  const role = isAdmin(session.user.email, dbRole) ? "admin" : dbRole;
 
   return {
     id: session.user.id,

@@ -38,9 +38,17 @@ function VerifyContent() {
   const [resendCooldown, setResendCooldown] = useState(getStoredCooldown);
   const [verified, setVerified] = useState(false);
 
-  const { verifyEmail, resendVerification, loading, error: storeError, clearError } = useAuthStore();
+  const {
+    verifyEmail,
+    resendVerification,
+    loading,
+    error: storeError,
+    clearError,
+  } = useAuthStore();
 
-  useEffect(() => { clearError(); }, [clearError]);
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   useEffect(() => {
     if (!token && !email) {
@@ -52,12 +60,17 @@ function VerifyContent() {
     if (token) {
       verifyEmail("", token).then(({ error }) => {
         if (error) {
-          const msg = typeof error === "string" ? error : error.message || "Verification failed.";
+          const msg =
+            typeof error === "string"
+              ? error
+              : error.message || "Verification failed.";
           setFormError(msg);
         } else {
           setVerified(true);
           setSuccessMsg("Email verified successfully!");
-          setTimeout(() => { router.push("/profile"); }, 2000);
+          setTimeout(() => {
+            router.push("/profile");
+          }, 2000);
         }
       });
     }
@@ -72,7 +85,11 @@ function VerifyContent() {
     setSuccessMsg("");
     const { error } = await resendVerification(email);
     if (error) {
-      setFormError(typeof error === "string" ? error : error.message || "Failed to resend.");
+      setFormError(
+        typeof error === "string"
+          ? error
+          : error.message || "Failed to resend.",
+      );
       localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
       setResendCooldown(60);
     } else {
@@ -82,7 +99,9 @@ function VerifyContent() {
     }
   };
 
-  const handleBack = () => { router.push("/login"); };
+  const handleBack = () => {
+    router.push("/login");
+  };
 
   if (!token && !email) return null;
 

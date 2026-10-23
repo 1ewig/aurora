@@ -22,11 +22,20 @@ function ResetPasswordContent() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [formError, setFormError] = useState("");
-  const [successMsg, setSuccessMsg] = useState(() => token ? "Reset link verified! Enter your new password below." : "");
+  const [successMsg, setSuccessMsg] = useState(() =>
+    token ? "Reset link verified! Enter your new password below." : "",
+  );
 
-  const { resetPassword, loading, error: storeError, clearError } = useAuthStore();
+  const {
+    resetPassword,
+    loading,
+    error: storeError,
+    clearError,
+  } = useAuthStore();
 
-  useEffect(() => { clearError(); }, [clearError]);
+  useEffect(() => {
+    clearError();
+  }, [clearError]);
 
   useEffect(() => {
     if (!token && !email) {
@@ -54,10 +63,16 @@ function ResetPasswordContent() {
 
     const { error } = await resetPassword(newPassword, token);
     if (error) {
-      setFormError(typeof error === "string" ? error : error.message || "Failed to update password.");
+      setFormError(
+        typeof error === "string"
+          ? error
+          : error.message || "Failed to update password.",
+      );
     } else {
       setSuccessMsg("Password updated successfully! Redirecting to login...");
-      setTimeout(() => { router.push("/login"); }, 2000);
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
     }
   };
 

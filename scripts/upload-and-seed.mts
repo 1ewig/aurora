@@ -12,46 +12,55 @@
  *   bun scripts/upload-and-seed.mts
  */
 
-import { createAdminClient } from '@insforge/sdk';
-import { Client } from 'pg';
-import * as fs from 'fs';
-import * as fsPromises from 'fs/promises';
-import * as path from 'path';
-import { execSync } from 'child_process';
+import { createAdminClient } from "@insforge/sdk";
+import { Client } from "pg";
+import * as fs from "fs";
+import * as fsPromises from "fs/promises";
+import * as path from "path";
+import { execSync } from "child_process";
 
 // Reads the static definitions.
-import { heroProducts, featuredProducts, allProducts, type Product } from '../src/data/products';
-import { lookbookSlides } from '../src/data/lookbook';
-import { editorialItems } from '../src/data/editorial';
-import { materials } from '../src/data/materials';
-import { categoryDataList } from '../src/data/categories';
+import {
+  heroProducts,
+  featuredProducts,
+  allProducts,
+  type Product,
+} from "../src/data/products";
+import { lookbookSlides } from "../src/data/lookbook";
+import { editorialItems } from "../src/data/editorial";
+import { materials } from "../src/data/materials";
+import { categoryDataList } from "../src/data/categories";
 
 // ════════════════════════════════════════════════════════
 //  Credential loading
 // ════════════════════════════════════════════════════════
 
-const projectJsonPath = path.resolve(process.cwd(), '.insforge', 'project.json');
-const dotenvPath = path.resolve(process.cwd(), '.env.local');
+const projectJsonPath = path.resolve(
+  process.cwd(),
+  ".insforge",
+  "project.json",
+);
+const dotenvPath = path.resolve(process.cwd(), ".env.local");
 
 if (!fs.existsSync(projectJsonPath)) {
   console.error(
     "Error: .insforge/project.json not found.\n" +
-    "Run `bunx @insforge/cli create` or `bunx @insforge/cli link` first."
+      "Run `bunx @insforge/cli create` or `bunx @insforge/cli link` first.",
   );
   process.exit(1);
 }
 
-const projectJson = JSON.parse(fs.readFileSync(projectJsonPath, 'utf-8'));
+const projectJson = JSON.parse(fs.readFileSync(projectJsonPath, "utf-8"));
 const ossHost: string = projectJson.oss_host;
 const apiKey: string = projectJson.api_key;
 
 if (fs.existsSync(dotenvPath)) {
-  const envConfig = fs.readFileSync(dotenvPath, 'utf-8');
-  for (const line of envConfig.split('\n')) {
+  const envConfig = fs.readFileSync(dotenvPath, "utf-8");
+  for (const line of envConfig.split("\n")) {
     const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
     if (match) {
       const key = match[1];
-      let value = match[2] || '';
+      let value = match[2] || "";
       value = value.trim();
       if (value.startsWith('"') && value.endsWith('"')) {
         value = value.slice(1, -1);
@@ -73,7 +82,7 @@ function addProducts(products: Product[]) {
   for (const p of products) {
     const existing = productMap.get(p.slug);
     if (existing) {
-      if (existing.id.startsWith('h') && !p.id.startsWith('h')) {
+      if (existing.id.startsWith("h") && !p.id.startsWith("h")) {
         productMap.set(p.slug, p);
       }
     } else {
@@ -92,36 +101,39 @@ const uniqueProducts = Array.from(productMap.values());
 // ════════════════════════════════════════════════════════
 
 const BUCKETS = {
-  products: 'product-media',
-  lookbook: 'lookbook-media',
-  editorial: 'editorial-media',
-  materials: 'material-media',
-  categories: 'category-media',
+  products: "product-media",
+  lookbook: "lookbook-media",
+  editorial: "editorial-media",
+  materials: "material-media",
+  categories: "category-media",
 };
 
-function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: string } {
-  if (localRelPath.startsWith('/images/lookbook/')) {
+function getBucketAndKey(localRelPath: string): {
+  bucket: string;
+  storageKey: string;
+} {
+  if (localRelPath.startsWith("/images/lookbook/")) {
     return {
       bucket: BUCKETS.lookbook,
-      storageKey: localRelPath.replace(/^\/images\/lookbook\//, ''),
+      storageKey: localRelPath.replace(/^\/images\/lookbook\//, ""),
     };
-  } else if (localRelPath.startsWith('/images/editorial/')) {
+  } else if (localRelPath.startsWith("/images/editorial/")) {
     return {
       bucket: BUCKETS.editorial,
-      storageKey: localRelPath.replace(/^\/images\/editorial\//, ''),
+      storageKey: localRelPath.replace(/^\/images\/editorial\//, ""),
     };
-  } else if (localRelPath.startsWith('/images/materials/')) {
+  } else if (localRelPath.startsWith("/images/materials/")) {
     return {
       bucket: BUCKETS.materials,
-      storageKey: localRelPath.replace(/^\/images\/materials\//, ''),
+      storageKey: localRelPath.replace(/^\/images\/materials\//, ""),
     };
-  } else if (localRelPath.startsWith('/images/categories/')) {
+  } else if (localRelPath.startsWith("/images/categories/")) {
     return {
       bucket: BUCKETS.categories,
-      storageKey: localRelPath.replace(/^\/images\/categories\//, ''),
+      storageKey: localRelPath.replace(/^\/images\/categories\//, ""),
     };
   } else {
-    const key = localRelPath.replace(/^\/images\//, '');
+    const key = localRelPath.replace(/^\/images\//, "");
     return {
       bucket: BUCKETS.products,
       storageKey: key,
@@ -132,18 +144,18 @@ function getBucketAndKey(localRelPath: string): { bucket: string; storageKey: st
 function getMimeType(filePath: string): string {
   const ext = path.extname(filePath).toLowerCase();
   const mime: Record<string, string> = {
-    '.webp': 'image/webp',
-    '.jpg': 'image/jpeg',
-    '.jpeg': 'image/jpeg',
-    '.png': 'image/png',
-    '.svg': 'image/svg+xml',
-    '.gif': 'image/gif',
+    ".webp": "image/webp",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".svg": "image/svg+xml",
+    ".gif": "image/gif",
   };
-  return mime[ext] || 'application/octet-stream';
+  return mime[ext] || "application/octet-stream";
 }
 
 function buildStorageUrl(bucketName: string, bucketKey: string): string {
-  const encodedKey = bucketKey.split('/').map(encodeURIComponent).join('%2F');
+  const encodedKey = bucketKey.split("/").map(encodeURIComponent).join("%2F");
   return `${ossHost}/api/storage/buckets/${bucketName}/objects/${encodedKey}`;
 }
 
@@ -175,7 +187,7 @@ async function runConcurrent<T>(
 
 type ImageResult = {
   url: string | null;
-  status: 'uploaded' | 'exists' | 'fallback' | 'missing';
+  status: "uploaded" | "exists" | "fallback" | "missing";
 };
 
 async function resolveImage(
@@ -185,21 +197,21 @@ async function resolveImage(
 ): Promise<ImageResult> {
   const fullPath = path.resolve(
     process.cwd(),
-    'public',
-    localRelPath.replace(/^\//, ''),
+    "public",
+    localRelPath.replace(/^\//, ""),
   );
 
   const { bucket, storageKey } = getBucketAndKey(localRelPath);
 
   if (existingKeys[bucket]?.has(storageKey)) {
-    return { url: buildStorageUrl(bucket, storageKey), status: 'exists' };
+    return { url: buildStorageUrl(bucket, storageKey), status: "exists" };
   }
 
   let buffer: Buffer;
   try {
     buffer = fs.readFileSync(fullPath);
   } catch {
-    return { url: null, status: 'missing' };
+    return { url: null, status: "missing" };
   }
   const mimeType = getMimeType(fullPath);
 
@@ -210,17 +222,17 @@ async function resolveImage(
       .upload(storageKey, blob);
 
     if (error) {
-      return { url: buildStorageUrl(bucket, storageKey), status: 'fallback' };
+      return { url: buildStorageUrl(bucket, storageKey), status: "fallback" };
     }
 
     const url = data?.url;
     if (!url) {
-      return { url: buildStorageUrl(bucket, storageKey), status: 'fallback' };
+      return { url: buildStorageUrl(bucket, storageKey), status: "fallback" };
     }
 
-    return { url, status: 'uploaded' };
+    return { url, status: "uploaded" };
   } catch {
-    return { url: buildStorageUrl(bucket, storageKey), status: 'fallback' };
+    return { url: buildStorageUrl(bucket, storageKey), status: "fallback" };
   }
 }
 
@@ -229,9 +241,11 @@ async function resolveImage(
 // ════════════════════════════════════════════════════════
 
 async function seed() {
-  const catalogOnly = process.argv.includes('--catalog-only');
+  const catalogOnly = process.argv.includes("--catalog-only");
   if (catalogOnly) {
-    console.log("\n=== Mode: Catalog-Only Seed (preserving orders and webhooks) ===\n");
+    console.log(
+      "\n=== Mode: Catalog-Only Seed (preserving orders and webhooks) ===\n",
+    );
   } else {
     console.log("\n=== Mode: Setup / Fresh seed (wipe & re-create all) ===\n");
   }
@@ -243,7 +257,9 @@ async function seed() {
 
   const existingKeys: Record<string, Set<string>> = {};
 
-  const bucketsList = execSync(`bunx @insforge/cli storage buckets`, { encoding: 'utf-8' });
+  const bucketsList = execSync(`bunx @insforge/cli storage buckets`, {
+    encoding: "utf-8",
+  });
 
   async function prepareBucket(bucketName: string) {
     console.log(`Verifying storage bucket "${bucketName}"...`);
@@ -252,34 +268,52 @@ async function seed() {
 
     if (bucketExists) {
       try {
-        const { data: listData } = await admin.storage.from(bucketName).list({ limit: 1 });
+        const { data: listData } = await admin.storage
+          .from(bucketName)
+          .list({ limit: 1 });
         const objects = (listData as any)?.data || (listData as any)?.objects;
         if (objects && objects.length > 0) {
           hasData = true;
         }
       } catch (err: any) {
-        console.warn(`Warning checking bucket "${bucketName}" status: ${err.message || err}`);
+        console.warn(
+          `Warning checking bucket "${bucketName}" status: ${err.message || err}`,
+        );
       }
     }
 
     if (!bucketExists) {
       console.log(`Bucket "${bucketName}" does not exist. Creating it...`);
       try {
-        const createOut = execSync(`bunx @insforge/cli storage create-bucket ${bucketName}`, { encoding: 'utf-8' });
+        const createOut = execSync(
+          `bunx @insforge/cli storage create-bucket ${bucketName}`,
+          { encoding: "utf-8" },
+        );
         console.log(createOut);
       } catch (err: any) {
-        console.error(`Failed to create bucket "${bucketName}" via CLI:`, err.message || err);
+        console.error(
+          `Failed to create bucket "${bucketName}" via CLI:`,
+          err.message || err,
+        );
         process.exit(1);
       }
     } else if (hasData) {
-      console.log(`Bucket "${bucketName}" has existing data. Wiping and recreating bucket...`);
+      console.log(
+        `Bucket "${bucketName}" has existing data. Wiping and recreating bucket...`,
+      );
       try {
-        execSync(`bunx @insforge/cli storage delete-bucket ${bucketName}`, { input: 'y\n', encoding: 'utf-8' });
+        execSync(`bunx @insforge/cli storage delete-bucket ${bucketName}`, {
+          input: "y\n",
+          encoding: "utf-8",
+        });
       } catch (err: any) {
         console.warn(`Note on bucket "${bucketName}": ${err.message || err}`);
       }
       try {
-        const createOut = execSync(`bunx @insforge/cli storage create-bucket ${bucketName}`, { encoding: 'utf-8' });
+        const createOut = execSync(
+          `bunx @insforge/cli storage create-bucket ${bucketName}`,
+          { encoding: "utf-8" },
+        );
         console.log(createOut);
       } catch {
         // Bucket might already exist, ignore if so
@@ -289,13 +323,18 @@ async function seed() {
     // Populate existing keys
     const keys = new Set<string>();
     try {
-      const { data: listData } = await admin.storage.from(bucketName).list({ limit: 1000 });
-      const objects = (listData as any)?.data || (listData as any)?.objects || [];
+      const { data: listData } = await admin.storage
+        .from(bucketName)
+        .list({ limit: 1000 });
+      const objects =
+        (listData as any)?.data || (listData as any)?.objects || [];
       for (const obj of objects) {
         keys.add(obj.key);
       }
     } catch (err: any) {
-      console.warn(`Warning pre-populating keys for bucket "${bucketName}": ${err.message || err}`);
+      console.warn(
+        `Warning pre-populating keys for bucket "${bucketName}": ${err.message || err}`,
+      );
     }
     existingKeys[bucketName] = keys;
   }
@@ -334,10 +373,13 @@ async function seed() {
   }
 
   // Scan directories for other public images
-  const publicDir = path.resolve(process.cwd(), 'public');
-  const imagesDir = path.resolve(publicDir, 'images');
+  const publicDir = path.resolve(process.cwd(), "public");
+  const imagesDir = path.resolve(publicDir, "images");
 
-  async function getFilesRecursively(dir: string, baseDir: string): Promise<string[]> {
+  async function getFilesRecursively(
+    dir: string,
+    baseDir: string,
+  ): Promise<string[]> {
     let results: string[] = [];
     try {
       await fsPromises.access(dir);
@@ -352,9 +394,9 @@ async function seed() {
         dirs.push(getFilesRecursively(fullPath, baseDir));
       } else {
         const ext = path.extname(entry.name).toLowerCase();
-        if (['.webp', '.jpg', '.jpeg', '.png', '.svg', '.gif'].includes(ext)) {
+        if ([".webp", ".jpg", ".jpeg", ".png", ".svg", ".gif"].includes(ext)) {
           const rel = path.relative(baseDir, fullPath);
-          results.push('/' + rel.replace(/\\/g, '/'));
+          results.push("/" + rel.replace(/\\/g, "/"));
         }
       }
     }
@@ -378,33 +420,35 @@ async function seed() {
 
   await runConcurrent(Array.from(allImagePaths), 25, async (localPath) => {
     const { url, status } = await resolveImage(admin, localPath, existingKeys);
-    const label = localPath.replace(/^\/images\//, '');
+    const label = localPath.replace(/^\/images\//, "");
 
     if (url) {
       urlMap.set(localPath, url);
     }
 
     switch (status) {
-      case 'uploaded':
+      case "uploaded":
         uploaded++;
         console.log(`  ✓ ${label} (uploaded)`);
         break;
-      case 'exists':
+      case "exists":
         exists++;
         console.log(`  ○ ${label} (exists)`);
         break;
-      case 'fallback':
+      case "fallback":
         exists++;
         console.log(`  ○ ${label} (fallback)`);
         break;
-      case 'missing':
+      case "missing":
         missing++;
         console.warn(`  ✗ ${label} (missing)`);
         break;
     }
   });
 
-  console.log(`\nImage resolution summary: ${uploaded} uploaded, ${exists} exists, ${missing} missing.`);
+  console.log(
+    `\nImage resolution summary: ${uploaded} uploaded, ${exists} exists, ${missing} missing.`,
+  );
 
   console.log(`\nConnecting to database...`);
   const client = new Client({ connectionString: DATABASE_URL });
@@ -412,34 +456,54 @@ async function seed() {
 
   console.log("Dropping tables & executing create-tables.sql schema...");
   const tablesToDrop = [
-    'product_images',
-    'product_sizes',
-    'product_details',
-    'product_keywords',
-    'products',
-    'public.lookbook_slides',
-    'public.editorial_content',
-    'categories',
+    "product_images",
+    "product_sizes",
+    "product_details",
+    "product_keywords",
+    "products",
+    "public.lookbook_slides",
+    "public.editorial_content",
+    "categories",
   ];
   if (!catalogOnly) {
-    tablesToDrop.push('public.materials', 'public.orders', 'processed_webhooks', 'product_reservations');
+    tablesToDrop.push(
+      "public.materials",
+      "public.orders",
+      "processed_webhooks",
+      "product_reservations",
+    );
   }
-  const dropSql = tablesToDrop.map((t) => `DROP TABLE IF EXISTS ${t} CASCADE;`).join('\n');
+  const dropSql = tablesToDrop
+    .map((t) => `DROP TABLE IF EXISTS ${t} CASCADE;`)
+    .join("\n");
   await client.query(dropSql);
 
-  const schemaSql = fs.readFileSync(path.resolve(process.cwd(), 'scripts', 'create-tables.sql'), 'utf-8');
+  const schemaSql = fs.readFileSync(
+    path.resolve(process.cwd(), "scripts", "create-tables.sql"),
+    "utf-8",
+  );
   await client.query(schemaSql);
 
   // ── Seeding Categories ──
   console.log(`Inserting ${categoryDataList.length} categories...`);
   const catParams: any[] = [];
-  const catPlaceholders = categoryDataList.map((cat, i) => {
-    const idx = i * 4;
-    catParams.push(cat.slug, cat.name, urlMap.get(cat.image) || cat.image, cat.description);
-    return `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4})`;
-  }).join(', ');
+  const catPlaceholders = categoryDataList
+    .map((cat, i) => {
+      const idx = i * 4;
+      catParams.push(
+        cat.slug,
+        cat.name,
+        urlMap.get(cat.image) || cat.image,
+        cat.description,
+      );
+      return `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4})`;
+    })
+    .join(", ");
   if (catPlaceholders) {
-    await client.query(`INSERT INTO categories (slug, name, image, description) VALUES ${catPlaceholders}`, catParams);
+    await client.query(
+      `INSERT INTO categories (slug, name, image, description) VALUES ${catPlaceholders}`,
+      catParams,
+    );
   }
 
   // ── Seeding Products ──
@@ -451,9 +515,17 @@ async function seed() {
         id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
       [
-        product.id, product.slug, product.name, product.category, product.price,
-        product.badge || null, imageUrl, product.altText,
-        product.span || null, product.aspectRatio || null, product.description,
+        product.id,
+        product.slug,
+        product.name,
+        product.category,
+        product.price,
+        product.badge || null,
+        imageUrl,
+        product.altText,
+        product.span || null,
+        product.aspectRatio || null,
+        product.description,
       ],
     );
 
@@ -462,7 +534,7 @@ async function seed() {
     const details = product.details ?? [];
 
     if (images.length > 0) {
-      const imgParams = images.map((_, i) => `($1, $${i + 2})`).join(', ');
+      const imgParams = images.map((_, i) => `($1, $${i + 2})`).join(", ");
       await client.query(
         `INSERT INTO product_images (product_id, image_url) VALUES ${imgParams}`,
         [product.id, ...images],
@@ -471,10 +543,12 @@ async function seed() {
 
     if (sizes.length > 0) {
       const szParams: any[] = [product.id];
-      const szPlaceholders = sizes.map((s) => {
-        szParams.push(s, 10);
-        return `($1, $${szParams.length - 1}, $${szParams.length})`;
-      }).join(', ');
+      const szPlaceholders = sizes
+        .map((s) => {
+          szParams.push(s, 10);
+          return `($1, $${szParams.length - 1}, $${szParams.length})`;
+        })
+        .join(", ");
       await client.query(
         `INSERT INTO product_sizes (product_id, size, stock) VALUES ${szPlaceholders}`,
         szParams,
@@ -482,7 +556,7 @@ async function seed() {
     }
 
     if (details.length > 0) {
-      const detParams = details.map((_, i) => `($1, $${i + 2})`).join(', ');
+      const detParams = details.map((_, i) => `($1, $${i + 2})`).join(", ");
       await client.query(
         `INSERT INTO product_details (product_id, detail) VALUES ${detParams}`,
         [product.id, ...details],
@@ -505,7 +579,7 @@ async function seed() {
     // Tokenize product name (filter out short words)
     const nameTokens = product.name
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/[^a-z0-9\s-]/g, "")
       .split(/\s+/);
     for (const t of nameTokens) {
       if (t.length > 2) keywordsSet.add(t);
@@ -521,11 +595,24 @@ async function seed() {
       for (const det of product.details) {
         const detTokens = det
           .toLowerCase()
-          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/[^a-z0-9\s-]/g, "")
           .split(/\s+/);
         for (const t of detTokens) {
           // Add common descriptive/material keywords
-          if (['silk', 'wool', 'linen', 'cashmere', 'cotton', 'leather', 'denim', 'shearling', 'alpaca', 'mohair'].includes(t)) {
+          if (
+            [
+              "silk",
+              "wool",
+              "linen",
+              "cashmere",
+              "cotton",
+              "leather",
+              "denim",
+              "shearling",
+              "alpaca",
+              "mohair",
+            ].includes(t)
+          ) {
             keywordsSet.add(t);
           }
         }
@@ -534,10 +621,12 @@ async function seed() {
 
     const keywords = Array.from(keywordsSet);
     if (keywords.length > 0) {
-      const kwPlaceholders = keywords.map((_, i) => `($1, $${i + 2})`).join(', ');
+      const kwPlaceholders = keywords
+        .map((_, i) => `($1, $${i + 2})`)
+        .join(", ");
       await client.query(
         `INSERT INTO product_keywords (product_id, keyword) VALUES ${kwPlaceholders} ON CONFLICT DO NOTHING`,
-        [product.id, ...keywords]
+        [product.id, ...keywords],
       );
     }
   }
@@ -545,37 +634,74 @@ async function seed() {
   // ── Seeding Lookbook Slides ──
   console.log("Seeding lookbook slides...");
   const lookbookParams: any[] = [];
-  const lookbookPlaceholders = lookbookSlides.map((slide, i) => {
-    const idx = i * 7;
-    lookbookParams.push(slide.slideNumber, slide.originalImage, urlMap.get(slide.originalImage) || slide.originalImage, slide.altText, slide.tag || null, slide.title || null, slide.link || null);
-    return `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${idx + 6}, $${idx + 7})`;
-  }).join(', ');
+  const lookbookPlaceholders = lookbookSlides
+    .map((slide, i) => {
+      const idx = i * 7;
+      lookbookParams.push(
+        slide.slideNumber,
+        slide.originalImage,
+        urlMap.get(slide.originalImage) || slide.originalImage,
+        slide.altText,
+        slide.tag || null,
+        slide.title || null,
+        slide.link || null,
+      );
+      return `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${idx + 6}, $${idx + 7})`;
+    })
+    .join(", ");
   if (lookbookPlaceholders) {
-    await client.query(`INSERT INTO lookbook_slides (slide_number, original_image, image_url, alt_text, tag, title, link) VALUES ${lookbookPlaceholders}`, lookbookParams);
+    await client.query(
+      `INSERT INTO lookbook_slides (slide_number, original_image, image_url, alt_text, tag, title, link) VALUES ${lookbookPlaceholders}`,
+      lookbookParams,
+    );
   }
 
   // ── Seeding Editorial Content ──
   console.log("Seeding editorial content...");
   const editorialParams: any[] = [];
-  const editorialPlaceholders = editorialItems.map((item, i) => {
-    const idx = i * 6;
-    editorialParams.push(item.id, item.originalImage, urlMap.get(item.originalImage) || item.originalImage, item.altText, item.title, item.description || null);
-    return `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${idx + 6})`;
-  }).join(', ');
+  const editorialPlaceholders = editorialItems
+    .map((item, i) => {
+      const idx = i * 6;
+      editorialParams.push(
+        item.id,
+        item.originalImage,
+        urlMap.get(item.originalImage) || item.originalImage,
+        item.altText,
+        item.title,
+        item.description || null,
+      );
+      return `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${idx + 6})`;
+    })
+    .join(", ");
   if (editorialPlaceholders) {
-    await client.query(`INSERT INTO editorial_content (id, original_image, image_url, alt_text, title, description) VALUES ${editorialPlaceholders}`, editorialParams);
+    await client.query(
+      `INSERT INTO editorial_content (id, original_image, image_url, alt_text, title, description) VALUES ${editorialPlaceholders}`,
+      editorialParams,
+    );
   }
 
   // ── Seeding Materials ──
   console.log("Seeding materials...");
   const matParams: any[] = [];
-  const matPlaceholders = materials.map((mat, i) => {
-    const idx = i * 6;
-    matParams.push(mat.name, mat.source, mat.image, urlMap.get(mat.image) || mat.image, mat.description, mat.properties);
-    return `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${idx + 6})`;
-  }).join(', ');
+  const matPlaceholders = materials
+    .map((mat, i) => {
+      const idx = i * 6;
+      matParams.push(
+        mat.name,
+        mat.source,
+        mat.image,
+        urlMap.get(mat.image) || mat.image,
+        mat.description,
+        mat.properties,
+      );
+      return `($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4}, $${idx + 5}, $${idx + 6})`;
+    })
+    .join(", ");
   if (matPlaceholders) {
-    await client.query(`INSERT INTO materials (name, source, original_image, image_url, description, properties) VALUES ${matPlaceholders}`, matParams);
+    await client.query(
+      `INSERT INTO materials (name, source, original_image, image_url, description, properties) VALUES ${matPlaceholders}`,
+      matParams,
+    );
   }
 
   await client.end();

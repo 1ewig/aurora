@@ -17,8 +17,15 @@ import { drawerSlide } from "@/animations/variants";
 
 /** Cart slide-out drawer with line items, quantity adjusters, and total. */
 export function CartDrawer() {
-  const { isOpen, closeCart, items, removeItem, updateQuantity, totalItems, totalPrice } =
-    useCartStore();
+  const {
+    isOpen,
+    closeCart,
+    items,
+    removeItem,
+    updateQuantity,
+    totalItems,
+    totalPrice,
+  } = useCartStore();
 
   useBodyScrollLock(isOpen);
 
@@ -89,10 +96,7 @@ export function CartDrawer() {
               ) : (
                 <ul className="space-y-6">
                   {items.map((item) => (
-                    <li
-                      key={`${item.id}-${item.size}`}
-                      className="flex gap-4"
-                    >
+                    <li key={`${item.id}-${item.size}`} className="flex gap-4">
                       <Link
                         href={`/products/${item.slug}`}
                         onClick={closeCart}
@@ -126,7 +130,7 @@ export function CartDrawer() {
                                   ? updateQuantity(
                                       item.id,
                                       item.size,
-                                      item.quantity - 1
+                                      item.quantity - 1,
                                     )
                                   : removeItem(item.id, item.size)
                               }
@@ -142,7 +146,7 @@ export function CartDrawer() {
                                 updateQuantity(
                                   item.id,
                                   item.size,
-                                  item.quantity + 1
+                                  item.quantity + 1,
                                 )
                               }
                               className="w-7 h-7 rounded-full border border-border-subtle flex items-center justify-center text-sm hover:border-text-primary transition-colors"
@@ -190,7 +194,11 @@ export function CartDrawer() {
                     {formatCurrency(total)}
                   </span>
                 </div>
-                <Link href="/checkout" onClick={closeCart} className="block w-full">
+                <Link
+                  href="/checkout"
+                  onClick={closeCart}
+                  className="block w-full"
+                >
                   <Button variant="filled" size="lg" fullWidth>
                     Checkout →
                   </Button>

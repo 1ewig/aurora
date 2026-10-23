@@ -9,8 +9,8 @@
  * router.push to avoid a flash of content before the redirect fires.
  */
 
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 
 export default function AdminPage() {
-  redirect('/admin/dashboard');
+  redirect("/admin/dashboard");
 }

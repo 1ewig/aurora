@@ -5,8 +5,8 @@
  * Returns order history with itemized product details, paginated.
  */
 
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 export interface OrderItem {
   id: string;

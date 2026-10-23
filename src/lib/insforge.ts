@@ -14,11 +14,11 @@
  * Both paths are handled here.
  */
 
-'use client';
+"use client";
 
-import { createClient, type InsForgeClient } from '@insforge/sdk';
-import { authClient } from './auth-client';
-import { useEffect, useMemo, useState } from 'react';
+import { createClient, type InsForgeClient } from "@insforge/sdk";
+import { authClient } from "./auth-client";
+import { useEffect, useMemo, useState } from "react";
 
 const REFRESH_INTERVAL_MS = 50 * 60 * 1000;
 
@@ -29,17 +29,28 @@ const REFRESH_INTERVAL_MS = 50 * 60 * 1000;
  * - V1: getHttpClient().setAuthToken() + realtime token manager.
  */
 function setBridgeToken(client: InsForgeClient, token: string | null) {
-  if (typeof (client as unknown as { setAccessToken?: unknown }).setAccessToken === 'function') {
-    (client as unknown as { setAccessToken: (t: string | null) => void }).setAccessToken(token);
+  if (
+    typeof (client as unknown as { setAccessToken?: unknown })
+      .setAccessToken === "function"
+  ) {
+    (
+      client as unknown as { setAccessToken: (t: string | null) => void }
+    ).setAccessToken(token);
     return;
   }
   client.getHttpClient().setAuthToken(token);
-  (client.realtime as unknown as { tokenManager: { setAccessToken: (t: string | null) => void } })
-    .tokenManager.setAccessToken(token);
+  (
+    client.realtime as unknown as {
+      tokenManager: { setAccessToken: (t: string | null) => void };
+    }
+  ).tokenManager.setAccessToken(token);
 }
 
 /** Provides an InsForge client with automatic JWT bridging for the current user session. */
-export function useInsforgeClient(): { client: InsForgeClient; isReady: boolean } {
+export function useInsforgeClient(): {
+  client: InsForgeClient;
+  isReady: boolean;
+} {
   const session = authClient.useSession();
   const userId = session.data?.user?.id;
   const [isReady, setIsReady] = useState(false);
@@ -76,11 +87,14 @@ export function useInsforgeClient(): { client: InsForgeClient; isReady: boolean 
     let cancelled = false;
     const refresh = async () => {
       try {
-        const res = await fetch('/api/insforge-token', { credentials: 'same-origin' });
+        const res = await fetch("/api/insforge-token", {
+          credentials: "same-origin",
+        });
         if (!res.ok) throw new Error(`bridge ${res.status}`);
         const { token } = await res.json();
         if (cancelled) return;
-        if (typeof token !== 'string' || !token) throw new Error('bridge: no token in response');
+        if (typeof token !== "string" || !token)
+          throw new Error("bridge: no token in response");
         setBridgeToken(client, token);
         setIsReady(true);
       } catch {

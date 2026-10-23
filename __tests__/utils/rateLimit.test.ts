@@ -47,10 +47,14 @@ describe("rateLimit", () => {
 
     expect(mockPoolQuery).toHaveBeenCalledWith(
       expect.stringContaining("rate_limits"),
-      ["1.2.3.4", "/api/newsletter"]
+      ["1.2.3.4", "/api/newsletter"],
     );
-    expect(mockPoolQuery.mock.calls[0][0]).toContain("date_trunc('minute', now())");
-    expect(mockPoolQuery.mock.calls[0][0]).toContain("ON CONFLICT (ip, route, window_start)");
+    expect(mockPoolQuery.mock.calls[0][0]).toContain(
+      "date_trunc('minute', now())",
+    );
+    expect(mockPoolQuery.mock.calls[0][0]).toContain(
+      "ON CONFLICT (ip, route, window_start)",
+    );
   });
 });
 
@@ -82,7 +86,9 @@ describe("getClientIp", () => {
   it("extracts the first IP from x-forwarded-for header when direct headers are absent", async () => {
     const { getClientIp } = await import("@/utils/rateLimit");
     const req = new Request("http://localhost/api/test", {
-      headers: { "x-forwarded-for": "203.0.113.195, 70.41.3.18, 150.172.238.178" },
+      headers: {
+        "x-forwarded-for": "203.0.113.195, 70.41.3.18, 150.172.238.178",
+      },
     }) as any;
 
     expect(getClientIp(req)).toBe("203.0.113.195");

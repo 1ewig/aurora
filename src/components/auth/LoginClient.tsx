@@ -79,12 +79,18 @@ export function LoginClient() {
 
     setSubmitting(true);
     try {
-      const { error, needsVerification: reqVerification } = await signIn(email, password);
+      const { error, needsVerification: reqVerification } = await signIn(
+        email,
+        password,
+      );
       if (error) {
         if (reqVerification) {
           router.push(`/verify?email=${encodeURIComponent(email)}`);
         } else {
-          const errorMsg = typeof error === "string" ? error : error.message || "Invalid email or password.";
+          const errorMsg =
+            typeof error === "string"
+              ? error
+              : error.message || "Invalid email or password.";
           setFormError(errorMsg);
         }
       } else {
@@ -110,10 +116,15 @@ export function LoginClient() {
     try {
       const { error } = await sendResetPasswordEmail(email);
       if (error) {
-        const msg = typeof error === "string" ? error : error.message || "Failed to send reset email.";
+        const msg =
+          typeof error === "string"
+            ? error
+            : error.message || "Failed to send reset email.";
         setFormError(msg);
       } else {
-        setSuccessMsg("If an account exists with this email, a password reset link has been sent. Check your inbox.");
+        setSuccessMsg(
+          "If an account exists with this email, a password reset link has been sent. Check your inbox.",
+        );
       }
     } catch {
       setFormError("Failed to initiate password reset.");

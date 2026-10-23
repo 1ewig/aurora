@@ -65,7 +65,9 @@ export function CheckoutSuccessClient() {
       </h2>
 
       <p className="text-text-secondary max-w-md mx-auto text-sm md:text-base leading-relaxed">
-        We couldn't locate any recent checkout session details. If you just placed an order, please check your email inbox for a confirmation receipt.
+        We couldn't locate any recent checkout session details. If you just
+        placed an order, please check your email inbox for a confirmation
+        receipt.
       </p>
 
       <div className="pt-6 flex flex-col sm:flex-row gap-4 justify-center items-center">

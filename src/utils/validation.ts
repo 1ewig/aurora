@@ -28,7 +28,10 @@ export function isValidEmail(email: string): boolean {
 }
 
 /** Validates a single form field and returns an error message or undefined. */
-export function validateField(field: string, value: string): string | undefined {
+export function validateField(
+  field: string,
+  value: string,
+): string | undefined {
   const trimmed = value.trim();
 
   switch (field) {
@@ -39,7 +42,8 @@ export function validateField(field: string, value: string): string | undefined 
     }
     case "firstName": {
       if (!trimmed) return "First name is required.";
-      if (trimmed.length < 2) return "First name must be at least 2 characters.";
+      if (trimmed.length < 2)
+        return "First name must be at least 2 characters.";
       return undefined;
     }
     case "lastName": {
@@ -57,7 +61,8 @@ export function validateField(field: string, value: string): string | undefined 
     }
     case "zipCode": {
       if (!trimmed) return "Postal / ZIP code is required.";
-      if (!/^\d{5}(-\d{4})?$/.test(trimmed)) return "Enter a valid ZIP code (e.g. 10001 or 10001-1234).";
+      if (!/^\d{5}(-\d{4})?$/.test(trimmed))
+        return "Enter a valid ZIP code (e.g. 10001 or 10001-1234).";
       return undefined;
     }
     case "cardNumber": {
@@ -68,14 +73,18 @@ export function validateField(field: string, value: string): string | undefined 
     }
     case "cardExpiry": {
       if (!trimmed) return "Expiration date is required.";
-      if (!/^\d{2}\/\d{2}$/.test(trimmed)) return "Use MM/YY format (e.g. 12/28).";
+      if (!/^\d{2}\/\d{2}$/.test(trimmed))
+        return "Use MM/YY format (e.g. 12/28).";
       const [mm, yy] = trimmed.split("/").map(Number);
       if (mm < 1 || mm > 12) return "Month must be 01–12.";
       // Compare against current date to reject expired cards
       const now = new Date();
       const expYear = 2000 + yy;
       const expMonth = mm - 1; // JS months are 0-indexed
-      if (expYear < now.getFullYear() || (expYear === now.getFullYear() && expMonth < now.getMonth())) {
+      if (
+        expYear < now.getFullYear() ||
+        (expYear === now.getFullYear() && expMonth < now.getMonth())
+      ) {
         return "Card is expired.";
       }
       return undefined;

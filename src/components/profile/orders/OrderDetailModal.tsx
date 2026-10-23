@@ -19,7 +19,11 @@ interface OrderDetailModalProps {
 }
 
 /** Renders an animated modal with order items, shipping address, and payment detail breakdown. */
-export function OrderDetailModal({ isOpen, onClose, order }: OrderDetailModalProps) {
+export function OrderDetailModal({
+  isOpen,
+  onClose,
+  order,
+}: OrderDetailModalProps) {
   useBodyScrollLock(isOpen);
 
   const date = new Date(order.createdAt).toLocaleDateString("en-US", {
@@ -72,7 +76,11 @@ export function OrderDetailModal({ isOpen, onClose, order }: OrderDetailModalPro
                   stroke="currentColor"
                   className="w-5 h-5"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -106,7 +114,10 @@ export function OrderDetailModal({ isOpen, onClose, order }: OrderDetailModalPro
                 </h4>
                 <div className="divide-y divide-border-subtle border border-border-subtle rounded-xl overflow-hidden bg-white">
                   {order.items.map((item) => (
-                    <div key={`${item.id}-${item.size}`} className="flex gap-4 p-4 hover:bg-bg-secondary/40 transition-colors">
+                    <div
+                      key={`${item.id}-${item.size}`}
+                      className="flex gap-4 p-4 hover:bg-bg-secondary/40 transition-colors"
+                    >
                       <div className="relative w-14 h-18 rounded-md bg-border-subtle overflow-hidden shrink-0 border border-border-subtle">
                         <Image
                           src={item.image}
@@ -141,11 +152,13 @@ export function OrderDetailModal({ isOpen, onClose, order }: OrderDetailModalPro
                 </h4>
                 <div className="border border-border-subtle rounded-xl p-4 text-xs text-text-secondary space-y-1 bg-bg-secondary/20">
                   <p className="font-semibold text-text-primary">
-                    {order.shippingAddress.firstName} {order.shippingAddress.lastName}
+                    {order.shippingAddress.firstName}{" "}
+                    {order.shippingAddress.lastName}
                   </p>
                   <p>{order.shippingAddress.address}</p>
                   <p>
-                    {order.shippingAddress.city}, {order.shippingAddress.zipCode}
+                    {order.shippingAddress.city},{" "}
+                    {order.shippingAddress.zipCode}
                   </p>
                   <p className="pt-1 border-t border-border-subtle mt-2 text-[11px] text-text-muted">
                     Contact: {order.shippingAddress.email}
@@ -161,21 +174,29 @@ export function OrderDetailModal({ isOpen, onClose, order }: OrderDetailModalPro
                 <div className="border border-border-subtle rounded-xl p-4 bg-white space-y-2.5">
                   <div className="flex justify-between text-xs text-text-secondary">
                     <span>Subtotal</span>
-                    <span className="font-mono">{formatCurrency(order.subtotal)}</span>
+                    <span className="font-mono">
+                      {formatCurrency(order.subtotal)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-xs text-text-secondary">
                     <span>Shipping</span>
                     <span className="font-mono">
-                      {order.shipping === 0 ? "Free" : formatCurrency(order.shipping)}
+                      {order.shipping === 0
+                        ? "Free"
+                        : formatCurrency(order.shipping)}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs text-text-secondary">
                     <span>Sales Tax (8%)</span>
-                    <span className="font-mono">{formatCurrency(order.tax)}</span>
+                    <span className="font-mono">
+                      {formatCurrency(order.tax)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm font-semibold text-text-primary pt-2 border-t border-border-subtle">
                     <span>Total Paid</span>
-                    <span className="font-mono">{formatCurrency(order.total)}</span>
+                    <span className="font-mono">
+                      {formatCurrency(order.total)}
+                    </span>
                   </div>
                 </div>
               </div>

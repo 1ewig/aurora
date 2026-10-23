@@ -5,16 +5,16 @@
  * Admin-only. Validates status against allowed transitions.
  */
 
-import { NextResponse } from 'next/server';
-import { pool } from '@/utils/db';
-import { requireAdmin } from '@/utils/admin';
-import { logAudit } from '@/utils/audit';
-import { rethrowIfDynamicServerError } from '@/utils/errors';
-import { updateOrderStatusSchema } from '@/utils/schemas';
+import { NextResponse } from "next/server";
+import { pool } from "@/utils/db";
+import { requireAdmin } from "@/utils/admin";
+import { logAudit } from "@/utils/audit";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
+import { updateOrderStatusSchema } from "@/utils/schemas";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -24,26 +24,33 @@ export async function PATCH(
     const body = await request.json();
     const parseResult = updateOrderStatusSchema.safeParse(body);
     if (!parseResult.success) {
-      return NextResponse.json({ error: 'Invalid or missing status' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid or missing status" },
+        { status: 400 },
+      );
     }
 
     const { status } = parseResult.data;
 
     const { rows: existing } = await pool.query(
-      'SELECT status FROM orders WHERE id = $1', [id]
+      "SELECT status FROM orders WHERE id = $1",
+      [id],
     );
     if (existing.length === 0) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
     const oldStatus = existing[0].status;
 
-    await pool.query('UPDATE orders SET status = $1 WHERE id = $2', [status, id]);
+    await pool.query("UPDATE orders SET status = $1 WHERE id = $2", [
+      status,
+      id,
+    ]);
 
     await logAudit({
       adminId: user.id,
       adminEmail: user.email,
-      action: 'order.update_status',
-      targetType: 'order',
+      action: "order.update_status",
+      targetType: "order",
       targetId: id,
       metadata: { from: oldStatus, to: status },
     });
@@ -51,7 +58,10 @@ export async function PATCH(
     return NextResponse.json({ success: true });
   } catch (err: any) {
     rethrowIfDynamicServerError(err);
-    console.error('Failed to update order status:', err);
-    return NextResponse.json({ error: err.message || 'Failed to update order status' }, { status: 500 });
+    console.error("Failed to update order status:", err);
+    return NextResponse.json(
+      { error: err.message || "Failed to update order status" },
+      { status: 500 },
+    );
   }
 }

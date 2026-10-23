@@ -33,7 +33,9 @@ export function AnimatedText({
     <div ref={ref} className={`overflow-hidden ${className ?? ""}`}>
       <motion.div
         initial={{ y: "100%", opacity: 0 }}
-        animate={shouldAnimate ? { y: 0, opacity: 1 } : { y: "100%", opacity: 0 }}
+        animate={
+          shouldAnimate ? { y: 0, opacity: 1 } : { y: "100%", opacity: 0 }
+        }
         transition={{
           duration: 0.8,
           delay,

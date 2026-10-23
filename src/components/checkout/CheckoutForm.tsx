@@ -45,17 +45,25 @@ interface CheckoutFormProps {
 
 /** Checkout form — contact info, shipping address, and mock credit-card fields with validation. */
 export function CheckoutForm({
-  email, setEmail,
-  firstName, setFirstName,
-  lastName, setLastName,
-  address, setAddress,
-  city, setCity,
-  zipCode, setZipCode,
-  loading, error,
+  email,
+  setEmail,
+  firstName,
+  setFirstName,
+  lastName,
+  setLastName,
+  address,
+  setAddress,
+  city,
+  setCity,
+  zipCode,
+  setZipCode,
+  loading,
+  error,
   handlePlaceOrder,
-  fieldErrors, handleBlur, touched,
+  fieldErrors,
+  handleBlur,
+  touched,
 }: CheckoutFormProps) {
-
   return (
     <form onSubmit={handlePlaceOrder} className="space-y-8">
       {/* Contact Section */}
@@ -64,7 +72,10 @@ export function CheckoutForm({
           Contact Information
         </h3>
         <div className="space-y-1">
-          <label htmlFor="email" className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+          <label
+            htmlFor="email"
+            className="text-xs font-semibold text-text-secondary uppercase tracking-wider"
+          >
             Email Address
           </label>
           <input
@@ -88,7 +99,10 @@ export function CheckoutForm({
         </h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label htmlFor="first-name" className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+            <label
+              htmlFor="first-name"
+              className="text-xs font-semibold text-text-secondary uppercase tracking-wider"
+            >
               First Name
             </label>
             <input
@@ -98,12 +112,20 @@ export function CheckoutForm({
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               onBlur={() => handleBlur("firstName")}
-              className={fieldClass(touched.has("firstName") && !!fieldErrors.firstName)}
+              className={fieldClass(
+                touched.has("firstName") && !!fieldErrors.firstName,
+              )}
             />
-            <FieldError show={touched.has("firstName")} message={fieldErrors.firstName} />
+            <FieldError
+              show={touched.has("firstName")}
+              message={fieldErrors.firstName}
+            />
           </div>
           <div className="space-y-1">
-            <label htmlFor="last-name" className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+            <label
+              htmlFor="last-name"
+              className="text-xs font-semibold text-text-secondary uppercase tracking-wider"
+            >
               Last Name
             </label>
             <input
@@ -112,13 +134,21 @@ export function CheckoutForm({
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               onBlur={() => handleBlur("lastName")}
-              className={fieldClass(touched.has("lastName") && !!fieldErrors.lastName)}
+              className={fieldClass(
+                touched.has("lastName") && !!fieldErrors.lastName,
+              )}
             />
-            <FieldError show={touched.has("lastName")} message={fieldErrors.lastName} />
+            <FieldError
+              show={touched.has("lastName")}
+              message={fieldErrors.lastName}
+            />
           </div>
         </div>
         <div className="space-y-1">
-          <label htmlFor="address" className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+          <label
+            htmlFor="address"
+            className="text-xs font-semibold text-text-secondary uppercase tracking-wider"
+          >
             Street Address
           </label>
           <input
@@ -128,13 +158,21 @@ export function CheckoutForm({
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             onBlur={() => handleBlur("address")}
-            className={fieldClass(touched.has("address") && !!fieldErrors.address)}
+            className={fieldClass(
+              touched.has("address") && !!fieldErrors.address,
+            )}
           />
-          <FieldError show={touched.has("address")} message={fieldErrors.address} />
+          <FieldError
+            show={touched.has("address")}
+            message={fieldErrors.address}
+          />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label htmlFor="city" className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+            <label
+              htmlFor="city"
+              className="text-xs font-semibold text-text-secondary uppercase tracking-wider"
+            >
               City
             </label>
             <input
@@ -149,7 +187,10 @@ export function CheckoutForm({
             <FieldError show={touched.has("city")} message={fieldErrors.city} />
           </div>
           <div className="space-y-1">
-            <label htmlFor="zip" className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
+            <label
+              htmlFor="zip"
+              className="text-xs font-semibold text-text-secondary uppercase tracking-wider"
+            >
               Postal / ZIP Code
             </label>
             <input
@@ -159,16 +200,23 @@ export function CheckoutForm({
               value={zipCode}
               onChange={(e) => setZipCode(e.target.value)}
               onBlur={() => handleBlur("zipCode")}
-              className={fieldClass(touched.has("zipCode") && !!fieldErrors.zipCode)}
+              className={fieldClass(
+                touched.has("zipCode") && !!fieldErrors.zipCode,
+              )}
               placeholder="10001"
             />
-            <FieldError show={touched.has("zipCode")} message={fieldErrors.zipCode} />
+            <FieldError
+              show={touched.has("zipCode")}
+              message={fieldErrors.zipCode}
+            />
           </div>
         </div>
       </div>
 
       {error && (
-        <div className="text-error text-xs font-medium px-1 whitespace-pre-line">{error}</div>
+        <div className="text-error text-xs font-medium px-1 whitespace-pre-line">
+          {error}
+        </div>
       )}
 
       {/* Checkout Submit CTA */}

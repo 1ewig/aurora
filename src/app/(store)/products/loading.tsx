@@ -4,7 +4,12 @@
  * Loading skeleton for the products listing page.
  */
 
-const aspectRatios = ["aspect-[3/4]", "aspect-[4/5]", "aspect-[2/3]", "aspect-[3/4]"];
+const aspectRatios = [
+  "aspect-[3/4]",
+  "aspect-[4/5]",
+  "aspect-[2/3]",
+  "aspect-[3/4]",
+];
 
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 
@@ -19,7 +24,7 @@ export default function ProductsLoading() {
             <div className="h-4 w-20 bg-bg-secondary rounded" />
             <div className="h-10 w-48 bg-bg-secondary rounded" />
           </div>
-          
+
           <div className="flex items-center gap-3 w-full md:w-auto">
             {/* Search Input Skeleton */}
             <div className="h-12 w-full md:w-80 bg-bg-secondary rounded-full" />
@@ -31,8 +36,13 @@ export default function ProductsLoading() {
         {/* Product Grid Skeleton */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className={`flex flex-col space-y-4 ${i % 4 === 1 || i % 4 === 2 ? "md:mt-8" : ""}`}>
-              <div className={`w-full bg-bg-secondary rounded-[20px] ${aspectRatios[i % aspectRatios.length]}`} />
+            <div
+              key={i}
+              className={`flex flex-col space-y-4 ${i % 4 === 1 || i % 4 === 2 ? "md:mt-8" : ""}`}
+            >
+              <div
+                className={`w-full bg-bg-secondary rounded-[20px] ${aspectRatios[i % aspectRatios.length]}`}
+              />
               <div className="space-y-2 px-2">
                 <div className="h-4 w-2/3 bg-bg-secondary rounded" />
                 <div className="h-3 w-1/3 bg-bg-secondary rounded" />

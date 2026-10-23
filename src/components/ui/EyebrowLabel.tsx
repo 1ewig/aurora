@@ -23,7 +23,7 @@ export function EyebrowLabel({
       className={cn(
         "text-xs font-medium tracking-[0.12em] uppercase block",
         color === "gold" ? "text-accent-primary" : "text-text-muted",
-        className
+        className,
       )}
     >
       {children}

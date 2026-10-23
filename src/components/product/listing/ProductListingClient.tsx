@@ -15,7 +15,9 @@ interface ProductListingClientProps {
 }
 
 /** Client bridging the product filter hook to the presentational listing component. */
-export function ProductListingClient({ initialCategory = "All" }: ProductListingClientProps) {
+export function ProductListingClient({
+  initialCategory = "All",
+}: ProductListingClientProps) {
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const filter = useProductFilter({ initialCategory });

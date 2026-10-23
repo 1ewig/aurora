@@ -33,9 +33,7 @@ export function ProfileWorkspace({
 }: ProfileWorkspaceProps) {
   return (
     <>
-      <div
-        className="mb-6 sm:mb-8 lg:mb-12"
-      >
+      <div className="mb-6 sm:mb-8 lg:mb-12">
         <h1 className="font-display font-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase tracking-wider">
           Wardrobe Profile
         </h1>

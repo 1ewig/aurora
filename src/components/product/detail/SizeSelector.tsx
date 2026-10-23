@@ -15,7 +15,12 @@ interface SizeSelectorProps {
 }
 
 /** Renders a row of selectable size buttons and a "Size Guide" link. */
-export function SizeSelector({ sizes, selectedSize, onChange, onOpenSizeGuide }: SizeSelectorProps) {
+export function SizeSelector({
+  sizes,
+  selectedSize,
+  onChange,
+  onOpenSizeGuide,
+}: SizeSelectorProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -38,7 +43,11 @@ export function SizeSelector({ sizes, selectedSize, onChange, onOpenSizeGuide }:
           <div className="w-[50px] h-[50px] bg-bg-secondary rounded-full" />
         </div>
       ) : (
-        <div className="flex flex-wrap gap-3" role="radiogroup" aria-label="Product size selection">
+        <div
+          className="flex flex-wrap gap-3"
+          role="radiogroup"
+          aria-label="Product size selection"
+        >
           {sizes.map((size) => {
             const isSelected = selectedSize === size;
             return (
@@ -52,7 +61,7 @@ export function SizeSelector({ sizes, selectedSize, onChange, onOpenSizeGuide }:
                   "min-w-[50px] h-[50px] px-3 border rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-300 flex items-center justify-center cursor-pointer select-none",
                   isSelected
                     ? "bg-bg-ink border-bg-ink text-text-inverted"
-                    : "bg-bg-secondary border-border-subtle text-text-primary hover:border-text-primary"
+                    : "bg-bg-secondary border-border-subtle text-text-primary hover:border-text-primary",
                 )}
               >
                 {size}

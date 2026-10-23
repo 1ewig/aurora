@@ -1,6 +1,7 @@
 # AGENTS.md
 
 <!-- INSFORGE:START -->
+
 ## InsForge backend
 
 This project uses [InsForge](https://insforge.dev): an all-in-one, open-source Postgres-based backend (BaaS) that gives this app a database, authentication, file storage, edge functions, realtime, an AI model gateway, and payments through one platform.
@@ -19,6 +20,7 @@ Key patterns:
 - Database inserts take an array: `insert([{ ... }])`.
 - Reference users with `auth.users(id)`; use `auth.uid()` in RLS policies.
 - For storage uploads, persist both the returned `url` and `key`.
+
 <!-- INSFORGE:END -->
 
 ## Runtime & Commands
@@ -38,7 +40,7 @@ Key patterns:
 - **4-layer unidirectional**: Page (server) → `XxxClient.tsx` (client bridge) → Hooks/Stores → Presentational (pure props, zero store/hook imports)
 - **`@/` alias** → `src/`
 - **No ORM**: raw `pg` Pool via `@/utils/db`, parameterized `$1, $2`
-- **Auth**: Better Auth handles auth (email/password), *not* InsForge auth
+- **Auth**: Better Auth handles auth (email/password), _not_ InsForge auth
 - **Guest checkout is default**: `orders.user_id` is nullable
 
 ## Middleware Caveat

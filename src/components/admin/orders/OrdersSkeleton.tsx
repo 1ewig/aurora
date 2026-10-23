@@ -27,13 +27,20 @@ export function OrdersSkeleton() {
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-border-subtle bg-bg-primary/50">
-              {["Order #", "Date", "Customer", "Items count", "Total Price", "Payment", "Fulfillment", "Actions"].map(
-                (h) => (
-                  <th key={h} className="px-6 py-4">
-                    <div className="h-3 w-16 bg-bg-secondary rounded" />
-                  </th>
-                )
-              )}
+              {[
+                "Order #",
+                "Date",
+                "Customer",
+                "Items count",
+                "Total Price",
+                "Payment",
+                "Fulfillment",
+                "Actions",
+              ].map((h) => (
+                <th key={h} className="px-6 py-4">
+                  <div className="h-3 w-16 bg-bg-secondary rounded" />
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-border-subtle">

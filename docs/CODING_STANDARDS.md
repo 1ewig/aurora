@@ -189,7 +189,13 @@ interface OrderSummaryProps {
   total: number;
 }
 
-export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSummaryProps) {
+export function OrderSummary({
+  items,
+  subtotal,
+  shipping,
+  tax,
+  total,
+}: OrderSummaryProps) {
   if (items.length === 0) return <EmptyCart />;
 
   return (
@@ -210,15 +216,15 @@ export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSum
 
 ## `"use client"` Rules
 
-| Scenario | Directive |
-|---|---|
-| Pure JSX layout, no hooks, no events | **None** (server component) |
-| Uses Framer Motion (`motion.div`, etc.) | `"use client"` |
-| Uses `useState`, `useEffect`, `useRef` | `"use client"` |
-| Uses a custom hook (useCarousel, etc.) | `"use client"` |
-| USES `onClick`, `onChange`, form events | `"use client"` |
-| Reads a Zustand store via selector | `"use client"` |
-| Page with `generateStaticParams` | **None** (server) — delegate interactivity to child client components |
+| Scenario                                | Directive                                                             |
+| --------------------------------------- | --------------------------------------------------------------------- |
+| Pure JSX layout, no hooks, no events    | **None** (server component)                                           |
+| Uses Framer Motion (`motion.div`, etc.) | `"use client"`                                                        |
+| Uses `useState`, `useEffect`, `useRef`  | `"use client"`                                                        |
+| Uses a custom hook (useCarousel, etc.)  | `"use client"`                                                        |
+| USES `onClick`, `onChange`, form events | `"use client"`                                                        |
+| Reads a Zustand store via selector      | `"use client"`                                                        |
+| Page with `generateStaticParams`        | **None** (server) — delegate interactivity to child client components |
 
 **As a rule**: start without `"use client"` and only add it when the compiler tells you it's needed. This maximizes SSG eligibility.
 
@@ -226,15 +232,15 @@ export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSum
 
 ## Import Conventions
 
-| Import | Path Prefix |
-|---|---|
-| Components | `@/components/...` |
-| Hooks | `@/hooks/...` |
-| Stores | `@/stores/...` |
-| Static data | `@/data/...` |
-| Utilities | `@/utils/...` |
-| Animation variants | `@/animations/...` |
-| Sibling files | `./ComponentName` (relative) |
+| Import             | Path Prefix                  |
+| ------------------ | ---------------------------- |
+| Components         | `@/components/...`           |
+| Hooks              | `@/hooks/...`                |
+| Stores             | `@/stores/...`               |
+| Static data        | `@/data/...`                 |
+| Utilities          | `@/utils/...`                |
+| Animation variants | `@/animations/...`           |
+| Sibling files      | `./ComponentName` (relative) |
 
 ---
 

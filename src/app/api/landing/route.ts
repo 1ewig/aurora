@@ -12,32 +12,33 @@ import { cacheLife, cacheTag } from "next/cache";
 import { rethrowIfDynamicServerError } from "@/utils/errors";
 
 export async function getLandingData() {
-  'use cache';
+  "use cache";
   cacheLife({ stale: 60, revalidate: 60 });
-  cacheTag('landing');
+  cacheTag("landing");
 
-  const [products, categories, lookbook, editorial, materials] = await Promise.all([
-    pool.query(
-      `SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description
-       FROM products ORDER BY name ASC`
-    ),
-    pool.query(
-      `SELECT slug, name, image, description
-       FROM categories ORDER BY name ASC`
-    ),
-    pool.query(
-      `SELECT id, slide_number, original_image, image_url, alt_text, tag, title, link
-       FROM lookbook_slides ORDER BY slide_number ASC`
-    ),
-    pool.query(
-      `SELECT id, original_image, image_url, alt_text, title, description
-       FROM editorial_content`
-    ),
-    pool.query(
-      `SELECT id, name, source, image_url, description, properties
-       FROM materials ORDER BY name ASC`
-    ),
-  ]);
+  const [products, categories, lookbook, editorial, materials] =
+    await Promise.all([
+      pool.query(
+        `SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description
+       FROM products ORDER BY name ASC`,
+      ),
+      pool.query(
+        `SELECT slug, name, image, description
+       FROM categories ORDER BY name ASC`,
+      ),
+      pool.query(
+        `SELECT id, slide_number, original_image, image_url, alt_text, tag, title, link
+       FROM lookbook_slides ORDER BY slide_number ASC`,
+      ),
+      pool.query(
+        `SELECT id, original_image, image_url, alt_text, title, description
+       FROM editorial_content`,
+      ),
+      pool.query(
+        `SELECT id, name, source, image_url, description, properties
+       FROM materials ORDER BY name ASC`,
+      ),
+    ]);
 
   return {
     products: products.rows.map((row) => ({
@@ -92,7 +93,7 @@ export async function GET() {
     console.error("Failed to fetch landing data:", error);
     return NextResponse.json(
       { error: "Failed to fetch landing data." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

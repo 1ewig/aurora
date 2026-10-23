@@ -16,17 +16,20 @@ import { ProductListingClient } from "@/components/product/listing/ProductListin
 /** Metadata for the all-products listing page. */
 export const metadata: Metadata = {
   title: "All Products",
-  description: "Explore our collection of premium, consciously designed clothing pieces.",
+  description:
+    "Explore our collection of premium, consciously designed clothing pieces.",
   openGraph: {
     title: "All Products | Aurora",
-    description: "Explore our collection of premium, consciously designed clothing pieces.",
+    description:
+      "Explore our collection of premium, consciously designed clothing pieces.",
     type: "website",
     url: "https://aurora-nu-three.vercel.app/products",
   },
   twitter: {
     card: "summary",
     title: "All Products | Aurora",
-    description: "Explore our collection of premium, consciously designed clothing pieces.",
+    description:
+      "Explore our collection of premium, consciously designed clothing pieces.",
   },
 };
 
@@ -34,4 +37,3 @@ export const metadata: Metadata = {
 export default function ProductsPage() {
   return <ProductListingClient initialCategory="All" />;
 }
-

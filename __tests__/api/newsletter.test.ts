@@ -74,7 +74,9 @@ describe("POST /api/newsletter", () => {
 
     // Verify SQL insert normalized the email
     expect(mockQuery).toHaveBeenCalledTimes(2);
-    expect(mockQuery.mock.calls[1][0]).toContain("INSERT INTO public.newsletter_subscriptions");
+    expect(mockQuery.mock.calls[1][0]).toContain(
+      "INSERT INTO public.newsletter_subscriptions",
+    );
     expect(mockQuery.mock.calls[1][1][0]).toBe("test@example.com");
   });
 

@@ -12,7 +12,7 @@ describe("sanitize", () => {
 
   it("strips HTML tags", () => {
     expect(sanitize("<script>alert('xss')</script>hello")).toBe(
-      "alert('xss')hello"
+      "alert('xss')hello",
     );
   });
 
@@ -129,20 +129,20 @@ describe("validateShippingAddress", () => {
   });
 
   it("treats whitespace-only string as missing", () => {
-    expect(
-      validateShippingAddress({ ...validAddress, email: "   " })
-    ).toBe("email is required");
+    expect(validateShippingAddress({ ...validAddress, email: "   " })).toBe(
+      "email is required",
+    );
   });
 
   it("returns error for invalid email format", () => {
     expect(
-      validateShippingAddress({ ...validAddress, email: "invalid-email" })
+      validateShippingAddress({ ...validAddress, email: "invalid-email" }),
     ).toBe("Enter a valid email address");
-    expect(
-      validateShippingAddress({ ...validAddress, email: "test@" })
-    ).toBe("Enter a valid email address");
-    expect(
-      validateShippingAddress({ ...validAddress, email: "@@@" })
-    ).toBe("Enter a valid email address");
+    expect(validateShippingAddress({ ...validAddress, email: "test@" })).toBe(
+      "Enter a valid email address",
+    );
+    expect(validateShippingAddress({ ...validAddress, email: "@@@" })).toBe(
+      "Enter a valid email address",
+    );
   });
 });

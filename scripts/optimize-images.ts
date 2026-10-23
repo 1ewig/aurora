@@ -62,7 +62,7 @@ interface CliArgs {
 export async function optimizeImage(
   inputFilePath: string,
   outputFilePath: string,
-  options: OptimizeOptions = {}
+  options: OptimizeOptions = {},
 ): Promise<SingleResult> {
   const { quality = DEFAULT_QUALITY, maxSize = DEFAULT_MAX_SIZE } = options;
 
@@ -85,9 +85,7 @@ export async function optimizeImage(
     await mkdir(targetDir, { recursive: true });
   }
 
-  await pipeline
-    .webp({ quality, effort: 6 })
-    .toFile(outputFilePath);
+  await pipeline.webp({ quality, effort: 6 }).toFile(outputFilePath);
 
   const originalSize = fs.statSync(inputFilePath).size;
   const optimizedSize = fs.statSync(outputFilePath).size;
@@ -107,7 +105,7 @@ export async function optimizeDirectory(
   inputDir: string,
   outputDir: string,
   options: OptimizeOptions = {},
-  subDir = ""
+  subDir = "",
 ): Promise<DirectoryStats> {
   const currentInputDir = join(inputDir, subDir);
   const currentOutputDir = join(outputDir, subDir);
@@ -115,12 +113,21 @@ export async function optimizeDirectory(
   await mkdir(currentOutputDir, { recursive: true });
 
   const entries = await readdir(currentInputDir, { withFileTypes: true });
-  const stats: DirectoryStats = { processed: 0, totalOriginal: 0, totalOptimized: 0 };
+  const stats: DirectoryStats = {
+    processed: 0,
+    totalOriginal: 0,
+    totalOptimized: 0,
+  };
 
   for (const entry of entries) {
     const entryPath = join(subDir, entry.name);
     if (entry.isDirectory()) {
-      const subStats = await optimizeDirectory(inputDir, outputDir, options, entryPath);
+      const subStats = await optimizeDirectory(
+        inputDir,
+        outputDir,
+        options,
+        entryPath,
+      );
       stats.processed += subStats.processed;
       stats.totalOriginal += subStats.totalOriginal;
       stats.totalOptimized += subStats.totalOptimized;
@@ -134,9 +141,12 @@ export async function optimizeDirectory(
       stats.totalOriginal += result.originalSize;
       stats.totalOptimized += result.optimizedSize;
 
-      const pct = ((1 - result.optimizedSize / result.originalSize) * 100).toFixed(1);
+      const pct = (
+        (1 - result.optimizedSize / result.originalSize) *
+        100
+      ).toFixed(1);
       console.log(
-        `${entryPath}: ${(result.originalSize / 1024).toFixed(0)}KB → ${(result.optimizedSize / 1024).toFixed(0)}KB (${pct}% saved)`
+        `${entryPath}: ${(result.originalSize / 1024).toFixed(0)}KB → ${(result.optimizedSize / 1024).toFixed(0)}KB (${pct}% saved)`,
       );
     }
   }
@@ -241,14 +251,19 @@ async function main(): Promise<void> {
     if (stats.processed === 0) {
       console.log(`No JPG/PNG images found in "${input}".`);
     } else {
-      const totalPct = ((1 - stats.totalOptimized / stats.totalOriginal) * 100).toFixed(1);
+      const totalPct = (
+        (1 - stats.totalOptimized / stats.totalOriginal) *
+        100
+      ).toFixed(1);
       console.log(
-        `\n✨ Optimized ${stats.processed} images: ${(stats.totalOriginal / 1024 / 1024).toFixed(1)}MB → ${(stats.totalOptimized / 1024 / 1024).toFixed(1)}MB (${totalPct}% saved)`
+        `\n✨ Optimized ${stats.processed} images: ${(stats.totalOriginal / 1024 / 1024).toFixed(1)}MB → ${(stats.totalOptimized / 1024 / 1024).toFixed(1)}MB (${totalPct}% saved)`,
       );
     }
   } else if (stat.isFile()) {
     if (!IMAGE_EXTENSIONS_REGEX.test(input)) {
-      console.error(`Error: "${input}" is not a supported image file (.jpg, .jpeg, .png).`);
+      console.error(
+        `Error: "${input}" is not a supported image file (.jpg, .jpeg, .png).`,
+      );
       process.exit(1);
     }
 
@@ -263,7 +278,7 @@ async function main(): Promise<void> {
     const res = await optimizeImage(input, targetFile, options);
     const pct = ((1 - res.optimizedSize / res.originalSize) * 100).toFixed(1);
     console.log(
-      `✨ ${input} → ${res.outputPath}: ${(res.originalSize / 1024).toFixed(0)}KB → ${(res.optimizedSize / 1024).toFixed(0)}KB (${pct}% saved)`
+      `✨ ${input} → ${res.outputPath}: ${(res.originalSize / 1024).toFixed(0)}KB → ${(res.optimizedSize / 1024).toFixed(0)}KB (${pct}% saved)`,
     );
   }
 }
@@ -271,7 +286,8 @@ async function main(): Promise<void> {
 // Run only if executed directly
 const isDirectExecution =
   Boolean(import.meta.main) ||
-  (Boolean(process.argv[1]) && resolve(process.argv[1]) === resolve(import.meta.filename || ""));
+  (Boolean(process.argv[1]) &&
+    resolve(process.argv[1]) === resolve(import.meta.filename || ""));
 
 if (isDirectExecution) {
   main().catch((err: unknown) => {

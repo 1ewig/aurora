@@ -5,10 +5,10 @@
  * allowing the browser client to authenticate with InsForge services.
  */
 
-import { requireAdmin } from '@/utils/admin';
-import jwt from 'jsonwebtoken';
-import { requireEnv } from '@/utils/env';
-import { NextResponse } from 'next/server';
+import { requireAdmin } from "@/utils/admin";
+import jwt from "jsonwebtoken";
+import { requireEnv } from "@/utils/env";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   const { user, error } = await requireAdmin();
@@ -17,15 +17,15 @@ export async function GET() {
   const token = jwt.sign(
     {
       sub: user.id,
-      role: 'admin',
-      aud: 'insforge-api',
+      role: "admin",
+      aud: "insforge-api",
     },
-    requireEnv('INSFORGE_JWT_SECRET'),
-    { algorithm: 'HS256', expiresIn: '1h' },
+    requireEnv("INSFORGE_JWT_SECRET"),
+    { algorithm: "HS256", expiresIn: "1h" },
   );
 
   return NextResponse.json(
     { token },
-    { headers: { 'Cache-Control': 'no-store' } },
+    { headers: { "Cache-Control": "no-store" } },
   );
 }

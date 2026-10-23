@@ -42,16 +42,32 @@ export function createDbMocks() {
     mockClientRelease.mockReset();
   }
 
-  return { mockQuery, mockConnect, mockClientQuery, mockClientRelease, mockPool, mockWithTransaction, reset };
+  return {
+    mockQuery,
+    mockConnect,
+    mockClientQuery,
+    mockClientRelease,
+    mockPool,
+    mockWithTransaction,
+    reset,
+  };
 }
 
-export function createAuthMock(session?: { user: { id: string; name: string } } | null) {
-  const resolved = session !== undefined ? session : { user: { id: "user-1", name: "Test User" } };
+export function createAuthMock(
+  session?: { user: { id: string; name: string } } | null,
+) {
+  const resolved =
+    session !== undefined
+      ? session
+      : { user: { id: "user-1", name: "Test User" } };
   const mockGetSession = vi.fn().mockResolvedValue(resolved);
   return { mockGetSession, reset: () => mockGetSession.mockReset() };
 }
 
-export function makeRequest(url: string, options?: { method?: string; body?: unknown }): Request {
+export function makeRequest(
+  url: string,
+  options?: { method?: string; body?: unknown },
+): Request {
   const { method = "GET", body } = options ?? {};
   return new Request(url, {
     method,

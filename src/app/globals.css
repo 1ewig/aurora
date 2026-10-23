@@ -70,10 +70,14 @@
 }
 
 @media print {
-  header, footer, nav, button, .print-hide {
+  header,
+  footer,
+  nav,
+  button,
+  .print-hide {
     display: none !important;
   }
   body {
-    background-color: #FFFFFF !important;
+    background-color: #ffffff !important;
   }
 }

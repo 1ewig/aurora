@@ -40,8 +40,18 @@ export function MediaUploadFields({
       {/* Product Narrative & Description Card */}
       <div className="border border-border-subtle bg-bg-primary/25 rounded-2xl p-4 sm:p-5 space-y-3.5">
         <h3 className="text-[11px] font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5 pb-1 border-b border-border-subtle/50">
-          <svg className="w-3.5 h-3.5 text-accent-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+          <svg
+            className="w-3.5 h-3.5 text-accent-primary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h7"
+            />
           </svg>
           Editorial Description
         </h3>
@@ -65,13 +75,24 @@ export function MediaUploadFields({
       <div className="border border-border-subtle bg-bg-primary/25 rounded-2xl p-4 sm:p-5 space-y-4">
         <div className="flex items-center justify-between pb-1 border-b border-border-subtle/50">
           <h3 className="text-[11px] font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
-            <svg className="w-3.5 h-3.5 text-accent-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg
+              className="w-3.5 h-3.5 text-accent-primary"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
             Media & Photography
           </h3>
           <span className="text-[10px] font-mono text-text-muted">
-            {galleryUrls.length + (mainImageUrl ? 1 : 0)} asset{galleryUrls.length + (mainImageUrl ? 1 : 0) === 1 ? "" : "s"}
+            {galleryUrls.length + (mainImageUrl ? 1 : 0)} asset
+            {galleryUrls.length + (mainImageUrl ? 1 : 0) === 1 ? "" : "s"}
           </span>
         </div>
 
@@ -98,13 +119,29 @@ export function MediaUploadFields({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
-              Primary Product Image <span className="text-accent-vivid font-semibold">*</span>
+              Primary Product Image{" "}
+              <span className="text-accent-vivid font-semibold">*</span>
             </span>
             {uploading && (
               <span className="text-[10px] font-semibold text-accent-vivid flex items-center gap-1">
-                <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                <svg
+                  className="animate-spin h-3 w-3"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
                 </svg>
                 Uploading to InsForge...
               </span>
@@ -146,20 +183,36 @@ export function MediaUploadFields({
             </div>
           ) : (
             <div
-              onClick={() => isReady && !uploading && mainFileInputRef.current?.click()}
+              onClick={() =>
+                isReady && !uploading && mainFileInputRef.current?.click()
+              }
               className={`p-6 border-2 border-dashed border-border-medium hover:border-accent-primary rounded-xl text-center cursor-pointer transition-all bg-bg-secondary/50 hover:bg-bg-secondary ${
                 !isReady || uploading ? "opacity-50 pointer-events-none" : ""
               }`}
             >
               <div className="flex flex-col items-center justify-center gap-2">
                 <div className="w-9 h-9 rounded-full bg-accent-primary/10 text-accent-vivid flex items-center justify-center">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-text-primary">Click to select primary image</p>
-                  <p className="text-[10px] text-text-muted mt-0.5">High-res WebP, JPG or PNG (up to 50MB)</p>
+                  <p className="text-xs font-bold text-text-primary">
+                    Click to select primary image
+                  </p>
+                  <p className="text-[10px] text-text-muted mt-0.5">
+                    High-res WebP, JPG or PNG (up to 50MB)
+                  </p>
                 </div>
               </div>
             </div>
@@ -183,7 +236,9 @@ export function MediaUploadFields({
           </div>
 
           {galleryUrls.length === 0 ? (
-            <p className="text-xs text-text-muted italic py-1">No additional gallery views uploaded yet.</p>
+            <p className="text-xs text-text-muted italic py-1">
+              No additional gallery views uploaded yet.
+            </p>
           ) : (
             <div className="grid grid-cols-4 sm:grid-cols-5 gap-2.5 pt-1">
               {galleryUrls.map((url, index) => (
@@ -206,8 +261,18 @@ export function MediaUploadFields({
                       title="Remove image"
                       aria-label="Remove image"
                     >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      <svg
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
                       </svg>
                     </button>
                   </div>

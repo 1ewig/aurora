@@ -20,7 +20,8 @@ import { redirect } from "next/navigation";
 /** Metadata for the admin layout. Prevent search indexing. */
 export const metadata: Metadata = {
   title: "Admin Panel — Aurora",
-  description: "Manage system dashboard metrics, inventory, orders, and user permissions.",
+  description:
+    "Manage system dashboard metrics, inventory, orders, and user permissions.",
   robots: {
     index: false,
     follow: false,

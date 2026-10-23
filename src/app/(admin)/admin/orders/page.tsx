@@ -9,12 +9,12 @@
  * useUpdateOrderStatusMutation for status changes.
  */
 
-import { OrdersClient } from '@/components/admin/orders/OrdersClient';
+import { OrdersClient } from "@/components/admin/orders/OrdersClient";
 
 /** Metadata for the admin orders page. */
 export const metadata = {
-  title: 'Orders | Admin | Aurora',
-  description: 'Process and manage customer orders.',
+  title: "Orders | Admin | Aurora",
+  description: "Process and manage customer orders.",
   robots: {
     index: false,
     follow: false,

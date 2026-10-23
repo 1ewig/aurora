@@ -21,7 +21,15 @@ export function InventorySkeleton() {
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-border-subtle bg-bg-primary/50">
-              {["Image", "ID", "Name", "Category", "Price", "Stock levels", "Actions"].map((h) => (
+              {[
+                "Image",
+                "ID",
+                "Name",
+                "Category",
+                "Price",
+                "Stock levels",
+                "Actions",
+              ].map((h) => (
                 <th key={h} className="px-6 py-4">
                   <div className="h-3 w-16 bg-bg-secondary rounded" />
                 </th>

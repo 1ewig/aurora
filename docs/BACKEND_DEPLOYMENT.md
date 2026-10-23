@@ -43,6 +43,7 @@ bunx @insforge/cli create
 ```
 
 Follow the interactive prompts:
+
 - **Project name**: `Aurora` (or your preferred name)
 - **Region**: `us-east` (or closest to your audience)
 - **Org**: Select your personal org
@@ -71,27 +72,27 @@ Get the **database connection string** — open the InsForge Dashboard, navigate
 
 You now have these values:
 
-| Variable | Where to find it |
-|---|---|
-| `DATABASE_URL` | InsForge Dashboard → Database section |
-| `NEXT_PUBLIC_INSFORGE_URL` | `.insforge/project.json` → `oss_host` |
-| `NEXT_PUBLIC_INSFORGE_ANON_KEY` | `bunx @insforge/cli secrets get ANON_KEY` |
-| `INSFORGE_API_KEY` | `.insforge/project.json` → `api_key` |
-| `INSFORGE_JWT_SECRET` | `bunx @insforge/cli secrets get JWT_SECRET` |
-| `BETTER_AUTH_SECRET` | Generate: `bun -e "console.log(Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('base64'))"` |
-| `BETTER_AUTH_URL` | `http://localhost:3000` (dev) or production URL |
-| `NEXT_PUBLIC_BETTER_AUTH_URL` | Same as `BETTER_AUTH_URL` |
-| `ADMIN_EMAILS` | Comma-separated admin email addresses |
-| `BREVO_SMTP_HOST` | `smtp-relay.brevo.com` |
-| `BREVO_SMTP_PORT` | `587` |
-| `BREVO_SMTP_USER` | Your Brevo SMTP login email |
-| `BREVO_SMTP_PASS` | Your Brevo SMTP API key |
-| `BREVO_FROM_EMAIL` | Sender email address |
-| `BREVO_FROM_NAME` | `Aurora` |
-| `LEMON_SQUEEZY_API_KEY` | Lemon Squeezy Dashboard → Settings → API (create key) |
-| `LEMON_SQUEEZY_STORE_ID` | Lemon Squeezy Dashboard → Settings → Store (numerical ID) |
-| `LEMON_SQUEEZY_WEBHOOK_SECRET` | Custom random string of your choice (6-40 chars) |
-| `NEXT_PUBLIC_LS_ORDER_VARIANT_ID` | Lemon Squeezy Dashboard → Products → variant ID |
+| Variable                          | Where to find it                                                                                             |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `DATABASE_URL`                    | InsForge Dashboard → Database section                                                                        |
+| `NEXT_PUBLIC_INSFORGE_URL`        | `.insforge/project.json` → `oss_host`                                                                        |
+| `NEXT_PUBLIC_INSFORGE_ANON_KEY`   | `bunx @insforge/cli secrets get ANON_KEY`                                                                    |
+| `INSFORGE_API_KEY`                | `.insforge/project.json` → `api_key`                                                                         |
+| `INSFORGE_JWT_SECRET`             | `bunx @insforge/cli secrets get JWT_SECRET`                                                                  |
+| `BETTER_AUTH_SECRET`              | Generate: `bun -e "console.log(Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('base64'))"` |
+| `BETTER_AUTH_URL`                 | `http://localhost:3000` (dev) or production URL                                                              |
+| `NEXT_PUBLIC_BETTER_AUTH_URL`     | Same as `BETTER_AUTH_URL`                                                                                    |
+| `ADMIN_EMAILS`                    | Comma-separated admin email addresses                                                                        |
+| `BREVO_SMTP_HOST`                 | `smtp-relay.brevo.com`                                                                                       |
+| `BREVO_SMTP_PORT`                 | `587`                                                                                                        |
+| `BREVO_SMTP_USER`                 | Your Brevo SMTP login email                                                                                  |
+| `BREVO_SMTP_PASS`                 | Your Brevo SMTP API key                                                                                      |
+| `BREVO_FROM_EMAIL`                | Sender email address                                                                                         |
+| `BREVO_FROM_NAME`                 | `Aurora`                                                                                                     |
+| `LEMON_SQUEEZY_API_KEY`           | Lemon Squeezy Dashboard → Settings → API (create key)                                                        |
+| `LEMON_SQUEEZY_STORE_ID`          | Lemon Squeezy Dashboard → Settings → Store (numerical ID)                                                    |
+| `LEMON_SQUEEZY_WEBHOOK_SECRET`    | Custom random string of your choice (6-40 chars)                                                             |
+| `NEXT_PUBLIC_LS_ORDER_VARIANT_ID` | Lemon Squeezy Dashboard → Products → variant ID                                                              |
 
 ---
 
@@ -135,6 +136,7 @@ NEXT_PUBLIC_LS_ORDER_VARIANT_ID="your-ls-test-product-variant-id"
 For a **first-time setup or clean reset**, you must initialize both the authentication schema and seed the catalog/media assets.
 
 ### 1. Initialize Better Auth Schema & Tables
+
 Run the database setup script to create the `better_auth` schema and its core tables (`user`, `session`, `account`, `verification`) and run the setup migrations:
 
 ```bash
@@ -142,6 +144,7 @@ bun scripts/setup-db.js
 ```
 
 ### 2. Seed Database Catalog & Upload Assets
+
 Run the seeding script to create storage buckets, build the catalog tables, upload files, and seed all products:
 
 ```bash
@@ -149,6 +152,7 @@ bun scripts/upload-and-seed.mts
 ```
 
 This performs a completely automated setup and seeding:
+
 1. **Multi-Bucket Verification & Wipe**: Checks and prepares three buckets: `product-media`, `lookbook-media`, and `editorial-media`. If missing, it creates them. If they exist with data, it wipes them to prevent name collisions.
 2. **Recursive Image Scan & Route**: Uploads all local assets recursively to their corresponding storage buckets (`/images/lookbook/*` -> `lookbook-media`, `/images/editorial/*` -> `editorial-media`, and products -> `product-media`).
 3. **Database Schema Creation**: Automatically drops existing tables and executes [`scripts/create-tables.sql`](../scripts/create-tables.sql) to build the database from scratch (excluding the Better Auth tables, which are handled in the previous step).
@@ -165,6 +169,7 @@ bun scripts/update-catalog.mts
 ```
 
 In this mode:
+
 - **Tables are never dropped** — existing user profiles and orders are preserved.
 - **Data is updated/inserted (upserted)** — updates existing records and inserts new ones.
 - **Images are force-overwritten** — deletes existing keys in storage before uploading new versions, ensuring lookbook/editorial image updates are instantly replaced.
@@ -180,6 +185,7 @@ bun run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) and check:
+
 - The home page loads with product images
 - The **Shop All** page shows products
 - Clicking a product shows its detail page
@@ -194,6 +200,7 @@ bun run build
 ```
 
 If you're deploying to Vercel or another platform, set these environment variables there:
+
 - `DATABASE_URL`
 - `NEXT_PUBLIC_INSFORGE_URL`
 - `NEXT_PUBLIC_INSFORGE_ANON_KEY`
@@ -218,13 +225,13 @@ If you're deploying to Vercel or another platform, set these environment variabl
 
 ## Summary of files created/modified during setup
 
-| Action | File |
-|---|---|
-| Auto-generated by `bunx @insforge/cli create` | `.insforge/project.json` |
-| You create manually | `.env.local` (from `.env.example`) |
-| Handled automatically | `scripts/create-tables.sql` (schema definitions) |
-| Setup and clean seed script | `scripts/upload-and-seed.mts` |
-| Catalog update script | `scripts/update-catalog.mts` |
+| Action                                        | File                                             |
+| --------------------------------------------- | ------------------------------------------------ |
+| Auto-generated by `bunx @insforge/cli create` | `.insforge/project.json`                         |
+| You create manually                           | `.env.local` (from `.env.example`)               |
+| Handled automatically                         | `scripts/create-tables.sql` (schema definitions) |
+| Setup and clean seed script                   | `scripts/upload-and-seed.mts`                    |
+| Catalog update script                         | `scripts/update-catalog.mts`                     |
 
 Everything else is committed to the repository and ready to use.
 
@@ -232,17 +239,17 @@ Everything else is committed to the repository and ready to use.
 
 ## Troubleshooting
 
-| Problem | Likely cause | Fix |
-|---|---|---|
-| `insforge: command not found` | CLI not installed | Use `bunx @insforge/cli ...` (no global install needed) |
-| `DATABASE_URL not found` | `.env.local` missing or misconfigured | Copy `.env.example` → `.env.local` and fill in the values |
-| Auth redirects to login loop | `BETTER_AUTH_URL` or `NEXT_PUBLIC_BETTER_AUTH_URL` mismatch | Ensure both match your deployment URL exactly (no trailing slash) |
-| Session invalidated on re-deploy | `BETTER_AUTH_SECRET` changed between deploys | Keep the same secret across all environments |
-| `relation "better_auth.user" does not exist` | BA tables not created | Run `bun scripts/setup-db.js` to initialize authentication schema and tables |
-| `relation "products" does not exist` | Tables not created | Run `bun scripts/upload-and-seed.mts` to automatically build schema |
-| `bucket product-media does not exist` | Bucket not created | Run `bun scripts/upload-and-seed.mts` to automatically create buckets |
-| Images show as broken | Bucket is private | Buckets are public by default, but verify: if private, run setup script to recreate them |
-| Build fails with type errors | Check for missing types | Run `bun install` again |
+| Problem                                      | Likely cause                                                | Fix                                                                                      |
+| -------------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `insforge: command not found`                | CLI not installed                                           | Use `bunx @insforge/cli ...` (no global install needed)                                  |
+| `DATABASE_URL not found`                     | `.env.local` missing or misconfigured                       | Copy `.env.example` → `.env.local` and fill in the values                                |
+| Auth redirects to login loop                 | `BETTER_AUTH_URL` or `NEXT_PUBLIC_BETTER_AUTH_URL` mismatch | Ensure both match your deployment URL exactly (no trailing slash)                        |
+| Session invalidated on re-deploy             | `BETTER_AUTH_SECRET` changed between deploys                | Keep the same secret across all environments                                             |
+| `relation "better_auth.user" does not exist` | BA tables not created                                       | Run `bun scripts/setup-db.js` to initialize authentication schema and tables             |
+| `relation "products" does not exist`         | Tables not created                                          | Run `bun scripts/upload-and-seed.mts` to automatically build schema                      |
+| `bucket product-media does not exist`        | Bucket not created                                          | Run `bun scripts/upload-and-seed.mts` to automatically create buckets                    |
+| Images show as broken                        | Bucket is private                                           | Buckets are public by default, but verify: if private, run setup script to recreate them |
+| Build fails with type errors                 | Check for missing types                                     | Run `bun install` again                                                                  |
 
 ---
 
@@ -255,11 +262,11 @@ To capture sandbox payment events and fulfill orders automatically, setup the we
    bunx ngrok http 3000
    ```
 2. **Register URL in Dashboard:**
-   * Go to your Lemon Squeezy Dashboard → **Settings ➔ Webhooks**.
-   * Click **+ Add Webhook**.
-   * **Callback URL**: 
+   - Go to your Lemon Squeezy Dashboard → **Settings ➔ Webhooks**.
+   - Click **+ Add Webhook**.
+   - **Callback URL**:
      - Development: `https://<your-ngrok-subdomain>.ngrok-free.dev/api/webhooks/lemonsqueezy`
      - Production: `https://<your-domain>/api/webhooks/lemonsqueezy`
-   * **Signing Secret**: Set the exact same string configured in your `LEMON_SQUEEZY_WEBHOOK_SECRET` variable.
-   * **Events**: Check the **`order_created`** event.
-   * Click **Save**.
+   - **Signing Secret**: Set the exact same string configured in your `LEMON_SQUEEZY_WEBHOOK_SECRET` variable.
+   - **Events**: Check the **`order_created`** event.
+   - Click **Save**.

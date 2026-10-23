@@ -15,12 +15,16 @@ import {
   useUpdateOrderStatusMutation,
 } from "@/hooks/queries";
 
-export function useOrdersManagement(page: number, search: string, filterStatus: string) {
+export function useOrdersManagement(
+  page: number,
+  search: string,
+  filterStatus: string,
+) {
   const { data, isLoading, isFetching, error, refetch } = useAdminOrdersQuery({
     page,
     limit: 20,
     search,
-    status: filterStatus === 'all' ? undefined : filterStatus,
+    status: filterStatus === "all" ? undefined : filterStatus,
   });
   const updateMutation = useUpdateOrderStatusMutation();
   const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
@@ -33,7 +37,9 @@ export function useOrdersManagement(page: number, search: string, filterStatus: 
     try {
       await updateMutation.mutateAsync({ orderId, status });
       if (selectedOrder?.id === orderId) {
-        setSelectedOrder((prev) => (prev ? { ...prev, status: status as OrderData["status"] } : null));
+        setSelectedOrder((prev) =>
+          prev ? { ...prev, status: status as OrderData["status"] } : null,
+        );
       }
     } catch (err: any) {
       alert(err.message || "Failed to update order status");

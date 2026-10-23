@@ -8,7 +8,9 @@ vi.mock("@/utils/db", () => ({
 }));
 
 vi.mock("@/lib/auth", () => ({
-  auth: { api: { getSession: (...args: unknown[]) => mockGetSession(...args) } },
+  auth: {
+    api: { getSession: (...args: unknown[]) => mockGetSession(...args) },
+  },
 }));
 
 vi.mock("next/headers", () => ({
@@ -52,7 +54,20 @@ describe("GET /api/orders", () => {
 
   it("returns paginated orders for authenticated user", async () => {
     const mockOrders = [
-      { id: "1", user_id: "user-1", order_number: "AUR-001", items: [], subtotal: 100, shipping: 25, tax: 8, total: 133, shipping_address: {}, status: "pending", is_paid: true, created_at: "2026-01-01" },
+      {
+        id: "1",
+        user_id: "user-1",
+        order_number: "AUR-001",
+        items: [],
+        subtotal: 100,
+        shipping: 25,
+        tax: 8,
+        total: 133,
+        shipping_address: {},
+        status: "pending",
+        is_paid: true,
+        created_at: "2026-01-01",
+      },
     ];
     mockGetSession.mockResolvedValue({ user: { id: "user-1" } });
     mockPoolQuery
@@ -76,7 +91,9 @@ describe("GET /api/orders", () => {
       .mockResolvedValueOnce({ rows: [] });
 
     const { GET } = await import("@/app/api/orders/route");
-    const res = await GET(makeRequest("http://localhost:3000/api/orders?limit=999"));
+    const res = await GET(
+      makeRequest("http://localhost:3000/api/orders?limit=999"),
+    );
 
     expect(res.status).toBe(200);
     const queryArgs = mockPoolQuery.mock.calls[1];
@@ -85,12 +102,17 @@ describe("GET /api/orders", () => {
 
   describe("lsOrderId lookup", () => {
     it("returns order number when found", async () => {
-      mockPoolQuery.mockResolvedValue({ rows: [{ order_number: "AUR-001" }], rowCount: 1 });
+      mockPoolQuery.mockResolvedValue({
+        rows: [{ order_number: "AUR-001" }],
+        rowCount: 1,
+      });
 
       const { GET } = await import("@/app/api/orders/route");
-      const res = await GET(makeRequest("http://localhost:3000/api/orders?lsOrderId=ls-1"));
+      const res = await GET(
+        makeRequest("http://localhost:3000/api/orders?lsOrderId=ls-1"),
+      );
       const json = await res.json();
-    expect(res.status).toBe(200);
+      expect(res.status).toBe(200);
       expect(json.orderNumber).toBe("AUR-001");
     });
 
@@ -98,7 +120,9 @@ describe("GET /api/orders", () => {
       mockPoolQuery.mockResolvedValue({ rows: [], rowCount: 0 });
 
       const { GET } = await import("@/app/api/orders/route");
-      const res = await GET(makeRequest("http://localhost:3000/api/orders?lsOrderId=ls-missing"));
+      const res = await GET(
+        makeRequest("http://localhost:3000/api/orders?lsOrderId=ls-missing"),
+      );
 
       expect(res.status).toBe(404);
     });

@@ -10,7 +10,11 @@ interface AdminHeaderPanelProps {
   action?: React.ReactNode;
 }
 
-export function AdminHeaderPanel({ title, description, action }: AdminHeaderPanelProps) {
+export function AdminHeaderPanel({
+  title,
+  description,
+  action,
+}: AdminHeaderPanelProps) {
   return (
     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-border-subtle pb-6">
       <div>

@@ -22,7 +22,8 @@ export default function RootNotFound() {
             404
           </h1>
           <p className="text-text-secondary text-base sm:text-lg leading-relaxed">
-            The requested destination could not be located across our storefront.
+            The requested destination could not be located across our
+            storefront.
           </p>
         </div>
 

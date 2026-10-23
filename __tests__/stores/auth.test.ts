@@ -1,7 +1,17 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createAuthStore } from "@/stores/useAuthStore";
 
-const { mockSignInEmail, mockSignUpEmail, mockSignOut, mockUpdateUser, mockVerifyEmail, mockSendVerificationEmail, mockRequestPasswordReset, mockResetPassword, mockChangePassword } = vi.hoisted(() => ({
+const {
+  mockSignInEmail,
+  mockSignUpEmail,
+  mockSignOut,
+  mockUpdateUser,
+  mockVerifyEmail,
+  mockSendVerificationEmail,
+  mockRequestPasswordReset,
+  mockResetPassword,
+  mockChangePassword,
+} = vi.hoisted(() => ({
   mockSignInEmail: vi.fn(),
   mockSignUpEmail: vi.fn(),
   mockSignOut: vi.fn(),
@@ -46,10 +56,21 @@ beforeEach(() => {
 
 describe("signIn", () => {
   it("sets user and profile on successful sign-in", async () => {
-    mockSignInEmail.mockResolvedValue({ data: { user: { id: "u1", email: "a@b.com" } }, error: null });
+    mockSignInEmail.mockResolvedValue({
+      data: { user: { id: "u1", email: "a@b.com" } },
+      error: null,
+    });
     mockFetchUserRole.mockResolvedValue({ isAdmin: false, role: "user" });
     mockBuildUserState.mockReturnValue({
-      user: { id: "u1", email: "a@b.com", name: "", emailVerified: false, image: "", isAdmin: false, role: "user" },
+      user: {
+        id: "u1",
+        email: "a@b.com",
+        name: "",
+        emailVerified: false,
+        image: "",
+        isAdmin: false,
+        role: "user",
+      },
       profile: { displayName: "" },
     });
 
@@ -62,7 +83,10 @@ describe("signIn", () => {
   });
 
   it("maps invalid_password error", async () => {
-    mockSignInEmail.mockResolvedValue({ data: null, error: { code: "invalid_password", message: "Invalid password" } });
+    mockSignInEmail.mockResolvedValue({
+      data: null,
+      error: { code: "invalid_password", message: "Invalid password" },
+    });
 
     const result = await store.getState().signIn("a@b.com", "wrong");
 
@@ -71,7 +95,10 @@ describe("signIn", () => {
   });
 
   it("detects unverified email via 403 status", async () => {
-    mockSignInEmail.mockResolvedValue({ data: null, error: { status: 403, message: "Email not verified" } });
+    mockSignInEmail.mockResolvedValue({
+      data: null,
+      error: { status: 403, message: "Email not verified" },
+    });
 
     const result = await store.getState().signIn("a@b.com", "pass");
 
@@ -80,7 +107,10 @@ describe("signIn", () => {
   });
 
   it("maps rate_limit error", async () => {
-    mockSignInEmail.mockResolvedValue({ data: null, error: { code: "rate_limit", message: "Too many requests" } });
+    mockSignInEmail.mockResolvedValue({
+      data: null,
+      error: { code: "rate_limit", message: "Too many requests" },
+    });
 
     await store.getState().signIn("a@b.com", "pass");
 
@@ -88,7 +118,10 @@ describe("signIn", () => {
   });
 
   it("maps weak_password error", async () => {
-    mockSignInEmail.mockResolvedValue({ data: null, error: { code: "weak_password", message: "Password is too short" } });
+    mockSignInEmail.mockResolvedValue({
+      data: null,
+      error: { code: "weak_password", message: "Password is too short" },
+    });
 
     await store.getState().signIn("a@b.com", "short");
 
@@ -98,30 +131,51 @@ describe("signIn", () => {
 
 describe("signUp", () => {
   it("returns needsVerification when email not verified", async () => {
-    mockSignUpEmail.mockResolvedValue({ data: { user: { id: "u2", email: "a@b.com", emailVerified: false } }, error: null });
+    mockSignUpEmail.mockResolvedValue({
+      data: { user: { id: "u2", email: "a@b.com", emailVerified: false } },
+      error: null,
+    });
 
-    const result = await store.getState().signUp("a@b.com", "password123", "Test");
+    const result = await store
+      .getState()
+      .signUp("a@b.com", "password123", "Test");
 
     expect(result.needsVerification).toBe(true);
     expect(store.getState().user).toBeNull();
   });
 
   it("sets user when email is verified after sign-up", async () => {
-    mockSignUpEmail.mockResolvedValue({ data: { user: { id: "u2", email: "a@b.com", emailVerified: true } }, error: null });
+    mockSignUpEmail.mockResolvedValue({
+      data: { user: { id: "u2", email: "a@b.com", emailVerified: true } },
+      error: null,
+    });
     mockFetchUserRole.mockResolvedValue({ isAdmin: false, role: "user" });
     mockBuildUserState.mockReturnValue({
-      user: { id: "u2", email: "a@b.com", name: "Test", emailVerified: true, image: "", isAdmin: false, role: "user" },
+      user: {
+        id: "u2",
+        email: "a@b.com",
+        name: "Test",
+        emailVerified: true,
+        image: "",
+        isAdmin: false,
+        role: "user",
+      },
       profile: { displayName: "Test" },
     });
 
-    const result = await store.getState().signUp("a@b.com", "password123", "Test");
+    const result = await store
+      .getState()
+      .signUp("a@b.com", "password123", "Test");
 
     expect(result.error).toBeNull();
     expect(store.getState().user?.id).toBe("u2");
   });
 
   it("maps existing account error", async () => {
-    mockSignUpEmail.mockResolvedValue({ data: null, error: { message: "An account with this email already exists" } });
+    mockSignUpEmail.mockResolvedValue({
+      data: null,
+      error: { message: "An account with this email already exists" },
+    });
 
     await store.getState().signUp("existing@b.com", "password123", "Test");
 
@@ -131,7 +185,10 @@ describe("signUp", () => {
 
 describe("signOut", () => {
   it("clears user and profile", async () => {
-    store.setState({ user: { id: "u1", email: "a@b.com" } as any, profile: { displayName: "A" } });
+    store.setState({
+      user: { id: "u1", email: "a@b.com" } as any,
+      profile: { displayName: "A" },
+    });
     mockSignOut.mockResolvedValue({ data: null, error: null });
 
     await store.getState().signOut();
@@ -169,7 +226,9 @@ describe("verifyEmail", () => {
   });
 
   it("maps invalid_token error", async () => {
-    mockVerifyEmail.mockResolvedValue({ error: { code: "invalid_token", message: "Invalid token" } });
+    mockVerifyEmail.mockResolvedValue({
+      error: { code: "invalid_token", message: "Invalid token" },
+    });
     await store.getState().verifyEmail("a@b.com", "bad-token");
     expect(store.getState().error).toContain("expired");
   });
@@ -177,7 +236,9 @@ describe("verifyEmail", () => {
 
 describe("resetPassword", () => {
   it("returns error on failure", async () => {
-    mockResetPassword.mockResolvedValue({ error: { code: "invalid_token", message: "Invalid or expired token" } });
+    mockResetPassword.mockResolvedValue({
+      error: { code: "invalid_token", message: "Invalid or expired token" },
+    });
     const result = await store.getState().resetPassword("newpass", "bad-token");
     expect(result.error).toBeTruthy();
   });
@@ -185,7 +246,9 @@ describe("resetPassword", () => {
 
 describe("changePassword", () => {
   it("returns error on wrong current password", async () => {
-    mockChangePassword.mockResolvedValue({ error: { code: "invalid_password", message: "Invalid password" } });
+    mockChangePassword.mockResolvedValue({
+      error: { code: "invalid_password", message: "Invalid password" },
+    });
     await store.getState().changePassword("wrong", "newpass");
     expect(store.getState().error).toContain("Incorrect password");
   });

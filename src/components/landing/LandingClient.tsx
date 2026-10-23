@@ -16,13 +16,34 @@ import type { Product } from "@/data/products";
 import { Hero } from "./Hero";
 import { LazySection } from "@/components/ui/LazySection";
 
-const SignaturePieces = dynamic(() => import("./SignaturePieces").then((m) => m.SignaturePieces), { loading: () => <div className="h-96" /> });
-const FeaturedCollection = dynamic(() => import("./FeaturedCollection").then((m) => m.FeaturedCollection), { loading: () => <div className="h-96" /> });
-const MaterialIndex = dynamic(() => import("./MaterialIndex").then((m) => m.MaterialIndex), { loading: () => <div className="h-[50vh]" /> });
-const LookbookSlider = dynamic(() => import("./LookbookSlider").then((m) => m.LookbookSlider), { loading: () => <div className="h-[60vh]" /> });
-const DesignerStory = dynamic(() => import("./DesignerStory").then((m) => m.DesignerStory), { loading: () => <div className="h-[50vh]" /> });
-const PressClientNotes = dynamic(() => import("./PressClientNotes").then((m) => m.PressClientNotes), { loading: () => <div className="h-80" /> });
-const Newsletter = dynamic(() => import("./Newsletter").then((m) => m.Newsletter), { loading: () => <div className="h-96" /> });
+const SignaturePieces = dynamic(
+  () => import("./SignaturePieces").then((m) => m.SignaturePieces),
+  { loading: () => <div className="h-96" /> },
+);
+const FeaturedCollection = dynamic(
+  () => import("./FeaturedCollection").then((m) => m.FeaturedCollection),
+  { loading: () => <div className="h-96" /> },
+);
+const MaterialIndex = dynamic(
+  () => import("./MaterialIndex").then((m) => m.MaterialIndex),
+  { loading: () => <div className="h-[50vh]" /> },
+);
+const LookbookSlider = dynamic(
+  () => import("./LookbookSlider").then((m) => m.LookbookSlider),
+  { loading: () => <div className="h-[60vh]" /> },
+);
+const DesignerStory = dynamic(
+  () => import("./DesignerStory").then((m) => m.DesignerStory),
+  { loading: () => <div className="h-[50vh]" /> },
+);
+const PressClientNotes = dynamic(
+  () => import("./PressClientNotes").then((m) => m.PressClientNotes),
+  { loading: () => <div className="h-80" /> },
+);
+const Newsletter = dynamic(
+  () => import("./Newsletter").then((m) => m.Newsletter),
+  { loading: () => <div className="h-96" /> },
+);
 
 interface LandingClientProps {
   initialData?: LandingData;
@@ -69,13 +90,16 @@ export default function LandingClient({ initialData }: LandingClientProps) {
 
   const dailyCategories = useMemo(() => {
     if (!allCategories || !allCategories.length) return [];
-    return Array.from({ length: Math.min(3, allCategories.length) }, (_, i) =>
-      allCategories[(serverDay + i) % allCategories.length]
+    return Array.from(
+      { length: Math.min(3, allCategories.length) },
+      (_, i) => allCategories[(serverDay + i) % allCategories.length],
     );
   }, [allCategories, serverDay]);
 
   const slides = dbSlides.slice(0, 6);
-  const designerImage = editorialItems.find((item) => item.id === "designer")?.imageUrl;
+  const designerImage = editorialItems.find(
+    (item) => item.id === "designer",
+  )?.imageUrl;
 
   return (
     <main id="main-content" tabIndex={-1}>

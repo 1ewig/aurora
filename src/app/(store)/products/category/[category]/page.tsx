@@ -33,13 +33,13 @@ interface CategoryPageProps {
  * so admin updates to categories invalidate cached lookups.
  */
 async function getCategoryName(slug: string) {
-  'use cache';
+  "use cache";
   cacheLife({ stale: 300, revalidate: 300 });
-  cacheTag('categories');
+  cacheTag("categories");
   try {
     const result = await pool.query(
       "SELECT name FROM categories WHERE LOWER(slug) = LOWER($1)",
-      [slug]
+      [slug],
     );
     return result.rows[0]?.name || null;
   } catch (error) {
@@ -49,10 +49,13 @@ async function getCategoryName(slug: string) {
 }
 
 /** Generate metadata based on the category slug. */
-export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: CategoryPageProps): Promise<Metadata> {
   const { category } = await params;
-  const categoryName = await getCategoryName(category) || "Collection";
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://aurora-nu-three.vercel.app";
+  const categoryName = (await getCategoryName(category)) || "Collection";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL || "https://aurora-nu-three.vercel.app";
   const title = `${categoryName} | Aurora`;
   const description = `Discover our collection of premium ${categoryName.toLowerCase()} designed for the considered wardrobe.`;
 
@@ -88,4 +91,3 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return <ProductListingClient initialCategory={categoryName} />;
 }
-

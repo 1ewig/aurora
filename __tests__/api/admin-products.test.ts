@@ -20,11 +20,16 @@ vi.mock("next/cache", () => ({
 
 vi.mock("@insforge/sdk", () => ({
   createAdminClient: vi.fn(() => ({
-    storage: { from: vi.fn(() => ({ remove: vi.fn().mockResolvedValue(undefined) })) },
+    storage: {
+      from: vi.fn(() => ({ remove: vi.fn().mockResolvedValue(undefined) })),
+    },
   })),
 }));
 
-function req(url: string, options?: { method?: string; body?: unknown }): Request {
+function req(
+  url: string,
+  options?: { method?: string; body?: unknown },
+): Request {
   const { method = "GET", body } = options ?? {};
   return new Request(url, {
     method,
@@ -38,16 +43,37 @@ beforeEach(() => {
   db.reset();
   mockRequireAdmin.mockReset();
   mockRevalidateTag.mockReset();
-  mockRequireAdmin.mockResolvedValue({ user: { id: "admin-1" }, error: undefined });
+  mockRequireAdmin.mockResolvedValue({
+    user: { id: "admin-1" },
+    error: undefined,
+  });
 });
 
 describe("GET /api/admin/products", () => {
   it("returns paginated products", async () => {
-    const productRow = { id: "p1", slug: "test", name: "Test", category: "Outerwear", price: 100, badge: null, image: "/img.jpg", altText: "", span: null, aspectRatio: null, description: "Desc", images: [], sizes: [], details: [], total: "1" };
+    const productRow = {
+      id: "p1",
+      slug: "test",
+      name: "Test",
+      category: "Outerwear",
+      price: 100,
+      badge: null,
+      image: "/img.jpg",
+      altText: "",
+      span: null,
+      aspectRatio: null,
+      description: "Desc",
+      images: [],
+      sizes: [],
+      details: [],
+      total: "1",
+    };
     db.mockQuery.mockResolvedValue({ rows: [productRow] });
 
     const { GET } = await import("@/app/api/admin/products/route");
-    const res = await GET(req("http://localhost:3000/api/admin/products?page=1&limit=20"));
+    const res = await GET(
+      req("http://localhost:3000/api/admin/products?page=1&limit=20"),
+    );
     const json = await res.json();
 
     expect(json.products).toHaveLength(1);
@@ -68,13 +94,27 @@ describe("GET /api/admin/products", () => {
 
 describe("POST /api/admin/products", () => {
   const validProduct = {
-    id: "p-new", slug: "new-product", name: "New Product", category: "Outerwear", price: 100,
-    image: "/img.jpg", altText: "Alt", description: "Desc", images: ["/img2.jpg"], sizes: [{ size: "M", stock: 10 }], details: ["Detail 1"],
+    id: "p-new",
+    slug: "new-product",
+    name: "New Product",
+    category: "Outerwear",
+    price: 100,
+    image: "/img.jpg",
+    altText: "Alt",
+    description: "Desc",
+    images: ["/img2.jpg"],
+    sizes: [{ size: "M", stock: 10 }],
+    details: ["Detail 1"],
   };
 
   it("rejects missing required fields", async () => {
     const { POST } = await import("@/app/api/admin/products/route");
-    const res = await POST(req("http://localhost:3000/api/admin/products", { method: "POST", body: { name: "No ID" } }));
+    const res = await POST(
+      req("http://localhost:3000/api/admin/products", {
+        method: "POST",
+        body: { name: "No ID" },
+      }),
+    );
     expect(res.status).toBe(400);
   });
 
@@ -82,22 +122,36 @@ describe("POST /api/admin/products", () => {
     db.mockClientQuery.mockResolvedValue({ rows: [{ id: 1 }] });
 
     const { POST } = await import("@/app/api/admin/products/route");
-    const res = await POST(req("http://localhost:3000/api/admin/products", { method: "POST", body: validProduct }));
+    const res = await POST(
+      req("http://localhost:3000/api/admin/products", {
+        method: "POST",
+        body: validProduct,
+      }),
+    );
 
     expect(res.status).toBe(400);
-    expect(db.mockClientQuery.mock.calls[0][0]).toContain("SELECT 1 FROM products");
+    expect(db.mockClientQuery.mock.calls[0][0]).toContain(
+      "SELECT 1 FROM products",
+    );
   });
 
   it("creates product with nested data in transaction", async () => {
     db.mockClientQuery.mockResolvedValue({ rows: [] });
 
     const { POST } = await import("@/app/api/admin/products/route");
-    const res = await POST(req("http://localhost:3000/api/admin/products", { method: "POST", body: validProduct }));
+    const res = await POST(
+      req("http://localhost:3000/api/admin/products", {
+        method: "POST",
+        body: validProduct,
+      }),
+    );
     const json = await res.json();
 
     expect(res.status).toBe(200);
     expect(json.success).toBe(true);
-    expect(db.mockClientQuery.mock.calls[1][0]).toContain("INSERT INTO products");
+    expect(db.mockClientQuery.mock.calls[1][0]).toContain(
+      "INSERT INTO products",
+    );
     expect(mockRevalidateTag).toHaveBeenCalled();
   });
 });
@@ -107,7 +161,21 @@ describe("PUT /api/admin/products/[id]", () => {
     db.mockClientQuery.mockResolvedValue({ rows: [] });
 
     const { PUT } = await import("@/app/api/admin/products/[id]/route");
-    const res = await PUT(req("http://localhost:3000", { method: "PUT", body: { slug: "test", name: "Test", category: "Outerwear", price: 100, image: "/img.jpg", altText: "Alt", description: "Desc" } }), { params: Promise.resolve({ id: "p-missing" }) });
+    const res = await PUT(
+      req("http://localhost:3000", {
+        method: "PUT",
+        body: {
+          slug: "test",
+          name: "Test",
+          category: "Outerwear",
+          price: 100,
+          image: "/img.jpg",
+          altText: "Alt",
+          description: "Desc",
+        },
+      }),
+      { params: Promise.resolve({ id: "p-missing" }) },
+    );
 
     expect(res.status).toBe(404);
   });
@@ -118,7 +186,21 @@ describe("PUT /api/admin/products/[id]", () => {
       .mockResolvedValueOnce({ rows: [{ id: 1 }] });
 
     const { PUT } = await import("@/app/api/admin/products/[id]/route");
-    const res = await PUT(req("http://localhost:3000", { method: "PUT", body: { slug: "taken", name: "Test", category: "Outerwear", price: 100, image: "/img.jpg", altText: "Alt", description: "Desc" } }), { params: Promise.resolve({ id: "p-1" }) });
+    const res = await PUT(
+      req("http://localhost:3000", {
+        method: "PUT",
+        body: {
+          slug: "taken",
+          name: "Test",
+          category: "Outerwear",
+          price: 100,
+          image: "/img.jpg",
+          altText: "Alt",
+          description: "Desc",
+        },
+      }),
+      { params: Promise.resolve({ id: "p-1" }) },
+    );
 
     expect(res.status).toBe(400);
     expect((await res.json()).error).toContain("Slug");
@@ -132,7 +214,24 @@ describe("PUT /api/admin/products/[id]", () => {
       .mockResolvedValue({ rows: [] });
 
     const { PUT } = await import("@/app/api/admin/products/[id]/route");
-    const res = await PUT(req("http://localhost:3000", { method: "PUT", body: { slug: "updated", name: "Updated", category: "Knitwear", price: 150, image: "/new.jpg", altText: "Alt", description: "New Desc", images: [], sizes: [{ size: "L", stock: 5 }], details: ["New detail"] } }), { params: Promise.resolve({ id: "p-1" }) });
+    const res = await PUT(
+      req("http://localhost:3000", {
+        method: "PUT",
+        body: {
+          slug: "updated",
+          name: "Updated",
+          category: "Knitwear",
+          price: 150,
+          image: "/new.jpg",
+          altText: "Alt",
+          description: "New Desc",
+          images: [],
+          sizes: [{ size: "L", stock: 5 }],
+          details: ["New detail"],
+        },
+      }),
+      { params: Promise.resolve({ id: "p-1" }) },
+    );
 
     expect(res.status).toBe(200);
     expect(mockRevalidateTag).toHaveBeenCalled();
@@ -166,7 +265,7 @@ describe("PUT /api/admin/products/[id]", () => {
           details: ["New detail"],
         },
       }),
-      { params: Promise.resolve({ id: "p-1" }) }
+      { params: Promise.resolve({ id: "p-1" }) },
     );
 
     expect(res.status).toBe(200);
@@ -179,7 +278,9 @@ describe("DELETE /api/admin/products/[id]", () => {
     db.mockClientQuery.mockResolvedValue({ rows: [] });
 
     const { DELETE } = await import("@/app/api/admin/products/[id]/route");
-    const res = await DELETE(new Request("http://localhost:3000"), { params: Promise.resolve({ id: "p-missing" }) });
+    const res = await DELETE(new Request("http://localhost:3000"), {
+      params: Promise.resolve({ id: "p-missing" }),
+    });
 
     expect(res.status).toBe(404);
   });
@@ -191,7 +292,9 @@ describe("DELETE /api/admin/products/[id]", () => {
       .mockResolvedValue({ rows: [] });
 
     const { DELETE } = await import("@/app/api/admin/products/[id]/route");
-    const res = await DELETE(new Request("http://localhost:3000"), { params: Promise.resolve({ id: "p-1" }) });
+    const res = await DELETE(new Request("http://localhost:3000"), {
+      params: Promise.resolve({ id: "p-1" }),
+    });
 
     expect(res.status).toBe(200);
     expect(mockRevalidateTag).toHaveBeenCalled();

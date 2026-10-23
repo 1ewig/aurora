@@ -10,13 +10,13 @@
  * Both endpoints require admin role (requireAdmin).
  */
 
-import { NextResponse } from 'next/server';
-import { pool, withTransaction } from '@/utils/db';
-import { requireAdmin } from '@/utils/admin';
-import { logAudit } from '@/utils/audit';
-import { revalidateTag } from 'next/cache';
-import { rethrowIfDynamicServerError } from '@/utils/errors';
-import { createProductSchema } from '@/utils/schemas';
+import { NextResponse } from "next/server";
+import { pool, withTransaction } from "@/utils/db";
+import { requireAdmin } from "@/utils/admin";
+import { logAudit } from "@/utils/audit";
+import { revalidateTag } from "next/cache";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
+import { createProductSchema } from "@/utils/schemas";
 
 export async function GET(request: Request) {
   try {
@@ -24,11 +24,14 @@ export async function GET(request: Request) {
     if (error) return error;
 
     const { searchParams } = new URL(request.url);
-    const page = Math.max(1, Number(searchParams.get('page')) || 1);
-    const limit = Math.min(100, Math.max(1, Number(searchParams.get('limit')) || 20));
+    const page = Math.max(1, Number(searchParams.get("page")) || 1);
+    const limit = Math.min(
+      100,
+      Math.max(1, Number(searchParams.get("limit")) || 20),
+    );
     const offset = (page - 1) * limit;
-    const search = searchParams.get('search') || '';
-    const category = searchParams.get('category') || '';
+    const search = searchParams.get("search") || "";
+    const category = searchParams.get("category") || "";
 
     /*
      * Build dynamic WHERE clause with parameterized queries.
@@ -49,14 +52,16 @@ export async function GET(request: Request) {
       params.push(category);
     }
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
     /*
      * Single-roundtrip query using json_agg subqueries to consolidate
      * related rows (images, sizes, details) into JSON arrays.
      * COUNT(*) OVER() provides total count without a separate query.
      */
-    const result = await pool.query(`
+    const result = await pool.query(
+      `
       SELECT
         p.id,
         p.slug,
@@ -89,10 +94,12 @@ export async function GET(request: Request) {
       ${whereClause}
       ORDER BY p.created_at DESC
       LIMIT $${paramIndex++} OFFSET $${paramIndex++}
-    `, [...params, limit, offset]);
+    `,
+      [...params, limit, offset],
+    );
 
     const total = result.rows.length > 0 ? Number(result.rows[0].total) : 0;
-    const products = result.rows.map(row => ({
+    const products = result.rows.map((row) => ({
       ...row,
       price: Number(row.price),
     }));
@@ -106,8 +113,11 @@ export async function GET(request: Request) {
     });
   } catch (err) {
     rethrowIfDynamicServerError(err);
-    console.error('Failed to list products:', err);
-    return NextResponse.json({ error: 'Failed to list products' }, { status: 500 });
+    console.error("Failed to list products:", err);
+    return NextResponse.json(
+      { error: "Failed to list products" },
+      { status: 500 },
+    );
   }
 }
 
@@ -120,8 +130,11 @@ export async function POST(request: Request) {
     const parseResult = createProductSchema.safeParse(body);
     if (!parseResult.success) {
       return NextResponse.json(
-        { error: parseResult.error.issues[0]?.message || 'Invalid product payload' },
-        { status: 400 }
+        {
+          error:
+            parseResult.error.issues[0]?.message || "Invalid product payload",
+        },
+        { status: 400 },
       );
     }
 
@@ -145,11 +158,14 @@ export async function POST(request: Request) {
     return await withTransaction(async (client) => {
       // Check for duplicate ID or slug before attempting insert
       const existingProduct = await client.query(
-        'SELECT 1 FROM products WHERE id = $1 OR slug = $2',
-        [id, slug]
+        "SELECT 1 FROM products WHERE id = $1 OR slug = $2",
+        [id, slug],
       );
       if (existingProduct.rows.length > 0) {
-        return NextResponse.json({ error: 'Product with this ID or slug already exists' }, { status: 400 });
+        return NextResponse.json(
+          { error: "Product with this ID or slug already exists" },
+          { status: 400 },
+        );
       }
 
       // Insert the base product row
@@ -157,31 +173,43 @@ export async function POST(request: Request) {
         `INSERT INTO products (
           id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-        [id, slug, name, category, price, badge || null, image, altText, span || null, aspectRatio || null, description]
+        [
+          id,
+          slug,
+          name,
+          category,
+          price,
+          badge || null,
+          image,
+          altText,
+          span || null,
+          aspectRatio || null,
+          description,
+        ],
       );
 
       // Insert related gallery images
       for (const imgUrl of images) {
         await client.query(
-          'INSERT INTO product_images (product_id, image_url) VALUES ($1, $2)',
-          [id, imgUrl]
+          "INSERT INTO product_images (product_id, image_url) VALUES ($1, $2)",
+          [id, imgUrl],
         );
       }
 
       // Insert size/stock variants
       for (const sizeObj of sizes) {
-        const stock = typeof sizeObj.stock === 'number' ? sizeObj.stock : 0;
+        const stock = typeof sizeObj.stock === "number" ? sizeObj.stock : 0;
         await client.query(
-          'INSERT INTO product_sizes (product_id, size, stock) VALUES ($1, $2, $3)',
-          [id, sizeObj.size, stock]
+          "INSERT INTO product_sizes (product_id, size, stock) VALUES ($1, $2, $3)",
+          [id, sizeObj.size, stock],
         );
       }
 
       // Insert detail bullets
       for (const detailText of details) {
         await client.query(
-          'INSERT INTO product_details (product_id, detail) VALUES ($1, $2)',
-          [id, detailText]
+          "INSERT INTO product_details (product_id, detail) VALUES ($1, $2)",
+          [id, detailText],
         );
       }
 
@@ -189,15 +217,15 @@ export async function POST(request: Request) {
        * Invalidate cached product and landing data so the storefront
        * picks up the new product on next request.
        */
-      revalidateTag('products', { expire: 0 });
-      revalidateTag('landing', { expire: 0 });
+      revalidateTag("products", { expire: 0 });
+      revalidateTag("landing", { expire: 0 });
 
       const { user } = await requireAdmin();
       await logAudit({
         adminId: user.id,
         adminEmail: user.email,
-        action: 'product.create',
-        targetType: 'product',
+        action: "product.create",
+        targetType: "product",
         targetId: id,
         metadata: { slug, name },
       });
@@ -206,7 +234,10 @@ export async function POST(request: Request) {
     });
   } catch (err: any) {
     rethrowIfDynamicServerError(err);
-    console.error('Failed to create product:', err);
-    return NextResponse.json({ error: err.message || 'Failed to create product' }, { status: 500 });
+    console.error("Failed to create product:", err);
+    return NextResponse.json(
+      { error: err.message || "Failed to create product" },
+      { status: 500 },
+    );
   }
 }

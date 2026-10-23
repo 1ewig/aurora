@@ -36,7 +36,7 @@ describe("calculateOrderPricing", () => {
   });
 
   it("rounds tax to 2 decimal places", () => {
-    const result = calculateOrderPricing(10.50);
+    const result = calculateOrderPricing(10.5);
     expect(result.tax).toBe(0.84);
     expect(result.total).toBeCloseTo(36.34);
   });

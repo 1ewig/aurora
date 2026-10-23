@@ -35,15 +35,21 @@ export function OrdersTable({
 }: OrdersTableProps) {
   return (
     <div className="space-y-8">
-
       {/* Filter and Search Panel */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative w-full sm:max-w-md">
           <svg
             className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary"
-            fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
           </svg>
           <input
             type="text"
@@ -63,7 +69,7 @@ export function OrdersTable({
               backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B6B6B' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/></svg>")`,
               backgroundRepeat: "no-repeat",
               backgroundPosition: "right 1rem center",
-              backgroundSize: "1rem"
+              backgroundSize: "1rem",
             }}
           >
             <option value="all">All Orders</option>
@@ -73,8 +79,21 @@ export function OrdersTable({
             <option value="delivered">Delivered</option>
             <option value="cancelled">Cancelled</option>
           </select>
-          <Button variant="ghost" size="md" onClick={onRefresh} disabled={loading} className="py-3">
-            {loading ? <>Refreshing<span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /></> : "Refresh"}
+          <Button
+            variant="ghost"
+            size="md"
+            onClick={onRefresh}
+            disabled={loading}
+            className="py-3"
+          >
+            {loading ? (
+              <>
+                Refreshing
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              </>
+            ) : (
+              "Refresh"
+            )}
           </Button>
         </div>
       </div>
@@ -105,17 +124,26 @@ export function OrdersTable({
               }`}
             >
               {orders.map((o) => {
-                const totalItems = o.items.reduce((sum, item) => sum + item.quantity, 0);
-                const orderDate = new Date(o.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
+                const totalItems = o.items.reduce(
+                  (sum, item) => sum + item.quantity,
+                  0,
+                );
+                const orderDate = new Date(o.createdAt).toLocaleDateString(
+                  "en-US",
+                  {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  },
+                );
 
                 return (
-                  <tr key={o.id} className="hover:bg-bg-primary/25 transition-colors">
+                  <tr
+                    key={o.id}
+                    className="hover:bg-bg-primary/25 transition-colors"
+                  >
                     <td className="px-6 py-4 font-mono font-bold text-text-primary">
                       {o.orderNumber}
                     </td>
@@ -124,13 +152,18 @@ export function OrdersTable({
                     </td>
                     <td className="px-6 py-4">
                       <div className="font-semibold text-text-primary">
-                        {o.shippingAddress.firstName} {o.shippingAddress.lastName}
+                        {o.shippingAddress.firstName}{" "}
+                        {o.shippingAddress.lastName}
                       </div>
                       <div className="text-xs text-text-muted mt-0.5 flex items-center gap-1.5">
                         <span>{o.shippingAddress.email}</span>
-                        <span className={`px-1.5 py-0.2 rounded-[4px] text-[8px] font-semibold uppercase ${
-                          o.userId ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : "bg-gray-100 text-gray-500 border border-gray-200"
-                        }`}>
+                        <span
+                          className={`px-1.5 py-0.2 rounded-[4px] text-[8px] font-semibold uppercase ${
+                            o.userId
+                              ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                              : "bg-gray-100 text-gray-500 border border-gray-200"
+                          }`}
+                        >
                           {o.userId ? "Member" : "Guest"}
                         </span>
                       </div>
@@ -142,11 +175,13 @@ export function OrdersTable({
                       ${o.total.toFixed(2)}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                        o.isPaid 
-                          ? "bg-success/10 text-success border border-success/20" 
-                          : "bg-text-secondary/10 text-text-secondary border border-border-medium"
-                      }`}>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                          o.isPaid
+                            ? "bg-success/10 text-success border border-success/20"
+                            : "bg-text-secondary/10 text-text-secondary border border-border-medium"
+                        }`}
+                      >
                         {o.isPaid ? "Paid" : "Unpaid"}
                       </span>
                     </td>

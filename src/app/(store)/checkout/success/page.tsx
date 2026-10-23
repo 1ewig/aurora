@@ -36,11 +36,15 @@ export default function CheckoutSuccessPage() {
           Next.js requires a Suspense boundary around any component
           that uses searchParams to allow the page to remain server-rendered.
         */}
-        <Suspense fallback={
-          <div className="max-w-xl mx-auto text-center py-12 px-6 md:px-8 bg-white rounded-2xl border border-border-subtle shadow-sm">
-            <p className="text-text-secondary text-sm">Loading order details...</p>
-          </div>
-        }>
+        <Suspense
+          fallback={
+            <div className="max-w-xl mx-auto text-center py-12 px-6 md:px-8 bg-white rounded-2xl border border-border-subtle shadow-sm">
+              <p className="text-text-secondary text-sm">
+                Loading order details...
+              </p>
+            </div>
+          }
+        >
           <CheckoutSuccessClient />
         </Suspense>
       </div>

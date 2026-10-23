@@ -16,8 +16,14 @@ interface LazySectionProps {
   id?: string; // anchor id rendered on the always-present wrapper so section links resolve before mount
 }
 
-export function LazySection({ children, height = "min-h-[400px]", id }: LazySectionProps) {
-  const [inView, setInView] = useState(() => typeof window !== "undefined" && !("IntersectionObserver" in window));
+export function LazySection({
+  children,
+  height = "min-h-[400px]",
+  id,
+}: LazySectionProps) {
+  const [inView, setInView] = useState(
+    () => typeof window !== "undefined" && !("IntersectionObserver" in window),
+  );
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,7 +40,7 @@ export function LazySection({ children, height = "min-h-[400px]", id }: LazySect
       },
       {
         rootMargin: "300px", // Preload slightly before scroll brings it into viewport
-      }
+      },
     );
 
     if (ref.current) {

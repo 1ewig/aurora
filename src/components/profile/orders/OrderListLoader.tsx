@@ -59,7 +59,9 @@ export function OrderListLoader() {
       >
         Loading Wardrobe
       </motion.p>
-      <p className="text-[11px] text-text-muted select-none">Retrieving your purchase history...</p>
+      <p className="text-[11px] text-text-muted select-none">
+        Retrieving your purchase history...
+      </p>
     </div>
   );
 }

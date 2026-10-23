@@ -9,7 +9,12 @@ export default defineConfig({
     exclude: ["node_modules", ".next"],
     coverage: {
       provider: "istanbul",
-      include: ["src/app/api/**", "src/utils/**", "src/stores/**", "src/lib/**"],
+      include: [
+        "src/app/api/**",
+        "src/utils/**",
+        "src/stores/**",
+        "src/lib/**",
+      ],
       exclude: ["src/app/api/auth/**", "**/__tests__/**"],
       reporter: ["text", "html"],
     },

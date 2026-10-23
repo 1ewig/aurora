@@ -8,13 +8,13 @@
  *   bun scripts/setup-db.js
  */
 
-const { Pool } = require('pg');
-const fs = require('fs');
-const path = require('path');
+const { Pool } = require("pg");
+const fs = require("fs");
+const path = require("path");
 
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
-  console.error('Set DATABASE_URL environment variable');
+  console.error("Set DATABASE_URL environment variable");
   process.exit(1);
 }
 
@@ -23,10 +23,10 @@ const pool = new Pool({ connectionString: DATABASE_URL });
 async function run() {
   try {
     // 1. Create better_auth schema and BA tables
-    console.log('Creating BA schema...');
-    await pool.query('CREATE SCHEMA IF NOT EXISTS better_auth');
+    console.log("Creating BA schema...");
+    await pool.query("CREATE SCHEMA IF NOT EXISTS better_auth");
 
-    console.log('Creating BA tables...');
+    console.log("Creating BA tables...");
     await pool.query(`CREATE TABLE IF NOT EXISTS better_auth.user (
       id TEXT PRIMARY KEY,
       name TEXT,
@@ -80,14 +80,19 @@ async function run() {
     )`);
 
     // 2. Run app schema migration (products, profiles, orders, RLS, etc.)
-    const migrationPath = path.join(__dirname, '..', 'migrations', '20260614145429_better-auth-setup.sql');
-    const migrationSql = fs.readFileSync(migrationPath, 'utf8');
+    const migrationPath = path.join(
+      __dirname,
+      "..",
+      "migrations",
+      "20260614145429_better-auth-setup.sql",
+    );
+    const migrationSql = fs.readFileSync(migrationPath, "utf8");
     await pool.query(migrationSql);
-    console.log('App schema migration applied.');
+    console.log("App schema migration applied.");
 
-    console.log('Database setup complete.');
+    console.log("Database setup complete.");
   } catch (e) {
-    console.error('Setup failed:', e.message);
+    console.error("Setup failed:", e.message);
     process.exit(1);
   } finally {
     await pool.end();

@@ -24,7 +24,10 @@ export default function StoryPageClient() {
     <main id="main-content" tabIndex={-1}>
       <StoryHero />
       <PhilosophySection content={designerContent} />
-      <AtelierSection loomContent={loomContent} foldingContent={foldingContent} />
+      <AtelierSection
+        loomContent={loomContent}
+        foldingContent={foldingContent}
+      />
       <StoryCta />
     </main>
   );

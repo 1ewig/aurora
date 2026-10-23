@@ -16,14 +16,14 @@ describe("requireEnv", () => {
 
   it("throws when env var is missing", () => {
     expect(() => requireEnv("MISSING_VAR")).toThrow(
-      "Missing required env var: MISSING_VAR"
+      "Missing required env var: MISSING_VAR",
     );
   });
 
   it("throws when env var is empty string", () => {
     process.env.EMPTY_VAR = "";
     expect(() => requireEnv("EMPTY_VAR")).toThrow(
-      "Missing required env var: EMPTY_VAR"
+      "Missing required env var: EMPTY_VAR",
     );
     delete process.env.EMPTY_VAR;
   });

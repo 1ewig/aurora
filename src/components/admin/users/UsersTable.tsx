@@ -39,7 +39,11 @@ function SortHeader({
   return (
     <th
       className={`px-6 py-4 cursor-pointer hover:text-text-primary select-none whitespace-nowrap ${
-        align === "center" ? "text-center" : align === "right" ? "text-right" : "text-left"
+        align === "center"
+          ? "text-center"
+          : align === "right"
+            ? "text-right"
+            : "text-left"
       }`}
       onClick={() => onSort(sortKey)}
     >
@@ -66,17 +70,48 @@ export function UsersTable({
         <table className="w-full border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-border-subtle bg-bg-primary/50 uppercase tracking-wider text-[10px] font-semibold text-text-secondary">
-              <SortHeader label="Name" sortKey="name" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="left" />
-              <SortHeader label="Email" sortKey="email" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="left" />
-              <SortHeader label="Verified" sortKey="emailVerified" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="left" />
-              <th className="px-6 py-4 text-left">
-                Auth
-              </th>
-              <SortHeader label="Sessions" sortKey="sessionCount" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="left" />
-              <SortHeader label="Joined" sortKey="createdAt" currentSortKey={sortKey} sortDir={sortDir} onSort={onSort} align="left" />
-              <th className="px-6 py-4 text-right">
-                Actions
-              </th>
+              <SortHeader
+                label="Name"
+                sortKey="name"
+                currentSortKey={sortKey}
+                sortDir={sortDir}
+                onSort={onSort}
+                align="left"
+              />
+              <SortHeader
+                label="Email"
+                sortKey="email"
+                currentSortKey={sortKey}
+                sortDir={sortDir}
+                onSort={onSort}
+                align="left"
+              />
+              <SortHeader
+                label="Verified"
+                sortKey="emailVerified"
+                currentSortKey={sortKey}
+                sortDir={sortDir}
+                onSort={onSort}
+                align="left"
+              />
+              <th className="px-6 py-4 text-left">Auth</th>
+              <SortHeader
+                label="Sessions"
+                sortKey="sessionCount"
+                currentSortKey={sortKey}
+                sortDir={sortDir}
+                onSort={onSort}
+                align="left"
+              />
+              <SortHeader
+                label="Joined"
+                sortKey="createdAt"
+                currentSortKey={sortKey}
+                sortDir={sortDir}
+                onSort={onSort}
+                align="left"
+              />
+              <th className="px-6 py-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody
@@ -86,17 +121,27 @@ export function UsersTable({
           >
             {users.length === 0 ? (
               <tr>
-                <td colSpan={7} className="p-20 text-center text-text-secondary text-sm">
+                <td
+                  colSpan={7}
+                  className="p-20 text-center text-text-secondary text-sm"
+                >
                   No users match your filters.
                 </td>
               </tr>
             ) : (
               users.map((user) => (
-                <tr key={user.id} className="hover:bg-bg-primary/25 transition-colors">
+                <tr
+                  key={user.id}
+                  className="hover:bg-bg-primary/25 transition-colors"
+                >
                   <td className="px-6 py-4 text-text-primary font-medium whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-text-primary">
-                        {user.name || <span className="text-text-muted italic font-normal">No name</span>}
+                        {user.name || (
+                          <span className="text-text-muted italic font-normal">
+                            No name
+                          </span>
+                        )}
                       </span>
                       {user.role && user.role !== "user" && (
                         <span
@@ -124,7 +169,11 @@ export function UsersTable({
                           strokeWidth={2.5}
                           stroke="currentColor"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M4.5 12.75l6 6 9-13.5"
+                          />
                         </svg>
                         Verified
                       </span>
@@ -137,7 +186,11 @@ export function UsersTable({
                           strokeWidth={2.5}
                           stroke="currentColor"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
                         </svg>
                         Unverified
                       </span>
@@ -151,11 +204,15 @@ export function UsersTable({
                           className="text-[10px] font-mono uppercase tracking-wider bg-bg-primary text-text-secondary border border-border-subtle px-2 py-0.5 rounded-md"
                           title={acc.providerId}
                         >
-                          {acc.providerId === "credential" ? "Email" : acc.providerId}
+                          {acc.providerId === "credential"
+                            ? "Email"
+                            : acc.providerId}
                         </span>
                       ))}
                       {user.accounts.length === 0 && (
-                        <span className="text-[10px] text-text-muted italic">none</span>
+                        <span className="text-[10px] text-text-muted italic">
+                          none
+                        </span>
                       )}
                     </div>
                   </td>

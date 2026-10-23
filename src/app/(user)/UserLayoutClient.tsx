@@ -11,11 +11,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-export function UserLayoutClient({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function UserLayoutClient({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuthStore();
   const router = useRouter();
 
