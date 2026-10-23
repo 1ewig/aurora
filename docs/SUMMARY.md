@@ -190,8 +190,7 @@ aurora/
 ├─ __tests__/                     ← 24 Vitest files (api/ 13, stores/ 2, utils/ 10 — 230 tests)
 ├─ docs/                          ← SUMMARY.md (single architecture reference), CODING_STANDARDS.md,
 │                                   performance-analysis.md, BACKEND_DEPLOYMENT.md
-├─ public/images/                 ← optimized WebP catalog assets (uploaded to InsForge buckets)
-└─ images-sources/                ← raw JPG/PNG inputs for the sharp pipeline
+└─ public/images/                 ← optimized WebP catalog assets (uploaded to InsForge buckets)
 
 ## 5. Domain Models & Data Schema Concepts
 
@@ -328,7 +327,7 @@ This codebase deliberately does **not** use Next.js Server Actions. Every mutati
 | `update-catalog.mts` | Interactive catalog sync (sync/add/delete) with storage cleanup + rewrites `src/data/products.ts` |
 | `wipe-db.mts` | Full teardown (tables + better_auth schema) |
 | `manage-user.ts` | Interactive CLI: create user (hashed via `better-auth/crypto`), change role, delete user |
-| `optimize-images.mjs` | Sharp batch conversion `images-sources/` → WebP into `public/images/` |
+| `optimize-images.mjs` | Modular Sharp conversion utility (directory or single image → WebP into `public/images/` or custom destination) |
 
 ### 7.5 Environment variable inventory (all defined in `.env.example`)
 
