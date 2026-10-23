@@ -19,7 +19,7 @@ import { cache } from "react";
 import { auth } from "@/lib/auth";
 import { pool } from "@/utils/db";
 import { headers } from "next/headers";
-import { connection, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { isAdmin } from "@/utils/auth";
 import { rethrowIfDynamicServerError } from "@/utils/errors";
 import type { User } from "@/stores/useAuthStore";
@@ -100,15 +100,26 @@ export const requireAdmin = cache(
  * Returns a client-safe User object or null if unauthenticated.
  */
 export const getServerAuthUser = cache(async (): Promise<User | null> => {
+  let reqHeaders: Headers | undefined;
   try {
-    await connection();
-  } catch {
-    // Tolerated outside of Next.js request store (e.g. Vitest unit tests)
+    reqHeaders = await headers();
+  } catch (err: unknown) {
+    rethrowIfDynamicServerError(err);
+  }
+
+  if (!reqHeaders) {
+    return null;
+  }
+
+  // Fast-path: Check if the session cookie exists before calling Better Auth
+  const cookie = reqHeaders.get("cookie") || "";
+  if (!cookie.includes("better-auth.session_token")) {
+    return null;
   }
 
   let session;
   try {
-    session = await auth.api.getSession({ headers: await headers() });
+    session = await auth.api.getSession({ headers: reqHeaders });
   } catch (err: unknown) {
     rethrowIfDynamicServerError(err);
     console.error("getServerAuthUser: session fetch failed:", err);
