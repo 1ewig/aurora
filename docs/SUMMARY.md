@@ -18,21 +18,21 @@
 
 ## 2. Technical Stack & Infrastructure
 
-| Layer                  | Technology                          | Key Responsibility & Configuration                                                                           |
-| :--------------------- | :---------------------------------- | :----------------------------------------------------------------------------------------------------------- |
-| **Framework**          | Next.js 16.2 (App Router)           | React Server Components, Route Handlers, `'use cache'` directives (`cacheComponents: true`).                 |
-| **UI Runtime**         | React 19.2                          | Server Components default; async `params`/`headers` promises; `<Suspense>` streaming boundaries.             |
-| **Language & Tooling** | TypeScript 5.9 + Bun                | Strict typing (`@/*` alias); Bun is the sole package manager and task runner across dev/build/test.          |
-| **Database**           | PostgreSQL (via InsForge BaaS)      | Raw connection pooling (`pg` Pool in `@/utils/db`), parameterized queries (`$1, $2`). No ORM.                |
-| **BaaS / Storage**     | InsForge (`@insforge/sdk`)          | Postgres hosting, HS256 JWT bridge, and 5 S3 buckets (`product/lookbook/editorial/material/category-media`). |
-| **Authentication**     | Better Auth 1.6 (email/password)    | Own `better_auth` schema and pool, edge session validation, sliding 7-day cookie windows.                    |
-| **Payments**           | Lemon Squeezy (REST API + Webhooks) | Dynamic checkout session generation and cryptographically verified webhook order fulfillment.                |
-| **Client State**       | Zustand 5                           | Cart persisted in `localStorage` (`useCartStore`); SSR-safe React Context auth store (`useAuthStore`).       |
-| **Server State**       | TanStack React Query 5              | Server cache: 5m stale / 10m GC. Admin queries use `staleTime: 0` + `keepPreviousData`.                      |
-| **Styling & Motion**   | Tailwind CSS 4 + Framer Motion 12   | Minimalist luxury design tokens (`@theme`); Framer Motion entrance and drawer transitions.                   |
-| **Asset Pipeline**     | Sharp 0.34 (`optimize-images.ts`)   | Offline WebP conversion for committed assets; Next.js `remotePatterns` for runtime AVIF/WebP.                |
-| **Email Transport**    | Nodemailer 9 + Brevo SMTP           | Transactional verification and order emails; silent-skip in local development when unconfigured.             |
-| **Testing & Linting**  | Vitest 4 + Oxlint                   | Unit/API integration tests with mocked DB (`vi.mock`); ultra-fast Rust-based Oxlint configuration.           |
+| Layer                  | Technology                          | Key Responsibility & Configuration                                                                                       |
+| :--------------------- | :---------------------------------- | :----------------------------------------------------------------------------------------------------------------------- |
+| **Framework**          | Next.js 16.4.2 (App Router)         | React Server Components, Route Handlers, `'use cache'` directives (`cacheComponents: true`, `partialPrefetching: true`). |
+| **UI Runtime**         | React 19.2                          | Server Components default; async `params`/`headers` promises; `<Suspense>` streaming boundaries.                         |
+| **Language & Tooling** | TypeScript 5.9 + Bun                | Strict typing (`@/*` alias); Bun is the sole package manager and task runner across dev/build/test.                      |
+| **Database**           | PostgreSQL (via InsForge BaaS)      | Raw connection pooling (`pg` Pool in `@/utils/db`), parameterized queries (`$1, $2`). No ORM.                            |
+| **BaaS / Storage**     | InsForge (`@insforge/sdk`)          | Postgres hosting, HS256 JWT bridge, and 5 S3 buckets (`product/lookbook/editorial/material/category-media`).             |
+| **Authentication**     | Better Auth 1.6 (email/password)    | Own `better_auth` schema and pool, edge session validation, sliding 7-day cookie windows.                                |
+| **Payments**           | Lemon Squeezy (REST API + Webhooks) | Dynamic checkout session generation and cryptographically verified webhook order fulfillment.                            |
+| **Client State**       | Zustand 5                           | Cart persisted in `localStorage` (`useCartStore`); SSR-safe React Context auth store (`useAuthStore`).                   |
+| **Server State**       | TanStack React Query 5              | Server cache: 5m stale / 10m GC. Admin queries use `staleTime: 0` + `keepPreviousData`.                                  |
+| **Styling & Motion**   | Tailwind CSS 4 + Framer Motion 12   | Minimalist luxury design tokens (`@theme`); Framer Motion entrance and drawer transitions.                               |
+| **Asset Pipeline**     | Sharp 0.34 (`optimize-images.ts`)   | Offline WebP conversion for committed assets; Next.js `remotePatterns` for runtime AVIF/WebP.                            |
+| **Email Transport**    | Nodemailer 9 + Brevo SMTP           | Transactional verification and order emails; silent-skip in local development when unconfigured.                         |
+| **Testing & Linting**  | Vitest 4 + Oxlint                   | Unit/API integration tests with mocked DB (`vi.mock`); ultra-fast Rust-based Oxlint configuration.                       |
 
 ---
 

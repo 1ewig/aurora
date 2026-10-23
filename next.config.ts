@@ -49,6 +49,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   output: "standalone",
   cacheComponents: true,
+  partialPrefetching: true,
   allowedDevOrigins: ["harmonics-paternity-blighted.ngrok-free.dev"],
   images: {
     qualities: [100, 85, 80, 75, 50],

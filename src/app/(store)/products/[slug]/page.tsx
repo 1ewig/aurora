@@ -15,12 +15,16 @@
  * object) rather than throwing a 500.
  */
 
+import { Suspense } from "react";
 import { pool } from "@/utils/db";
 import { ProductDetailClient } from "@/components/product/detail/ProductDetailClient";
+import ProductDetailsLoading from "./loading";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
+
+export const instant = false;
 
 /**
  * Dynamic SEO metadata. Queries the product name/description/image so
@@ -135,7 +139,9 @@ export default async function ProductPage({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: jsonLdString }}
         />
       )}
-      <ProductDetailClient slug={slug} />
+      <Suspense fallback={<ProductDetailsLoading />}>
+        <ProductDetailClient slug={slug} />
+      </Suspense>
     </>
   );
 }

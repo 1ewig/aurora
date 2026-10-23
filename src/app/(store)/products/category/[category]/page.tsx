@@ -13,15 +13,19 @@
  * rather than rendering an empty listing.
  */
 
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cacheLife, cacheTag } from "next/cache";
 import { pool } from "@/utils/db";
 import { ProductListingClient } from "@/components/product/listing/ProductListingClient";
+import CategoryLoading from "./loading";
 
 interface CategoryPageProps {
   params: Promise<{ category: string }>;
 }
+
+export const instant = false;
 
 /**
  * Resolves a URL category slug to the human-readable category name from
@@ -89,5 +93,9 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound();
   }
 
-  return <ProductListingClient initialCategory={categoryName} />;
+  return (
+    <Suspense fallback={<CategoryLoading />}>
+      <ProductListingClient initialCategory={categoryName} />
+    </Suspense>
+  );
 }
