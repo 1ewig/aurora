@@ -1,25 +1,25 @@
 /**
- * optimize-images.mjs
- * ===================
+ * optimize-images.ts
+ * ==================
  *
  * Sharp-based WebP image preprocessing script.
- * Modular CLI utility to convert JPG/PNG images to WebP.
+ * Modular TypeScript CLI utility to convert JPG/PNG images to WebP.
  *
  * Usage:
- *   bun scripts/optimize-images.mjs [inputDirOrFile] [outputDir]
- *   bun scripts/optimize-images.mjs -i <path> -o <path> [-q 100] [-m 2000]
+ *   bun scripts/optimize-images.ts [inputDirOrFile] [outputDir]
+ *   bun scripts/optimize-images.ts -i <path> -o <path> [-q 100] [-m 2000]
  *
  * Examples:
- *   bun scripts/optimize-images.mjs
- *   bun scripts/optimize-images.mjs raw-photos public/images
- *   bun scripts/optimize-images.mjs photo.png public/images
- *   bun scripts/optimize-images.mjs -i assets/banner.jpg -o public/images/banner.webp --quality 90
+ *   bun scripts/optimize-images.ts
+ *   bun scripts/optimize-images.ts raw-photos public/images
+ *   bun scripts/optimize-images.ts photo.png public/images
+ *   bun scripts/optimize-images.ts -i assets/banner.jpg -o public/images/banner.webp --quality 90
  */
 
 import sharp from "sharp";
 import { readdir, mkdir } from "fs/promises";
 import { join, parse, resolve } from "path";
-import fs from "fs";
+import * as fs from "fs";
 
 export const DEFAULT_INPUT = "images-sources";
 export const DEFAULT_OUTPUT = "public/images";
@@ -28,17 +28,42 @@ export const DEFAULT_MAX_SIZE = 2000;
 
 const IMAGE_EXTENSIONS_REGEX = /\.(jpe?g|png)$/i;
 
+export interface OptimizeOptions {
+  /** WebP compression quality from 1 to 100 (default: 100) */
+  quality?: number;
+  /** Max long-edge dimension in pixels (default: 2000) */
+  maxSize?: number;
+}
+
+export interface SingleResult {
+  inputPath: string;
+  outputPath: string;
+  originalSize: number;
+  optimizedSize: number;
+}
+
+export interface DirectoryStats {
+  processed: number;
+  totalOriginal: number;
+  totalOptimized: number;
+}
+
+interface CliArgs {
+  input: string;
+  output: string;
+  quality: number;
+  maxSize: number;
+  help: boolean;
+}
+
 /**
  * Optimizes a single image file to WebP.
- *
- * @param {string} inputFilePath - Path to source image (jpg/png)
- * @param {string} outputFilePath - Destination path for .webp file
- * @param {object} [options]
- * @param {number} [options.quality=100] - WebP quality (1-100)
- * @param {number} [options.maxSize=2000] - Max long-edge dimension in pixels
- * @returns {Promise<{inputPath: string, outputPath: string, originalSize: number, optimizedSize: number}>}
  */
-export async function optimizeImage(inputFilePath, outputFilePath, options = {}) {
+export async function optimizeImage(
+  inputFilePath: string,
+  outputFilePath: string,
+  options: OptimizeOptions = {}
+): Promise<SingleResult> {
   const { quality = DEFAULT_QUALITY, maxSize = DEFAULT_MAX_SIZE } = options;
 
   const img = sharp(inputFilePath);
@@ -77,21 +102,20 @@ export async function optimizeImage(inputFilePath, outputFilePath, options = {})
 
 /**
  * Recursively scans and optimizes all JPG/PNG images in a directory.
- *
- * @param {string} inputDir - Root input directory
- * @param {string} outputDir - Root output directory
- * @param {object} [options]
- * @param {string} [subDir=""] - Internal recursion subdirectory
- * @returns {Promise<{processed: number, totalOriginal: number, totalOptimized: number}>}
  */
-export async function optimizeDirectory(inputDir, outputDir, options = {}, subDir = "") {
+export async function optimizeDirectory(
+  inputDir: string,
+  outputDir: string,
+  options: OptimizeOptions = {},
+  subDir = ""
+): Promise<DirectoryStats> {
   const currentInputDir = join(inputDir, subDir);
   const currentOutputDir = join(outputDir, subDir);
 
   await mkdir(currentOutputDir, { recursive: true });
 
   const entries = await readdir(currentInputDir, { withFileTypes: true });
-  const stats = { processed: 0, totalOriginal: 0, totalOptimized: 0 };
+  const stats: DirectoryStats = { processed: 0, totalOriginal: 0, totalOptimized: 0 };
 
   for (const entry of entries) {
     const entryPath = join(subDir, entry.name);
@@ -123,9 +147,15 @@ export async function optimizeDirectory(inputDir, outputDir, options = {}, subDi
 /**
  * Parses CLI arguments.
  */
-function parseArgs() {
+function parseArgs(): CliArgs {
   const args = process.argv.slice(2);
-  const parsed = {
+  const parsed: {
+    input: string | null;
+    output: string | null;
+    quality: number;
+    maxSize: number;
+    help: boolean;
+  } = {
     input: null,
     output: null,
     quality: DEFAULT_QUALITY,
@@ -133,16 +163,16 @@ function parseArgs() {
     help: false,
   };
 
-  const positional = [];
+  const positional: string[] = [];
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === "-h" || arg === "--help") {
       parsed.help = true;
     } else if (arg === "-i" || arg === "--input") {
-      parsed.input = args[++i];
+      parsed.input = args[++i] || null;
     } else if (arg === "-o" || arg === "--output") {
-      parsed.output = args[++i];
+      parsed.output = args[++i] || null;
     } else if (arg === "-q" || arg === "--quality") {
       parsed.quality = parseInt(args[++i], 10) || DEFAULT_QUALITY;
     } else if (arg === "-m" || arg === "--max-size") {
@@ -159,17 +189,20 @@ function parseArgs() {
     parsed.output = positional[1];
   }
 
-  parsed.input = parsed.input || DEFAULT_INPUT;
-  parsed.output = parsed.output || DEFAULT_OUTPUT;
-
-  return parsed;
+  return {
+    input: parsed.input || DEFAULT_INPUT,
+    output: parsed.output || DEFAULT_OUTPUT,
+    quality: parsed.quality,
+    maxSize: parsed.maxSize,
+    help: parsed.help,
+  };
 }
 
-function printUsage() {
+function printUsage(): void {
   console.log(`
 Usage:
-  bun scripts/optimize-images.mjs [inputDirOrFile] [outputDir]
-  bun scripts/optimize-images.mjs -i <path> -o <path> [options]
+  bun scripts/optimize-images.ts [inputDirOrFile] [outputDir]
+  bun scripts/optimize-images.ts -i <path> -o <path> [options]
 
 Options:
   -i, --input <path>      Input directory or image file (default: "${DEFAULT_INPUT}")
@@ -180,7 +213,7 @@ Options:
 `);
 }
 
-async function main() {
+async function main(): Promise<void> {
   const { input, output, quality, maxSize, help } = parseArgs();
 
   if (help) {
@@ -196,7 +229,7 @@ async function main() {
   }
 
   const stat = fs.statSync(input);
-  const options = { quality, maxSize };
+  const options: OptimizeOptions = { quality, maxSize };
 
   console.log(`Starting image optimization:`);
   console.log(`  Source:  ${input}`);
@@ -219,7 +252,7 @@ async function main() {
       process.exit(1);
     }
 
-    let targetFile;
+    let targetFile: string;
     if (output.toLowerCase().endsWith(".webp")) {
       targetFile = output;
     } else {
@@ -241,7 +274,7 @@ const isDirectExecution =
   (Boolean(process.argv[1]) && resolve(process.argv[1]) === resolve(import.meta.filename || ""));
 
 if (isDirectExecution) {
-  main().catch((err) => {
+  main().catch((err: unknown) => {
     console.error("Image optimization failed:", err);
     process.exit(1);
   });

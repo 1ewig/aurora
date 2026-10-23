@@ -268,4 +268,4 @@ Explore the implementation quality of the core components in this codebase:
 | **[src/stores/useAuthStore.tsx](src/stores/useAuthStore.tsx)** | Zustand client wrapper for session tracking. |
 | **[scripts/manage-user.ts](scripts/manage-user.ts)** | Comprehensive CLI for user creations, role updating, and account deletion. |
 | **[scripts/upload-and-seed.mts](scripts/upload-and-seed.mts)** | Schema deployer, S3 bucket config, and media asset ingestion pipeline. |
-| **[scripts/optimize-images.mjs](scripts/optimize-images.mjs)** | Asset WebP preprocessing script utilizing Sharp. |
+| **[scripts/optimize-images.ts](scripts/optimize-images.ts)** | Modular asset WebP preprocessing script utilizing Sharp. |

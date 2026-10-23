@@ -40,7 +40,7 @@
 | Testing | Vitest 4.1.9 | Unit + API integration tests | `globals: true`, node env, `@` alias; all DB access mocked via `vi.mock` — no live DB needed; route handlers dynamically imported per-test; coverage via `bun run test:coverage` (istanbul provider — v8 is unsupported under Bun) |
 | Linting | Oxlint | Code quality | High-performance Rust-based linter (`.oxlintrc.json` with TypeScript, React, Next.js, and Unicorn plugins) |
 | Analytics | `@vercel/analytics` | Web vitals tracking | Injected once in root layout |
-| Image pipeline | `sharp` 0.34.5 | Offline image optimization | `scripts/optimize-images.mjs`: JPG/PNG → WebP (q100, 2000px max) into `public/images/` |
+| Image pipeline | `sharp` 0.34.5 | Offline image optimization | `scripts/optimize-images.ts`: JPG/PNG → WebP (q100, 2000px max) into `public/images/` |
 | Misc | `jsonwebtoken` 9, `server-only` | JWT bridge signing; server-only module enforcement | `'server-only'` import guard on server utilities (`db.ts`, `admin.ts`, etc.) |
 | Deployment | Vercel + InsForge | Hosting | `next.config.ts` `images.remotePatterns` allows `**.insforge.app` storage URLs; `allowedDevOrigins` whitelists ngrok domain; image qualities `[100,85,80,75,50]`, formats `avif,webp`, `minimumCacheTTL` 30 days |
 
@@ -327,7 +327,7 @@ This codebase deliberately does **not** use Next.js Server Actions. Every mutati
 | `update-catalog.mts` | Interactive catalog sync (sync/add/delete) with storage cleanup + rewrites `src/data/products.ts` |
 | `wipe-db.mts` | Full teardown (tables + better_auth schema) |
 | `manage-user.ts` | Interactive CLI: create user (hashed via `better-auth/crypto`), change role, delete user |
-| `optimize-images.mjs` | Modular Sharp conversion utility (directory or single image → WebP into `public/images/` or custom destination) |
+| `optimize-images.ts` | Modular Sharp conversion utility (directory or single image → WebP into `public/images/` or custom destination) |
 
 ### 7.5 Environment variable inventory (all defined in `.env.example`)
 

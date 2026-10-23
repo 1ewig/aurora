@@ -109,7 +109,7 @@ Cart, auth, product UI, and admin stores use Zustand with granular selectors. No
 
 ## 8. Sharp-based WebP pre-processing in build pipeline
 
-`scripts/optimize-images.mjs` converts source images to WebP before upload. Combined with `next/image` `remotePatterns` for runtime AVIF/WebP conversion.
+`scripts/optimize-images.ts` converts source images to WebP before upload. Combined with `next/image` `remotePatterns` for runtime AVIF/WebP conversion.
 
 **Sources:**
 - [PkgPulse Sharp vs Jimp (2026)](https://www.pkgpulse.com/guides/sharp-vs-jimp-vs-squoosh-2026): "Sharp is **25× faster** than squoosh-cli, **4-40× faster** than jimp"
