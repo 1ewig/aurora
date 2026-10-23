@@ -33,9 +33,24 @@ describe("Categories API /api/categories", () => {
 
   it("successfully returns the list of categories from the database", async () => {
     const mockCategoriesList = [
-      { slug: "outerwear", name: "Outerwear", image: "/img/outerwear.webp", description: "Outerwear description" },
-      { slug: "knitwear", name: "Knitwear", image: "/img/knitwear.webp", description: "Knitwear description" },
-      { slug: "trousers", name: "Trousers", image: "/img/trousers.webp", description: "Trousers description" },
+      {
+        slug: "outerwear",
+        name: "Outerwear",
+        image: "/img/outerwear.webp",
+        description: "Outerwear description",
+      },
+      {
+        slug: "knitwear",
+        name: "Knitwear",
+        image: "/img/knitwear.webp",
+        description: "Knitwear description",
+      },
+      {
+        slug: "trousers",
+        name: "Trousers",
+        image: "/img/trousers.webp",
+        description: "Trousers description",
+      },
     ];
 
     mockPoolQuery.mockResolvedValue({

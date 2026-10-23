@@ -54,7 +54,8 @@ export async function Footer() {
     console.error("Failed to load categories in footer:", error);
   }
 
-  const displayCategories = categories.length > 0 ? categories : categoryDataList;
+  const displayCategories =
+    categories.length > 0 ? categories : categoryDataList;
 
   return (
     <footer
@@ -70,7 +71,8 @@ export async function Footer() {
                 Aurora
               </p>
               <p className="text-text-secondary text-xs sm:text-sm leading-relaxed mt-2.5 sm:mt-4 max-w-sm font-light">
-                Designed in solitude. Worn with intention. High-quality essentials crafted for longevity.
+                Designed in solitude. Worn with intention. High-quality
+                essentials crafted for longevity.
               </p>
             </div>
 

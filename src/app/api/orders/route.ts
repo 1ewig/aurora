@@ -18,14 +18,11 @@ export async function GET(request: Request) {
     if (lsOrderId) {
       const result = await pool.query(
         "SELECT order_number FROM orders WHERE ls_order_id = $1",
-        [lsOrderId]
+        [lsOrderId],
       );
 
       if ((result.rowCount ?? 0) === 0) {
-        return NextResponse.json(
-          { error: "Order not found" },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: "Order not found" }, { status: 404 });
       }
 
       return NextResponse.json({ orderNumber: result.rows[0].order_number });
@@ -33,10 +30,7 @@ export async function GET(request: Request) {
 
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const limit = Math.min(Number(searchParams.get("limit")) || 50, 100);
@@ -44,7 +38,7 @@ export async function GET(request: Request) {
 
     const countRes = await pool.query(
       "SELECT COUNT(*) FROM orders WHERE user_id = $1",
-      [session.user.id]
+      [session.user.id],
     );
     const total = parseInt(countRes.rows[0].count, 10);
 
@@ -54,7 +48,7 @@ export async function GET(request: Request) {
        WHERE user_id = $1
        ORDER BY created_at DESC
        LIMIT $2 OFFSET $3`,
-      [session.user.id, limit, offset]
+      [session.user.id, limit, offset],
     );
 
     const orders = result.rows.map((row) => ({
@@ -78,7 +72,7 @@ export async function GET(request: Request) {
     console.error("Failed to fetch orders:", error);
     return NextResponse.json(
       { error: "Failed to fetch orders" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

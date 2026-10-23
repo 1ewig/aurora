@@ -10,7 +10,7 @@
  * and handles client release in the finally block.
  */
 
-import { Pool, type PoolClient } from 'pg';
+import { Pool, type PoolClient } from "pg";
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -21,22 +21,35 @@ if (!connectionString) {
 function getCleanConnectionString(url?: string): string | undefined {
   if (!url) return undefined;
   // Normalize sslmode parameter to prevent pg-connection-string libpq deprecation warnings
-  return url.replace(/sslmode=(require|prefer|verify-ca)/gi, 'sslmode=verify-full');
+  return url.replace(
+    /sslmode=(require|prefer|verify-ca)/gi,
+    "sslmode=verify-full",
+  );
 }
 
 function getSslConfig() {
   if (!connectionString) return undefined;
 
   if (process.env.DATABASE_SSL_REJECT_UNAUTHORIZED !== undefined) {
-    return { rejectUnauthorized: process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === 'true' };
+    return {
+      rejectUnauthorized:
+        process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === "true",
+    };
   }
 
   const lower = connectionString.toLowerCase();
-  if (lower.includes('sslmode=verify-full') || lower.includes('sslmode=verify-ca')) {
+  if (
+    lower.includes("sslmode=verify-full") ||
+    lower.includes("sslmode=verify-ca")
+  ) {
     return { rejectUnauthorized: true };
   }
 
-  if (lower.includes('sslmode=require') || lower.includes('sslmode=no-verify') || lower.includes('sslmode=')) {
+  if (
+    lower.includes("sslmode=require") ||
+    lower.includes("sslmode=no-verify") ||
+    lower.includes("sslmode=")
+  ) {
     return { rejectUnauthorized: false };
   }
 
@@ -60,16 +73,16 @@ export const pool = new Pool({
  * ROLLBACK on error, and always releases the client in the finally block.
  */
 export async function withTransaction<T>(
-  fn: (client: PoolClient) => Promise<T>
+  fn: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
   const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    await client.query("BEGIN");
     const result = await fn(client);
-    await client.query('COMMIT');
+    await client.query("COMMIT");
     return result;
   } catch (err) {
-    await client.query('ROLLBACK');
+    await client.query("ROLLBACK");
     throw err;
   } finally {
     client.release();

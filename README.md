@@ -2,9 +2,7 @@
 
 ### A Quiet-Luxury Digital Storefront — Minimalist, Editorial, Server-Rendered.
 
-![Aurora Storefront Preview](public/images/storefront-preview.webp)
-
-[![Next.js 16](https://img.shields.io/badge/Next.js-16.2-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16.4.2-black?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)](https://react.dev/)
 [![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4.1-38bdf8?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169e1?style=flat-square&logo=postgresql)](https://www.postgresql.org/)
@@ -17,236 +15,131 @@
 
 ## 🔗 Live Application & Demo Accounts
 
-Explore the live environment and administration panel using these credentials:
+Explore the live digital storefront and administration panel:
 
-*   **Live Application**: [aurora-nu-three.vercel.app](https://aurora-nu-three.vercel.app/)
-*   **GitHub Repository**: [github.com/1ewig/aurora](https://github.com/1ewig/aurora)
-
-### ⚡ Lighthouse Performance Metrics
-
-Aurora is heavily optimized for speed, access, and search visibility, achieving near-perfect Core Web Vitals:
-
-*   **Performance**: **`99%`**
-*   **Accessibility**: **`95%`**
-*   **Best Practices**: **`100%`**
-*   **SEO**: **`100%`**
-
-![Lighthouse Score](public/images/lighthouse-score.webp)
+- **Live Storefront**: [aurora-nu-three.vercel.app](https://aurora-nu-three.vercel.app/)
+- **Repository**: [github.com/1ewig/aurora](https://github.com/1ewig/aurora)
 
 ### Demo Accounts
 
-| Role | Email | Password | Access Privileges |
-| :--- | :--- | :--- | :--- |
-| **Customer** | `customer@example.com` | `Customer123!` | Personal profile, order history, checkout |
+| Role         | Email                  | Password       | Access Privileges                                     |
+| :----------- | :--------------------- | :------------- | :---------------------------------------------------- |
+| **Customer** | `customer@example.com` | `Customer123!` | Personal profile, order history, checkout             |
+| **Admin**    | `admin@example.com`    | `Admin123!`    | Full admin console, inventory CRUD, order fulfillment |
 
 > [!TIP]
-> **Guest Checkout** is fully enabled. Users can browse products, select sizes, input address details, and checkout without authenticating or creating an account.
+> **Guest Checkout** is default. Shoppers can browse pieces, select sizes, input address details, and checkout without authenticating or creating an account.
 
 ---
 
-## 🏛️ System Architecture
+## ✨ The Product Experience
 
-Aurora combines React Server Components (RSC) for fast first-paint metrics and SEO indexability, combined with highly focused client state containers for responsive user interaction.
+Aurora marries the aesthetic discipline of high-fashion editorial publishing with the transactional reliability of modern commerce engineering.
 
-```mermaid
-graph TD
-    subgraph Client ["Client Browser (React 19 / Zustand / React Query)"]
-        UI["UI & Presentational Components"]
-        Zustand["Zustand Store (Cart & UI State)"]
-        RQ["React Query (Server Cache)"]
-    end
+### 1. Curated Storefront & Editorial Identity
 
-    subgraph Edge ["Edge Infrastructure"]
-        Middleware["Next.js Edge Middleware (Session & Admin protection)"]
-    end
+A minimalist design language inspired by print fashion journals. High-contrast typography paired with tailored cream tones, smooth entrances, and marquee highlights showcase the seasonal collection.
 
-    subgraph Server ["Next.js 16 Server (App Router)"]
-        RSC["Server Components (RSC - Hydrated & SEO)"]
-        Routes["API Route Handlers (Auth & Checkout Operations)"]
-    end
-
-    subgraph Backend ["InsForge BaaS & Infrastructure"]
-        Postgres[("PostgreSQL Database (Raw pg, SELECT FOR UPDATE locks)")]
-        Storage["Object Storage (Product / Lookbook / Editorial buckets)"]
-        BetterAuth["Better Auth Engine"]
-    end
-
-    UI --> Middleware
-    Middleware --> RSC
-    Middleware --> Routes
-    RSC --> Postgres
-    RSC --> Storage
-    Routes --> Postgres
-    Routes --> BetterAuth
-    UI -.-> |Reads Cache| RQ
-    UI -.-> |Manages Cart| Zustand
-```
+![Aurora Storefront Hero](public/screenshots/01-hero-storefront.webp)
 
 ---
 
-## 🌌 Core Engineering & Architecture Highlights
+### 2. Brand Story & Textile Archives
 
-### 1. Robust Design Patterns & Architecture
-- **Clean Architecture Enforced**: Restricts the storefront to a strict 4-layer separation of concerns (Pages → Containers/Bridges → Hooks/Stores → Presentational UI) documented in [docs/CODING_STANDARDS.md](docs/CODING_STANDARDS.md) to ensure maintainable, modular code.
-- **Maximum Search & Render Speed**: Prioritizes React Server Components (RSC) by default and restricts client-side rendering boundaries to interactive sub-trees, maximizing search visibility and load times.
-- **Perfect Core Web Vitals**: Optimizes layout shifts, rendering speeds, and semantic structure to achieve a **100% SEO** score and **92% Performance** rating on live production audits.
-- **Zero-Friction Conversion**: Supports complete unauthenticated guest checkouts, decoupling cart operations and shipping address collections from signup requirements.
-- **URL-Synchronized State**: Syncs categories, sorting, pagination, and search queries directly to URL query strings to enable bookmarking and back-history navigation with zero layout shifts.
+Immersive editorial storytelling honoring atelier craftsmanship, heritage textiles (Mongolian cashmere, mulberry silk, fine merino wool), and interactive lookbook sliders.
 
-### 2. High-Performance Database Engineering
-- **Race Condition Prevention**: Implements pessimistic concurrency control (`SELECT ... FOR UPDATE`) inside atomic database transactions, preventing stock overselling under concurrent checkout load.
-- **N+1 Query Elimination**: Consolidates relational product details (images, sizes, details) into a single, high-performance database roundtrip using PostgreSQL `json_agg` aggregates, reducing DB latency by over 70%.
-- **Atomic Order Consistency**: Encapsulates stock checks, inventory updates, billing data entries, and transactional emails inside a managed database transaction to prevent orphan orders on checkout failure.
-- **SQL Injection Defeated**: Enforces query parameterization ($1, $2, $3) across all endpoints, hiding underlying database schemas to block potential information leaks.
-- **Direct Database Access**: Queries PostgreSQL directly via connection pooling (singleton `pg` client wrapper with connection timeouts) to eliminate the bundle size and execution latency overhead of ORMs like Prisma.
-
-### 3. State & Cache Optimization
-- **Explicit Cache Directives**: Uses Next.js 16's explicit `'use cache'` compiler directive on catalog API endpoints with stale-while-revalidate revalidation, reducing server response times by 38-60%.
-- **Offline-Resilient Cart**: Persists Zustand client shopping bags using localStorage sync, allowing users to restore their shopping sessions across browser reloads.
-- **Granular Cached State**: Fetches and caches server-state via TanStack Query. Admin list filters use `keepPreviousData` caching, preventing screen-tearing and layout flashes while background queries execute.
-- **Zero-Flicker Transitions**: Hydrates detail views immediately from cached TanStack Query product lists, eliminating render latency when browsing from the listing catalog.
-- **Humanized Auth Exceptions**: Maps raw Better Auth exception codes (such as `email_not_verified` or `expired_reset_token`) to user-friendly alert banners.
-- **Dynamic Receipt Syncing**: Polls the public API on successful redirection to replace `"Pending Fulfillment"` with the official database order number once the webhook completes.
+![Editorial Story & Lookbook](public/screenshots/02-editorial-story.webp)
 
 ---
 
-## ⚙️ Core Engineering Highlights & Code Examples
+### 3. The Atelier Catalog
 
-### 1. Concurrency Control (Stock Locks)
-Prevents inventory overselling by locking the product size database row during checkout verification.
+Effortless catalog exploration featuring instant search, category filtering, and responsive product cards with hover animations. Category, sorting, and pagination states sync directly with URL query strings for effortless sharing.
 
-In [src/app/api/webhooks/lemonsqueezy/route.ts](src/app/api/webhooks/lemonsqueezy/route.ts#L122-L140):
-```typescript
-// Lock product size stock row to prevent race conditions
-const sizeRes = await client.query(
-  `SELECT id, stock FROM product_sizes
-   WHERE product_id = $1 AND size = $2 FOR UPDATE`,
-  [item.internalProductId, item.size]
-);
-const sizeInfo = sizeRes.rows[0];
-if (!sizeInfo || sizeInfo.stock < item.quantity) {
-  throw new Error(`Insufficient stock.`);
-}
-// Decrement stock atomically
-await client.query(
-  `UPDATE product_sizes
-   SET stock = stock - $1
-   WHERE id = $2`,
-  [item.quantity, sizeInfo.id]
-);
-```
-
-### 2. Direct SQL (`json_agg` Optimization)
-Consolidates nested relational details directly inside PostgreSQL to eliminate multiple roundtrips.
-
-In [src/app/api/products/[slug]/route.ts](src/app/api/products/%5Bslug%5D/route.ts#L19-L49):
-```sql
-SELECT 
-  p.id, p.slug, p.name, p.price, p.description,
-  (SELECT COALESCE(json_agg(image_url ORDER BY id), '[]'::json) 
-   FROM product_images WHERE product_id = p.id) as images,
-  (SELECT COALESCE(json_agg(size ORDER BY id), '[]'::json) 
-   FROM product_sizes WHERE product_id = p.id) as sizes
-FROM products p
-WHERE p.slug = $1;
-```
-
-### 3. Edge-Gated Security Middleware
-Interceptive Edge functions block unauthenticated or non-admin requests prior to loading server bundles.
-
-In [src/proxy.ts](src/proxy.ts#L36-L55):
-```typescript
-const cookie = request.headers.get('cookie') || '';
-
-// Fast-path: Check session cookie before making any fetches
-const hasSessionCookie = cookie.includes('better-auth.session_token');
-
-if (!hasSessionCookie) {
-  const loginUrl = new URL("/login", request.url);
-  loginUrl.searchParams.set("redirect", pathname);
-  return NextResponse.redirect(loginUrl);
-}
-
-// For admin routes, check role via the dedicated endpoint
-if (isAdminPath(pathname)) {
-  const roleRes = await fetch(`${baseUrl}/api/auth/role`, {
-    headers: { cookie },
-  });
-  if (roleRes.status === 401) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-}
-```
+![Atelier Catalog Listing](public/screenshots/03-catalog-listing.webp)
 
 ---
 
-## 🎨 Architectural Coding Standards
+### 4. Considered Product Detail (PDP)
 
-We follow a strict unidirectional data flow standard defined in [docs/CODING_STANDARDS.md](docs/CODING_STANDARDS.md):
+Deep-dive garment presentations with high-resolution photography, interactive size selection, real-time availability badges, and structured tabs for tailored details, fabric care, and shipping terms.
 
-```
-Pages (src/app/)
-  │  Server Components: resolve route params, export SEO metadata, render containers
-  ▼
-Containers / Bridges (src/components/*/)
-  │  Read stores, call hooks, assemble props
-  ├──► Hooks (src/hooks/) - Business logic, form state, queries
-  └──► Stores (src/stores/) - Zustand global state management
-  ▼
-Presentational Components (src/components/*/)
-     Pure JSX — receive everything via props, zero store/hook imports
-```
+![Product Detail View](public/screenshots/04-product-detail.webp)
 
 ---
 
-## 🛠️ Complete Technical Stack
+### 5. Fluid Shopping Bag Drawer
 
-| Component | Technology | Usage |
-| :--- | :--- | :--- |
-| **Core Framework** | Next.js 16.2 + React 19 | App Router, Server Components, Route Handlers |
-| **Database** | PostgreSQL (InsForge) | SQL Database, transactional operations, direct connection pool |
-| **Authentication** | Better Auth 1.6 | Email/password auth, edge session validations, secure administration |
-| **Server Cache** | TanStack React Query 5 | Query caching, optimistic UI hydration, stale revalidation |
-| **Client State** | Zustand 5 | Client-side shopping cart with localStorage persistence, UI modal toggles |
-| **Styling Engine** | Tailwind CSS 4 | CSS theme tokens, responsive layouts, modular styles |
-| **Animations** | Framer Motion 12 | Smooth page entrances, cart drawers, lookbook sliders |
-| **Image Preprocessor**| Sharp | Automated asset WebP conversions and edge constraint scaling |
-| **Notifications** | Nodemailer + SMTP | Automated transactional order confirmations and auth updates |
-| **Payments Integration**| Lemon Squeezy Sandbox | Payment overlay modal, webhooks processing |
-| **Analytics** | Vercel Analytics | Production user insights, traffic tracking, and performance monitoring |
+A responsive slide-out bag with zero layout shifts. Displays live item totals, stock constraints, complimentary worldwide shipping thresholds, and local storage session persistence.
+
+![Shopping Bag Drawer](public/screenshots/05-cart-drawer.webp)
 
 ---
 
-## 🚀 Quick Start & Onboarding
+### 6. Zero-Friction Secure Checkout
 
-To spin up a local instance of Aurora, clone the repository and execute the setup pipeline:
+Streamlined guest checkout by default. Built-in address validation, automated tax and shipping calculation, and instant payment handoff via the embedded Lemon Squeezy overlay.
+
+![Secure Checkout](public/screenshots/06-checkout-page.webp)
+
+---
+
+### 7. Store Operator Back-Office
+
+A dedicated admin back-office for operators. Features real-time inventory tracking, per-size stock monitors, low-stock warnings, order fulfillment transitions, and user management.
+
+![Admin Inventory Management](public/screenshots/07-admin-inventory.webp)
+
+---
+
+### 8. Streamlined Product Studio
+
+An integrated administrative suite for managing the catalog. Easily create and edit garment listings, configure pricing and marketing badges, allocate per-size stock, and upload multi-angle photography.
+
+![Admin Product Studio](public/screenshots/08-admin-product-modal.webp)
+
+---
+
+## 🏛️ Architecture & Engineering Blueprint
+
+While the storefront feels minimal and effortless, the underlying architecture is engineered for enterprise-grade integrity:
+
+- **Strict 4-Layer Unidirectional Data Flow**: Pages (Server Components) $\to$ Client Orchestrators (`XxxClient.tsx`) $\to$ Hooks & Stores $\to$ Presentational UI (zero store/hook imports).
+- **High-Concurrency Stock Control**: Pessimistic database row locks (`SELECT ... FOR UPDATE`), 35-minute soft stock reservations, and cryptographic HMAC webhook verification eliminate overselling and race conditions.
+- **Direct SQL with Single-Roundtrip Aggregations**: Hand-written parameterized SQL using PostgreSQL `json_agg` eliminates N+1 queries and avoids ORM latency.
+- **Next.js 16 Edge Protection & Caching**: Active edge proxy (`src/proxy.ts`) gates protected routes before rendering, while Next.js 16 `'use cache'` directives deliver sub-second response times.
+
+### 📚 Technical Documentation & Deep-Dives
+
+Detailed engineering specifications, database schemas, and coding guidelines live in dedicated guides:
+
+| Document                                                                                    | Purpose                                                                                                              |
+| :------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------- |
+| **[System Architecture Guide (`docs/SUMMARY.md`)](docs/SUMMARY.md)**                        | Single architecture reference: domain invariants, routing blueprints, concurrency lifecycles, and engineering rules. |
+| **[Coding Standards (`docs/CODING_STANDARDS.md`)](docs/CODING_STANDARDS.md)**               | Layer contracts, styling tokens, Framer Motion presets, and code cleanliness rules.                                  |
+| **[Backend & Deployment Guide (`docs/BACKEND_DEPLOYMENT.md`)](docs/BACKEND_DEPLOYMENT.md)** | PostgreSQL setup, InsForge storage buckets, Brevo SMTP configuration, and seeding pipelines.                         |
+| **[Performance Rationale (`docs/performance-analysis.md`)](docs/performance-analysis.md)**  | In-depth Core Web Vitals analysis, bundle sizes, caching strategies, and database query optimizations.               |
+
+---
+
+## 🚀 Quick Start
+
+Spin up Aurora locally in a few simple steps:
 
 ```bash
-# 1. Clone the project and install dependencies
+# 1. Clone repository and install dependencies
 git clone https://github.com/1ewig/aurora.git
 cd aurora
 bun install
 
-# 2. Configure environment parameters
+# 2. Configure environment variables
 cp .env.example .env.local
-```
 
-### 3. Database Schema, Storage & Data Seeding
-Follow the **[Backend Deployment Guide](docs/BACKEND_DEPLOYMENT.md)** to configure your InsForge credentials in `.env.local`. Once ready, execute the onboarding pipeline:
-
-```bash
-# Initialize Better Auth schema and tables
+# 3. Setup database and seed catalog assets
 bun scripts/setup-db.js
-
-# Deploy full database structures and store media resources
 bun scripts/upload-and-seed.mts
 
-# Manage admin user accounts and roles
-bun scripts/manage-user.ts
-
-# Start local server
+# 4. Start local development server
 bun run dev
 ```
 
@@ -254,18 +147,17 @@ Visit `http://localhost:3000` to interact with your local environment.
 
 ---
 
-## 🔍 Key Files to Review
+## 🧪 Verification & Quality Control
 
-Explore the implementation quality of the core components in this codebase:
+Aurora maintains a strict verification pipeline:
 
-| Resource Path | Demonstration Purpose |
-| :--- | :--- |
-| **[src/proxy.ts](src/proxy.ts)** | Next.js 16 Edge proxy middleware, route-gating. |
-| **[src/app/api/orders/route.ts](src/app/api/orders/route.ts)** | Concurrency transaction logic, email template compiler. |
-| **[src/hooks/queries/index.ts](src/hooks/queries/index.ts)** | Optimistic cache loading, React Query data fetching layer. |
-| **[src/app/api/products/[slug]/route.ts](src/app/api/products/%5Bslug%5D/route.ts)** | PostgreSQL query optimizations (`json_agg` data shaping). |
-| **[src/hooks/useUsersManagement.ts](src/hooks/useUsersManagement.ts)** | Custom React hook separating business/state logic from admin user panel. |
-| **[src/stores/useAuthStore.tsx](src/stores/useAuthStore.tsx)** | Zustand client wrapper for session tracking. |
-| **[scripts/manage-user.ts](scripts/manage-user.ts)** | Comprehensive CLI for user creations, role updating, and account deletion. |
-| **[scripts/upload-and-seed.mts](scripts/upload-and-seed.mts)** | Schema deployer, S3 bucket config, and media asset ingestion pipeline. |
-| **[scripts/optimize-images.mjs](scripts/optimize-images.mjs)** | Asset WebP preprocessing script utilizing Sharp. |
+```bash
+# High-speed static analysis
+bun run lint
+
+# Vitest test suite (24 suites, 232 tests with mocked DB)
+bun run test
+
+# Next.js 16 production build & TypeScript validation
+bun run build
+```

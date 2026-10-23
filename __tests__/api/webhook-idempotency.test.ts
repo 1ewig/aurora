@@ -69,7 +69,7 @@ function signPayload(rawBody: string): string {
 function makeWebhookPayload(
   eventName: string,
   eventId: string,
-  overrides: Record<string, unknown> = {}
+  overrides: Record<string, unknown> = {},
 ) {
   return {
     meta: {
@@ -103,10 +103,7 @@ function makeWebhookPayload(
   };
 }
 
-function makeWebhookRequest(
-  rawBody: string,
-  signature: string
-): Request {
+function makeWebhookRequest(rawBody: string, signature: string): Request {
   return new Request("http://localhost:3000/api/webhooks/lemonsqueezy", {
     method: "POST",
     headers: {
@@ -138,7 +135,9 @@ describe("POST /api/webhooks/lemonsqueezy", () => {
   // ── Signature verification ─────────────────────────────────────────────
 
   it("returns 401 when x-signature header is missing", async () => {
-    const rawBody = JSON.stringify(makeWebhookPayload("order_created", "evt-1"));
+    const rawBody = JSON.stringify(
+      makeWebhookPayload("order_created", "evt-1"),
+    );
     const req = new Request("http://localhost:3000/api/webhooks/lemonsqueezy", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -150,7 +149,9 @@ describe("POST /api/webhooks/lemonsqueezy", () => {
   });
 
   it("returns 401 when signature is invalid", async () => {
-    const rawBody = JSON.stringify(makeWebhookPayload("order_created", "evt-1"));
+    const rawBody = JSON.stringify(
+      makeWebhookPayload("order_created", "evt-1"),
+    );
     const req = makeWebhookRequest(rawBody, "invalid-signature");
 
     const res = await POST(req);
@@ -158,7 +159,9 @@ describe("POST /api/webhooks/lemonsqueezy", () => {
   });
 
   it("returns 401 when signature does not match body", async () => {
-    const rawBody = JSON.stringify(makeWebhookPayload("order_created", "evt-1"));
+    const rawBody = JSON.stringify(
+      makeWebhookPayload("order_created", "evt-1"),
+    );
     const wrongSignature = signPayload("tampered-body");
     const req = makeWebhookRequest(rawBody, wrongSignature);
 
@@ -227,7 +230,11 @@ describe("POST /api/webhooks/lemonsqueezy", () => {
     mockClientQuery
       .mockResolvedValueOnce(undefined) // BEGIN
       .mockResolvedValueOnce({ rowCount: 1 }) // INSERT processed_webhooks → new
-      .mockResolvedValueOnce({ rows: [{ price: 100, name: "Product", slug: "product", image: "/img.jpg" }] }) // SELECT product
+      .mockResolvedValueOnce({
+        rows: [
+          { price: 100, name: "Product", slug: "product", image: "/img.jpg" },
+        ],
+      }) // SELECT product
       .mockResolvedValueOnce({ rows: [{ id: "size-1", stock: 50 }] }) // SELECT product_sizes FOR UPDATE
       .mockResolvedValueOnce(undefined) // UPDATE product_sizes stock
       .mockResolvedValueOnce(undefined) // DELETE reservation
@@ -309,7 +316,11 @@ describe("POST /api/webhooks/lemonsqueezy", () => {
     mockClientQuery
       .mockResolvedValueOnce(undefined) // BEGIN
       .mockResolvedValueOnce({ rowCount: 1 }) // INSERT processed_webhooks
-      .mockResolvedValueOnce({ rows: [{ price: 100, name: "Product", slug: "product", image: "/img.jpg" }] }) // SELECT product
+      .mockResolvedValueOnce({
+        rows: [
+          { price: 100, name: "Product", slug: "product", image: "/img.jpg" },
+        ],
+      }) // SELECT product
       .mockResolvedValueOnce({ rows: [{ id: "size-1", stock: 50 }] }) // SELECT product_sizes FOR UPDATE
       .mockResolvedValueOnce(undefined) // UPDATE product_sizes stock
       .mockResolvedValueOnce(undefined) // DELETE reservation
@@ -325,7 +336,10 @@ describe("POST /api/webhooks/lemonsqueezy", () => {
   });
 
   it("returns 500 when custom field cart_items is not an array", async () => {
-    const payload = makeWebhookPayload("order_created", "evt-invalid-cart-array");
+    const payload = makeWebhookPayload(
+      "order_created",
+      "evt-invalid-cart-array",
+    );
     payload.meta.custom_data.cart_items = JSON.stringify("not-an-array");
     const rawBody = JSON.stringify(payload);
     const signature = signPayload(rawBody);
@@ -369,7 +383,9 @@ describe("POST /api/webhooks/lemonsqueezy", () => {
 
   it("returns 500 when shipping_address custom field is not a valid object", async () => {
     const payload = makeWebhookPayload("order_created", "evt-invalid-address");
-    payload.meta.custom_data.shipping_address = JSON.stringify("invalid-address-string");
+    payload.meta.custom_data.shipping_address = JSON.stringify(
+      "invalid-address-string",
+    );
     const rawBody = JSON.stringify(payload);
     const signature = signPayload(rawBody);
 

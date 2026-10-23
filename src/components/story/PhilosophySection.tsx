@@ -55,14 +55,27 @@ export function PhilosophySection({ content }: PhilosophySectionProps) {
             {title}
           </h2>
         </motion.div>
-        <motion.p variants={fadeInUp} className="text-text-secondary leading-relaxed text-sm md:text-base">
+        <motion.p
+          variants={fadeInUp}
+          className="text-text-secondary leading-relaxed text-sm md:text-base"
+        >
           {description}
         </motion.p>
-        <motion.p variants={fadeInUp} className="text-text-secondary leading-relaxed text-sm md:text-base">
-          Each piece starts as a silent draft. We sketch before the world wakes, stripping away the unnecessary until only the essential structure remains. The silhouette must drape cleanly, the shoulders must fall naturally, and the item must adapt to the wearer&apos;s life.
+        <motion.p
+          variants={fadeInUp}
+          className="text-text-secondary leading-relaxed text-sm md:text-base"
+        >
+          Each piece starts as a silent draft. We sketch before the world wakes,
+          stripping away the unnecessary until only the essential structure
+          remains. The silhouette must drape cleanly, the shoulders must fall
+          naturally, and the item must adapt to the wearer&apos;s life.
         </motion.p>
-        <motion.blockquote variants={fadeInUp} className="border-l-2 border-accent-primary pl-6 font-display italic text-lg text-text-primary">
-          &ldquo;We do not create pieces to shout. We create them to belong.&rdquo;
+        <motion.blockquote
+          variants={fadeInUp}
+          className="border-l-2 border-accent-primary pl-6 font-display italic text-lg text-text-primary"
+        >
+          &ldquo;We do not create pieces to shout. We create them to
+          belong.&rdquo;
         </motion.blockquote>
       </motion.div>
     </section>

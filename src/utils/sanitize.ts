@@ -34,11 +34,16 @@ export interface VerifiedItem {
 
 /** Strips HTML tags, trims, and truncates to 200 chars. */
 export function sanitize(s: string): string {
-  return s.trim().replace(/<[^>]*>/g, "").slice(0, 200);
+  return s
+    .trim()
+    .replace(/<[^>]*>/g, "")
+    .slice(0, 200);
 }
 
 /** Sanitizes all fields of a raw shipping address object. */
-export function sanitizeShippingAddress(raw: Record<string, any>): ShippingAddress {
+export function sanitizeShippingAddress(
+  raw: Record<string, any>,
+): ShippingAddress {
   return {
     email: (raw.email || "").trim(),
     firstName: sanitize(raw.firstName || ""),
@@ -50,7 +55,9 @@ export function sanitizeShippingAddress(raw: Record<string, any>): ShippingAddre
 }
 
 /** Validates that all required shipping address fields are present and email is valid. */
-export function validateShippingAddress(address: Record<string, any>): string | null {
+export function validateShippingAddress(
+  address: Record<string, any>,
+): string | null {
   const fields: [string, string][] = [
     ["email", "email"],
     ["firstName", "first name"],

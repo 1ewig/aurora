@@ -15,8 +15,8 @@ import { isValidEmail } from "@/utils/validation";
 export async function POST(request: NextRequest) {
   try {
     const ip = getClientIp(request);
-    if (!await rateLimit(ip, 'newsletter', 3)) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    if (!(await rateLimit(ip, "newsletter", 3))) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
     const { email } = await request.json();
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     if (!email || typeof email !== "string" || !isValidEmail(email)) {
       return NextResponse.json(
         { error: "A valid email address is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -32,13 +32,13 @@ export async function POST(request: NextRequest) {
     try {
       await pool.query(
         "INSERT INTO public.newsletter_subscriptions (email) VALUES ($1)",
-        [email.trim().toLowerCase()]
+        [email.trim().toLowerCase()],
       );
     } catch (dbError: any) {
       if (dbError.code === "23505") {
         return NextResponse.json(
           { error: "This email address is already subscribed." },
-          { status: 400 }
+          { status: 400 },
         );
       }
       throw dbError;
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     console.error("[newsletter-api] Failed to process subscription:", error);
     return NextResponse.json(
       { error: "Failed to process subscription" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

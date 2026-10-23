@@ -43,12 +43,21 @@ export function CheckoutSuccess({
   total,
 }: CheckoutSuccessProps) {
   return (
-    <div
-      className="max-w-xl mx-auto space-y-6 text-center py-12 px-6 md:px-8 bg-white rounded-2xl border border-border-subtle shadow-sm"
-    >
+    <div className="max-w-xl mx-auto space-y-6 text-center py-12 px-6 md:px-8 bg-white rounded-2xl border border-border-subtle shadow-sm">
       <div className="w-16 h-16 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2.5}
+          stroke="currentColor"
+          className="w-8 h-8"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M4.5 12.75l6 6 9-13.5"
+          />
         </svg>
       </div>
 
@@ -57,8 +66,11 @@ export function CheckoutSuccess({
       </h2>
 
       <p className="text-text-secondary max-w-md mx-auto text-sm md:text-base leading-relaxed">
-        Thank you for your purchase. We are preparing your order. A confirmation email has been sent to:
-        <span className="block font-medium text-text-primary mt-1">{email}</span>
+        Thank you for your purchase. We are preparing your order. A confirmation
+        email has been sent to:
+        <span className="block font-medium text-text-primary mt-1">
+          {email}
+        </span>
       </p>
 
       {/* Purchased Items List */}
@@ -79,8 +91,12 @@ export function CheckoutSuccess({
                 />
               </div>
               <div className="flex-1 min-w-0 space-y-0.5 text-left">
-                <p className="font-medium text-text-primary text-sm truncate max-w-[240px]">{item.name}</p>
-                <p className="text-[10px] text-text-secondary uppercase tracking-wider">Size: {item.size} × Qty: {item.quantity}</p>
+                <p className="font-medium text-text-primary text-sm truncate max-w-[240px]">
+                  {item.name}
+                </p>
+                <p className="text-[10px] text-text-secondary uppercase tracking-wider">
+                  Size: {item.size} × Qty: {item.quantity}
+                </p>
                 <span className="font-mono text-xs font-semibold text-text-primary block mt-0.5">
                   {formatCurrency(item.price * item.quantity)}
                 </span>
@@ -96,7 +112,9 @@ export function CheckoutSuccess({
           </div>
           <div className="flex justify-between text-text-secondary">
             <span>Shipping</span>
-            <span className="font-mono">{shipping === 0 ? "Complimentary" : formatCurrency(shipping)}</span>
+            <span className="font-mono">
+              {shipping === 0 ? "Complimentary" : formatCurrency(shipping)}
+            </span>
           </div>
           <div className="flex justify-between text-text-secondary">
             <span>Estimated Tax (8%)</span>
@@ -110,16 +128,31 @@ export function CheckoutSuccess({
       </div>
 
       <div className="bg-bg-primary py-4 px-6 rounded-lg max-w-xs mx-auto border border-border-subtle font-mono text-sm space-y-1">
-        <span className="text-text-muted text-xs uppercase tracking-wider block">Reference Number</span>
+        <span className="text-text-muted text-xs uppercase tracking-wider block">
+          Reference Number
+        </span>
         <span className="text-text-primary font-bold">{orderNumber}</span>
       </div>
 
       <p className="text-xs text-text-secondary flex items-center justify-center gap-1 mt-4">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="currentColor" className="w-3.5 h-3.5 text-success">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2.2}
+          stroke="currentColor"
+          className="w-3.5 h-3.5 text-success"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+          />
         </svg>
         <span>Payment Method:</span>
-        <span className="font-semibold text-text-primary">Secured by Lemon Squeezy</span>
+        <span className="font-semibold text-text-primary">
+          Secured by Lemon Squeezy
+        </span>
       </p>
 
       <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center items-center">
@@ -132,4 +165,3 @@ export function CheckoutSuccess({
     </div>
   );
 }
-

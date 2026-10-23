@@ -5,6 +5,7 @@
  * then renders AuthStoreInitializer to bootstrap the client store.
  */
 
+import { connection } from "next/server";
 import { getServerAuthUser } from "@/utils/admin";
 import { AuthProvider } from "@/stores/useAuthStore";
 
@@ -14,6 +15,7 @@ interface AuthInitializerProps {
 
 /** Server component to resolve session and initialize auth store. */
 export async function AuthInitializer({ children }: AuthInitializerProps) {
+  await connection();
   const initialUser = await getServerAuthUser();
   return <AuthProvider initialUser={initialUser}>{children}</AuthProvider>;
 }

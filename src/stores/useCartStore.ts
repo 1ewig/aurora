@@ -45,14 +45,14 @@ export const useCartStore = create<CartState>()(
       addItem: (product) =>
         set((state) => {
           const existing = state.items.find(
-            (i) => i.id === product.id && i.size === product.size
+            (i) => i.id === product.id && i.size === product.size,
           );
           if (existing) {
             return {
               items: state.items.map((i) =>
                 i.id === product.id && i.size === product.size
                   ? { ...i, quantity: i.quantity + 1 }
-                  : i
+                  : i,
               ),
             };
           }
@@ -69,7 +69,7 @@ export const useCartStore = create<CartState>()(
       updateQuantity: (id, size, quantity) =>
         set((state) => ({
           items: state.items.map((i) =>
-            i.id === id && i.size === size ? { ...i, quantity } : i
+            i.id === id && i.size === size ? { ...i, quantity } : i,
           ),
         })),
 
@@ -82,6 +82,6 @@ export const useCartStore = create<CartState>()(
       totalPrice: () =>
         get().items.reduce((sum, i) => sum + i.price * i.quantity, 0),
     }),
-    { name: "aurora-cart" }
-  )
+    { name: "aurora-cart" },
+  ),
 );

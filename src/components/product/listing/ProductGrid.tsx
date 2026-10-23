@@ -10,7 +10,12 @@ import { ProductCard } from "@/components/ui/ProductCard";
 import { cardEnter } from "@/animations/variants";
 import type { Product } from "@/data/products";
 
-const aspectRatios = ["aspect-[3/4]", "aspect-[4/5]", "aspect-[2/3]", "aspect-[3/4]"];
+const aspectRatios = [
+  "aspect-[3/4]",
+  "aspect-[4/5]",
+  "aspect-[2/3]",
+  "aspect-[3/4]",
+];
 
 interface ProductGridProps {
   products: Product[];
@@ -21,7 +26,10 @@ interface ProductGridProps {
 export function ProductGrid({ products, isLoading }: ProductGridProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 animate-pulse" aria-hidden="true">
+      <div
+        className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 animate-pulse"
+        aria-hidden="true"
+      >
         {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
@@ -34,7 +42,9 @@ export function ProductGrid({ products, isLoading }: ProductGridProps) {
             }}
           >
             {/* Image Placeholder */}
-            <div className={`w-full bg-bg-primary ${aspectRatios[i % aspectRatios.length]}`} />
+            <div
+              className={`w-full bg-bg-primary ${aspectRatios[i % aspectRatios.length]}`}
+            />
 
             {/* Info Placeholder */}
             <div className="p-5 space-y-3">
@@ -58,13 +68,26 @@ export function ProductGrid({ products, isLoading }: ProductGridProps) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-6 text-center bg-bg-secondary border border-border-subtle rounded-[24px] shadow-sm max-w-md mx-auto my-8">
         <div className="w-12 h-12 rounded-full bg-bg-primary flex items-center justify-center mb-4 text-text-secondary">
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
           </svg>
         </div>
-        <h3 className="font-sans font-semibold text-lg text-text-primary mb-1">No Products Found</h3>
+        <h3 className="font-sans font-semibold text-lg text-text-primary mb-1">
+          No Products Found
+        </h3>
         <p className="text-text-secondary text-sm max-w-xs leading-relaxed">
-          We couldn't find any products matching your search terms or filters. Try adjusting your keyword search or clear the filter.
+          We couldn't find any products matching your search terms or filters.
+          Try adjusting your keyword search or clear the filter.
         </p>
       </div>
     );
@@ -78,7 +101,11 @@ export function ProductGrid({ products, isLoading }: ProductGridProps) {
           hidden: { opacity: 0 },
           visible: {
             opacity: 1,
-            transition: { duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94], staggerChildren: 0.05 } as Record<string, unknown>,
+            transition: {
+              duration: 0.25,
+              ease: [0.25, 0.46, 0.45, 0.94],
+              staggerChildren: 0.05,
+            } as Record<string, unknown>,
           },
           exit: { opacity: 0, transition: { duration: 0.12 } },
         }}

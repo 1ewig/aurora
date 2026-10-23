@@ -50,7 +50,8 @@ export function scrollToSection(id: string): void {
   const scrollWithNavOffset = (el: HTMLElement) => {
     const navbar = document.querySelector("header");
     const navHeight = navbar ? navbar.getBoundingClientRect().height : 80;
-    const targetTop = el.getBoundingClientRect().top + window.scrollY - navHeight;
+    const targetTop =
+      el.getBoundingClientRect().top + window.scrollY - navHeight;
 
     window.scrollTo({
       top: Math.max(0, targetTop),
@@ -74,7 +75,10 @@ export function scrollToSection(id: string): void {
 
   observer.observe(document.body, { childList: true, subtree: true });
 
-  window.setTimeout(() => {
-    observer.disconnect();
-  }, MOUNT_WAIT_MS - (Date.now() - startedAt));
+  window.setTimeout(
+    () => {
+      observer.disconnect();
+    },
+    MOUNT_WAIT_MS - (Date.now() - startedAt),
+  );
 }

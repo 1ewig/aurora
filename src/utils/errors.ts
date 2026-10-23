@@ -16,18 +16,20 @@
  */
 export function rethrowIfDynamicServerError(err: unknown): void {
   // Standard DynamicServerError from Next.js
-  if (err instanceof Error && err.name === 'DynamicServerError') {
+  if (err instanceof Error && err.name === "DynamicServerError") {
     throw err;
   }
   // Errors with specific digest codes that Next.js uses internally
   if (
-    typeof err === 'object' &&
+    typeof err === "object" &&
     err !== null &&
-    'digest' in err &&
-    typeof (err as { digest: unknown }).digest === 'string' &&
-    ['DYNAMIC_SERVER_USAGE', 'HANGING_PROMISE_REJECTION', 'NEXT_PRERENDER_INTERRUPTED'].includes(
-      (err as { digest: string }).digest
-    )
+    "digest" in err &&
+    typeof (err as { digest: unknown }).digest === "string" &&
+    [
+      "DYNAMIC_SERVER_USAGE",
+      "HANGING_PROMISE_REJECTION",
+      "NEXT_PRERENDER_INTERRUPTED",
+    ].includes((err as { digest: string }).digest)
   ) {
     throw err;
   }

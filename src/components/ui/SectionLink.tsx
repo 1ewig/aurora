@@ -22,7 +22,7 @@ export function SectionLink({ href, onClick, ...props }: SectionLinkProps) {
     onClick?.(event);
     if (event.defaultPrevented) return;
 
-    const hrefString = typeof href === "string" ? href : href.pathname ?? "";
+    const hrefString = typeof href === "string" ? href : (href.pathname ?? "");
     const [path, hash] = hrefString.split("#");
     if (!hash) return;
 

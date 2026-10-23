@@ -43,7 +43,8 @@ export function FeaturedCollection({ categories }: FeaturedCollectionProps) {
           </h2>
         </div>
         <p className="text-text-secondary font-light text-sm md:text-base max-w-sm mt-4 md:mt-0 leading-relaxed text-center md:text-left">
-          Curated seasonal capsules designed for versatile elegance and lasting ease.
+          Curated seasonal capsules designed for versatile elegance and lasting
+          ease.
         </p>
       </motion.div>
 
@@ -55,10 +56,7 @@ export function FeaturedCollection({ categories }: FeaturedCollectionProps) {
         className="grid grid-cols-1 md:grid-cols-3 gap-6"
       >
         {categories.map((category) => (
-          <motion.div
-            key={category.slug}
-            variants={scaleIn}
-          >
+          <motion.div key={category.slug} variants={scaleIn}>
             <FeatureCard
               image={category.image}
               alt={`${category.name} cover`}
@@ -74,10 +72,7 @@ export function FeaturedCollection({ categories }: FeaturedCollectionProps) {
 
       <div className="flex justify-center mt-16">
         <Link href="/products">
-          <Button
-            variant="ghost"
-            size="lg"
-          >
+          <Button variant="ghost" size="lg">
             View Entire Collection →
           </Button>
         </Link>

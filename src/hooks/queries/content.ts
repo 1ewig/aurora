@@ -5,7 +5,7 @@
  * Fetches from their respective API endpoints with cache tags for ISR.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 
 export interface CategoryMetadata {
   slug: string;
@@ -15,9 +15,9 @@ export interface CategoryMetadata {
 }
 
 async function fetchEditorialContent(): Promise<any[]> {
-  const response = await fetch('/api/editorial');
+  const response = await fetch("/api/editorial");
   if (!response.ok) {
-    throw new Error('Failed to fetch editorial content');
+    throw new Error("Failed to fetch editorial content");
   }
   return response.json();
 }
@@ -25,16 +25,16 @@ async function fetchEditorialContent(): Promise<any[]> {
 /** Fetches editorial content for the brand story page. */
 export function useEditorialQuery() {
   return useQuery({
-    queryKey: ['editorial'],
+    queryKey: ["editorial"],
     queryFn: fetchEditorialContent,
     staleTime: 1000 * 60 * 5,
   });
 }
 
 async function fetchCategories(): Promise<CategoryMetadata[]> {
-  const response = await fetch('/api/categories');
+  const response = await fetch("/api/categories");
   if (!response.ok) {
-    throw new Error('Failed to fetch categories list');
+    throw new Error("Failed to fetch categories list");
   }
   return response.json();
 }

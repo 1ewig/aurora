@@ -20,25 +20,29 @@ import type { SortKey } from "@/hooks/useUsersManagement";
 
 const UserDetailModal = dynamic(
   () => import("./UserDetailModal").then((m) => m.UserDetailModal),
-  { ssr: false }
+  { ssr: false },
 );
 const ConfirmDialog = dynamic(
   () => import("@/components/ui/ConfirmDialog").then((m) => m.ConfirmDialog),
-  { ssr: false }
+  { ssr: false },
 );
 
-export type { UserRow, SortKey, FilterVerified } from "@/hooks/useUsersManagement";
+export type {
+  UserRow,
+  SortKey,
+  FilterVerified,
+} from "@/hooks/useUsersManagement";
 
 export function UsersClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
-  const page = Math.max(1, Number(searchParams.get('page')) || 1);
-  const urlSearch = searchParams.get('search') || '';
-  const verified = searchParams.get('verified') || 'all';
-  const sortBy = searchParams.get('sortBy') || 'createdAt';
-  const sortDirParam = searchParams.get('sortDir') || 'desc';
+  const page = Math.max(1, Number(searchParams.get("page")) || 1);
+  const urlSearch = searchParams.get("search") || "";
+  const verified = searchParams.get("verified") || "all";
+  const sortBy = searchParams.get("sortBy") || "createdAt";
+  const sortDirParam = searchParams.get("sortDir") || "desc";
 
   const {
     users,
@@ -75,36 +79,39 @@ export function UsersClient() {
       if (localSearch !== urlSearch) {
         const p = new URLSearchParams(searchParams.toString());
         if (localSearch) {
-          p.set('search', localSearch);
+          p.set("search", localSearch);
         } else {
-          p.delete('search');
+          p.delete("search");
         }
-        p.set('page', '1');
+        p.set("page", "1");
         router.replace(`${pathname}?${p.toString()}`);
       }
     }, 300);
     return () => clearTimeout(timer);
   }, [localSearch, urlSearch, searchParams, router, pathname]);
 
-  const updateParam = useCallback((key: string, value: string) => {
-    const p = new URLSearchParams(searchParams.toString());
-    if (value && value !== 'all') {
-      p.set(key, value);
-    } else {
-      p.delete(key);
-    }
-    if (key !== 'page') p.set('page', '1');
-    router.replace(`${pathname}?${p.toString()}`);
-  }, [searchParams, pathname, router]);
+  const updateParam = useCallback(
+    (key: string, value: string) => {
+      const p = new URLSearchParams(searchParams.toString());
+      if (value && value !== "all") {
+        p.set(key, value);
+      } else {
+        p.delete(key);
+      }
+      if (key !== "page") p.set("page", "1");
+      router.replace(`${pathname}?${p.toString()}`);
+    },
+    [searchParams, pathname, router],
+  );
 
   const handleSort = (key: SortKey) => {
-    const currentSortBy = searchParams.get('sortBy') || 'createdAt';
-    const currentSortDir = searchParams.get('sortDir') || 'desc';
+    const currentSortBy = searchParams.get("sortBy") || "createdAt";
+    const currentSortDir = searchParams.get("sortDir") || "desc";
     if (key === currentSortBy) {
-      updateParam('sortDir', currentSortDir === 'asc' ? 'desc' : 'asc');
+      updateParam("sortDir", currentSortDir === "asc" ? "desc" : "asc");
     } else {
-      updateParam('sortBy', key);
-      updateParam('sortDir', 'asc');
+      updateParam("sortBy", key);
+      updateParam("sortDir", "asc");
     }
   };
 
@@ -127,7 +134,7 @@ export function UsersClient() {
             searchQuery={localSearch}
             onSearchChange={setLocalSearch}
             filterVerified={verified as any}
-            onFilterChange={(val) => updateParam('verified', val)}
+            onFilterChange={(val) => updateParam("verified", val)}
             onRefresh={fetchUsers}
             loading={loading}
           />
@@ -146,7 +153,7 @@ export function UsersClient() {
             <Pagination
               currentPage={page}
               totalPages={totalPages}
-              onPageChange={(p) => updateParam('page', String(p))}
+              onPageChange={(p) => updateParam("page", String(p))}
             />
           )}
         </>

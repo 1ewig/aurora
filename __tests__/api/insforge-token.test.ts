@@ -7,7 +7,9 @@ const mockQuery = vi.fn();
 vi.mock("server-only", () => ({}));
 
 vi.mock("@/lib/auth", () => ({
-  auth: { api: { getSession: (...args: unknown[]) => mockGetSession(...args) } },
+  auth: {
+    api: { getSession: (...args: unknown[]) => mockGetSession(...args) },
+  },
 }));
 
 vi.mock("@/utils/db", () => ({
@@ -46,7 +48,9 @@ describe("GET /api/insforge-token", () => {
   });
 
   it("returns 403 when user is not an admin", async () => {
-    mockGetSession.mockResolvedValue({ user: { id: "user-42", email: "user@example.com" } });
+    mockGetSession.mockResolvedValue({
+      user: { id: "user-42", email: "user@example.com" },
+    });
     mockQuery.mockResolvedValue({ rows: [{ role: "user" }] });
 
     const { GET } = await import("@/app/api/insforge-token/route");
@@ -58,7 +62,9 @@ describe("GET /api/insforge-token", () => {
   });
 
   it("signs a 1h HS256 JWT with admin role for authorized admin users", async () => {
-    mockGetSession.mockResolvedValue({ user: { id: "user-42", email: "admin@example.com" } });
+    mockGetSession.mockResolvedValue({
+      user: { id: "user-42", email: "admin@example.com" },
+    });
     mockQuery.mockResolvedValue({ rows: [{ role: "admin" }] });
 
     const { GET } = await import("@/app/api/insforge-token/route");
@@ -82,12 +88,16 @@ describe("GET /api/insforge-token", () => {
   });
 
   it("throws when INSFORGE_JWT_SECRET is missing", async () => {
-    mockGetSession.mockResolvedValue({ user: { id: "user-42", email: "admin@example.com" } });
+    mockGetSession.mockResolvedValue({
+      user: { id: "user-42", email: "admin@example.com" },
+    });
     mockQuery.mockResolvedValue({ rows: [{ role: "admin" }] });
     delete process.env.INSFORGE_JWT_SECRET;
 
     const { GET } = await import("@/app/api/insforge-token/route");
 
-    await expect(GET()).rejects.toThrow("Missing required env var: INSFORGE_JWT_SECRET");
+    await expect(GET()).rejects.toThrow(
+      "Missing required env var: INSFORGE_JWT_SECRET",
+    );
   });
 });

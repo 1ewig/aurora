@@ -12,12 +12,13 @@
  * Self-deletion is blocked at the API level (route.ts).
  */
 
-import { UsersClient } from '@/components/admin/users/UsersClient';
+import { UsersClient } from "@/components/admin/users/UsersClient";
 
 /** Metadata for the admin users page. */
 export const metadata = {
-  title: 'Users | Admin | Aurora',
-  description: 'Manage registered user accounts, sessions, and authentication methods.',
+  title: "Users | Admin | Aurora",
+  description:
+    "Manage registered user accounts, sessions, and authentication methods.",
   robots: {
     index: false,
     follow: false,

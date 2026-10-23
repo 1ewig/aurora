@@ -20,7 +20,10 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { withTransaction } from "@/utils/db";
 import { sendEmail } from "@/lib/email";
-import { orderConfirmationHtml, orderConfirmationText } from "@/lib/email-templates";
+import {
+  orderConfirmationHtml,
+  orderConfirmationText,
+} from "@/lib/email-templates";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { calculateOrderPricing } from "@/utils/pricing";
 import { sanitizeShippingAddress, type VerifiedItem } from "@/utils/sanitize";
@@ -58,7 +61,10 @@ export async function POST(req: NextRequest) {
 
     if (!signature || !verifySignature(rawBody, signature)) {
       console.warn("[LS Webhook] Failed signature verification.");
-      return NextResponse.json({ error: "Invalid signature." }, { status: 401 });
+      return NextResponse.json(
+        { error: "Invalid signature." },
+        { status: 401 },
+      );
     }
 
     let payload: any;
@@ -66,18 +72,26 @@ export async function POST(req: NextRequest) {
       payload = JSON.parse(rawBody);
     } catch (parseErr) {
       console.warn("[LS Webhook] Failed to parse request body JSON:", parseErr);
-      return NextResponse.json({ error: "Invalid JSON payload." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid JSON payload." },
+        { status: 400 },
+      );
     }
 
     if (!payload || typeof payload !== "object") {
       console.warn("[LS Webhook] Payload is null or not an object.");
-      return NextResponse.json({ error: "Invalid payload format." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid payload format." },
+        { status: 400 },
+      );
     }
 
     const eventName = payload.meta?.event_name;
     const lsEventId = payload.data?.id;
 
-    console.log(`[LS Webhook] Received event: ${eventName} (Event ID: ${lsEventId})`);
+    console.log(
+      `[LS Webhook] Received event: ${eventName} (Event ID: ${lsEventId})`,
+    );
 
     if (!lsEventId) {
       return NextResponse.json({ error: "Missing event ID." }, { status: 400 });
@@ -92,7 +106,10 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     rethrowIfDynamicServerError(err);
     console.error("[LS Webhook] Error processing event payload:", err);
-    return NextResponse.json({ error: "Internal processing failed." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal processing failed." },
+      { status: 500 },
+    );
   }
 }
 
@@ -107,14 +124,18 @@ function parseCustomField<T>(val: any, fallback: T): T {
     try {
       return JSON.parse(val) as T;
     } catch (err: any) {
-      throw new Error(`Failed to parse custom field JSON: ${err.message || err}`);
+      throw new Error(
+        `Failed to parse custom field JSON: ${err.message || err}`,
+      );
     }
   }
   throw new Error(`Invalid custom field type: ${typeof val}`);
 }
 
 /** Validates the structure of cart items extracted from custom_data. */
-function validateCartItems(items: any): Array<{ internalProductId: string; quantity: number; size: string }> {
+function validateCartItems(
+  items: any,
+): Array<{ internalProductId: string; quantity: number; size: string }> {
   if (!Array.isArray(items)) {
     throw new Error("cart_items must be an array.");
   }
@@ -122,10 +143,19 @@ function validateCartItems(items: any): Array<{ internalProductId: string; quant
     if (!item || typeof item !== "object") {
       throw new Error("cart_item must be an object.");
     }
-    if (typeof item.internalProductId !== "string" || !item.internalProductId.trim()) {
-      throw new Error("cart_item.internalProductId must be a non-empty string.");
+    if (
+      typeof item.internalProductId !== "string" ||
+      !item.internalProductId.trim()
+    ) {
+      throw new Error(
+        "cart_item.internalProductId must be a non-empty string.",
+      );
     }
-    if (typeof item.quantity !== "number" || !Number.isInteger(item.quantity) || item.quantity < 1) {
+    if (
+      typeof item.quantity !== "number" ||
+      !Number.isInteger(item.quantity) ||
+      item.quantity < 1
+    ) {
       throw new Error("cart_item.quantity must be a positive integer.");
     }
     if (typeof item.size !== "string") {
@@ -148,14 +178,22 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
 
   // Guest checkouts have no userId; authenticated users with sessions have one
   const userId: string | null =
-    customData.user_id && customData.user_id !== "guest" ? customData.user_id : null;
+    customData.user_id && customData.user_id !== "guest"
+      ? customData.user_id
+      : null;
 
   const reservationId: string | null = customData.reservation_id ?? null;
 
-  const cartItems = validateCartItems(parseCustomField(customData.cart_items, []));
+  const cartItems = validateCartItems(
+    parseCustomField(customData.cart_items, []),
+  );
 
   const shippingAddress = parseCustomField(customData.shipping_address, {});
-  if (!shippingAddress || typeof shippingAddress !== "object" || Array.isArray(shippingAddress)) {
+  if (
+    !shippingAddress ||
+    typeof shippingAddress !== "object" ||
+    Array.isArray(shippingAddress)
+  ) {
     throw new Error("shipping_address must be a valid object.");
   }
   const sanitizedAddress = sanitizeShippingAddress(shippingAddress);
@@ -172,11 +210,13 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
        VALUES ($1) 
        ON CONFLICT (ls_event_id) DO NOTHING 
        RETURNING 1`,
-      [lsEventId]
+      [lsEventId],
     );
 
     if ((checkRes.rowCount ?? 0) === 0) {
-      console.log(`[LS Webhook] Event ${lsEventId} was already processed. Skipping.`);
+      console.log(
+        `[LS Webhook] Event ${lsEventId} was already processed. Skipping.`,
+      );
       return { verifiedItems: [] as VerifiedItem[], subtotal: 0 };
     }
 
@@ -187,11 +227,13 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
     for (const item of cartItems) {
       const productRes = await client.query(
         "SELECT price, name, slug, image FROM products WHERE id = $1",
-        [item.internalProductId]
+        [item.internalProductId],
       );
       const product = productRes.rows[0];
       if (!product) {
-        throw new Error(`Product mapping failed for ID: ${item.internalProductId}`);
+        throw new Error(
+          `Product mapping failed for ID: ${item.internalProductId}`,
+        );
       }
 
       const dbPrice = Number(product.price);
@@ -211,15 +253,19 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
       const sizeRes = await client.query(
         `SELECT id, stock FROM product_sizes
          WHERE product_id = $1 AND size = $2 FOR UPDATE`,
-        [item.internalProductId, item.size]
+        [item.internalProductId, item.size],
       );
       const sizeInfo = sizeRes.rows[0];
       if (!sizeInfo) {
-        throw new Error(`Size "${item.size}" not found for product "${item.internalProductId}".`);
+        throw new Error(
+          `Size "${item.size}" not found for product "${item.internalProductId}".`,
+        );
       }
 
       if (sizeInfo.stock < item.quantity) {
-        throw new Error(`Insufficient stock for product "${item.internalProductId}" (Size: ${item.size}).`);
+        throw new Error(
+          `Insufficient stock for product "${item.internalProductId}" (Size: ${item.size}).`,
+        );
       }
 
       // Decrement inventory permanently
@@ -227,7 +273,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
         `UPDATE product_sizes
          SET stock = stock - $1
          WHERE id = $2`,
-        [item.quantity, sizeInfo.id]
+        [item.quantity, sizeInfo.id],
       );
     }
 
@@ -235,7 +281,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
     if (reservationId) {
       await client.query(
         "DELETE FROM product_reservations WHERE reservation_id = $1",
-        [reservationId]
+        [reservationId],
       );
     }
 
@@ -263,7 +309,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
         JSON.stringify(sanitizedAddress),
         lsOrderId,
         lsOrderNumber,
-      ]
+      ],
     );
 
     // Link the LS customer ID to the user account for future purchases
@@ -272,7 +318,7 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
         `UPDATE better_auth."user"
          SET ls_customer_id = $1
          WHERE id = $2 AND ls_customer_id IS NULL`,
-        [lsCustomerId, userId]
+        [lsCustomerId, userId],
       );
     }
 
@@ -290,7 +336,9 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
     subject: `Order Received — ${orderNumber}`,
     text: orderConfirmationText({
       orderNumber,
-      customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
+      customerName:
+        `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() ||
+        "Valued Customer",
       items: verifiedItems.map((i) => ({
         name: i.name,
         size: i.size || "",
@@ -311,7 +359,9 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
     }),
     html: orderConfirmationHtml({
       orderNumber,
-      customerName: `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() || "Valued Customer",
+      customerName:
+        `${sanitizedAddress.firstName} ${sanitizedAddress.lastName}`.trim() ||
+        "Valued Customer",
       items: verifiedItems.map((i) => ({
         name: i.name,
         size: i.size || "",
@@ -332,6 +382,9 @@ async function handleOrderCreated(payload: any, lsEventId: string) {
     }),
   }).catch((emailErr) => {
     // Email failures are non-fatal — the order is already saved
-    console.error("[LS Webhook] Failed to dispatch order confirmation email:", emailErr);
+    console.error(
+      "[LS Webhook] Failed to dispatch order confirmation email:",
+      emailErr,
+    );
   });
 }

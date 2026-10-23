@@ -17,7 +17,7 @@ const protectedPaths = ["/profile", "/admin"];
 
 function isProtectedPath(pathname: string): boolean {
   return protectedPaths.some(
-    (path) => pathname === path || pathname.startsWith(path + "/")
+    (path) => pathname === path || pathname.startsWith(path + "/"),
   );
 }
 
@@ -33,10 +33,10 @@ export async function proxy(request: NextRequest) {
   }
 
   const baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
-  const cookie = request.headers.get('cookie') || '';
+  const cookie = request.headers.get("cookie") || "";
 
   // Fast-path: Check if the session cookie exists before making any network calls.
-  const hasSessionCookie = cookie.includes('better-auth.session_token');
+  const hasSessionCookie = cookie.includes("better-auth.session_token");
 
   if (!hasSessionCookie) {
     const loginUrl = new URL("/login", request.url);
@@ -56,8 +56,8 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    const { role } = roleRes.ok ? await roleRes.json() : { role: 'user' };
-    if (role !== 'admin') {
+    const { role } = roleRes.ok ? await roleRes.json() : { role: "user" };
+    if (role !== "admin") {
       return NextResponse.redirect(new URL("/", request.url));
     }
     return NextResponse.next();
@@ -67,7 +67,9 @@ export async function proxy(request: NextRequest) {
   const sessionRes = await fetch(`${baseUrl}/api/auth/get-session`, {
     headers: { cookie },
   });
-  const session: SessionResponse | null = sessionRes.ok ? await sessionRes.json() : null;
+  const session: SessionResponse | null = sessionRes.ok
+    ? await sessionRes.json()
+    : null;
 
   if (!session?.user) {
     const loginUrl = new URL("/login", request.url);

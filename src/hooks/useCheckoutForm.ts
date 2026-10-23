@@ -18,7 +18,11 @@ import { useState, useCallback } from "react";
 import { useCartStore } from "@/stores/useCartStore";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useQueryClient } from "@tanstack/react-query";
-import { validateField, validateAll, type FieldErrors } from "@/utils/validation";
+import {
+  validateField,
+  validateAll,
+  type FieldErrors,
+} from "@/utils/validation";
 
 export function useCheckoutForm() {
   const queryClient = useQueryClient();
@@ -55,7 +59,8 @@ export function useCheckoutForm() {
     if (profile?.displayName) {
       const parts = profile.displayName.trim().split(/\s+/);
       if (parts.length > 0) setFirstName((prev) => prev || parts[0]);
-      if (parts.length > 1) setLastName((prev) => prev || parts.slice(1).join(" "));
+      if (parts.length > 1)
+        setLastName((prev) => prev || parts.slice(1).join(" "));
     }
   }
 
@@ -73,21 +78,32 @@ export function useCheckoutForm() {
     setTouched((prev) => new Set(prev).add(field));
   }, []);
 
-  const handleBlur = useCallback((field: string) => {
-    markTouched(field);
-  }, [markTouched]);
+  const handleBlur = useCallback(
+    (field: string) => {
+      markTouched(field);
+    },
+    [markTouched],
+  );
 
   // Validates the field immediately on every change for real-time feedback
-  const setAndValidate = useCallback((field: string, value: string, setter: (v: string) => void) => {
-    setter(value);
-    setFieldErrors((prev) => {
-      const error = validateField(field, value);
-      return { ...prev, [field]: error };
-    });
-  }, []);
+  const setAndValidate = useCallback(
+    (field: string, value: string, setter: (v: string) => void) => {
+      setter(value);
+      setFieldErrors((prev) => {
+        const error = validateField(field, value);
+        return { ...prev, [field]: error };
+      });
+    },
+    [],
+  );
 
   const fields: Record<string, string> = {
-    email, firstName, lastName, address, city, zipCode,
+    email,
+    firstName,
+    lastName,
+    address,
+    city,
+    zipCode,
   };
 
   /* Masks an email for display on the confirmation screen:
@@ -161,7 +177,10 @@ export function useCheckoutForm() {
        * This mirrors calculateOrderPricing so the success page can
        * display pricing immediately without a server round-trip.
        */
-      const subtotal = cartItemsSnapshot.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const subtotal = cartItemsSnapshot.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
       const shipping = subtotal > 500 || subtotal === 0 ? 0 : 25;
       const tax = Math.round(subtotal * 0.08 * 100) / 100;
       const total = subtotal + shipping + tax;
@@ -198,7 +217,7 @@ export function useCheckoutForm() {
               clearCart();
               queryClient.invalidateQueries({ queryKey: ["orders"] });
             }
-          }
+          },
         });
 
         window.LemonSqueezy.Url.Open(data.checkoutUrl);
@@ -225,8 +244,13 @@ export function useCheckoutForm() {
     setCity: (v: string) => setAndValidate("city", v, setCity),
     zipCode,
     setZipCode: (v: string) => setAndValidate("zipCode", v, setZipCode),
-    loading, items, handlePlaceOrder,
-    error, setError,
-    fieldErrors, handleBlur, touched,
+    loading,
+    items,
+    handlePlaceOrder,
+    error,
+    setError,
+    fieldErrors,
+    handleBlur,
+    touched,
   };
 }

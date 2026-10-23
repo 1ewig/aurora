@@ -76,19 +76,16 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${playfairDisplay.variable}`}
-    >
+    <html lang="en" className={`${inter.variable} ${playfairDisplay.variable}`}>
       <body className="bg-bg-primary min-h-screen antialiased">
         <Providers>
           {/* Suspense allows the auth check to stream without blocking SSR */}
           <Suspense fallback={null}>
-            <AuthInitializer>
-              {children}
-            </AuthInitializer>
+            <AuthInitializer>{children}</AuthInitializer>
           </Suspense>
-          <Analytics />
+          <Suspense fallback={null}>
+            <Analytics />
+          </Suspense>
         </Providers>
       </body>
     </html>

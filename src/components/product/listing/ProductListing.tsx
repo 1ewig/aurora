@@ -50,23 +50,35 @@ export function ProductListing({
   onOpenFilterDrawer,
   onCloseFilterDrawer,
 }: ProductListingProps) {
-
   return (
     <main id="main-content" tabIndex={-1} className="pt-32 md:pt-36 pb-32">
       <div className="px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
           <PageHeader category={activeCategory} />
-          
+
           <div className="flex items-center gap-3 w-full md:w-auto">
             {/* Search Input Container */}
-            <form onSubmit={handleSearchSubmit} className="relative flex-1 md:w-80 md:flex-initial">
+            <form
+              onSubmit={handleSearchSubmit}
+              className="relative flex-1 md:w-80 md:flex-initial"
+            >
               <button
                 type="submit"
                 className="absolute inset-y-0 left-4 flex items-center text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
                 aria-label="Submit search"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </button>
               <input
@@ -95,8 +107,18 @@ export function ProductListing({
               className="p-3 bg-bg-secondary border border-border-medium rounded-full text-text-primary hover:border-text-primary transition-all duration-300 flex items-center justify-center cursor-pointer shadow-sm focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2"
               aria-label="Open filters"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+                />
               </svg>
             </button>
           </div>

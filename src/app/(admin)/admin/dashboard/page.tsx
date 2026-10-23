@@ -8,12 +8,12 @@
  * robots: noindex to prevent search crawling of admin pages.
  */
 
-import { DashboardClient } from '@/components/admin/dashboard/DashboardClient';
+import { DashboardClient } from "@/components/admin/dashboard/DashboardClient";
 
 /** Metadata for the admin dashboard page. */
 export const metadata = {
-  title: 'Dashboard | Admin | Aurora',
-  description: 'Aurora administrative panel.',
+  title: "Dashboard | Admin | Aurora",
+  description: "Aurora administrative panel.",
   robots: {
     index: false,
     follow: false,

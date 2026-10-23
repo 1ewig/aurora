@@ -5,32 +5,32 @@
  * Maps snake_case DB columns to camelCase for the frontend.
  */
 
-import { NextResponse } from 'next/server';
-import { pool } from '@/utils/db';
-import { cacheLife, cacheTag } from 'next/cache';
-import { rethrowIfDynamicServerError } from '@/utils/errors';
+import { NextResponse } from "next/server";
+import { pool } from "@/utils/db";
+import { cacheLife, cacheTag } from "next/cache";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
 
 const fetchProductsList = async (
   category: string | null,
   pageParam: string | null,
   limitParam: string | null,
   search: string | null,
-  sortBy: string | null
+  sortBy: string | null,
 ) => {
   if (pageParam !== null) {
     const page = Math.max(1, parseInt(pageParam, 10) || 1);
-    const limit = Math.max(1, parseInt(limitParam || '12', 10) || 12);
+    const limit = Math.max(1, parseInt(limitParam || "12", 10) || 12);
     const offset = (page - 1) * limit;
 
     const whereClauses: string[] = [];
     const params: string[] = [];
 
-    if (category && category !== 'All') {
+    if (category && category !== "All") {
       params.push(category);
       whereClauses.push(`category = $${params.length}`);
     }
 
-    if (search && search.trim() !== '') {
+    if (search && search.trim() !== "") {
       params.push(`%${search.trim()}%`);
       whereClauses.push(`(
         name ILIKE $${params.length} OR 
@@ -42,7 +42,8 @@ const fetchProductsList = async (
       )`);
     }
 
-    const whereSql = whereClauses.length > 0 ? ` WHERE ${whereClauses.join(' AND ')}` : '';
+    const whereSql =
+      whereClauses.length > 0 ? ` WHERE ${whereClauses.join(" AND ")}` : "";
 
     const countQuery = `SELECT COUNT(*) as count FROM products${whereSql}`;
     const countResult = await pool.query(countQuery, params);
@@ -50,16 +51,16 @@ const fetchProductsList = async (
 
     let dataQuery = `SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description FROM products${whereSql}`;
 
-    if (sortBy === 'price-asc') {
-      dataQuery += ' ORDER BY price ASC, name ASC';
-    } else if (sortBy === 'price-desc') {
-      dataQuery += ' ORDER BY price DESC, name ASC';
-    } else if (sortBy === 'name-asc') {
-      dataQuery += ' ORDER BY name ASC';
-    } else if (sortBy === 'name-desc') {
-      dataQuery += ' ORDER BY name DESC';
+    if (sortBy === "price-asc") {
+      dataQuery += " ORDER BY price ASC, name ASC";
+    } else if (sortBy === "price-desc") {
+      dataQuery += " ORDER BY price DESC, name ASC";
+    } else if (sortBy === "name-asc") {
+      dataQuery += " ORDER BY name ASC";
+    } else if (sortBy === "name-desc") {
+      dataQuery += " ORDER BY name DESC";
     } else {
-      dataQuery += ' ORDER BY name ASC';
+      dataQuery += " ORDER BY name ASC";
     }
 
     const limitIdx = params.length + 1;
@@ -86,15 +87,16 @@ const fetchProductsList = async (
     return { products, total };
   }
 
-  let query = 'SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description FROM products';
+  let query =
+    "SELECT id, slug, name, category, price, badge, image, alt_text, span, aspect_ratio, description FROM products";
   let params: string[] = [];
 
-  if (category && category !== 'All') {
-    query += ' WHERE category = $1';
+  if (category && category !== "All") {
+    query += " WHERE category = $1";
     params.push(category);
   }
 
-  query += ' ORDER BY name ASC';
+  query += " ORDER BY name ASC";
 
   const result = await pool.query(query, params);
 
@@ -106,12 +108,11 @@ const fetchProductsList = async (
     price: Number(row.price),
     badge: row.badge,
     image: row.image,
-      altText: row.alt_text,
-      span: row.span,
-      aspectRatio: row.aspect_ratio,
-      description: row.description,
+    altText: row.alt_text,
+    span: row.span,
+    aspectRatio: row.aspect_ratio,
+    description: row.description,
   }));
-
 
   return { products, total: products.length };
 };
@@ -121,24 +122,30 @@ async function getCachedProducts(
   pageParam: string | null,
   limitParam: string | null,
   search: string | null,
-  sortBy: string | null
+  sortBy: string | null,
 ) {
-  'use cache';
+  "use cache";
   cacheLife({ stale: 300, revalidate: 300 });
-  cacheTag('products');
+  cacheTag("products");
   return fetchProductsList(category, pageParam, limitParam, search, sortBy);
 }
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const category = searchParams.get('category');
-    const pageParam = searchParams.get('page');
-    const limitParam = searchParams.get('limit');
-    const search = searchParams.get('search');
-    const sortBy = searchParams.get('sortBy');
+    const category = searchParams.get("category");
+    const pageParam = searchParams.get("page");
+    const limitParam = searchParams.get("limit");
+    const search = searchParams.get("search");
+    const sortBy = searchParams.get("sortBy");
 
-    const result = await getCachedProducts(category, pageParam, limitParam, search, sortBy);
+    const result = await getCachedProducts(
+      category,
+      pageParam,
+      limitParam,
+      search,
+      sortBy,
+    );
 
     if (pageParam !== null) {
       return NextResponse.json(result);
@@ -149,8 +156,8 @@ export async function GET(request: Request) {
     rethrowIfDynamicServerError(error);
     console.error("Database query failed:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch products. Please try again later.' },
-      { status: 500 }
+      { error: "Failed to fetch products. Please try again later." },
+      { status: 500 },
     );
   }
 }

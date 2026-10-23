@@ -19,7 +19,7 @@ import { useOrdersManagement } from "@/hooks/useOrdersManagement";
 
 const OrderDetailModal = dynamic(
   () => import("./OrderDetailModal").then((m) => m.OrderDetailModal),
-  { ssr: false }
+  { ssr: false },
 );
 
 export function OrdersClient() {
@@ -27,9 +27,9 @@ export function OrdersClient() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const page = Math.max(1, Number(searchParams.get('page')) || 1);
-  const search = searchParams.get('search') || '';
-  const status = searchParams.get('status') || 'all';
+  const page = Math.max(1, Number(searchParams.get("page")) || 1);
+  const search = searchParams.get("search") || "";
+  const status = searchParams.get("status") || "all";
 
   const {
     orders,
@@ -57,27 +57,30 @@ export function OrdersClient() {
       if (localSearch !== search) {
         const p = new URLSearchParams(searchParams.toString());
         if (localSearch) {
-          p.set('search', localSearch);
+          p.set("search", localSearch);
         } else {
-          p.delete('search');
+          p.delete("search");
         }
-        p.set('page', '1');
+        p.set("page", "1");
         router.replace(`${pathname}?${p.toString()}`);
       }
     }, 300);
     return () => clearTimeout(timer);
   }, [localSearch, search, searchParams, router, pathname]);
 
-  const updateParam = useCallback((key: string, value: string) => {
-    const p = new URLSearchParams(searchParams.toString());
-    if (value) {
-      p.set(key, value);
-    } else {
-      p.delete(key);
-    }
-    if (key !== 'page') p.set('page', '1');
-    router.replace(`${pathname}?${p.toString()}`);
-  }, [searchParams, pathname, router]);
+  const updateParam = useCallback(
+    (key: string, value: string) => {
+      const p = new URLSearchParams(searchParams.toString());
+      if (value) {
+        p.set(key, value);
+      } else {
+        p.delete(key);
+      }
+      if (key !== "page") p.set("page", "1");
+      router.replace(`${pathname}?${p.toString()}`);
+    },
+    [searchParams, pathname, router],
+  );
 
   return (
     <div className="space-y-8 pb-12">
@@ -97,7 +100,7 @@ export function OrdersClient() {
           <OrdersTable
             orders={orders}
             filterStatus={status}
-            onFilterStatusChange={(val) => updateParam('status', val)}
+            onFilterStatusChange={(val) => updateParam("status", val)}
             searchQuery={localSearch}
             onSearchChange={setLocalSearch}
             onViewDetailsClick={setSelectedOrder}
@@ -109,14 +112,18 @@ export function OrdersClient() {
             <Pagination
               currentPage={page}
               totalPages={totalPages}
-              onPageChange={(p) => updateParam('page', String(p))}
+              onPageChange={(p) => updateParam("page", String(p))}
             />
           )}
 
           <OrderDetailModal
             isOpen={!!selectedOrder}
             onClose={() => setSelectedOrder(null)}
-            order={selectedOrder ? (orders.find((o) => o.id === selectedOrder.id) || selectedOrder) : null}
+            order={
+              selectedOrder
+                ? orders.find((o) => o.id === selectedOrder.id) || selectedOrder
+                : null
+            }
             onStatusUpdate={updateOrderStatus}
             updatingStatusId={updatingOrderId}
             isAdmin={isAdmin}

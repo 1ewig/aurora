@@ -75,7 +75,10 @@ export function useProductForm(onSuccess: () => void) {
   }
 
   const hasChanges = currentSnapshot() !== initialSnapshot;
-  const totalStock = formSizes.reduce((acc, s) => acc + (Number(s.stock) || 0), 0);
+  const totalStock = formSizes.reduce(
+    (acc, s) => acc + (Number(s.stock) || 0),
+    0,
+  );
 
   /*
    * Auto-generate slug from name when creating a new product.
@@ -128,7 +131,7 @@ export function useProductForm(onSuccess: () => void) {
           sizes: product.sizes || [],
           image: product.image,
           images: product.images || [],
-        })
+        }),
       );
     } else {
       // Reset to default blank form for new product creation
@@ -170,7 +173,7 @@ export function useProductForm(onSuccess: () => void) {
           ],
           image: "",
           images: [],
-        })
+        }),
       );
     }
   }
@@ -192,7 +195,9 @@ export function useProductForm(onSuccess: () => void) {
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
         const key = `${idForPath}/${safeName}`;
 
-        const { data, error } = await insforge.storage.from("product-media").upload(key, file);
+        const { data, error } = await insforge.storage
+          .from("product-media")
+          .upload(key, file);
         if (error) throw error;
         return data?.url || "";
       });
@@ -227,12 +232,18 @@ export function useProductForm(onSuccess: () => void) {
       setErrorMessage("Product Name is required");
       return;
     }
-    if (!formPrice || isNaN(parseFloat(formPrice)) || parseFloat(formPrice) < 0) {
+    if (
+      !formPrice ||
+      isNaN(parseFloat(formPrice)) ||
+      parseFloat(formPrice) < 0
+    ) {
       setErrorMessage("Please enter a valid non-negative price");
       return;
     }
     if (!mainImageUrl) {
-      setErrorMessage("Main product image is required. Please upload an image.");
+      setErrorMessage(
+        "Main product image is required. Please upload an image.",
+      );
       return;
     }
 
@@ -252,13 +263,19 @@ export function useProductForm(onSuccess: () => void) {
       images: galleryUrls,
       sizes: formSizes.map((s) => ({
         size: s.size,
-        stock: typeof s.stock === 'number' && !isNaN(s.stock) ? Math.max(0, Math.floor(s.stock)) : Math.max(0, parseInt(String(s.stock), 10) || 0),
+        stock:
+          typeof s.stock === "number" && !isNaN(s.stock)
+            ? Math.max(0, Math.floor(s.stock))
+            : Math.max(0, parseInt(String(s.stock), 10) || 0),
       })),
       details: formDetails,
     };
 
     try {
-      await saveMutation.mutateAsync({ product: payload, id: editingProduct?.id });
+      await saveMutation.mutateAsync({
+        product: payload,
+        id: editingProduct?.id,
+      });
       onSuccess();
     } catch (err: any) {
       setErrorMessage(err.message || "Failed to save product");
@@ -284,12 +301,16 @@ export function useProductForm(onSuccess: () => void) {
     if (newSizeName.trim()) {
       const stock = parseInt(newSizeStock, 10);
       if (isNaN(stock) || stock < 0) {
-        setErrorMessage("Invalid stock level: please provide a non-negative number");
+        setErrorMessage(
+          "Invalid stock level: please provide a non-negative number",
+        );
         return;
       }
       setErrorMessage(null);
       setFormSizes((prev) => {
-        const filtered = prev.filter((s) => s.size.toUpperCase() !== newSizeName.trim().toUpperCase());
+        const filtered = prev.filter(
+          (s) => s.size.toUpperCase() !== newSizeName.trim().toUpperCase(),
+        );
         return [...filtered, { size: newSizeName.trim().toUpperCase(), stock }];
       });
       setNewSizeName("");
@@ -320,23 +341,40 @@ export function useProductForm(onSuccess: () => void) {
   }
 
   return {
-    formId, setFormId,
-    formName, setFormName,
-    formSlug, setFormSlug,
-    formCategory, setFormCategory,
-    formPrice, setFormPrice,
-    formBadge, setFormBadge,
-    formAltText, setFormAltText,
-    formSpan, setFormSpan,
-    formAspectRatio, setFormAspectRatio,
-    formDescription, setFormDescription,
-    formDetailInput, setFormDetailInput,
-    formDetails, setFormDetails,
-    formSizes, setFormSizes,
-    newSizeName, setNewSizeName,
-    newSizeStock, setNewSizeStock,
-    mainImageUrl, setMainImageUrl,
-    galleryUrls, setGalleryUrls,
+    formId,
+    setFormId,
+    formName,
+    setFormName,
+    formSlug,
+    setFormSlug,
+    formCategory,
+    setFormCategory,
+    formPrice,
+    setFormPrice,
+    formBadge,
+    setFormBadge,
+    formAltText,
+    setFormAltText,
+    formSpan,
+    setFormSpan,
+    formAspectRatio,
+    setFormAspectRatio,
+    formDescription,
+    setFormDescription,
+    formDetailInput,
+    setFormDetailInput,
+    formDetails,
+    setFormDetails,
+    formSizes,
+    setFormSizes,
+    newSizeName,
+    setNewSizeName,
+    newSizeStock,
+    setNewSizeStock,
+    mainImageUrl,
+    setMainImageUrl,
+    galleryUrls,
+    setGalleryUrls,
     uploading,
     saving,
     isReady,

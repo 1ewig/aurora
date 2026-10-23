@@ -3,28 +3,29 @@ import { cacheLife, cacheTag } from "next/cache";
 import { MetadataRoute } from "next";
 
 async function getSitemapProducts() {
-  'use cache';
+  "use cache";
   cacheLife({ stale: 3600, revalidate: 3600 });
-  cacheTag('products');
+  cacheTag("products");
   const productRes = await pool.query(
-    "SELECT slug, created_at FROM products ORDER BY created_at DESC"
+    "SELECT slug, created_at FROM products ORDER BY created_at DESC",
   );
   return productRes.rows;
 }
 
 async function getSitemapCategories() {
-  'use cache';
+  "use cache";
   cacheLife({ stale: 3600, revalidate: 3600 });
-  cacheTag('categories');
+  cacheTag("categories");
   const categoryRes = await pool.query(
-    "SELECT slug FROM categories ORDER BY name ASC"
+    "SELECT slug FROM categories ORDER BY name ASC",
   );
   return categoryRes.rows;
 }
 
 /** Dynamically generates sitemap.xml listing all product routes and static pages. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://aurora-nu-three.vercel.app";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL || "https://aurora-nu-three.vercel.app";
 
   let products: MetadataRoute.Sitemap = [];
   let categories: MetadataRoute.Sitemap = [];

@@ -6,13 +6,29 @@
  */
 
 /** Standard spring — buttons, cards. */
-export const springSmooth = { type: "spring" as const, stiffness: 300, damping: 30 };
+export const springSmooth = {
+  type: "spring" as const,
+  stiffness: 300,
+  damping: 30,
+};
 /** Bouncier spring — playful ui elements. */
-export const springBouncy = { type: "spring" as const, stiffness: 400, damping: 20 };
+export const springBouncy = {
+  type: "spring" as const,
+  stiffness: 400,
+  damping: 20,
+};
 /** Stiff spring — subtle micro-interactions. */
-export const springStiff = { type: "spring" as const, stiffness: 500, damping: 35 };
+export const springStiff = {
+  type: "spring" as const,
+  stiffness: 500,
+  damping: 35,
+};
 /** Gentle spring — soft reveals. */
-export const springGentle = { type: "spring" as const, stiffness: 180, damping: 22 };
+export const springGentle = {
+  type: "spring" as const,
+  stiffness: 180,
+  damping: 22,
+};
 /** Smooth deceleration curve. */
 export const easeOutQuart = [0.25, 0.46, 0.45, 0.94] as const;
 /** Gentle ease-in-out for fades. */

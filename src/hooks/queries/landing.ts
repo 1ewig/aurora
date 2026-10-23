@@ -5,10 +5,10 @@
  * material features, testimonials, and category metadata.
  */
 
-import { useQuery } from '@tanstack/react-query';
-import type { Product } from '@/data/products';
-import type { MaterialItem } from '@/data/materials';
-import type { CategoryMetadata } from './content';
+import { useQuery } from "@tanstack/react-query";
+import type { Product } from "@/data/products";
+import type { MaterialItem } from "@/data/materials";
+import type { CategoryMetadata } from "./content";
 
 export interface LookbookSlide {
   id: number;
@@ -40,16 +40,16 @@ export interface LandingData {
 }
 
 async function fetchLanding(): Promise<LandingData> {
-  const response = await fetch('/api/landing');
+  const response = await fetch("/api/landing");
   if (!response.ok) {
-    throw new Error('Failed to fetch landing data');
+    throw new Error("Failed to fetch landing data");
   }
   return response.json();
 }
 
 export function useLandingQuery(initialData?: LandingData) {
   return useQuery<LandingData>({
-    queryKey: ['landing'],
+    queryKey: ["landing"],
     queryFn: fetchLanding,
     initialData,
     staleTime: 1000 * 60 * 5,

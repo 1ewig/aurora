@@ -18,11 +18,19 @@ interface OrderSummaryProps {
 }
 
 /** Order summary sidebar — item list, quantities, and pricing breakdown. */
-export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSummaryProps) {
+export function OrderSummary({
+  items,
+  subtotal,
+  shipping,
+  tax,
+  total,
+}: OrderSummaryProps) {
   if (items.length === 0) {
     return (
       <div className="bg-bg-secondary p-8 rounded-2xl border border-border-subtle text-center space-y-4">
-        <p className="text-text-secondary font-medium">Your shopping bag is empty.</p>
+        <p className="text-text-secondary font-medium">
+          Your shopping bag is empty.
+        </p>
       </div>
     );
   }
@@ -34,10 +42,16 @@ export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSum
       </h2>
 
       {/* Cart Items List */}
-      <ul role="list" className="divide-y divide-border-subtle max-h-[350px] overflow-y-auto pr-2">
+      <ul
+        role="list"
+        className="divide-y divide-border-subtle max-h-[350px] overflow-y-auto pr-2"
+      >
         {items.map((item) => (
           <li key={`${item.id}-${item.size}`} className="py-4 flex gap-4">
-            <Link href={`/products/${item.slug}`} className="relative w-16 h-20 bg-border-subtle rounded-md overflow-hidden flex-shrink-0">
+            <Link
+              href={`/products/${item.slug}`}
+              className="relative w-16 h-20 bg-border-subtle rounded-md overflow-hidden flex-shrink-0"
+            >
               <Image
                 src={item.image}
                 alt={`${item.name} in size ${item.size}`}
@@ -53,7 +67,9 @@ export function OrderSummary({ items, subtotal, shipping, tax, total }: OrderSum
               >
                 {item.name}
               </Link>
-              <p className="text-text-secondary text-xs">Size: {item.size} × Qty: {item.quantity}</p>
+              <p className="text-text-secondary text-xs">
+                Size: {item.size} × Qty: {item.quantity}
+              </p>
               <span className="font-mono text-sm font-medium text-text-primary block">
                 {formatCurrency(item.price * item.quantity)}
               </span>

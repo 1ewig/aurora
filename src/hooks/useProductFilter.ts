@@ -26,23 +26,21 @@ interface UseProductFilterOptions {
 
 /** Manages category, sort, and search filters for the products listing page with server-side pagination and URL sync. */
 export function useProductFilter(options: UseProductFilterOptions = {}) {
-  const {
-    initialCategory = "All",
-    onCategoryChange,
-  } = options;
+  const { initialCategory = "All", onCategoryChange } = options;
 
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
   const [activeCategory, setActiveCategory] = useState<string>(initialCategory);
-  const [prevInitialCategory, setPrevInitialCategory] = useState(initialCategory);
+  const [prevInitialCategory, setPrevInitialCategory] =
+    useState(initialCategory);
 
   if (prevInitialCategory !== initialCategory) {
     setPrevInitialCategory(initialCategory);
     setActiveCategory(initialCategory);
   }
-  
+
   // Read current filters directly from URL search parameters as the source of truth
   const page = Number(searchParams.get("page")) || 1;
   const sortBy = searchParams.get("sortBy") || "featured";
@@ -152,4 +150,3 @@ export function useProductFilter(options: UseProductFilterOptions = {}) {
     categories: ["All", ...dbCategories.map((c) => c.name)],
   };
 }
-

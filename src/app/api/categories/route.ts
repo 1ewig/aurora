@@ -5,10 +5,10 @@
  * (name, slug, image, description) from the database.
  */
 
-import { NextResponse } from 'next/server';
-import { pool } from '@/utils/db';
-import { cacheLife, cacheTag } from 'next/cache';
-import { rethrowIfDynamicServerError } from '@/utils/errors';
+import { NextResponse } from "next/server";
+import { pool } from "@/utils/db";
+import { cacheLife, cacheTag } from "next/cache";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
 
 const fetchCategoriesFromDb = async () => {
   const result = await pool.query(`
@@ -20,9 +20,9 @@ const fetchCategoriesFromDb = async () => {
 };
 
 export async function getCachedCategories() {
-  'use cache';
+  "use cache";
   cacheLife({ stale: 300, revalidate: 300 });
-  cacheTag('categories', 'products');
+  cacheTag("categories", "products");
   return fetchCategoriesFromDb();
 }
 
@@ -34,8 +34,8 @@ export async function GET() {
     rethrowIfDynamicServerError(error);
     console.error("Failed to fetch categories list:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch categories' },
-      { status: 500 }
+      { error: "Failed to fetch categories" },
+      { status: 500 },
     );
   }
 }

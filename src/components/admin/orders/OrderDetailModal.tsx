@@ -64,7 +64,10 @@ export function OrderDetailModal({
       })
     : "Date unknown";
 
-  const totalItemsCount = order.items.reduce((acc, item) => acc + item.quantity, 0);
+  const totalItemsCount = order.items.reduce(
+    (acc, item) => acc + item.quantity,
+    0,
+  );
 
   return (
     <div
@@ -81,12 +84,14 @@ export function OrderDetailModal({
 
       {/* Modal Dialog */}
       <div className="relative w-full max-w-4xl bg-bg-secondary border border-border-subtle rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[85vh] sm:max-h-[90vh] overflow-hidden z-10">
-        
         {/* ================= BARE MINIMUM HEADER ================= */}
         <div className="flex-shrink-0 flex items-center justify-between px-5 sm:px-6 py-3.5 border-b border-border-subtle bg-bg-secondary">
           <div className="flex items-center gap-2.5 min-w-0">
             <span className="w-2 h-2 rounded-full bg-accent-primary shrink-0" />
-            <h2 id="order-details-title" className="text-xs sm:text-sm font-bold uppercase tracking-widest text-text-primary truncate">
+            <h2
+              id="order-details-title"
+              className="text-xs sm:text-sm font-bold uppercase tracking-widest text-text-primary truncate"
+            >
               Order Details
             </h2>
             <span className="font-mono text-[11px] font-semibold text-text-secondary bg-bg-primary border border-border-subtle px-2 py-0.5 rounded-md shrink-0">
@@ -112,8 +117,18 @@ export function OrderDetailModal({
             className="p-1.5 text-text-secondary hover:text-text-primary transition-colors cursor-pointer rounded-full hover:bg-bg-primary shrink-0 ml-2"
             aria-label="Close order details"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -138,16 +153,24 @@ export function OrderDetailModal({
         {/* ================= SCROLLABLE BODY ================= */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-            
             {/* LEFT COLUMN: Line Items & Totals (7 Cols) */}
             <div className="lg:col-span-7 space-y-4">
-              
               {/* Items Card */}
               <div className="border border-border-subtle bg-bg-primary/25 rounded-2xl p-4 sm:p-5 space-y-3">
                 <div className="flex items-center justify-between pb-1 border-b border-border-subtle/50">
                   <h3 className="text-[11px] font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                      />
                     </svg>
                     Items Ordered ({totalItemsCount})
                   </h3>
@@ -215,20 +238,28 @@ export function OrderDetailModal({
                 <div className="space-y-2 text-xs">
                   <div className="flex justify-between text-text-secondary">
                     <span>Subtotal</span>
-                    <span className="font-mono font-medium text-text-primary">${order.subtotal.toFixed(2)}</span>
+                    <span className="font-mono font-medium text-text-primary">
+                      ${order.subtotal.toFixed(2)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-text-secondary">
                     <span>Shipping</span>
                     <span className="font-mono font-medium text-text-primary">
-                      {order.shipping === 0 ? "Free" : `$${order.shipping.toFixed(2)}`}
+                      {order.shipping === 0
+                        ? "Free"
+                        : `$${order.shipping.toFixed(2)}`}
                     </span>
                   </div>
                   <div className="flex justify-between text-text-secondary">
                     <span>Estimated Tax (8%)</span>
-                    <span className="font-mono font-medium text-text-primary">${order.tax.toFixed(2)}</span>
+                    <span className="font-mono font-medium text-text-primary">
+                      ${order.tax.toFixed(2)}
+                    </span>
                   </div>
                   <div className="flex justify-between items-baseline border-t border-border-subtle pt-2.5 text-sm">
-                    <span className="font-bold text-text-primary">Total Paid</span>
+                    <span className="font-bold text-text-primary">
+                      Total Paid
+                    </span>
                     <span className="font-mono font-bold text-base text-accent-primary">
                       ${order.total.toFixed(2)}
                     </span>
@@ -239,35 +270,59 @@ export function OrderDetailModal({
 
             {/* RIGHT COLUMN: Customer, Shipping & Controls (5 Cols) */}
             <div className="lg:col-span-5 space-y-4">
-              
               {/* Shipping / Customer Card */}
               <div className="border border-border-subtle bg-bg-primary/25 p-4 sm:p-5 rounded-2xl space-y-3.5">
                 <h3 className="text-[11px] font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5 pb-1 border-b border-border-subtle/50">
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
                   </svg>
                   Delivery & Contact
                 </h3>
 
                 <div className="space-y-3 text-xs">
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block">Recipient</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block">
+                      Recipient
+                    </span>
                     <div className="font-semibold text-text-primary text-xs sm:text-sm mt-0.5">
-                      {order.shippingAddress.firstName} {order.shippingAddress.lastName}
+                      {order.shippingAddress.firstName}{" "}
+                      {order.shippingAddress.lastName}
                     </div>
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block">Destination</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block">
+                      Destination
+                    </span>
                     <div className="text-text-secondary mt-0.5 leading-relaxed">
                       <p>{order.shippingAddress.address}</p>
-                      <p>{order.shippingAddress.city}, {order.shippingAddress.zipCode}</p>
+                      <p>
+                        {order.shippingAddress.city},{" "}
+                        {order.shippingAddress.zipCode}
+                      </p>
                     </div>
                   </div>
 
                   <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block">Email Address</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block">
+                      Email Address
+                    </span>
                     <div className="flex items-center justify-between gap-2 mt-0.5 bg-bg-secondary p-2 rounded-lg border border-border-subtle">
                       <a
                         href={`mailto:${order.shippingAddress.email}`}
@@ -277,18 +332,40 @@ export function OrderDetailModal({
                       </a>
                       <button
                         type="button"
-                        onClick={() => handleCopyEmail(order.shippingAddress.email)}
+                        onClick={() =>
+                          handleCopyEmail(order.shippingAddress.email)
+                        }
                         className="p-1 text-text-muted hover:text-text-primary rounded transition-colors shrink-0 cursor-pointer"
                         title="Copy Email"
                         aria-label="Copy Email"
                       >
                         {copiedEmail ? (
-                          <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          <svg
+                            className="w-3.5 h-3.5 text-emerald-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2.5}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M5 13l4 4L19 7"
+                            />
                           </svg>
                         ) : (
-                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          <svg
+                            className="w-3.5 h-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                            />
                           </svg>
                         )}
                       </button>
@@ -299,9 +376,11 @@ export function OrderDetailModal({
 
               {/* Status Management Card (Admin) */}
               {isAdmin && (
-                <div className={`border border-border-subtle bg-bg-primary/25 p-4 sm:p-5 rounded-2xl space-y-3.5 relative overflow-hidden transition-opacity ${
-                  isUpdating ? "opacity-75" : ""
-                }`}>
+                <div
+                  className={`border border-border-subtle bg-bg-primary/25 p-4 sm:p-5 rounded-2xl space-y-3.5 relative overflow-hidden transition-opacity ${
+                    isUpdating ? "opacity-75" : ""
+                  }`}
+                >
                   <div className="flex items-center justify-between pb-1 border-b border-border-subtle/50">
                     <h3 className="text-[11px] font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-accent-primary" />
@@ -309,9 +388,24 @@ export function OrderDetailModal({
                     </h3>
                     {isUpdating && (
                       <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-accent-vivid animate-pulse">
-                        <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24" fill="none">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        <svg
+                          className="animate-spin h-3 w-3"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
                         </svg>
                         Updating...
                       </span>
@@ -320,12 +414,17 @@ export function OrderDetailModal({
 
                   <div className="space-y-3 text-xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-text-secondary">Current Status:</span>
+                      <span className="text-text-secondary">
+                        Current Status:
+                      </span>
                       <OrderStatusBadge status={order.status} />
                     </div>
 
                     <div className="space-y-1.5 pt-1">
-                      <label htmlFor="order-status-select" className="block text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                      <label
+                        htmlFor="order-status-select"
+                        className="block text-[10px] font-bold uppercase tracking-wider text-text-muted"
+                      >
                         Update Fulfillment Status
                       </label>
                       <div className="relative">
@@ -333,7 +432,9 @@ export function OrderDetailModal({
                           id="order-status-select"
                           disabled={isUpdating}
                           value={order.status}
-                          onChange={(e) => onStatusUpdate(order.id, e.target.value)}
+                          onChange={(e) =>
+                            onStatusUpdate(order.id, e.target.value)
+                          }
                           className="w-full px-3.5 py-2.5 bg-bg-secondary border border-border-medium rounded-xl text-xs font-semibold text-text-primary focus:border-accent-primary focus:outline-none transition-colors cursor-pointer appearance-none pr-10 hover:border-text-muted disabled:opacity-50 disabled:cursor-not-allowed"
                           style={{
                             backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B6B6B' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/></svg>")`,
@@ -353,7 +454,6 @@ export function OrderDetailModal({
                   </div>
                 </div>
               )}
-
             </div>
           </div>
         </div>
@@ -371,7 +471,6 @@ export function OrderDetailModal({
             Close
           </button>
         </div>
-
       </div>
     </div>
   );

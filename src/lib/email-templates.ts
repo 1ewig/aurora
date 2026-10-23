@@ -63,7 +63,7 @@ function emailShell(contentHtml: string): string {
 
 /** Verification email — HTML */
 export function verificationEmailHtml(url: string, name?: string): string {
-  const greeting = name ? `Hi ${escapeHtml(name)},` : 'Hi there,';
+  const greeting = name ? `Hi ${escapeHtml(name)},` : "Hi there,";
   return emailShell(`
     <tr>
       <td style="padding:32px 32px 0;text-align:center">
@@ -83,23 +83,23 @@ export function verificationEmailHtml(url: string, name?: string): string {
 
 /** Verification email — plain text */
 export function verificationEmailText(url: string, name?: string): string {
-  const greeting = name ? `Hi ${name},` : 'Hi there,';
+  const greeting = name ? `Hi ${name},` : "Hi there,";
   return [
-    'Verify Your Email Address',
-    '',
+    "Verify Your Email Address",
+    "",
     greeting,
-    'Thanks for joining Aurora. Please verify your email address to get started.',
-    '',
+    "Thanks for joining Aurora. Please verify your email address to get started.",
+    "",
     `Verify: ${url}`,
-    '',
-    'This link expires in 1 hour.',
-    '— Aurora',
-  ].join('\n');
+    "",
+    "This link expires in 1 hour.",
+    "— Aurora",
+  ].join("\n");
 }
 
 /** Password reset email — HTML */
 export function resetPasswordEmailHtml(url: string, name?: string): string {
-  const greeting = name ? `Hi ${escapeHtml(name)},` : 'Hi there,';
+  const greeting = name ? `Hi ${escapeHtml(name)},` : "Hi there,";
   return emailShell(`
     <tr>
       <td style="padding:32px 32px 0;text-align:center">
@@ -119,18 +119,18 @@ export function resetPasswordEmailHtml(url: string, name?: string): string {
 
 /** Password reset email — plain text */
 export function resetPasswordEmailText(url: string, name?: string): string {
-  const greeting = name ? `Hi ${name},` : 'Hi there,';
+  const greeting = name ? `Hi ${name},` : "Hi there,";
   return [
-    'Reset Your Password',
-    '',
+    "Reset Your Password",
+    "",
     greeting,
-    'We received a request to reset the password for your Aurora account.',
-    '',
+    "We received a request to reset the password for your Aurora account.",
+    "",
     `Reset: ${url}`,
-    '',
-    'This link expires in 1 hour. If you didn\'t request this, please ignore this email.',
-    '— Aurora',
-  ].join('\n');
+    "",
+    "This link expires in 1 hour. If you didn't request this, please ignore this email.",
+    "— Aurora",
+  ].join("\n");
 }
 
 /** Sign-up alert email — HTML */
@@ -150,14 +150,14 @@ export function signUpAlertHtml(email: string): string {
 /** Sign-up alert email — plain text */
 export function signUpAlertText(email: string): string {
   return [
-    'Sign-Up Attempt Detected',
-    '',
-    'Hi there,',
+    "Sign-Up Attempt Detected",
+    "",
+    "Hi there,",
     `Someone tried to create an Aurora account using ${email}.`,
-    '',
-    'If this was you, sign in instead. If not, you can safely ignore this email.',
-    '— Aurora',
-  ].join('\n');
+    "",
+    "If this was you, sign in instead. If not, you can safely ignore this email.",
+    "— Aurora",
+  ].join("\n");
 }
 
 /** Builds a styled HTML email for order confirmation. */
@@ -172,7 +172,7 @@ export function orderConfirmationHtml(data: OrderConfirmationData): string {
         <td style="padding:10px 0;border-bottom:1px solid #e5e5e5;font-size:14px;color:#333;text-align:right;font-family:monospace">
           ${item.price}
         </td>
-      </tr>`
+      </tr>`,
     )
     .join("");
 
@@ -241,7 +241,10 @@ export function orderConfirmationHtml(data: OrderConfirmationData): string {
 /** Builds a plain-text email for order confirmation (fallback / non-HTML clients). */
 export function orderConfirmationText(data: OrderConfirmationData): string {
   const itemsList = data.items
-    .map((item) => `  ${item.name} (Size: ${item.size} × ${item.quantity}) — ${item.price}`)
+    .map(
+      (item) =>
+        `  ${item.name} (Size: ${item.size} × ${item.quantity}) — ${item.price}`,
+    )
     .join("\n");
 
   return [

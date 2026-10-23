@@ -20,8 +20,14 @@ interface NewsletterProps {
 }
 
 /** Newsletter subscription form with email validation, loading state, and success animation. */
-export function Newsletter({ email, setEmail, submitted, loading, error, handleSubmit }: NewsletterProps) {
-
+export function Newsletter({
+  email,
+  setEmail,
+  submitted,
+  loading,
+  error,
+  handleSubmit,
+}: NewsletterProps) {
   return (
     <section
       aria-labelledby="newsletter-heading"
@@ -53,7 +59,8 @@ export function Newsletter({ email, setEmail, submitted, loading, error, handleS
             variants={fadeInUp}
             className="text-text-muted mt-6 leading-relaxed max-w-md mx-auto"
           >
-            Receive private notifications of limited-run releases, custom atelier swatches, and priority entry before public drops.
+            Receive private notifications of limited-run releases, custom
+            atelier swatches, and priority entry before public drops.
           </motion.p>
 
           <motion.div variants={fadeInUp} className="mt-12">
@@ -67,19 +74,23 @@ export function Newsletter({ email, setEmail, submitted, loading, error, handleS
                     hidden: { opacity: 0 },
                     visible: {
                       opacity: 1,
-                      transition: { staggerChildren: 0.15 }
-                    }
+                      transition: { staggerChildren: 0.15 },
+                    },
                   }}
                   className="flex flex-col items-center gap-4 text-center"
                 >
                   <motion.div
                     variants={{
                       hidden: { scale: 0, rotate: -45 },
-                      visible: { 
-                        scale: 1, 
+                      visible: {
+                        scale: 1,
                         rotate: 0,
-                        transition: { type: "spring", stiffness: 200, damping: 15 } 
-                      }
+                        transition: {
+                          type: "spring",
+                          stiffness: 200,
+                          damping: 15,
+                        },
+                      },
                     }}
                     className="w-16 h-16 rounded-full bg-accent-primary flex items-center justify-center shadow-lg"
                   >
@@ -101,25 +112,26 @@ export function Newsletter({ email, setEmail, submitted, loading, error, handleS
                       />
                     </svg>
                   </motion.div>
-                  
+
                   <motion.p
                     variants={{
                       hidden: { opacity: 0, y: 10 },
-                      visible: { opacity: 1, y: 0 }
+                      visible: { opacity: 1, y: 0 },
                     }}
                     className="text-text-inverted font-display text-xl tracking-wide uppercase font-light mt-2"
                   >
                     Access Granted.
                   </motion.p>
-                  
+
                   <motion.p
                     variants={{
                       hidden: { opacity: 0 },
-                      visible: { opacity: 1 }
+                      visible: { opacity: 1 },
                     }}
                     className="text-text-muted text-sm font-light max-w-sm"
                   >
-                    Your address has been registered. Private preview entry confirmation will arrive in your inbox.
+                    Your address has been registered. Private preview entry
+                    confirmation will arrive in your inbox.
                   </motion.p>
                 </motion.div>
               ) : (
@@ -151,9 +163,25 @@ export function Newsletter({ email, setEmail, submitted, loading, error, handleS
                     className="px-8 py-4 rounded-full bg-accent-primary text-white font-medium hover:bg-accent-vivid hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-300 text-sm disabled:opacity-70 whitespace-nowrap cursor-pointer min-w-[140px] flex items-center justify-center"
                   >
                     {loading ? (
-                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                     ) : (
                       "Subscribe →"

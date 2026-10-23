@@ -4,16 +4,17 @@
  * GET /api/editorial — returns editorial content for the brand story page.
  */
 
-import { NextResponse } from 'next/server';
-import { cacheLife, cacheTag } from 'next/cache';
-import { pool } from '@/utils/db';
-import { rethrowIfDynamicServerError } from '@/utils/errors';
+import { NextResponse } from "next/server";
+import { cacheLife, cacheTag } from "next/cache";
+import { pool } from "@/utils/db";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
 
 async function getEditorialContent() {
-  'use cache';
+  "use cache";
   cacheLife({ stale: 600, revalidate: 600 });
-  cacheTag('editorial');
-  const query = 'SELECT id, original_image, image_url, alt_text, title, description FROM editorial_content';
+  cacheTag("editorial");
+  const query =
+    "SELECT id, original_image, image_url, alt_text, title, description FROM editorial_content";
   const result = await pool.query(query);
 
   return result.rows.map((row) => ({
@@ -32,10 +33,10 @@ export async function GET() {
     return NextResponse.json(items);
   } catch (error) {
     rethrowIfDynamicServerError(error);
-    console.error('Failed to fetch editorial content:', error);
+    console.error("Failed to fetch editorial content:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch editorial content. Please try again later.' },
-      { status: 500 }
+      { error: "Failed to fetch editorial content. Please try again later." },
+      { status: 500 },
     );
   }
 }

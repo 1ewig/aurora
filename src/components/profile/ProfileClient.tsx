@@ -21,7 +21,9 @@ export function ProfileClient() {
     router.push("/login");
   };
 
-  const [displayName, setDisplayName] = useState(() => profile?.displayName || "");
+  const [displayName, setDisplayName] = useState(
+    () => profile?.displayName || "",
+  );
   const [prevProfileName, setPrevProfileName] = useState(profile?.displayName);
   const [statusMsg, setStatusMsg] = useState("");
   const [statusType, setStatusType] = useState<"success" | "error" | "">("");
@@ -53,7 +55,9 @@ export function ProfileClient() {
     }
   };
 
-  const hasChanges = displayName.trim() !== (profile?.displayName || "") && displayName.trim().length > 0;
+  const hasChanges =
+    displayName.trim() !== (profile?.displayName || "") &&
+    displayName.trim().length > 0;
 
   if (loading) return <ProfileSkeleton />;
   if (!user) return null;

@@ -25,10 +25,9 @@ interface LookbookSliderProps {
 
 /** Full-screen lookbook carousel with auto-advance and dot navigation. */
 export function LookbookSlider({ slides }: LookbookSliderProps) {
-
   const autoplay = useMemo(
     () => Autoplay({ delay: 6000, stopOnInteraction: true }),
-    []
+    [],
   );
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [autoplay]);
@@ -68,7 +67,7 @@ export function LookbookSlider({ slides }: LookbookSliderProps) {
       emblaApi.scrollTo(index);
       scheduleResume();
     },
-    [emblaApi, scheduleResume]
+    [emblaApi, scheduleResume],
   );
 
   return (
@@ -105,20 +104,23 @@ export function LookbookSlider({ slides }: LookbookSliderProps) {
 
                 {/* Caption + button group (bottom-right) */}
                 <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2">
-                  <Link href={slide.link || "/products"} className="inline-block">
+                  <Link
+                    href={slide.link || "/products"}
+                    className="inline-block"
+                  >
                     <button className="px-5 py-2 rounded-full border border-white/50 text-white text-sm font-medium backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-colors cursor-pointer">
                       Shop The Look
                     </button>
                   </Link>
                   <figcaption className="text-white/70 text-xs tracking-[0.15em] uppercase font-mono">
-                    {slide.title ?? `Look 0${i + 1}`} / {i + 1} of {slides.length}
+                    {slide.title ?? `Look 0${i + 1}`} / {i + 1} of{" "}
+                    {slides.length}
                   </figcaption>
                 </div>
               </figure>
             ))}
           </div>
         </div>
-
       </div>
 
       {/* Dot Indicators */}
@@ -135,9 +137,7 @@ export function LookbookSlider({ slides }: LookbookSliderProps) {
             aria-label={`Go to slide ${i + 1}`}
             onClick={() => scrollTo(i)}
             className={`h-[3px] rounded-full transition-all duration-300 ${
-              i === selectedIndex
-                ? "w-6 bg-accent-primary"
-                : "w-2 bg-white/30"
+              i === selectedIndex ? "w-6 bg-accent-primary" : "w-2 bg-white/30"
             }`}
           />
         ))}

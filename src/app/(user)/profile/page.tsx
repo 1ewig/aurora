@@ -14,7 +14,8 @@ import { ProfileClient } from "@/components/profile/ProfileClient";
 /** Metadata for the profile page. */
 export const metadata: Metadata = {
   title: "Your Profile — Aurora",
-  description: "Customize your display profile and account specifications for the Aurora collection.",
+  description:
+    "Customize your display profile and account specifications for the Aurora collection.",
   robots: {
     index: false,
     follow: false,

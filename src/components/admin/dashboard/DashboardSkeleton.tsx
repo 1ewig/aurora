@@ -19,7 +19,10 @@ export function DashboardSkeleton() {
       {/* Metrics Grid Skeleton */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="bg-bg-secondary border border-border-subtle rounded-2xl p-6 shadow-sm flex items-center gap-4">
+          <div
+            key={i}
+            className="bg-bg-secondary border border-border-subtle rounded-2xl p-6 shadow-sm flex items-center gap-4"
+          >
             <div className="p-3 bg-bg-primary rounded-xl">
               <div className="w-6 h-6 bg-bg-secondary rounded" />
             </div>
@@ -36,7 +39,10 @@ export function DashboardSkeleton() {
         <div className="lg:col-span-2 space-y-4">
           <div className="h-6 w-40 bg-bg-secondary rounded" />
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="h-16 bg-bg-secondary rounded-xl border border-border-subtle p-4 flex items-center justify-between">
+            <div
+              key={i}
+              className="h-16 bg-bg-secondary rounded-xl border border-border-subtle p-4 flex items-center justify-between"
+            >
               <div className="space-y-2 flex-1">
                 <div className="h-4 w-48 bg-bg-primary rounded" />
                 <div className="h-3 w-32 bg-bg-primary rounded" />
@@ -52,7 +58,10 @@ export function DashboardSkeleton() {
         <div className="space-y-4">
           <div className="h-6 w-32 bg-bg-secondary rounded" />
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-11 bg-bg-secondary rounded-full border border-border-subtle" />
+            <div
+              key={i}
+              className="h-11 bg-bg-secondary rounded-full border border-border-subtle"
+            />
           ))}
         </div>
       </div>

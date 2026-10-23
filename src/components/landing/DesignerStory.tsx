@@ -52,18 +52,18 @@ export function DesignerStory({ imageUrl }: DesignerStoryProps) {
           className="text-text-secondary leading-relaxed mt-8 max-w-lg text-base font-light"
         >
           Aurora was born from a single conviction: that clothing should carry
-          intention. Not just in its making, but in the quiet way it asks you
-          to move through the world.
+          intention. Not just in its making, but in the quiet way it asks you to
+          move through the world.
         </motion.p>
 
         <motion.p
           variants={fadeInUp}
           className="text-text-secondary leading-relaxed mt-4 max-w-lg text-base font-light"
         >
-          Each collection begins in silence — sketched before dawn, refined
-          over months. We partner with heritage mills that have operated for
-          generations, choosing noble materials that age with grace, produced
-          in quantities small enough to remain truly yours.
+          Each collection begins in silence — sketched before dawn, refined over
+          months. We partner with heritage mills that have operated for
+          generations, choosing noble materials that age with grace, produced in
+          quantities small enough to remain truly yours.
         </motion.p>
 
         <motion.div
@@ -97,8 +97,7 @@ export function DesignerStory({ imageUrl }: DesignerStoryProps) {
         <div
           className="absolute inset-0"
           style={{
-            background:
-              "rgba(200,168,130,0.08)",
+            background: "rgba(200,168,130,0.08)",
             mixBlendMode: "multiply",
           }}
         />

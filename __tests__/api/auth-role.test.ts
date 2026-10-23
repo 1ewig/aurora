@@ -5,7 +5,9 @@ const mockPoolQuery = vi.fn();
 const mockIsAdmin = vi.fn();
 
 vi.mock("@/lib/auth", () => ({
-  auth: { api: { getSession: (...args: unknown[]) => mockGetSession(...args) } },
+  auth: {
+    api: { getSession: (...args: unknown[]) => mockGetSession(...args) },
+  },
 }));
 
 vi.mock("@/utils/db", () => ({
@@ -42,7 +44,9 @@ describe("GET /api/auth/role", () => {
   });
 
   it("returns user role with isAdmin=false for non-admin users", async () => {
-    mockGetSession.mockResolvedValue({ user: { id: "user-1", email: "user@test.com" } });
+    mockGetSession.mockResolvedValue({
+      user: { id: "user-1", email: "user@test.com" },
+    });
     mockPoolQuery.mockResolvedValue({ rows: [{ role: "user" }] });
     mockIsAdmin.mockReturnValue(false);
 
@@ -56,7 +60,9 @@ describe("GET /api/auth/role", () => {
   });
 
   it("returns admin role with isAdmin=true for admin users", async () => {
-    mockGetSession.mockResolvedValue({ user: { id: "admin-1", email: "admin@test.com" } });
+    mockGetSession.mockResolvedValue({
+      user: { id: "admin-1", email: "admin@test.com" },
+    });
     mockPoolQuery.mockResolvedValue({ rows: [{ role: "admin" }] });
     mockIsAdmin.mockReturnValue(true);
 
@@ -70,7 +76,9 @@ describe("GET /api/auth/role", () => {
   });
 
   it("calls isAdmin with email and role", async () => {
-    mockGetSession.mockResolvedValue({ user: { id: "user-1", email: "admin@test.com" } });
+    mockGetSession.mockResolvedValue({
+      user: { id: "user-1", email: "admin@test.com" },
+    });
     mockPoolQuery.mockResolvedValue({ rows: [{ role: "admin" }] });
 
     const { GET } = await import("@/app/api/auth/role/route");

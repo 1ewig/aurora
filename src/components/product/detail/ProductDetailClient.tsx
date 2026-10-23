@@ -6,7 +6,10 @@
 "use client";
 
 import { notFound, useRouter } from "next/navigation";
-import { useProductDetailsQuery, useRelatedProductsQuery } from "@/hooks/queries";
+import {
+  useProductDetailsQuery,
+  useRelatedProductsQuery,
+} from "@/hooks/queries";
 import { useProductStore } from "@/stores/useProductStore";
 import { useCartStore } from "@/stores/useCartStore";
 import { Breadcrumbs } from "./Breadcrumbs";
@@ -71,7 +74,7 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
 
   const selectedSize = selectedSizes[product.id] || product.sizes?.[0] || "M";
   const isInCart = cartItems.some(
-    (item) => item.id === product.id && item.size === selectedSize
+    (item) => item.id === product.id && item.size === selectedSize,
   );
   const activeTab = activeTabs[product.id] || "details";
 
@@ -103,7 +106,11 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
   };
 
   return (
-    <main id="main-content" tabIndex={-1} className="pt-32 md:pt-36 pb-16 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="pt-32 md:pt-36 pb-16 px-6 md:px-12 lg:px-20 max-w-[1400px] mx-auto"
+    >
       {/* Breadcrumbs */}
       <Breadcrumbs category={product.category} />
 
@@ -135,7 +142,9 @@ export function ProductDetailClient({ slug }: ProductDetailClientProps) {
       </div>
 
       {/* Related Products Grid */}
-      {relatedProducts.length > 0 && <RelatedProducts products={relatedProducts} />}
+      {relatedProducts.length > 0 && (
+        <RelatedProducts products={relatedProducts} />
+      )}
 
       <SizeGuideModal
         isOpen={isSizeGuideOpen}

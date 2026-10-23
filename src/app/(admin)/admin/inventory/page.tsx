@@ -10,12 +10,12 @@
  * InsForge 'product-media' storage bucket.
  */
 
-import { InventoryClient } from '@/components/admin/inventory/InventoryClient';
+import { InventoryClient } from "@/components/admin/inventory/InventoryClient";
 
 /** Metadata for the admin inventory page. */
 export const metadata = {
-  title: 'Inventory | Admin | Aurora',
-  description: 'Manage the product inventory.',
+  title: "Inventory | Admin | Aurora",
+  description: "Manage the product inventory.",
   robots: {
     index: false,
     follow: false,
@@ -26,4 +26,3 @@ export const metadata = {
 export default function AdminProductsPage() {
   return <InventoryClient />;
 }
-

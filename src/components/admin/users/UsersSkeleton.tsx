@@ -27,7 +27,14 @@ export function UsersSkeleton() {
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b border-border-subtle bg-bg-primary/50">
-              {["Name", "Email", "Verified", "Accounts", "Sessions", "Created"].map((h) => (
+              {[
+                "Name",
+                "Email",
+                "Verified",
+                "Accounts",
+                "Sessions",
+                "Created",
+              ].map((h) => (
                 <th key={h} className="px-6 py-4">
                   <div className="h-3 w-16 bg-bg-secondary rounded" />
                 </th>

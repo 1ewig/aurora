@@ -12,7 +12,10 @@ import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import type { ProductData } from "@/stores/useAdminStore";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { useAdminProductsQuery, useDeleteProductMutation } from "@/hooks/queries";
+import {
+  useAdminProductsQuery,
+  useDeleteProductMutation,
+} from "@/hooks/queries";
 import { useProductForm } from "@/hooks/useProductForm";
 import dynamic from "next/dynamic";
 import { Pagination } from "@/components/ui/Pagination";
@@ -23,11 +26,11 @@ import { InventorySkeleton } from "./InventorySkeleton";
 
 const ProductFormModal = dynamic(
   () => import("./ProductFormModal").then((m) => m.ProductFormModal),
-  { ssr: false }
+  { ssr: false },
 );
 const ConfirmDialog = dynamic(
   () => import("@/components/ui/ConfirmDialog").then((m) => m.ConfirmDialog),
-  { ssr: false }
+  { ssr: false },
 );
 
 export function InventoryClient() {
@@ -35,16 +38,18 @@ export function InventoryClient() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const page = Math.max(1, Number(searchParams.get('page')) || 1);
-  const urlSearch = searchParams.get('search') || '';
-  const category = searchParams.get('category') || 'All';
+  const page = Math.max(1, Number(searchParams.get("page")) || 1);
+  const urlSearch = searchParams.get("search") || "";
+  const category = searchParams.get("category") || "All";
 
-  const { data, isLoading, isFetching, error, refetch } = useAdminProductsQuery({
-    page,
-    limit: 20,
-    search: urlSearch,
-    category: category === 'All' ? undefined : category,
-  });
+  const { data, isLoading, isFetching, error, refetch } = useAdminProductsQuery(
+    {
+      page,
+      limit: 20,
+      search: urlSearch,
+      category: category === "All" ? undefined : category,
+    },
+  );
 
   const deleteMutation = useDeleteProductMutation();
   const isAdmin = useAuthStore((s) => s.user?.isAdmin ?? false);
@@ -52,8 +57,12 @@ export function InventoryClient() {
   const [localSearch, setLocalSearch] = useState(urlSearch);
   const [prevUrlSearch, setPrevUrlSearch] = useState(urlSearch);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<ProductData | null>(null);
-  const [productToDelete, setProductToDelete] = useState<ProductData | null>(null);
+  const [editingProduct, setEditingProduct] = useState<ProductData | null>(
+    null,
+  );
+  const [productToDelete, setProductToDelete] = useState<ProductData | null>(
+    null,
+  );
   const [deleting, setDeleting] = useState(false);
 
   if (prevUrlSearch !== urlSearch) {
@@ -66,27 +75,30 @@ export function InventoryClient() {
       if (localSearch !== urlSearch) {
         const p = new URLSearchParams(searchParams.toString());
         if (localSearch) {
-          p.set('search', localSearch);
+          p.set("search", localSearch);
         } else {
-          p.delete('search');
+          p.delete("search");
         }
-        p.set('page', '1');
+        p.set("page", "1");
         router.replace(`${pathname}?${p.toString()}`);
       }
     }, 300);
     return () => clearTimeout(timer);
   }, [localSearch, urlSearch, searchParams, router, pathname]);
 
-  const updateParam = useCallback((key: string, value: string) => {
-    const p = new URLSearchParams(searchParams.toString());
-    if (value) {
-      p.set(key, value);
-    } else {
-      p.delete(key);
-    }
-    if (key !== 'page') p.set('page', '1');
-    router.replace(`${pathname}?${p.toString()}`);
-  }, [searchParams, pathname, router]);
+  const updateParam = useCallback(
+    (key: string, value: string) => {
+      const p = new URLSearchParams(searchParams.toString());
+      if (value) {
+        p.set(key, value);
+      } else {
+        p.delete(key);
+      }
+      if (key !== "page") p.set("page", "1");
+      router.replace(`${pathname}?${p.toString()}`);
+    },
+    [searchParams, pathname, router],
+  );
 
   const products: ProductData[] = data?.products ?? [];
   const totalPages = data?.totalPages ?? 0;
@@ -121,7 +133,11 @@ export function InventoryClient() {
     }
   }
 
-  const displayError = error ? (typeof error === 'object' && 'message' in error ? (error as Error).message : 'An error occurred') : null;
+  const displayError = error
+    ? typeof error === "object" && "message" in error
+      ? (error as Error).message
+      : "An error occurred"
+    : null;
 
   return (
     <div className="space-y-8 pb-12">
@@ -136,11 +152,17 @@ export function InventoryClient() {
           <AdminHeaderPanel
             title="Inventory Management"
             description="Add, update, or remove items from the catalog."
-            action={isAdmin ? (
-              <Button onClick={() => handleOpenModal()} variant="gold" size="sm">
-                Add Product
-              </Button>
-            ) : undefined}
+            action={
+              isAdmin ? (
+                <Button
+                  onClick={() => handleOpenModal()}
+                  variant="gold"
+                  size="sm"
+                >
+                  Add Product
+                </Button>
+              ) : undefined
+            }
           />
 
           <InventoryTable
@@ -148,7 +170,7 @@ export function InventoryClient() {
             searchQuery={localSearch}
             onSearchChange={setLocalSearch}
             selectedCategory={category}
-            onCategoryChange={(val) => updateParam('category', val)}
+            onCategoryChange={(val) => updateParam("category", val)}
             onEditClick={handleOpenModal}
             isAdmin={isAdmin}
             onRefresh={refetch}
@@ -159,7 +181,7 @@ export function InventoryClient() {
             <Pagination
               currentPage={page}
               totalPages={totalPages}
-              onPageChange={(p) => updateParam('page', String(p))}
+              onPageChange={(p) => updateParam("page", String(p))}
             />
           )}
 

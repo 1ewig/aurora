@@ -18,17 +18,17 @@ interface CascadeCardsProps {
 }
 
 const desktopPositions = [
-  { left: "2%",  top: "70px",  zIndex: 10 },
-  { left: "16%", top: "30px",  zIndex: 11 },
-  { left: "30%", top: "0px",   zIndex: 20 },
-  { left: "44%", top: "25px",  zIndex: 11 },
-  { left: "58%", top: "65px",  zIndex: 10 },
+  { left: "2%", top: "70px", zIndex: 10 },
+  { left: "16%", top: "30px", zIndex: 11 },
+  { left: "30%", top: "0px", zIndex: 20 },
+  { left: "44%", top: "25px", zIndex: 11 },
+  { left: "58%", top: "65px", zIndex: 10 },
 ];
 
 const mobilePositions = [
-  { left: "5%",  top: "40px",  zIndex: 10 },
-  { left: "25%", top: "15px",  zIndex: 15 },
-  { left: "45%", top: "0px",   zIndex: 20 },
+  { left: "5%", top: "40px", zIndex: 10 },
+  { left: "25%", top: "15px", zIndex: 15 },
+  { left: "45%", top: "0px", zIndex: 20 },
 ];
 
 /** Cascading card fan using products with staggered entry and hover animations. */
@@ -63,10 +63,14 @@ export function CascadeCards({ products }: CascadeCardsProps) {
                 rotate: rotation,
                 width: "clamp(140px, 18vw, 210px)",
                 height: "clamp(200px, 26vw, 300px)",
-                boxShadow: "0 20px 60px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.10)",
+                boxShadow:
+                  "0 20px 60px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.10)",
               }}
             >
-              <Link href={`/products/${product.slug}`} className="block w-full h-full relative">
+              <Link
+                href={`/products/${product.slug}`}
+                className="block w-full h-full relative"
+              >
                 <Image
                   src={product.image}
                   alt={product.altText}
@@ -78,7 +82,7 @@ export function CascadeCards({ products }: CascadeCardsProps) {
                 />
                 {/* Subtle bottom gradient (default state) */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-                
+
                 {/* Full-card hover gradient overlay with Product Name & Price */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-350 flex flex-col justify-end p-4 text-left">
                   <span className="text-[9px] font-mono text-accent-primary uppercase tracking-[0.2em] mb-1 block">
@@ -129,7 +133,10 @@ export function CascadeCards({ products }: CascadeCardsProps) {
                 boxShadow: "0 16px 40px rgba(0,0,0,0.16)",
               }}
             >
-              <Link href={`/products/${product.slug}`} className="block w-full h-full relative">
+              <Link
+                href={`/products/${product.slug}`}
+                className="block w-full h-full relative"
+              >
                 <Image
                   src={product.image}
                   alt={product.altText}
@@ -141,7 +148,7 @@ export function CascadeCards({ products }: CascadeCardsProps) {
                 />
                 {/* Subtle bottom gradient (default state) */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-                
+
                 {/* Mobile Full-card hover gradient overlay with Product Name & Price */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-350 flex flex-col justify-end p-3 text-left">
                   <span className="text-[8px] font-mono text-accent-primary uppercase tracking-[0.15em] mb-0.5 block">

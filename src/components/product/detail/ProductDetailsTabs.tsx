@@ -14,10 +14,18 @@ interface ProductDetailsTabsProps {
 }
 
 /** Renders tabbed content toggling between product details and shipping/returns information. */
-export function ProductDetailsTabs({ product, activeTab, onTabChange }: ProductDetailsTabsProps) {
+export function ProductDetailsTabs({
+  product,
+  activeTab,
+  onTabChange,
+}: ProductDetailsTabsProps) {
   return (
     <div className="border-t border-border-subtle pt-6">
-      <div className="flex border-b border-border-subtle mb-4" role="tablist" aria-label="Product extra information tabs">
+      <div
+        className="flex border-b border-border-subtle mb-4"
+        role="tablist"
+        aria-label="Product extra information tabs"
+      >
         <button
           type="button"
           role="tab"
@@ -48,7 +56,7 @@ export function ProductDetailsTabs({ product, activeTab, onTabChange }: ProductD
 
       <div className="min-h-[120px]">
         {activeTab === "details" ? (
-          (!product.details || product.details.length === 0) ? (
+          !product.details || product.details.length === 0 ? (
             <div className="space-y-2.5 animate-pulse" aria-hidden="true">
               <div className="h-3.5 bg-bg-secondary rounded w-2/3" />
               <div className="h-3.5 bg-bg-secondary rounded w-1/2" />
@@ -65,12 +73,13 @@ export function ProductDetailsTabs({ product, activeTab, onTabChange }: ProductD
         ) : (
           <div className="text-xs md:text-sm text-text-secondary space-y-2 leading-relaxed">
             <p>
-              Enjoy complimentary express shipping on all orders over $500. Orders are prepared
-              and shipped within 1-2 business days.
+              Enjoy complimentary express shipping on all orders over $500.
+              Orders are prepared and shipped within 1-2 business days.
             </p>
             <p>
-              Returns are accepted within 14 days of delivery. Items must be returned in their original,
-              unworn condition with all designer tags attached.
+              Returns are accepted within 14 days of delivery. Items must be
+              returned in their original, unworn condition with all designer
+              tags attached.
             </p>
           </div>
         )}

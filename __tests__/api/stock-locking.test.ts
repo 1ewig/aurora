@@ -125,7 +125,7 @@ describe("Stock locking and reservation", () => {
       makeRequest({
         cartItems: [{ internalProductId: "prod-1", quantity: 2, size: "M" }],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     expect(res.status).toBe(200);
@@ -157,7 +157,7 @@ describe("Stock locking and reservation", () => {
       makeRequest({
         cartItems: [{ internalProductId: "prod-1", quantity: 3, size: "M" }],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     expect(res.status).toBe(400);
@@ -167,7 +167,7 @@ describe("Stock locking and reservation", () => {
 
     // Verify ROLLBACK was called
     const rollbackCall = mockClientQuery.mock.calls.find(
-      (call) => typeof call[0] === "string" && call[0] === "ROLLBACK"
+      (call) => typeof call[0] === "string" && call[0] === "ROLLBACK",
     );
     expect(rollbackCall).toBeDefined();
   });
@@ -188,7 +188,7 @@ describe("Stock locking and reservation", () => {
       makeRequest({
         cartItems: [{ internalProductId: "prod-1", quantity: 1, size: "M" }],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     expect(res.status).toBe(400);
@@ -198,7 +198,7 @@ describe("Stock locking and reservation", () => {
 
     // Verify ROLLBACK was called
     const rollbackCall = mockClientQuery.mock.calls.find(
-      (call) => typeof call[0] === "string" && call[0] === "ROLLBACK"
+      (call) => typeof call[0] === "string" && call[0] === "ROLLBACK",
     );
     expect(rollbackCall).toBeDefined();
   });
@@ -228,7 +228,7 @@ describe("Stock locking and reservation", () => {
       makeRequest({
         cartItems: [{ internalProductId: "prod-1", quantity: 1, size: "S" }],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     // Verify the SELECT query uses FOR UPDATE
@@ -253,7 +253,7 @@ describe("Stock locking and reservation", () => {
       makeRequest({
         cartItems: [{ internalProductId: "prod-1", quantity: 1, size: "L" }],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     expect(res.status).toBe(400);
@@ -287,19 +287,23 @@ describe("Stock locking and reservation", () => {
           { internalProductId: "prod-2", quantity: 2, size: "L" },
         ],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     expect(res.status).toBe(400);
     const json = await res.json();
-    
-    expect(json.error).toContain("Insufficient stock for \"Product One\" (Size: M). Please reduce your quantity and try again.");
-    expect(json.error).toContain("Insufficient stock for \"Product Two\" (Size: L).");
+
+    expect(json.error).toContain(
+      'Insufficient stock for "Product One" (Size: M). Please reduce your quantity and try again.',
+    );
+    expect(json.error).toContain(
+      'Insufficient stock for "Product Two" (Size: L).',
+    );
     expect(json.error.split("\n")).toHaveLength(2);
 
     // Verify ROLLBACK was called
     const rollbackCall = mockClientQuery.mock.calls.find(
-      (call) => typeof call[0] === "string" && call[0] === "ROLLBACK"
+      (call) => typeof call[0] === "string" && call[0] === "ROLLBACK",
     );
     expect(rollbackCall).toBeDefined();
   });

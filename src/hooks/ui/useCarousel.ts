@@ -37,16 +37,13 @@ export function useCarousel({
     setDirection(-1);
   }, [length]);
 
-  const goTo = useCallback(
-    (i: number) => {
-      setAuto(false);
-      setCurrent((prev) => {
-        setDirection(i > prev ? 1 : -1);
-        return i;
-      });
-    },
-    []
-  );
+  const goTo = useCallback((i: number) => {
+    setAuto(false);
+    setCurrent((prev) => {
+      setDirection(i > prev ? 1 : -1);
+      return i;
+    });
+  }, []);
 
   useEffect(() => {
     if (!auto) return;

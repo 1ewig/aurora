@@ -36,7 +36,8 @@ export default function StoreError({
             Something went amiss.
           </h1>
           <p className="text-text-secondary text-base sm:text-lg max-w-md mx-auto leading-relaxed">
-            We encountered an issue preparing this collection view. You may retry or return to our homepage.
+            We encountered an issue preparing this collection view. You may
+            retry or return to our homepage.
           </p>
         </div>
 

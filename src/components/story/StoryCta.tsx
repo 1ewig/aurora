@@ -26,17 +26,21 @@ export function StoryCta() {
           <div
             className="absolute -top-1/2 left-1/2 -translate-x-1/2 w-[70%] h-[70%] rounded-full"
             style={{
-              background: "radial-gradient(circle, rgba(200,168,130,0.4) 0%, transparent 70%)",
+              background:
+                "radial-gradient(circle, rgba(200,168,130,0.4) 0%, transparent 70%)",
             }}
           />
         </div>
         <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-          <EyebrowLabel className="text-accent-primary">Explore Aurora</EyebrowLabel>
+          <EyebrowLabel className="text-accent-primary">
+            Explore Aurora
+          </EyebrowLabel>
           <h2 className="font-display font-black text-3xl md:text-5xl tracking-tight leading-tight">
             Curated For The Intended.
           </h2>
           <p className="text-text-muted text-sm md:text-base max-w-md mx-auto leading-relaxed">
-            Step inside our complete library of premium outercoats, cashmeres, and accessories designed for longevity.
+            Step inside our complete library of premium outercoats, cashmeres,
+            and accessories designed for longevity.
           </p>
           <div className="pt-4 flex justify-center">
             <Link href="/products">

@@ -12,11 +12,11 @@
  * The JWT is signed with HS256 and expires in 1 hour.
  */
 
-import { createClient } from '@insforge/sdk';
-import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
-import { requireEnv } from '@/utils/env';
-import jwt from 'jsonwebtoken';
+import { createClient } from "@insforge/sdk";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { requireEnv } from "@/utils/env";
+import jwt from "jsonwebtoken";
 
 /** Creates an authenticated InsForge client for the current user session. Returns null if unauthenticated. */
 export async function createInsforgeClient() {
@@ -32,11 +32,11 @@ export async function createInsforgeClient() {
   const insforgeToken = jwt.sign(
     {
       sub: session.user.id,
-      role: 'authenticated',
-      aud: 'insforge-api',
+      role: "authenticated",
+      aud: "insforge-api",
     },
-    requireEnv('INSFORGE_JWT_SECRET'),
-    { algorithm: 'HS256', expiresIn: '1h' },
+    requireEnv("INSFORGE_JWT_SECRET"),
+    { algorithm: "HS256", expiresIn: "1h" },
   );
 
   return createClient({

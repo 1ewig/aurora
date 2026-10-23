@@ -24,7 +24,7 @@ export function OrdersClient() {
     setPrevData(data);
     if (data) {
       setAllOrders((prev) =>
-        page === 0 ? data.orders : [...prev, ...data.orders]
+        page === 0 ? data.orders : [...prev, ...data.orders],
       );
     }
   }
@@ -44,7 +44,9 @@ export function OrdersClient() {
           Failed to load purchase history.
         </p>
         <Link href="/profile">
-          <Button variant="ghost" size="sm">Back to Profile</Button>
+          <Button variant="ghost" size="sm">
+            Back to Profile
+          </Button>
         </Link>
       </div>
     );
@@ -52,18 +54,32 @@ export function OrdersClient() {
     mainContent = (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center bg-bg-secondary border border-border-subtle p-8 rounded-[24px] shadow-sm">
         <div className="w-16 h-16 rounded-full bg-border-subtle flex items-center justify-center mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-8 h-8 text-text-muted">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1}
+            stroke="currentColor"
+            className="w-8 h-8 text-text-muted"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+            />
           </svg>
         </div>
         <h2 className="font-display font-bold text-2xl uppercase tracking-wide mb-2">
           No Orders Yet
         </h2>
         <p className="text-text-secondary text-sm max-w-xs mb-6">
-          You haven&apos;t placed any orders yet. Browse the collection and find something that speaks to you.
+          You haven&apos;t placed any orders yet. Browse the collection and find
+          something that speaks to you.
         </p>
         <Link href="/products">
-          <Button variant="filled" size="md">Shop the Collection</Button>
+          <Button variant="filled" size="md">
+            Shop the Collection
+          </Button>
         </Link>
       </div>
     );
@@ -98,9 +114,7 @@ export function OrdersClient() {
 
   return (
     <>
-      <div
-        className="mb-6 sm:mb-8 lg:mb-12"
-      >
+      <div className="mb-6 sm:mb-8 lg:mb-12">
         <h1 className="font-display font-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase tracking-wider">
           Purchase History
         </h1>

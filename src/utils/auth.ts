@@ -10,12 +10,20 @@ import type { Profile, User } from "@/stores/useAuthStore";
 /** Normalizes a provider's raw profile data into a consistent Profile shape. */
 export function normalizeProfile(data: any): Profile {
   return {
-    displayName: data?.displayName || data?.profile?.displayName || data?.nickname || data?.name || "",
+    displayName:
+      data?.displayName ||
+      data?.profile?.displayName ||
+      data?.nickname ||
+      data?.name ||
+      "",
   };
 }
 
 /** Fetches the current user's role from the server with a safe fallback. */
-export async function fetchUserRole(): Promise<{ isAdmin: boolean; role: string }> {
+export async function fetchUserRole(): Promise<{
+  isAdmin: boolean;
+  role: string;
+}> {
   const roleRes = await fetch("/api/auth/role").catch(() => null);
   return roleRes?.ok ? roleRes.json() : { isAdmin: false, role: "user" };
 }
@@ -29,7 +37,7 @@ export function buildUserState(
     emailVerified?: boolean | null;
     image?: string | null;
   },
-  role: { isAdmin: boolean; role: string }
+  role: { isAdmin: boolean; role: string },
 ): { user: User; profile: Profile } {
   return {
     user: {
@@ -56,10 +64,11 @@ export function buildUserState(
  * ADMIN_EMAILS continue to work even before they have a DB role set.
  */
 export function isAdmin(email?: string, role?: string): boolean {
-  if (role === 'admin') return true;
+  if (role === "admin") return true;
   if (!email) return false;
   const adminEmailsStr = process.env.ADMIN_EMAILS || "";
-  const adminEmails = adminEmailsStr.split(",").map((e) => e.trim().toLowerCase());
+  const adminEmails = adminEmailsStr
+    .split(",")
+    .map((e) => e.trim().toLowerCase());
   return adminEmails.includes(email.toLowerCase());
 }
-

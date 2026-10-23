@@ -5,10 +5,10 @@
  * Admin-only. Requires authentication and admin role.
  */
 
-import { NextResponse } from 'next/server';
-import { pool } from '@/utils/db';
-import { requireAdmin } from '@/utils/admin';
-import { rethrowIfDynamicServerError } from '@/utils/errors';
+import { NextResponse } from "next/server";
+import { pool } from "@/utils/db";
+import { requireAdmin } from "@/utils/admin";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
 
 export async function GET() {
   try {
@@ -47,7 +47,8 @@ export async function GET() {
       `),
     ];
 
-    const [ordersAggRes, stockRes, recentRes] = await Promise.all(statsPromises);
+    const [ordersAggRes, stockRes, recentRes] =
+      await Promise.all(statsPromises);
 
     const aggRow = ordersAggRes.rows[0] || {};
     const totalSales = Number(aggRow.totalSales || 0);
@@ -57,7 +58,7 @@ export async function GET() {
     const shippedCount = Number(aggRow.shippedCount || 0);
     const lowStockCount = Number(stockRes.rows[0]?.lowStockCount || 0);
 
-    const recentOrders = recentRes.rows.map(row => ({
+    const recentOrders = recentRes.rows.map((row) => ({
       ...row,
       total: Number(row.total),
     }));
@@ -75,7 +76,10 @@ export async function GET() {
     });
   } catch (err: unknown) {
     rethrowIfDynamicServerError(err);
-    console.error('Failed to load dashboard metrics:', err);
-    return NextResponse.json({ error: 'Failed to load dashboard metrics' }, { status: 500 });
+    console.error("Failed to load dashboard metrics:", err);
+    return NextResponse.json(
+      { error: "Failed to load dashboard metrics" },
+      { status: 500 },
+    );
   }
 }

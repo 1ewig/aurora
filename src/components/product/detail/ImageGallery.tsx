@@ -21,7 +21,10 @@ export function ImageGallery({ images, altText }: ImageGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   // If there are no additional images, degrade gracefully to a single image
-  const galleryImages = images && images.length > 0 ? images : [getStorageUrl("/images/products/hero-product-1.webp")];
+  const galleryImages =
+    images && images.length > 0
+      ? images
+      : [getStorageUrl("/images/products/hero-product-1.webp")];
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -51,7 +54,11 @@ export function ImageGallery({ images, altText }: ImageGalleryProps) {
 
       {/* Thumbnails Row */}
       {galleryImages.length > 1 && (
-        <div className="flex flex-wrap gap-2.5" role="tablist" aria-label="Product image gallery">
+        <div
+          className="flex flex-wrap gap-2.5"
+          role="tablist"
+          aria-label="Product image gallery"
+        >
           {galleryImages.map((img, idx) => {
             const isActive = idx === activeIndex;
             return (
@@ -65,7 +72,7 @@ export function ImageGallery({ images, altText }: ImageGalleryProps) {
                   "relative w-16 h-16 rounded-md overflow-hidden border-2 bg-border-subtle transition-all duration-300 cursor-pointer flex-shrink-0 select-none",
                   isActive
                     ? "border-bg-ink opacity-100"
-                    : "border-transparent opacity-65 hover:opacity-100 hover:border-border-medium"
+                    : "border-transparent opacity-65 hover:opacity-100 hover:border-border-medium",
                 )}
                 aria-label={`View image ${idx + 1}`}
               >
@@ -85,4 +92,3 @@ export function ImageGallery({ images, altText }: ImageGalleryProps) {
     </div>
   );
 }
-

@@ -20,10 +20,17 @@ interface ProductCardProps {
 }
 
 /** Product card with image reveal, badge overlay, and price display. */
-export function ProductCard({ product, aspectRatio = "aspect-[3/4]" }: ProductCardProps) {
+export function ProductCard({
+  product,
+  aspectRatio = "aspect-[3/4]",
+}: ProductCardProps) {
   return (
     <article aria-label={`${product.name} — ${formatCurrency(product.price)}`}>
-      <Link href={`/products/${product.slug}`} prefetch={false} className="block">
+      <Link
+        href={`/products/${product.slug}`}
+        prefetch={false}
+        className="block"
+      >
         <div
           className="relative overflow-hidden rounded-[20px] bg-white cursor-pointer group transition-all duration-300 border border-transparent hover:border-accent-primary"
           style={{

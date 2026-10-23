@@ -22,7 +22,6 @@ interface HeroProps {
 
 /** Landing page hero with animated headline, cascade cards, and call-to-action buttons. */
 export function Hero({ products }: HeroProps) {
-
   return (
     <section
       id="hero"
@@ -52,14 +51,16 @@ export function Hero({ products }: HeroProps) {
         />
       </div>
 
-      <motion.div
-        className="relative z-10 flex flex-col items-center text-center w-full max-w-6xl mx-auto px-6"
-      >
+      <motion.div className="relative z-10 flex flex-col items-center text-center w-full max-w-6xl mx-auto px-6">
         {/* Eyebrow */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{
+            duration: 0.6,
+            delay: 0.1,
+            ease: [0.25, 0.46, 0.45, 0.94],
+          }}
         >
           <EyebrowLabel>SS 2026 Collection</EyebrowLabel>
         </motion.div>
@@ -77,9 +78,7 @@ export function Hero({ products }: HeroProps) {
             <span className="block">The World</span>
           </AnimatedText>
           <AnimatedText delay={0.5} immediate>
-            <span className="block text-accent-primary">
-              Whispers.
-            </span>
+            <span className="block text-accent-primary">Whispers.</span>
           </AnimatedText>
         </h1>
 
@@ -92,7 +91,11 @@ export function Hero({ products }: HeroProps) {
         <motion.p
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.9, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{
+            duration: 0.8,
+            delay: 0.9,
+            ease: [0.25, 0.46, 0.45, 0.94],
+          }}
           className="text-text-secondary text-base md:text-lg font-light max-w-sm md:max-w-md mt-10 md:mt-8 leading-relaxed"
         >
           Singular pieces for the considered wardrobe. Designed in solitude.
@@ -103,7 +106,11 @@ export function Hero({ products }: HeroProps) {
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{
+            duration: 0.8,
+            delay: 1.1,
+            ease: [0.25, 0.46, 0.45, 0.94],
+          }}
           className="flex flex-row gap-2 sm:gap-4 mt-8"
         >
           <div className="flex-1 min-w-0 sm:flex-none">
@@ -131,8 +138,6 @@ export function Hero({ products }: HeroProps) {
           </div>
         </motion.div>
       </motion.div>
-
-
     </section>
   );
 }

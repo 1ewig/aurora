@@ -15,7 +15,9 @@ const contentSecurityPolicy = `
   base-uri 'self';
   form-action 'self' https://app.lemonsqueezy.com;
   ${isProd ? "upgrade-insecure-requests;" : ""}
-`.replace(/\s{2,}/g, " ").trim();
+`
+  .replace(/\s{2,}/g, " ")
+  .trim();
 
 const securityHeaders = [
   {
@@ -45,18 +47,19 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  output: "standalone",
   cacheComponents: true,
-  allowedDevOrigins: ['harmonics-paternity-blighted.ngrok-free.dev'],
+  partialPrefetching: true,
+  allowedDevOrigins: ["harmonics-paternity-blighted.ngrok-free.dev"],
   images: {
     qualities: [100, 85, 80, 75, 50],
-    formats: ['image/avif', 'image/webp'],
+    formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 2592000,
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: '**.insforge.app',
-        pathname: '/api/storage/buckets/**',
+        protocol: "https",
+        hostname: "**.insforge.app",
+        pathname: "/api/storage/buckets/**",
       },
     ],
   },
@@ -71,4 +74,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-

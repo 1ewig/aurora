@@ -34,11 +34,15 @@ export function SortFilter({ value, onChange }: SortFilterProps) {
           backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B6B6B' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/></svg>")`,
           backgroundRepeat: "no-repeat",
           backgroundPosition: "right 1.5rem center",
-          backgroundSize: "1rem"
+          backgroundSize: "1rem",
         }}
       >
         {options.map((option) => (
-          <option key={option.value} value={option.value} className="bg-bg-secondary text-text-primary">
+          <option
+            key={option.value}
+            value={option.value}
+            className="bg-bg-secondary text-text-primary"
+          >
             {option.label}
           </option>
         ))}

@@ -18,7 +18,10 @@ interface AtelierSectionProps {
 }
 
 /** Atelier section detailing the brand's partnerships with historic family-owned mills. */
-export function AtelierSection({ loomContent, foldingContent }: AtelierSectionProps) {
+export function AtelierSection({
+  loomContent,
+  foldingContent,
+}: AtelierSectionProps) {
   const loomImg = loomContent?.imageUrl;
   const loomAlt = loomContent?.altText;
   const loomTitle = loomContent?.title;
@@ -39,14 +42,26 @@ export function AtelierSection({ loomContent, foldingContent }: AtelierSectionPr
           <motion.div variants={fadeInUp}>
             <EyebrowLabel>Origin Matters</EyebrowLabel>
           </motion.div>
-          <motion.h2 variants={fadeInUp} className="font-sans font-black text-3xl md:text-4xl tracking-tight text-text-primary uppercase">
+          <motion.h2
+            variants={fadeInUp}
+            className="font-sans font-black text-3xl md:text-4xl tracking-tight text-text-primary uppercase"
+          >
             {loomTitle}.
           </motion.h2>
-          <motion.p variants={fadeInUp} className="text-text-secondary leading-relaxed text-sm md:text-base">
+          <motion.p
+            variants={fadeInUp}
+            className="text-text-secondary leading-relaxed text-sm md:text-base"
+          >
             {loomDesc}
           </motion.p>
-          <motion.p variants={fadeInUp} className="text-text-secondary leading-relaxed text-sm md:text-base">
-            These partnerships are built on transparency, fair practice, and a mutual obsession with quality. By selecting fibers that are spun to retain their natural resiliency, our clothing grows softer with age and resists wear.
+          <motion.p
+            variants={fadeInUp}
+            className="text-text-secondary leading-relaxed text-sm md:text-base"
+          >
+            These partnerships are built on transparency, fair practice, and a
+            mutual obsession with quality. By selecting fibers that are spun to
+            retain their natural resiliency, our clothing grows softer with age
+            and resists wear.
           </motion.p>
         </motion.div>
         <motion.div

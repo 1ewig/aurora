@@ -10,7 +10,6 @@ import { type ProductData } from "@/stores/useAdminStore";
 import { Button } from "@/components/ui/Button";
 import { useCategoriesQuery } from "@/hooks/queries";
 
-
 interface InventoryTableProps {
   filteredProducts: ProductData[];
   searchQuery: string;
@@ -22,7 +21,6 @@ interface InventoryTableProps {
   onRefresh: () => void;
   loading: boolean;
 }
-
 
 /** Renders a product table with search, category filter, and edit row actions. */
 export function InventoryTable({
@@ -46,9 +44,16 @@ export function InventoryTable({
         <div className="relative w-full sm:max-w-md">
           <svg
             className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-secondary"
-            fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
           </svg>
           <input
             type="text"
@@ -68,7 +73,7 @@ export function InventoryTable({
               backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B6B6B' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/></svg>")`,
               backgroundRepeat: "no-repeat",
               backgroundPosition: "right 1rem center",
-              backgroundSize: "1rem"
+              backgroundSize: "1rem",
             }}
           >
             <option value="All">All Categories</option>
@@ -78,12 +83,24 @@ export function InventoryTable({
               </option>
             ))}
           </select>
-          <Button variant="ghost" size="md" onClick={onRefresh} disabled={loading} className="py-3">
-            {loading ? <>Refreshing<span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /></> : "Refresh"}
+          <Button
+            variant="ghost"
+            size="md"
+            onClick={onRefresh}
+            disabled={loading}
+            className="py-3"
+          >
+            {loading ? (
+              <>
+                Refreshing
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              </>
+            ) : (
+              "Refresh"
+            )}
           </Button>
         </div>
       </div>
-
 
       {/* Main Table */}
       {filteredProducts.length === 0 ? (
@@ -114,7 +131,10 @@ export function InventoryTable({
                 const isLowStock = p.sizes.some((s) => s.stock < 5);
 
                 return (
-                  <tr key={p.id} className="hover:bg-bg-primary/25 transition-colors">
+                  <tr
+                    key={p.id}
+                    className="hover:bg-bg-primary/25 transition-colors"
+                  >
                     <td className="px-6 py-4">
                       {p.image ? (
                         <div className="relative w-12 h-16 rounded-[8px] overflow-hidden border border-border-subtle">
@@ -136,8 +156,12 @@ export function InventoryTable({
                       {p.id}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-text-primary">{p.name}</div>
-                      <div className="text-xs text-text-muted mt-0.5">{p.slug}</div>
+                      <div className="font-semibold text-text-primary">
+                        {p.name}
+                      </div>
+                      <div className="text-xs text-text-muted mt-0.5">
+                        {p.slug}
+                      </div>
                     </td>
                     <td className="px-6 py-4 capitalize text-text-secondary">
                       {p.category}
@@ -163,7 +187,10 @@ export function InventoryTable({
                       <div className="text-[10px] text-text-muted mt-1.5 flex items-center gap-1.5">
                         <span>Total Stock: {totalStock}</span>
                         {isLowStock && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" title="Low stock alert" />
+                          <span
+                            className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"
+                            title="Low stock alert"
+                          />
                         )}
                       </div>
                     </td>

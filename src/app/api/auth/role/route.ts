@@ -17,31 +17,31 @@ export async function GET() {
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session?.user) {
       return NextResponse.json(
-        { isAdmin: false, role: 'guest', authenticated: false },
-        { 
+        { isAdmin: false, role: "guest", authenticated: false },
+        {
           status: 401,
-          headers: { "Cache-Control": "no-store" } 
-        }
+          headers: { "Cache-Control": "no-store" },
+        },
       );
     }
 
     const userResult = await pool.query(
       `SELECT role FROM better_auth."user" WHERE id = $1`,
-      [session.user.id]
+      [session.user.id],
     );
-    const dbRole = userResult.rows[0]?.role || 'user';
-    const role = isAdmin(session.user.email, dbRole) ? 'admin' : dbRole;
+    const dbRole = userResult.rows[0]?.role || "user";
+    const role = isAdmin(session.user.email, dbRole) ? "admin" : dbRole;
 
     return NextResponse.json(
       { isAdmin: isAdmin(session.user.email, role), role },
-      { headers: { "Cache-Control": "no-store" } }
+      { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error: unknown) {
     rethrowIfDynamicServerError(error);
     console.error("Failed to check user role:", error);
     return NextResponse.json(
       { error: "Failed to resolve role" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

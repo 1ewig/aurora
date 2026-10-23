@@ -17,7 +17,10 @@ interface PaginationProps {
 }
 
 /** Pure helper to generate pagination page numbers and ellipsis indicators. */
-function getPageNumbers(currentPage: number, totalPages: number): (number | string)[] {
+function getPageNumbers(
+  currentPage: number,
+  totalPages: number,
+): (number | string)[] {
   const pages: (number | string)[] = [];
   const maxVisible = 5;
 
@@ -65,7 +68,7 @@ export function Pagination({
       aria-label="Pagination Navigation"
       className={cn(
         "flex items-center justify-center gap-2.5 mt-16 md:mt-20 select-none",
-        className
+        className,
       )}
     >
       {/* Previous Button */}
@@ -76,7 +79,7 @@ export function Pagination({
           "flex items-center justify-center w-10 h-10 rounded-full border border-border-medium bg-bg-secondary text-text-primary transition-all duration-300 shadow-xs",
           currentPage === 1
             ? "opacity-40 cursor-not-allowed border-border-subtle"
-            : "hover:border-text-primary hover:scale-105 active:scale-95 cursor-pointer"
+            : "hover:border-text-primary hover:scale-105 active:scale-95 cursor-pointer",
         )}
         aria-label="Go to previous page"
       >
@@ -87,7 +90,11 @@ export function Pagination({
           strokeWidth="2"
           viewBox="0 0 24 24"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15 19l-7-7 7-7"
+          />
         </svg>
       </button>
 
@@ -115,7 +122,7 @@ export function Pagination({
                 "relative flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 text-sm font-medium",
                 isCurrent
                   ? "bg-text-primary text-bg-primary font-semibold shadow-md"
-                  : "bg-transparent text-text-secondary border border-transparent hover:border-border-medium hover:text-text-primary cursor-pointer hover:scale-105 active:scale-95"
+                  : "bg-transparent text-text-secondary border border-transparent hover:border-border-medium hover:text-text-primary cursor-pointer hover:scale-105 active:scale-95",
               )}
               aria-label={`Go to page ${page}`}
               aria-current={isCurrent ? "page" : undefined}
@@ -135,13 +142,15 @@ export function Pagination({
 
       {/* Next Button */}
       <button
-        onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
+        onClick={() =>
+          currentPage < totalPages && onPageChange(currentPage + 1)
+        }
         disabled={currentPage === totalPages}
         className={cn(
           "flex items-center justify-center w-10 h-10 rounded-full border border-border-medium bg-bg-secondary text-text-primary transition-all duration-300 shadow-xs",
           currentPage === totalPages
             ? "opacity-40 cursor-not-allowed border-border-subtle"
-            : "hover:border-text-primary hover:scale-105 active:scale-95 cursor-pointer"
+            : "hover:border-text-primary hover:scale-105 active:scale-95 cursor-pointer",
         )}
         aria-label="Go to next page"
       >

@@ -35,7 +35,8 @@ export default function GlobalError({
               Critical Application Error
             </h1>
             <p className="text-[#6B6B6B] text-sm leading-relaxed">
-              An unexpected system anomaly interrupted this session. Our telemetry has logged the event.
+              An unexpected system anomaly interrupted this session. Our
+              telemetry has logged the event.
             </p>
           </div>
 

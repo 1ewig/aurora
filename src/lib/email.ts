@@ -43,11 +43,11 @@ export interface SendEmailOptions {
 
 /** Sends a transactional email via Brevo SMTP. Silently skips if unconfigured. */
 export async function sendEmail(
-  options: SendEmailOptions
+  options: SendEmailOptions,
 ): Promise<{ sent: boolean; error?: string }> {
   if (!isConfigured()) {
     console.warn(
-      "[email] Brevo SMTP not configured. Set BREVO_SMTP_HOST, BREVO_SMTP_USER, BREVO_SMTP_PASS, and BREVO_FROM_EMAIL."
+      "[email] Brevo SMTP not configured. Set BREVO_SMTP_HOST, BREVO_SMTP_USER, BREVO_SMTP_PASS, and BREVO_FROM_EMAIL.",
     );
     return { sent: false, error: "SMTP not configured" };
   }

@@ -45,8 +45,8 @@ export async function POST(req: NextRequest) {
   try {
     // Rate limit: 10 checkout attempts per minute per IP
     const ip = getClientIp(req);
-    if (!await rateLimit(ip, 'checkout', 10)) {
-      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    if (!(await rateLimit(ip, "checkout", 10))) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
     const body: CheckoutSessionRequest = await req.json();
@@ -54,17 +54,19 @@ export async function POST(req: NextRequest) {
     // Validate that the LS product variant ID is configured on the server
     const variantId = process.env.NEXT_PUBLIC_LS_ORDER_VARIANT_ID;
     if (!variantId) {
-      console.error("[Checkout Session] NEXT_PUBLIC_LS_ORDER_VARIANT_ID is not configured in environment.");
+      console.error(
+        "[Checkout Session] NEXT_PUBLIC_LS_ORDER_VARIANT_ID is not configured in environment.",
+      );
       return NextResponse.json(
         { error: "Store checkout configuration is incomplete on the server." },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     if (!body.cartItems?.length || !body.shippingAddress) {
       return NextResponse.json(
         { error: "cartItems and shippingAddress parameters are required." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -78,19 +80,25 @@ export async function POST(req: NextRequest) {
       ) {
         return NextResponse.json(
           { error: "Invalid item quantity parameter." },
-          { status: 400 }
+          { status: 400 },
         );
       }
       if (item.quantity > 10) {
         return NextResponse.json(
-          { error: "Maximum purchase limit exceeded (10 items per product size)." },
-          { status: 400 }
+          {
+            error:
+              "Maximum purchase limit exceeded (10 items per product size).",
+          },
+          { status: 400 },
         );
       }
     }
 
     // 2. Merge duplicate items: same product ID + size = combined quantity
-    const mergedCart = new Map<string, { internalProductId: string; quantity: number; size: string }>();
+    const mergedCart = new Map<
+      string,
+      { internalProductId: string; quantity: number; size: string }
+    >();
     for (const item of body.cartItems) {
       const key = `${item.internalProductId}-${(item.size || "").trim()}`;
       const existing = mergedCart.get(key);
@@ -98,15 +106,18 @@ export async function POST(req: NextRequest) {
         existing.quantity += item.quantity;
         if (existing.quantity > 10) {
           return NextResponse.json(
-            { error: "Maximum purchase limit exceeded (10 items per product size)." },
-            { status: 400 }
+            {
+              error:
+                "Maximum purchase limit exceeded (10 items per product size).",
+            },
+            { status: 400 },
           );
         }
       } else {
         mergedCart.set(key, {
           internalProductId: item.internalProductId,
           quantity: item.quantity,
-          size: (item.size || "").trim()
+          size: (item.size || "").trim(),
         });
       }
     }
@@ -121,7 +132,7 @@ export async function POST(req: NextRequest) {
     const itemIds = cartItems.map((item) => item.internalProductId);
     const result = await pool.query(
       "SELECT id, price, name FROM products WHERE id = ANY($1)",
-      [itemIds]
+      [itemIds],
     );
     const dbProducts = result.rows;
 
@@ -165,11 +176,13 @@ export async function POST(req: NextRequest) {
           // Lock the specific product_size row to prevent concurrent stock changes
           const sizeRes = await client.query(
             "SELECT id, stock FROM product_sizes WHERE product_id = $1 AND size = $2 FOR UPDATE",
-            [item.internalProductId, item.size || ""]
+            [item.internalProductId, item.size || ""],
           );
           const sizeInfo = sizeRes.rows[0];
           if (!sizeInfo) {
-            errors.push(`Size "${item.size}" not found for product "${dbProd.name}".`);
+            errors.push(
+              `Size "${item.size}" not found for product "${dbProd.name}".`,
+            );
             continue;
           }
 
@@ -178,7 +191,7 @@ export async function POST(req: NextRequest) {
             `SELECT COALESCE(SUM(quantity), 0) AS reserved
               FROM product_reservations
               WHERE product_id = $1 AND size = $2 AND expires_at > NOW()`,
-            [item.internalProductId, item.size || ""]
+            [item.internalProductId, item.size || ""],
           );
           const reservedCount = parseInt(activeResQuery.rows[0].reserved, 10);
           const availableStock = sizeInfo.stock - reservedCount;
@@ -186,11 +199,11 @@ export async function POST(req: NextRequest) {
           if (availableStock < item.quantity) {
             if (availableStock > 0) {
               errors.push(
-                `Insufficient stock for "${dbProd.name}" (Size: ${item.size}). Please reduce your quantity and try again.`
+                `Insufficient stock for "${dbProd.name}" (Size: ${item.size}). Please reduce your quantity and try again.`,
               );
             } else {
               errors.push(
-                `Insufficient stock for "${dbProd.name}" (Size: ${item.size}).`
+                `Insufficient stock for "${dbProd.name}" (Size: ${item.size}).`,
               );
             }
             continue;
@@ -200,11 +213,18 @@ export async function POST(req: NextRequest) {
           await client.query(
             `INSERT INTO product_reservations (reservation_id, product_id, size, quantity, expires_at)
               VALUES ($1, $2, $3, $4, NOW() + INTERVAL '35 minutes')`,
-            [reservationId, item.internalProductId, item.size || "", item.quantity]
+            [
+              reservationId,
+              item.internalProductId,
+              item.size || "",
+              item.quantity,
+            ],
           );
 
           subtotal += dbProd.price * item.quantity;
-          itemsDescriptionParts.push(`${item.quantity}x ${dbProd.name} (${item.size})`);
+          itemsDescriptionParts.push(
+            `${item.quantity}x ${dbProd.name} (${item.size})`,
+          );
         }
 
         if (errors.length > 0) {
@@ -215,7 +235,7 @@ export async function POST(req: NextRequest) {
       rethrowIfDynamicServerError(err);
       return NextResponse.json(
         { error: err.message || "Inventory verification failed." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -228,16 +248,17 @@ export async function POST(req: NextRequest) {
     const addressError = validateShippingAddress(address);
     if (addressError) {
       // Roll back reservations if address validation fails
-      await pool.query(
-        "DELETE FROM product_reservations WHERE reservation_id = $1",
-        [reservationId]
-      ).catch((delErr) => {
-        console.error("Failed to clean up reservation after validation failure:", delErr);
-      });
-      return NextResponse.json(
-        { error: addressError },
-        { status: 400 }
-      );
+      await pool
+        .query("DELETE FROM product_reservations WHERE reservation_id = $1", [
+          reservationId,
+        ])
+        .catch((delErr) => {
+          console.error(
+            "Failed to clean up reservation after validation failure:",
+            delErr,
+          );
+        });
+      return NextResponse.json({ error: addressError }, { status: 400 });
     }
 
     const sanitizedAddress = sanitizeShippingAddress(address);
@@ -259,17 +280,26 @@ export async function POST(req: NextRequest) {
       });
     } catch (err: any) {
       rethrowIfDynamicServerError(err);
-      console.error("[POST /api/checkout/session] Lemon Squeezy call failed:", err);
+      console.error(
+        "[POST /api/checkout/session] Lemon Squeezy call failed:",
+        err,
+      );
       // Roll back all reservations on LS API failure
-      await pool.query(
-        "DELETE FROM product_reservations WHERE reservation_id = $1",
-        [reservationId]
-      ).catch((delErr) => {
-        console.error("Failed to clean up reservation after checkout failure:", delErr);
-      });
+      await pool
+        .query("DELETE FROM product_reservations WHERE reservation_id = $1", [
+          reservationId,
+        ])
+        .catch((delErr) => {
+          console.error(
+            "Failed to clean up reservation after checkout failure:",
+            delErr,
+          );
+        });
       return NextResponse.json(
-        { error: "Failed to initialize secure checkout with payment provider." },
-        { status: 500 }
+        {
+          error: "Failed to initialize secure checkout with payment provider.",
+        },
+        { status: 500 },
       );
     }
 
@@ -282,7 +312,7 @@ export async function POST(req: NextRequest) {
     console.error("[POST /api/checkout/session] Error creating session:", err);
     return NextResponse.json(
       { error: err.message || "Failed to create checkout session." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

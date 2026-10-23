@@ -43,7 +43,8 @@ export function SignaturePieces({ products }: SignaturePiecesProps) {
           </h2>
         </div>
         <p className="text-text-secondary font-light text-sm md:text-base max-w-sm mt-4 md:mt-0 leading-relaxed text-center md:text-left">
-          Core wardrobe foundations designed in quiet solitude and crafted to endure.
+          Core wardrobe foundations designed in quiet solitude and crafted to
+          endure.
         </p>
       </motion.div>
 
@@ -55,10 +56,7 @@ export function SignaturePieces({ products }: SignaturePiecesProps) {
         className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8"
       >
         {products.map((product, i) => (
-          <motion.div
-            key={product.id}
-            variants={cardEnter(i)}
-          >
+          <motion.div key={product.id} variants={cardEnter(i)}>
             <FeatureCard
               image={product.image}
               alt={product.altText}

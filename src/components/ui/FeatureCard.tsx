@@ -42,7 +42,7 @@ export function FeatureCard({
     <div
       className={cn(
         "relative overflow-hidden rounded-[20px] bg-white cursor-pointer group transition-all duration-300 border border-transparent hover:border-accent-primary aspect-[3/4]",
-        className
+        className,
       )}
       style={{
         boxShadow: "0 2px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
@@ -59,7 +59,7 @@ export function FeatureCard({
             sizes="(max-width: 768px) 100vw, 33vw"
             className={cn(
               "object-cover transition-transform duration-[800ms] ease-out group-hover:scale-105",
-              imagePosition === "top" ? "object-top" : "object-center"
+              imagePosition === "top" ? "object-top" : "object-center",
             )}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10 transition-opacity duration-300 group-hover:from-black/90" />

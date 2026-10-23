@@ -101,9 +101,7 @@ describe("POST /api/checkout/session", () => {
     // Set the env var before importing the route
     process.env.NEXT_PUBLIC_LS_ORDER_VARIANT_ID = "test-variant-123";
 
-    const mod = await import(
-      "@/app/api/checkout/session/route"
-    );
+    const mod = await import("@/app/api/checkout/session/route");
     POST = mod.POST as unknown as (req: Request) => Promise<Response>;
   });
 
@@ -121,7 +119,7 @@ describe("POST /api/checkout/session", () => {
       makeRequest({
         cartItems: [validCartItem],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     expect(res.status).toBe(500);
@@ -132,9 +130,7 @@ describe("POST /api/checkout/session", () => {
   // ── Missing required fields ──────────────────────────────────────────────
 
   it("returns 400 when cartItems is missing", async () => {
-    const res = await POST(
-      makeRequest({ shippingAddress: validAddress })
-    );
+    const res = await POST(makeRequest({ shippingAddress: validAddress }));
 
     expect(res.status).toBe(400);
     const json = await res.json();
@@ -142,9 +138,7 @@ describe("POST /api/checkout/session", () => {
   });
 
   it("returns 400 when shippingAddress is missing", async () => {
-    const res = await POST(
-      makeRequest({ cartItems: [validCartItem] })
-    );
+    const res = await POST(makeRequest({ cartItems: [validCartItem] }));
 
     expect(res.status).toBe(400);
     const json = await res.json();
@@ -158,7 +152,7 @@ describe("POST /api/checkout/session", () => {
       makeRequest({
         cartItems: [{ ...validCartItem, quantity: 1.5 }],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     expect(res.status).toBe(400);
@@ -171,7 +165,7 @@ describe("POST /api/checkout/session", () => {
       makeRequest({
         cartItems: [{ ...validCartItem, quantity: 0 }],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     expect(res.status).toBe(400);
@@ -182,7 +176,7 @@ describe("POST /api/checkout/session", () => {
       makeRequest({
         cartItems: [{ ...validCartItem, quantity: -3 }],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     expect(res.status).toBe(400);
@@ -193,7 +187,7 @@ describe("POST /api/checkout/session", () => {
       makeRequest({
         cartItems: [{ ...validCartItem, quantity: 11 }],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     expect(res.status).toBe(400);
@@ -211,7 +205,7 @@ describe("POST /api/checkout/session", () => {
           { internalProductId: "prod-1", quantity: 5, size: "M" },
         ],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     expect(res.status).toBe(400);
@@ -245,7 +239,7 @@ describe("POST /api/checkout/session", () => {
         variantId: "attacker-variant-999",
         cartItems: [validCartItem],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     expect(res.status).toBe(200);
@@ -253,7 +247,7 @@ describe("POST /api/checkout/session", () => {
     expect(mockCreateCheckout).toHaveBeenCalledWith(
       expect.objectContaining({
         variantId: "test-variant-123",
-      })
+      }),
     );
   });
 
@@ -264,7 +258,7 @@ describe("POST /api/checkout/session", () => {
       makeRequest({
         cartItems: [{ quantity: 2, size: "M" }],
         shippingAddress: validAddress,
-      })
+      }),
     );
 
     expect(res.status).toBe(400);

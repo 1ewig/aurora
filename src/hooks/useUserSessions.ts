@@ -53,7 +53,9 @@ export function useUserSessions(userId: string | null) {
     }
 
     load();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [userId]);
 
   return { sessions, loading };

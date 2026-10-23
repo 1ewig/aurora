@@ -5,14 +5,14 @@
  * Admin-only.
  */
 
-import { NextResponse } from 'next/server';
-import { pool } from '@/utils/db';
-import { requireAdmin } from '@/utils/admin';
-import { rethrowIfDynamicServerError } from '@/utils/errors';
+import { NextResponse } from "next/server";
+import { pool } from "@/utils/db";
+import { requireAdmin } from "@/utils/admin";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
 
 const SORT_MAP: Record<string, string> = {
-  name: 'u.name',
-  email: 'u.email',
+  name: "u.name",
+  email: "u.email",
   emailVerified: 'u."emailVerified"',
   createdAt: 'u."createdAt"',
   sessionCount: '"sessionCount"',
@@ -24,33 +24,41 @@ export async function GET(request: Request) {
     if (error) return error;
 
     const { searchParams } = new URL(request.url);
-    const page = Math.max(1, Number(searchParams.get('page')) || 1);
-    const limit = Math.min(100, Math.max(1, Number(searchParams.get('limit')) || 20));
+    const page = Math.max(1, Number(searchParams.get("page")) || 1);
+    const limit = Math.min(
+      100,
+      Math.max(1, Number(searchParams.get("limit")) || 20),
+    );
     const offset = (page - 1) * limit;
-    const search = searchParams.get('search') || '';
-    const verified = searchParams.get('verified') || '';
-    const sortBy = SORT_MAP[searchParams.get('sortBy') || 'createdAt'] || 'u."createdAt"';
-    const sortDir = searchParams.get('sortDir') === 'asc' ? 'ASC' : 'DESC';
+    const search = searchParams.get("search") || "";
+    const verified = searchParams.get("verified") || "";
+    const sortBy =
+      SORT_MAP[searchParams.get("sortBy") || "createdAt"] || 'u."createdAt"';
+    const sortDir = searchParams.get("sortDir") === "asc" ? "ASC" : "DESC";
 
     const conditions: string[] = [];
     const params: any[] = [];
     let paramIndex = 1;
 
     if (search) {
-      conditions.push(`(u.name ILIKE $${paramIndex} OR u.email ILIKE $${paramIndex})`);
+      conditions.push(
+        `(u.name ILIKE $${paramIndex} OR u.email ILIKE $${paramIndex})`,
+      );
       params.push(`%${search}%`);
       paramIndex++;
     }
 
-    if (verified === 'verified') {
+    if (verified === "verified") {
       conditions.push(`u."emailVerified" = TRUE`);
-    } else if (verified === 'unverified') {
+    } else if (verified === "unverified") {
       conditions.push(`u."emailVerified" = FALSE`);
     }
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
-    const result = await pool.query(`
+    const result = await pool.query(
+      `
       SELECT
         u.id,
         u.name,
@@ -77,7 +85,9 @@ export async function GET(request: Request) {
       GROUP BY u.id
       ORDER BY ${sortBy} ${sortDir}
       LIMIT $${paramIndex++} OFFSET $${paramIndex++}
-    `, [...params, limit, offset]);
+    `,
+      [...params, limit, offset],
+    );
 
     const total = result.rows.length > 0 ? Number(result.rows[0].total) : 0;
 
@@ -90,7 +100,10 @@ export async function GET(request: Request) {
     });
   } catch (err: unknown) {
     rethrowIfDynamicServerError(err);
-    console.error('Failed to list users:', err);
-    return NextResponse.json({ error: 'Failed to list users' }, { status: 500 });
+    console.error("Failed to list users:", err);
+    return NextResponse.json(
+      { error: "Failed to list users" },
+      { status: 500 },
+    );
   }
 }

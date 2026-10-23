@@ -15,12 +15,16 @@
  * object) rather than throwing a 500.
  */
 
+import { Suspense } from "react";
 import { pool } from "@/utils/db";
 import { ProductDetailClient } from "@/components/product/detail/ProductDetailClient";
+import ProductDetailsLoading from "./loading";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
+
+export const instant = false;
 
 /**
  * Dynamic SEO metadata. Queries the product name/description/image so
@@ -32,15 +36,16 @@ export async function generateMetadata({ params }: PageProps) {
   try {
     const result = await pool.query(
       "SELECT name, description, image, category FROM products WHERE LOWER(slug) = LOWER($1)",
-      [slug]
+      [slug],
     );
     const product = result.rows[0];
     if (!product) {
       return {};
     }
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://aurora-nu-three.vercel.app";
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL || "https://aurora-nu-three.vercel.app";
     const title = `${product.name} | Aurora`;
-    
+
     return {
       title,
       description: product.description,
@@ -88,23 +93,24 @@ export default async function ProductPage({ params }: PageProps) {
   try {
     const result = await pool.query(
       "SELECT name, description, price, image FROM products WHERE LOWER(slug) = LOWER($1)",
-      [slug]
+      [slug],
     );
     const product = result.rows[0];
     if (product) {
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://aurora-nu-three.vercel.app";
+      const baseUrl =
+        process.env.NEXT_PUBLIC_APP_URL || "https://aurora-nu-three.vercel.app";
       jsonLd = {
         "@context": "https://schema.org",
         "@type": "Product",
-        "name": product.name,
-        "image": product.image,
-        "description": product.description,
-        "offers": {
+        name: product.name,
+        image: product.image,
+        description: product.description,
+        offers: {
           "@type": "Offer",
-          "price": product.price,
-          "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock",
-          "url": `${baseUrl}/products/${slug}`,
+          price: product.price,
+          priceCurrency: "USD",
+          availability: "https://schema.org/InStock",
+          url: `${baseUrl}/products/${slug}`,
         },
       };
     }
@@ -121,7 +127,9 @@ export default async function ProductPage({ params }: PageProps) {
    * escape \u003c prevents this without breaking JSON.parse on
    * the consumer side (Google, Discord, etc. handle it correctly).
    */
-  const jsonLdString = jsonLd ? JSON.stringify(jsonLd).replace(/</g, "\\u003c") : null;
+  const jsonLdString = jsonLd
+    ? JSON.stringify(jsonLd).replace(/</g, "\\u003c")
+    : null;
 
   return (
     <>
@@ -131,7 +139,9 @@ export default async function ProductPage({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: jsonLdString }}
         />
       )}
-      <ProductDetailClient slug={slug} />
+      <Suspense fallback={<ProductDetailsLoading />}>
+        <ProductDetailClient slug={slug} />
+      </Suspense>
     </>
   );
 }

@@ -33,7 +33,8 @@ export function StoryHero() {
           variants={fadeInUp}
           className="text-text-secondary font-display italic text-lg md:text-2xl max-w-2xl mx-auto"
         >
-          &ldquo;Clothing should carry intention. Not just in its making, but in the quiet way it asks you to move through the world.&rdquo;
+          &ldquo;Clothing should carry intention. Not just in its making, but in
+          the quiet way it asks you to move through the world.&rdquo;
         </motion.p>
       </motion.div>
     </section>

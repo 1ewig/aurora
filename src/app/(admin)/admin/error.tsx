@@ -28,8 +28,19 @@ export default function AdminError({
       <div className="max-w-md w-full bg-white border border-border-subtle rounded-3xl p-8 sm:p-12 shadow-sm space-y-6">
         {/* Warning Icon */}
         <div className="w-12 h-12 rounded-2xl bg-error/10 text-error flex items-center justify-center mx-auto">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.75} stroke="currentColor" className="w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.75}
+            stroke="currentColor"
+            className="w-6 h-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+            />
           </svg>
         </div>
 
@@ -39,7 +50,8 @@ export default function AdminError({
             Admin Operation Failed
           </h2>
           <p className="text-text-secondary text-sm leading-relaxed">
-            An unexpected error occurred while loading this admin workspace component.
+            An unexpected error occurred while loading this admin workspace
+            component.
           </p>
         </div>
 

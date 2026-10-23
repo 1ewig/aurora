@@ -5,10 +5,10 @@
  * Admin-only. Includes full order details with shipping info.
  */
 
-import { NextResponse } from 'next/server';
-import { pool } from '@/utils/db';
-import { requireAdmin } from '@/utils/admin';
-import { rethrowIfDynamicServerError } from '@/utils/errors';
+import { NextResponse } from "next/server";
+import { pool } from "@/utils/db";
+import { requireAdmin } from "@/utils/admin";
+import { rethrowIfDynamicServerError } from "@/utils/errors";
 
 export async function GET(request: Request) {
   try {
@@ -16,11 +16,14 @@ export async function GET(request: Request) {
     if (error) return error;
 
     const { searchParams } = new URL(request.url);
-    const page = Math.max(1, Number(searchParams.get('page')) || 1);
-    const limit = Math.min(100, Math.max(1, Number(searchParams.get('limit')) || 20));
+    const page = Math.max(1, Number(searchParams.get("page")) || 1);
+    const limit = Math.min(
+      100,
+      Math.max(1, Number(searchParams.get("limit")) || 20),
+    );
     const offset = (page - 1) * limit;
-    const search = searchParams.get('search') || '';
-    const status = searchParams.get('status') || '';
+    const search = searchParams.get("search") || "";
+    const status = searchParams.get("status") || "";
 
     const conditions: string[] = [];
     const params: any[] = [];
@@ -37,14 +40,16 @@ export async function GET(request: Request) {
       paramIndex++;
     }
 
-    if (status && status !== 'all') {
+    if (status && status !== "all") {
       conditions.push(`status = $${paramIndex++}`);
       params.push(status);
     }
 
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const whereClause =
+      conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
 
-    const result = await pool.query(`
+    const result = await pool.query(
+      `
       SELECT
         id,
         user_id as "userId",
@@ -63,10 +68,13 @@ export async function GET(request: Request) {
       ${whereClause}
       ORDER BY created_at DESC
       LIMIT $${paramIndex++} OFFSET $${paramIndex++}
-    `, [...params, limit, offset]);
+    `,
+      [...params, limit, offset],
+    );
 
-    const total = result.rows.length > 0 ? Number(result.rows[0].totalCount) : 0;
-    const orders = result.rows.map(row => ({
+    const total =
+      result.rows.length > 0 ? Number(result.rows[0].totalCount) : 0;
+    const orders = result.rows.map((row) => ({
       ...row,
       subtotal: Number(row.subtotal),
       shipping: Number(row.shipping),
@@ -76,20 +84,20 @@ export async function GET(request: Request) {
 
     const missingImgIds = [
       ...new Set(
-        orders.flatMap(o =>
+        orders.flatMap((o) =>
           (o.items as any[])
-            .filter(item => !item.image)
-            .map(item => item.id)
-        )
+            .filter((item) => !item.image)
+            .map((item) => item.id),
+        ),
       ),
     ];
     if (missingImgIds.length > 0) {
       const imgResult = await pool.query(
         `SELECT id, image FROM products WHERE id = ANY($1)`,
-        [missingImgIds]
+        [missingImgIds],
       );
       const imageMap = Object.fromEntries(
-        imgResult.rows.map(r => [r.id, r.image])
+        imgResult.rows.map((r) => [r.id, r.image]),
       );
       for (const order of orders) {
         for (const item of order.items as any[]) {
@@ -109,7 +117,10 @@ export async function GET(request: Request) {
     });
   } catch (err: unknown) {
     rethrowIfDynamicServerError(err);
-    console.error('Failed to list orders:', err);
-    return NextResponse.json({ error: 'Failed to list orders' }, { status: 500 });
+    console.error("Failed to list orders:", err);
+    return NextResponse.json(
+      { error: "Failed to list orders" },
+      { status: 500 },
+    );
   }
 }

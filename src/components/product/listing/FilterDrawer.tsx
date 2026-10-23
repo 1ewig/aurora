@@ -88,8 +88,18 @@ export function FilterDrawer({
                 className="p-2 -mr-2 text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
                 aria-label="Close filters"
               >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -113,7 +123,7 @@ export function FilterDrawer({
                           "px-4 py-3 rounded-xl border text-xs font-semibold uppercase tracking-wider text-left transition-all duration-300 cursor-pointer select-none outline-none",
                           isSelected
                             ? "bg-bg-ink border-bg-ink text-text-inverted"
-                            : "bg-bg-primary/50 border-border-medium/60 text-text-secondary hover:border-text-primary hover:text-text-primary"
+                            : "bg-bg-primary/50 border-border-medium/60 text-text-secondary hover:border-text-primary hover:text-text-primary",
                         )}
                       >
                         {category}
@@ -140,7 +150,7 @@ export function FilterDrawer({
                           "w-full flex items-center justify-between px-5 py-3.5 rounded-xl border text-xs font-semibold uppercase tracking-wider transition-all duration-300 cursor-pointer select-none outline-none",
                           isSelected
                             ? "bg-bg-ink border-bg-ink text-text-inverted"
-                            : "bg-bg-primary/50 border-border-medium/60 text-text-secondary hover:border-text-primary hover:text-text-primary"
+                            : "bg-bg-primary/50 border-border-medium/60 text-text-secondary hover:border-text-primary hover:text-text-primary",
                         )}
                       >
                         <span>{option.label}</span>

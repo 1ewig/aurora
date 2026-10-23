@@ -18,7 +18,7 @@ describe("cn", () => {
   it("handles conditional classes with ternary", () => {
     const isBold: boolean = true;
     expect(cn("text-sm", isBold ? "font-bold" : "font-normal")).toBe(
-      "text-sm font-bold"
+      "text-sm font-bold",
     );
   });
 
